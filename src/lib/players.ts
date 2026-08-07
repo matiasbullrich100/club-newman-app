@@ -25,3 +25,17 @@ export function norm(s: string): string {
 export function playerId(name: string): string {
   return norm(name).replace(",", " ").split(" ").filter(Boolean).sort().join(" ");
 }
+
+// Heuristica ya validada por el club (portada del HTML de referencia de la sesion anterior):
+// si el nombre tiene coma, separa por coma; si no, la ultima palabra es el nombre de pila y
+// el resto el apellido (soporta apellidos compuestos como "De la Vega Joaquin").
+export function splitNombre(nombreCompleto: string): { apellido: string; nombre: string } {
+  const raw = nombreCompleto.trim();
+  if (raw.includes(",")) {
+    const [apellido, nombre] = raw.split(",").map((s) => s.trim());
+    return { apellido: apellido ?? "", nombre: nombre ?? "" };
+  }
+  const partes = raw.split(/\s+/);
+  if (partes.length <= 1) return { apellido: raw, nombre: "" };
+  return { apellido: partes.slice(0, -1).join(" "), nombre: partes[partes.length - 1] };
+}

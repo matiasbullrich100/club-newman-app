@@ -45,6 +45,10 @@ export interface Partido {
   estado: EstadoPartido;
   resultado: Resultado;
   enCanchaIds: string[];
+  // Se muestra en vez del resultado/"vs", sea cual sea el estado — ej. "Fecha libre" o
+  // "Suspendido por tormenta eléctrica". No confundir con estado "suspendido", que es
+  // exclusivamente para un partido EN CURSO pausado por el Designado (ver match/actions.ts).
+  notaEspecial?: string;
   createdAt?: Timestamp | Date;
   updatedAt?: Timestamp | Date;
 }
@@ -67,6 +71,8 @@ export interface JugadorPartido {
   dorsal: string;
   titular: boolean;
   enCancha: boolean;
+  capitan?: boolean;
+  debut?: boolean;
   minutosJugados1T?: number;
   minutosJugados2T?: number;
 }
