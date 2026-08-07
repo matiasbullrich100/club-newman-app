@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx src/scripts/seed.ts"
+    "seed": "tsx src/scripts/seed.ts",
+    "reset-demo": "tsx src/scripts/reset-demo.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",
