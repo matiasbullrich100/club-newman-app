@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// All writes happen server-side via the Firebase Admin SDK (Next.js Server Actions),
+// which is NOT subject to these rules. These rules only govern the browser's Client SDK.
+// See src/lib/firebase-admin.ts / src/lib/firebase-client.ts.
+//
+// IMPORTANT: Firestore rules are a logical OR across every `match` block that matches a
+// given path — there is no "most specific wins". A broad `match /{document=**}` would grant
+// read access to `cuentas` too, even with an explicit deny in its own block. So every
+// top-level collection gets its own non-overlapping `match` block instead of a catch-all.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Holds password hashes. Never readable or writable from the client, ever.
+    match /cuentas/{cuentaId} {
+      allow read, write: if false;
+    }
+
+    match /categorias/{categoriaId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /jugadores/{jugadorId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /partidos/{partidoId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /{subcollection=**} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+  }
+}

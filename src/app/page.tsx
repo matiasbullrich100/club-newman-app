@@ -1,69 +1,49 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { adminDb } from "@/lib/firebase-admin";
+import type { Partido } from "@/types/firestore";
+import { getSession } from "@/lib/auth/session";
+import { logout } from "@/lib/auth/actions";
 
-export default function Home() {
+export default async function Home() {
+  const [snap, session] = await Promise.all([
+    adminDb.collection("partidos").get(),
+    getSession(),
+  ]);
+  const partidos = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Partido) }));
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main style={{ padding: "1.5rem 1rem", fontFamily: "sans-serif" }}>
+      <h1 style={{ fontSize: "1.25rem" }}>Club Newman — En vivo</h1>
+      <p style={{ color: "#666", fontSize: "0.9rem" }}>
+        Etapa 1: motor en vivo (datos de prueba). El diseño definitivo se aplica más adelante.
+      </p>
+
+      {session ? (
+        <p style={{ fontSize: "0.9rem" }}>
+          Sesión: <strong>{session.username}</strong> ({session.rol}){" "}
+          <form action={logout} style={{ display: "inline" }}>
+            <button type="submit">Cerrar sesión</button>
+          </form>
+        </p>
+      ) : null}
+
+      {partidos.length === 0 ? (
+        <p>No hay partidos cargados todavía. Corré el script de seed.</p>
+      ) : (
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {partidos.map((p) => (
+            <li key={p.id} style={{ marginBottom: "0.5rem" }}>
+              <Link href={`/partido/${p.id}`}>
+                {p.esLocal ? `Newman vs ${p.rival}` : `${p.rival} vs Newman`} — {p.estado}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p style={{ marginTop: "2rem" }}>
+        <Link href="/login">Iniciar sesión (Designado / Entrenador / Manager)</Link>
+      </p>
+    </main>
   );
 }
