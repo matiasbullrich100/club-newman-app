@@ -10,6 +10,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
 import PanelDesignado from "@/components/panel-designado/PanelDesignado";
+import ResetDemoButton from "@/components/ResetDemoButton";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -25,6 +26,7 @@ export default async function PartidoPage({
   if (!partidoSnap.exists) notFound();
   const partido = partidoSnap.data() as Partido;
   const categoriaNombre = CATEGORIAS.find((c) => c.id === partido.categoriaId)?.nombre ?? partido.categoriaId;
+  const mostrarReset = partidoId === "demo-partido-1" && session?.rol === "manager";
 
   const cabecera = (
     <>
@@ -60,6 +62,7 @@ export default async function PartidoPage({
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
         <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} />
+        {mostrarReset && <ResetDemoButton />}
         <FooterChip />
       </main>
     );
@@ -106,6 +109,7 @@ export default async function PartidoPage({
             periodo={null}
           />
         )}
+        {mostrarReset && <ResetDemoButton />}
         <FooterChip />
       </main>
     );
@@ -132,6 +136,7 @@ export default async function PartidoPage({
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       {cabecera}
       <PartidoLive partidoId={partidoId} inicial={partidoParaCliente} session={session} plantel={plantel} />
+      {mostrarReset && <ResetDemoButton />}
       <FooterChip />
     </main>
   );

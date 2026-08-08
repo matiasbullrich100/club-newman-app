@@ -362,3 +362,56 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
 
   revalidatePath(`/partido/${partidoId}`);
 }
+
+// ---- Solo para el partido de prueba (Fase 1) --------------------------------------------
+
+const PARTIDO_DEMO_ID = "demo-partido-1";
+
+/**
+ * Vuelve el partido de prueba a "programado" (0-0, sin incidencias) para poder simularlo
+ * de nuevo. Hardcodeado a demo-partido-1 a proposito -- nunca debe poder tocar un partido
+ * real (mismo efecto que scripts/reset-demo.ts, pero disparable desde la UI por el Manager).
+ */
+export async function resetearPartidoDemo(): Promise<void> {
+  const session = await getSession();
+  if (!session || session.rol !== "manager") throw new Error("No autorizado");
+
+  const partidoRef = adminDb.collection("partidos").doc(PARTIDO_DEMO_ID);
+  const partidoSnap = await partidoRef.get();
+  if (!partidoSnap.exists) throw new Error("El partido de prueba no existe");
+
+  const [plantelSnap, incidentesSnap] = await Promise.all([
+    partidoRef.collection("plantel").get(),
+    partidoRef.collection("incidentes").get(),
+  ]);
+
+  const batch = adminDb.batch();
+
+  const titularesIds = plantelSnap.docs.filter((d) => d.data().titular).map((d) => d.id);
+  batch.update(partidoRef, {
+    estado: "programado",
+    resultado: { newman: 0, rival: 0 },
+    enCanchaIds: titularesIds,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  batch.set(partidoRef.collection("liveState").doc("state"), {
+    periodo: null,
+    clockRunning: false,
+    clockAnchor: null,
+    accumulatedSeconds: 0,
+  });
+
+  for (const doc of plantelSnap.docs) {
+    const titular = doc.data().titular as boolean;
+    batch.update(doc.ref, { enCancha: titular, minutosJugados1T: 0, minutosJugados2T: 0 });
+  }
+
+  for (const doc of incidentesSnap.docs) {
+    batch.delete(doc.ref);
+  }
+
+  await batch.commit();
+  revalidatePath(`/partido/${PARTIDO_DEMO_ID}`);
+  revalidatePath("/");
+}
