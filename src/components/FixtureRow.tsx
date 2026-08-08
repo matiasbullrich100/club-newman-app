@@ -76,6 +76,8 @@ export default function FixtureRow({
         borderRadius: 8,
         padding: "8px 10px",
         minHeight: 54,
+        minWidth: 0,
+        width: "100%",
       }}
     >
       <div

@@ -65,7 +65,7 @@ async function main() {
   const partido: Partido = {
     categoriaId: CATEGORIA_ID,
     numeroFecha: "demo",
-    rival: "Equipo Prueba",
+    rival: "Beromama",
     esLocal: true,
     cancha: "Cancha 1",
     estado: "programado",
