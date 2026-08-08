@@ -29,6 +29,20 @@ const btnStyle: React.CSSProperties = {
   letterSpacing: 1,
 };
 
+// Estas dos cierran una etapa del partido que no se puede deshacer (el reloj de ese tiempo
+// no vuelve a correr) -- piden confirmacion, igual que publicar una incidencia.
+type AccionConfirmable = "cortar1T" | "terminarPartido";
+
+const ACCIONES_CONFIRMABLES: Record<AccionConfirmable, (id: string) => Promise<void>> = {
+  cortar1T,
+  terminarPartido,
+};
+
+const PREGUNTAS_CONFIRMACION: Record<AccionConfirmable, string> = {
+  cortar1T: "¿Cortar el 1er tiempo?",
+  terminarPartido: "¿Terminar el partido?",
+};
+
 export default function PanelDesignado({
   partidoId,
   partido,
@@ -41,6 +55,7 @@ export default function PanelDesignado({
   periodo: LiveState["periodo"];
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -59,6 +74,17 @@ export default function PanelDesignado({
     });
   }
 
+  function pedirConfirmacion(accion: AccionConfirmable) {
+    setError(null);
+    setPendiente(accion);
+  }
+
+  function confirmarPendiente() {
+    if (!pendiente) return;
+    ejecutar(ACCIONES_CONFIRMABLES[pendiente]);
+    setPendiente(null);
+  }
+
   return (
     <div
       style={{
@@ -73,41 +99,56 @@ export default function PanelDesignado({
         Panel del Designado
       </h2>
 
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem" }}>
-        {partido.estado === "programado" && (
-          <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciarPartido)}>
-            Iniciar partido
+      {pendiente ? (
+        <div style={{ marginBottom: "1rem" }}>
+          <p style={{ color: DORADO_SUAVE }}>
+            Confirmar: <strong>{PREGUNTAS_CONFIRMACION[pendiente]}</strong>
+          </p>
+          {error && <p style={{ color: "#f3caca" }}>{error}</p>}
+          <button style={btnStyle} disabled={isPending} onClick={confirmarPendiente}>
+            {isPending ? "Confirmando…" : "Confirmar"}
+          </button>{" "}
+          <button disabled={isPending} onClick={() => setPendiente(null)}>
+            Cancelar
           </button>
-        )}
-        {partido.estado === "en_juego" && (
-          <>
-            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(suspender)}>
-              Suspender
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+          {partido.estado === "programado" && (
+            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciarPartido)}>
+              Iniciar partido
             </button>
-            {periodo === "1T" && (
-              <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(cortar1T)}>
-                Cortar 1er tiempo
+          )}
+          {partido.estado === "en_juego" && (
+            <>
+              <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(suspender)}>
+                Suspender
               </button>
-            )}
-            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(terminarPartido)}>
-              Terminar partido
+              {periodo === "1T" && (
+                <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("cortar1T")}>
+                  Cortar 1er tiempo
+                </button>
+              )}
+              <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("terminarPartido")}>
+                Terminar partido
+              </button>
+            </>
+          )}
+          {partido.estado === "entretiempo" && (
+            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciar2T)}>
+              Iniciar 2do tiempo
             </button>
-          </>
-        )}
-        {partido.estado === "entretiempo" && (
-          <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciar2T)}>
-            Iniciar 2do tiempo
-          </button>
-        )}
-        {partido.estado === "suspendido" && (
-          <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(reanudar)}>
-            Reanudar
-          </button>
-        )}
-        {partido.estado === "terminado" && <p style={{ color: DORADO_SUAVE, fontSize: "0.85rem" }}>Partido terminado.</p>}
-      </div>
+          )}
+          {partido.estado === "suspendido" && (
+            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(reanudar)}>
+              Reanudar
+            </button>
+          )}
+          {partido.estado === "terminado" && <p style={{ color: DORADO_SUAVE, fontSize: "0.85rem" }}>Partido terminado.</p>}
+        </div>
+      )}
 
-      {error && <p style={{ color: "#f3caca" }}>{error}</p>}
+      {!pendiente && error && <p style={{ color: "#f3caca" }}>{error}</p>}
 
       {partido.estado === "en_juego" && (
         <div style={{ display: "grid", gap: "1rem" }}>
