@@ -21,6 +21,7 @@ const inputStyle: React.CSSProperties = {
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(formData: FormData) {
@@ -59,8 +60,25 @@ export default function LoginPage() {
             <input name="username" type="text" required style={inputStyle} />
           </label>
           <label style={{ fontSize: "0.75rem", opacity: 0.8, color: DORADO_SUAVE }}>
-            Contraseña
-            <input name="password" type="password" required style={inputStyle} />
+            <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              Contraseña
+              <button
+                type="button"
+                onClick={() => setMostrarPassword((v) => !v)}
+                style={{
+                  fontSize: "0.68rem",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                  color: DORADO,
+                  background: "transparent",
+                  border: "none",
+                  padding: 0,
+                }}
+              >
+                {mostrarPassword ? "Ocultar" : "Mostrar"}
+              </button>
+            </span>
+            <input name="password" type={mostrarPassword ? "text" : "password"} required style={inputStyle} />
           </label>
           {error && <p style={{ color: "#f3caca", fontSize: "0.85rem" }}>{error}</p>}
           <button
