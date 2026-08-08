@@ -28,6 +28,12 @@ export default async function Home() {
       <Header tituloHome />
       <SessionBar session={session} />
 
+      <p style={{ marginTop: 16, fontSize: "0.85rem", textAlign: "center" }}>
+        <Link href="/partido/demo-partido-1" style={{ color: DORADO_SUAVE }}>
+          Partido de prueba (Fase 1)
+        </Link>
+      </p>
+
       {partidosEnVivo.map((p) => (
         <LiveBanner
           key={p.id}
@@ -86,12 +92,6 @@ export default async function Home() {
           ) : null
         )}
       </div>
-
-      <p style={{ marginTop: "2rem", fontSize: "0.85rem", textAlign: "center" }}>
-        <Link href="/partido/demo-partido-1" style={{ color: DORADO_SUAVE }}>
-          Partido de prueba (Fase 1)
-        </Link>
-      </p>
     </main>
   );
 }

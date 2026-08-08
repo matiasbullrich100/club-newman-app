@@ -16,7 +16,8 @@ export default function IncidentesList({ incidentes }: { incidentes: (Incidente 
     return <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Sin incidencias todavía.</p>;
   }
 
-  const ordenadas = ordenarIncidentes(incidentes);
+  // Lo mas reciente arriba del todo.
+  const ordenadas = ordenarIncidentes(incidentes).reverse();
 
   return (
     <div>

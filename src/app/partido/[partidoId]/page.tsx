@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
+import { CATEGORIAS } from "@/lib/categorias";
 import type { Incidente, JugadorPartido, Partido } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
 import PartidoHistorico from "@/components/PartidoHistorico";
@@ -10,6 +11,7 @@ import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
 import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import type { RosterJugador } from "@/components/panel-designado/types";
+import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PartidoPage({
   params,
@@ -22,12 +24,16 @@ export default async function PartidoPage({
   const [partidoSnap, session] = await Promise.all([partidoRef.get(), getSession()]);
   if (!partidoSnap.exists) notFound();
   const partido = partidoSnap.data() as Partido;
+  const categoriaNombre = CATEGORIAS.find((c) => c.id === partido.categoriaId)?.nombre ?? partido.categoriaId;
 
   const cabecera = (
     <>
       <BackLink href={`/fecha/${partido.numeroFecha}`} />
       <Header rightLabel={`Fecha ${partido.numeroFecha}`} />
       <SessionBar session={session} />
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
+        {categoriaNombre}
+      </div>
     </>
   );
 
