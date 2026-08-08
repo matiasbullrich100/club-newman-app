@@ -5,6 +5,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import { elapsedSeconds, formatMMSS } from "@/lib/match/clock";
 import type { LiveState } from "@/types/firestore";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default function Cronometro({ partidoId }: { partidoId: string }) {
   const [liveState, setLiveState] = useState<LiveState | null>(null);
@@ -24,15 +25,16 @@ export default function Cronometro({ partidoId }: { partidoId: string }) {
   }, []);
 
   if (!liveState || !liveState.periodo) {
-    return <div style={{ fontSize: "1.1rem", color: "#666" }}>Partido no iniciado</div>;
+    return <div style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.75, color: DORADO_SUAVE }}>—</div>;
   }
 
   return (
-    <div style={{ fontVariantNumeric: "tabular-nums", fontSize: "1.75rem", fontWeight: 700 }}>
-      {liveState.periodo} · {formatMMSS(elapsedSeconds(liveState))}
-      {!liveState.clockRunning && (
-        <span style={{ fontSize: "1rem", fontWeight: 400, color: "#666" }}> (detenido)</span>
-      )}
+    <div style={{ fontVariantNumeric: "tabular-nums", fontSize: "1.15rem", letterSpacing: 1, color: DORADO }}>
+      {formatMMSS(elapsedSeconds(liveState))}
+      <div style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.75, color: DORADO_SUAVE }}>
+        {liveState.periodo}
+        {!liveState.clockRunning && " · detenido"}
+      </div>
     </div>
   );
 }

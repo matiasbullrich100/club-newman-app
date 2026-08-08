@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   cortar1T,
   iniciar2T,
@@ -13,6 +14,19 @@ import type { LiveState, Partido } from "@/types/firestore";
 import type { RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+
+const btnStyle: React.CSSProperties = {
+  fontSize: "0.78rem",
+  padding: "10px 16px",
+  borderRadius: 8,
+  border: "none",
+  background: DORADO,
+  color: "#451526",
+  fontWeight: 600,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+};
 
 export default function PanelDesignado({
   partidoId,
@@ -27,12 +41,17 @@ export default function PanelDesignado({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   function ejecutar(accion: (id: string) => Promise<void>) {
     setError(null);
     startTransition(async () => {
       try {
         await accion(partidoId);
+        // La pagina del partido bifurca server-side segun estado (programado -> vista estatica,
+        // en_juego -> motor en vivo) -- sin esto, arrancar/terminar un partido no cambiaria de
+        // vista hasta recargar a mano.
+        router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Ocurrió un error");
       }
@@ -40,44 +59,54 @@ export default function PanelDesignado({
   }
 
   return (
-    <div style={{ border: "1px solid #ccc", borderRadius: 8, padding: "1rem", marginTop: "1rem" }}>
-      <h2 style={{ fontSize: "1rem", marginTop: 0 }}>Panel del Designado</h2>
+    <div
+      style={{
+        background: "rgba(255,255,255,.045)",
+        border: "1px solid rgba(226,197,120,.2)",
+        borderRadius: 12,
+        padding: 16,
+        marginTop: 14,
+      }}
+    >
+      <h2 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 10 }}>
+        Panel del Designado
+      </h2>
 
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem" }}>
         {partido.estado === "programado" && (
-          <button disabled={isPending} onClick={() => ejecutar(iniciarPartido)}>
+          <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciarPartido)}>
             Iniciar partido
           </button>
         )}
         {partido.estado === "en_juego" && (
           <>
-            <button disabled={isPending} onClick={() => ejecutar(suspender)}>
+            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(suspender)}>
               Suspender
             </button>
             {periodo === "1T" && (
-              <button disabled={isPending} onClick={() => ejecutar(cortar1T)}>
+              <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(cortar1T)}>
                 Cortar 1er tiempo
               </button>
             )}
-            <button disabled={isPending} onClick={() => ejecutar(terminarPartido)}>
+            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(terminarPartido)}>
               Terminar partido
             </button>
           </>
         )}
         {partido.estado === "entretiempo" && (
-          <button disabled={isPending} onClick={() => ejecutar(iniciar2T)}>
+          <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciar2T)}>
             Iniciar 2do tiempo
           </button>
         )}
         {partido.estado === "suspendido" && (
-          <button disabled={isPending} onClick={() => ejecutar(reanudar)}>
+          <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(reanudar)}>
             Reanudar
           </button>
         )}
-        {partido.estado === "terminado" && <p>Partido terminado.</p>}
+        {partido.estado === "terminado" && <p style={{ color: DORADO_SUAVE, fontSize: "0.85rem" }}>Partido terminado.</p>}
       </div>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p style={{ color: "#f3caca" }}>{error}</p>}
 
       {partido.estado === "en_juego" && (
         <div style={{ display: "grid", gap: "1rem" }}>

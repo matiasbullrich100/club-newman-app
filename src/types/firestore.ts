@@ -39,6 +39,7 @@ export interface Resultado {
 export interface Partido {
   categoriaId: string;
   numeroFecha: number | string;
+  fecha?: string; // ISO "YYYY-MM-DD", fecha calendario del fixture — no siempre disponible (partido de prueba)
   rival: string;
   esLocal: boolean;
   cancha: string;

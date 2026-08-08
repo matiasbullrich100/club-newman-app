@@ -1,6 +1,5 @@
 import { splitNombre } from "@/lib/players";
-
-const DORADO = "#f2a900";
+import { DORADO } from "@/lib/colors";
 
 interface RosterJugadorHistorico {
   jugadorId: string;
@@ -88,8 +87,11 @@ function Etiqueta({ children }: { children: React.ReactNode }) {
 }
 
 export default function Formaciones({ plantel }: { plantel: RosterJugadorHistorico[] }) {
-  const titulares = plantel.filter((j) => j.titular);
-  const suplentes = plantel.filter((j) => !j.titular);
+  // Firestore no garantiza el orden de lectura de una subcoleccion -- hay que ordenar por
+  // dorsal explicitamente (numerico, no alfabetico: "10" antes que "2" rompe todo si no).
+  const porDorsal = (a: RosterJugadorHistorico, b: RosterJugadorHistorico) => Number(a.dorsal) - Number(b.dorsal);
+  const titulares = plantel.filter((j) => j.titular).sort(porDorsal);
+  const suplentes = plantel.filter((j) => !j.titular).sort(porDorsal);
   const mitadSuplentes = Math.ceil(suplentes.length / 2);
 
   return (

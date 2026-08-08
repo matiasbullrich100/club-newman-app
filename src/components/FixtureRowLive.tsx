@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
-import FixtureRow from "./FixtureRow";
+import FixtureRow, { MatchupText } from "./FixtureRow";
 import type { EstadoPartido, Resultado } from "@/types/firestore";
 
 interface EstadoVivo {
@@ -15,14 +15,14 @@ interface EstadoVivo {
 export default function FixtureRowLive({
   partidoId,
   href,
-  label,
+  categoriaNombre,
   esLocal,
   rival,
   inicial,
 }: {
   partidoId: string;
   href: string;
-  label: string;
+  categoriaNombre: string;
   esLocal: boolean;
   rival: string;
   inicial: EstadoVivo;
@@ -41,12 +41,15 @@ export default function FixtureRowLive({
   return (
     <FixtureRow
       href={href}
-      label={label}
-      esLocal={esLocal}
-      rival={rival}
-      estado={vivo.estado}
-      resultado={vivo.resultado}
-      notaEspecial={vivo.notaEspecial}
+      jugada={false}
+      tituloPrincipal={categoriaNombre}
+      notaSecundaria={
+        vivo.notaEspecial ?? (
+          <>
+            <MatchupText esLocal={esLocal} rival={rival} jugado={false} resultado={vivo.resultado} /> · en vivo
+          </>
+        )
+      }
     />
   );
 }

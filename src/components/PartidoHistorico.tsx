@@ -1,10 +1,8 @@
 import type { Incidente, Partido } from "@/types/firestore";
 import { describirIncidente } from "@/lib/incidentes";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { MatchupText } from "./FixtureRow";
 import Formaciones from "./Formaciones";
-
-const DORADO = "#f2a900";
-const DORADO_SUAVE = "#f0cb86";
-const CREMA = "#f7f1e4";
 
 interface RosterJugadorHistorico {
   jugadorId: string;
@@ -15,35 +13,21 @@ interface RosterJugadorHistorico {
   debut?: boolean;
 }
 
-function nombreEquipo(nombre: string) {
-  const chico = nombre.length > 12;
-  return <span style={{ fontSize: chico ? "0.78em" : "1em" }}>{nombre}</span>;
-}
+const cardStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,.045)",
+  border: "1px solid rgba(226,197,120,.2)",
+  borderRadius: 12,
+  padding: 16,
+  marginBottom: 14,
+};
 
-function ResultadoFinal({ partido }: { partido: Partido }) {
-  const local = partido.esLocal ? "Newman" : partido.rival;
-  const visitante = partido.esLocal ? partido.rival : "Newman";
-  const golLocal = partido.esLocal ? partido.resultado.newman : partido.resultado.rival;
-  const golVisitante = partido.esLocal ? partido.resultado.rival : partido.resultado.newman;
-  const bonusLocal = partido.esLocal ? partido.resultado.bonusNewman : partido.resultado.bonusRival;
-  const bonusVisitante = partido.esLocal ? partido.resultado.bonusRival : partido.resultado.bonusNewman;
-
-  return (
-    <p style={{ fontSize: "1.1rem", color: CREMA, textAlign: "center" }}>
-      {nombreEquipo(local)}{" "}
-      <strong>
-        {golLocal}
-        {bonusLocal && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
-      </strong>{" "}
-      -{" "}
-      <strong>
-        {golVisitante}
-        {bonusVisitante && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
-      </strong>{" "}
-      {nombreEquipo(visitante)}
-    </p>
-  );
-}
+const cardTituloStyle: React.CSSProperties = {
+  textTransform: "uppercase",
+  letterSpacing: 1,
+  fontSize: "0.85rem",
+  color: DORADO,
+  marginBottom: 10,
+};
 
 const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
   tarjeta_amarilla: "🟨",
@@ -90,29 +74,36 @@ export default function PartidoHistorico({
   plantel: RosterJugadorHistorico[];
   incidentes: (Incidente & { id: string })[];
 }) {
+  const jugado = partido.estado === "terminado";
+
   return (
     <div>
-      {partido.notaEspecial ? (
-        <p style={{ fontStyle: "italic", color: DORADO_SUAVE, textAlign: "center", fontSize: "1rem" }}>
-          {partido.notaEspecial}
-        </p>
-      ) : partido.estado === "terminado" ? (
-        <ResultadoFinal partido={partido} />
-      ) : (
-        <p style={{ opacity: 0.6, fontStyle: "italic", textAlign: "center" }}>Partido sin cargar</p>
-      )}
+      <div style={cardStyle}>
+        {partido.notaEspecial ? (
+          <p style={{ fontStyle: "italic", color: DORADO_SUAVE, textAlign: "center", fontSize: "1rem" }}>
+            {partido.notaEspecial}
+          </p>
+        ) : jugado ? (
+          <p style={{ fontSize: "1.1rem", textAlign: "center" }}>
+            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} />
+          </p>
+        ) : (
+          <p style={{ opacity: 0.6, fontStyle: "italic", textAlign: "center" }}>Partido sin cargar</p>
+        )}
+      </div>
 
-      {plantel.length > 0 ? (
-        <Formaciones plantel={plantel} />
-      ) : (
-        <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem", marginTop: "1rem" }}>
-          Aún sin formación cargada.
-        </p>
-      )}
+      <div style={cardStyle}>
+        <h3 style={cardTituloStyle}>Formaciones</h3>
+        {plantel.length > 0 ? (
+          <Formaciones plantel={plantel} />
+        ) : (
+          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Aún sin formación cargada.</p>
+        )}
+      </div>
 
-      {partido.estado === "terminado" && (
-        <div style={{ marginTop: "1.5rem" }}>
-          <h3 style={{ fontSize: "0.9rem" }}>Incidencias</h3>
+      {jugado && (
+        <div style={cardStyle}>
+          <h3 style={cardTituloStyle}>Incidencias</h3>
           <Incidencias incidentes={incidentes} />
         </div>
       )}

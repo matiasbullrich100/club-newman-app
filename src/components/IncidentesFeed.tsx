@@ -5,6 +5,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import type { Incidente } from "@/types/firestore";
 import { describirIncidente } from "@/lib/incidentes";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default function IncidentesFeed({ partidoId }: { partidoId: string }) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
@@ -19,15 +20,27 @@ export default function IncidentesFeed({ partidoId }: { partidoId: string }) {
   if (incidentes.length === 0) return null;
 
   return (
-    <div style={{ marginTop: "1.5rem" }}>
-      <h3 style={{ fontSize: "0.9rem" }}>Incidencias</h3>
-      <ul style={{ listStyle: "none", padding: 0, fontSize: "0.85rem" }}>
-        {incidentes.map((inc) => (
-          <li key={inc.id} style={{ padding: "0.25rem 0", borderBottom: "1px solid #eee" }}>
-            {inc.periodo} {inc.minuto}&apos; — {describirIncidente(inc)}
-          </li>
-        ))}
-      </ul>
+    <div
+      style={{
+        background: "rgba(255,255,255,.045)",
+        border: "1px solid rgba(226,197,120,.2)",
+        borderRadius: 12,
+        padding: 16,
+        marginTop: 14,
+      }}
+    >
+      <h3 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginBottom: 10 }}>Incidencias</h3>
+      {incidentes.map((inc) => (
+        <div
+          key={inc.id}
+          style={{ display: "flex", gap: 10, padding: "8px 4px", fontSize: "0.85rem", borderBottom: "1px dashed rgba(255,255,255,.08)" }}
+        >
+          <div style={{ color: DORADO, minWidth: 34, fontSize: "0.8rem" }}>
+            {inc.periodo} {inc.minuto}&apos;
+          </div>
+          <div style={{ color: DORADO_SUAVE }}>{describirIncidente(inc)}</div>
+        </div>
+      ))}
     </div>
   );
 }

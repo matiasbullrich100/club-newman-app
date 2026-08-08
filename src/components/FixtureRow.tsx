@@ -1,15 +1,10 @@
 import Link from "next/link";
-import type { Equipo, EstadoPartido, Resultado } from "@/types/firestore";
-
-const BORDO = "#651d32";
-const NEGRO_JUGADA = "#1c1315";
-const DORADO = "#f2a900";
-const DORADO_SUAVE = "#f0cb86";
-const CREMA = "#f7f1e4";
+import type { Equipo, Resultado } from "@/types/firestore";
+import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
 function nombreEquipo(nombre: string) {
   const chico = nombre.length > 12;
-  return <span style={{ fontSize: chico ? "0.78em" : "1em" }}>{nombre}</span>;
+  return <span style={{ fontSize: chico ? "0.78em" : "1em", letterSpacing: chico ? 0 : undefined }}>{nombre}</span>;
 }
 
 function golesDe(equipo: Equipo, resultado: Resultado) {
@@ -23,58 +18,83 @@ function golesDe(equipo: Equipo, resultado: Resultado) {
   );
 }
 
-export default function FixtureRow({
-  href,
-  label,
+/** "Newman 31 (B) - 3 BACRC" (jugado) o "Newman vs BACRC" (sin jugar) — reusado en filas y títulos. */
+export function MatchupText({
   esLocal,
   rival,
-  estado,
+  jugado,
   resultado,
-  notaEspecial,
 }: {
-  href: string;
-  label: string;
   esLocal: boolean;
   rival: string;
-  estado: EstadoPartido;
+  jugado: boolean;
   resultado: Resultado;
-  notaEspecial?: string;
 }) {
-  const jugado = estado === "terminado";
   const local = esLocal ? "Newman" : rival;
   const visitante = esLocal ? rival : "Newman";
   const equipoLocal: Equipo = esLocal ? "newman" : "rival";
   const equipoVisitante: Equipo = esLocal ? "rival" : "newman";
 
+  if (jugado) {
+    return (
+      <>
+        {nombreEquipo(local)} <b>{golesDe(equipoLocal, resultado)}</b> - <b>{golesDe(equipoVisitante, resultado)}</b>{" "}
+        {nombreEquipo(visitante)}
+      </>
+    );
+  }
+  return (
+    <>
+      {nombreEquipo(local)} <em style={{ fontSize: "0.65em", textTransform: "lowercase", fontWeight: 400, opacity: 0.75 }}>vs</em>{" "}
+      {nombreEquipo(visitante)}
+    </>
+  );
+}
+
+export default function FixtureRow({
+  href,
+  tituloPrincipal,
+  notaSecundaria,
+  jugada,
+}: {
+  href: string;
+  tituloPrincipal: React.ReactNode;
+  notaSecundaria: React.ReactNode;
+  jugada: boolean;
+}) {
   return (
     <Link
       href={href}
       style={{
-        display: "block",
-        textDecoration: "none",
-        background: jugado ? NEGRO_JUGADA : BORDO,
-        color: CREMA,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        gap: 2,
+        background: jugada ? NEGRO_JUGADA : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
+        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.25)"}`,
         borderRadius: 8,
-        padding: "0.6rem 0.9rem",
-        marginBottom: "0.4rem",
+        padding: "8px 10px",
+        minHeight: 54,
       }}
     >
-      <div style={{ fontSize: "0.75rem", color: DORADO_SUAVE, textTransform: "uppercase", marginBottom: 2 }}>
-        {label}
+      <div
+        style={{
+          fontWeight: 600,
+          letterSpacing: 0.3,
+          fontSize: "0.8rem",
+          textTransform: "uppercase",
+          color: DORADO_SUAVE,
+          lineHeight: 1.25,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          width: "100%",
+        }}
+      >
+        {tituloPrincipal}
       </div>
-      {notaEspecial ? (
-        <div style={{ fontStyle: "italic", color: DORADO_SUAVE, fontSize: "0.9rem" }}>{notaEspecial}</div>
-      ) : jugado ? (
-        <div style={{ fontSize: "0.95rem" }}>
-          {nombreEquipo(local)} <strong>{golesDe(equipoLocal, resultado)}</strong> -{" "}
-          <strong>{golesDe(equipoVisitante, resultado)}</strong> {nombreEquipo(visitante)}
-        </div>
-      ) : (
-        <div style={{ fontSize: "0.95rem" }}>
-          {nombreEquipo(local)} <em style={{ fontSize: "0.8em", color: DORADO_SUAVE }}>vs</em>{" "}
-          {nombreEquipo(visitante)}
-        </div>
-      )}
+      <div style={{ fontSize: "0.72rem", opacity: 0.6 }}>{notaSecundaria}</div>
     </Link>
   );
 }

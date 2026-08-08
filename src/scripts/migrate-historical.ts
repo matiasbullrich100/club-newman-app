@@ -71,6 +71,11 @@ class Lote {
     this.ops++;
     if (this.ops >= 450) this.flush();
   }
+  delete(ref: FirebaseFirestore.DocumentReference) {
+    this.batch.delete(ref);
+    this.ops++;
+    if (this.ops >= 450) this.flush();
+  }
   private flush() {
     this.pendientes.push(this.batch.commit());
     this.batch = this.db.batch();
@@ -142,6 +147,7 @@ async function main() {
       const partido: Partido = {
         categoriaId: cat.id,
         numeroFecha: fecha,
+        fecha: base.fecha,
         rival,
         esLocal,
         cancha,
@@ -172,8 +178,18 @@ async function main() {
           }
         }
 
+        // Limpieza defensiva: si una corrida anterior (antes del id deterministico "hist-N")
+        // dejo incidencias con id autogenerado, borrarlas para no duplicar.
+        const viejasSnap = await partidoRef
+          .collection("incidentes")
+          .where("publicadoPorCuentaId", "==", "migracion-historica")
+          .get();
+        for (const doc of viejasSnap.docs) {
+          if (!doc.id.startsWith("hist-")) lote.delete(doc.ref);
+        }
+
         const incidentesFecha = incidentesHist[`${cat.nombre}|${fecha}`] ?? [];
-        for (const inc of incidentesFecha) {
+        incidentesFecha.forEach((inc, i) => {
           const tipo: TipoIncidente = inc.tipo === "amarilla" ? "tarjeta_amarilla" : "tarjeta_roja";
           const incidente: Incidente = {
             tipo,
@@ -187,9 +203,11 @@ async function main() {
             publicadoPorCuentaId: "migracion-historica",
             createdAt: new Date(),
           };
-          lote.set(partidoRef.collection("incidentes").doc(), incidente);
+          // Id deterministico (no autogenerado) -- correr el script de nuevo debe sobreescribir,
+          // no duplicar.
+          lote.set(partidoRef.collection("incidentes").doc(`hist-${i}`), incidente);
           incidenteDocs++;
-        }
+        });
       }
     }
   }
