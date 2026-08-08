@@ -37,7 +37,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: "0 auto", padding: "18px 16px 40px" }}>
+    <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
       <Header />
       <div

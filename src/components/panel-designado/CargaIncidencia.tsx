@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react";
 import { publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
 import type { Equipo, TipoIncidente } from "@/types/firestore";
+import { requierePlayerSelection } from "@/lib/incidentes";
 import type { RosterJugador } from "./types";
 
-const TIPOS: { tipo: Exclude<TipoIncidente, "cambio">; label: string }[] = [
+const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; label: string }[] = [
   { tipo: "try", label: "Try (+5)" },
+  { tipo: "try_scrum", label: "Try Scrum (+5)" },
   { tipo: "conversion", label: "Conversión (+2)" },
   { tipo: "penal", label: "Penal (+3)" },
   { tipo: "drop", label: "Drop (+3)" },
@@ -29,14 +31,15 @@ export default function CargaIncidencia({
   enCanchaIds: string[];
 }) {
   const [paso, setPaso] = useState<Paso>("tipo");
-  const [tipo, setTipo] = useState<Exclude<TipoIncidente, "cambio"> | null>(null);
+  const [tipo, setTipo] = useState<(typeof TIPOS)[number]["tipo"] | null>(null);
   const [equipo, setEquipo] = useState<Equipo | null>(null);
   const [jugadorId, setJugadorId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const enCancha = plantel.filter((j) => enCanchaIds.includes(j.jugadorId));
-  const requiereJugador = equipo === "newman";
+  // Try Penal / Try Scrum se le dan al equipo entero, no a un jugador puntual.
+  const requiereJugador = equipo === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
   const jugador = plantel.find((j) => j.jugadorId === jugadorId);
 
   function reset() {
@@ -47,7 +50,7 @@ export default function CargaIncidencia({
     setError(null);
   }
 
-  function elegirTipo(t: Exclude<TipoIncidente, "cambio">) {
+  function elegirTipo(t: (typeof TIPOS)[number]["tipo"]) {
     setTipo(t);
     if (t === "lesion") {
       setEquipo("newman");
@@ -59,7 +62,8 @@ export default function CargaIncidencia({
 
   function elegirEquipo(e: Equipo) {
     setEquipo(e);
-    setPaso(e === "newman" ? "jugador" : "confirmar");
+    const necesitaJugador = e === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
+    setPaso(necesitaJugador ? "jugador" : "confirmar");
   }
 
   function confirmar() {
@@ -114,7 +118,7 @@ export default function CargaIncidencia({
         <div>
           <p>
             Confirmar: <strong>{TIPOS.find((t) => t.tipo === tipo)?.label}</strong> —{" "}
-            {equipo === "newman" ? jugador?.nombre ?? "" : "Rival"}
+            {equipo === "newman" ? (requiereJugador ? jugador?.nombre ?? "" : "Newman") : "Rival"}
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
           <button disabled={isPending} onClick={confirmar}>

@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import type { Incidente } from "@/types/firestore";
-import { describirIncidente } from "@/lib/incidentes";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO } from "@/lib/colors";
+import IncidentesList from "./IncidentesList";
 
 export default function IncidentesFeed({ partidoId }: { partidoId: string }) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
 
   useEffect(() => {
-    const q = query(collection(db, "partidos", partidoId, "incidentes"), orderBy("createdAt", "desc"));
+    // Sin orderBy: el orden cronologico correcto lo resuelve ordenarIncidentes() (por
+    // periodo+minuto de juego), no el momento en que se escribio el documento.
+    const q = query(collection(db, "partidos", partidoId, "incidentes"));
     return onSnapshot(q, (snap) => {
       setIncidentes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Incidente) })));
     });
@@ -30,17 +32,7 @@ export default function IncidentesFeed({ partidoId }: { partidoId: string }) {
       }}
     >
       <h3 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginBottom: 10 }}>Incidencias</h3>
-      {incidentes.map((inc) => (
-        <div
-          key={inc.id}
-          style={{ display: "flex", gap: 10, padding: "8px 4px", fontSize: "0.85rem", borderBottom: "1px dashed rgba(255,255,255,.08)" }}
-        >
-          <div style={{ color: DORADO, minWidth: 34, fontSize: "0.8rem" }}>
-            {inc.periodo} {inc.minuto}&apos;
-          </div>
-          <div style={{ color: DORADO_SUAVE }}>{describirIncidente(inc)}</div>
-        </div>
-      ))}
+      <IncidentesList incidentes={incidentes} />
     </div>
   );
 }

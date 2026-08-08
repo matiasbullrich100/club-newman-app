@@ -4,7 +4,6 @@ import { getSession } from "@/lib/auth/session";
 import type { Incidente, JugadorPartido, Partido } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
 import PartidoHistorico from "@/components/PartidoHistorico";
-import IncidentesFeed from "@/components/IncidentesFeed";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -52,7 +51,7 @@ export default async function PartidoPage({
     const incidentes = incidentesSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Incidente) }));
 
     return (
-      <main style={{ maxWidth: 480, margin: "0 auto", padding: "18px 16px 40px" }}>
+      <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
         <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} />
         <FooterChip />
@@ -90,7 +89,7 @@ export default async function PartidoPage({
     };
 
     return (
-      <main style={{ maxWidth: 480, margin: "0 auto", padding: "18px 16px 40px" }}>
+      <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
         <PartidoHistorico partido={partido} plantel={plantel} incidentes={[]} />
         {puedeOperar && (
@@ -124,10 +123,9 @@ export default async function PartidoPage({
   });
 
   return (
-    <main style={{ maxWidth: 480, margin: "0 auto", padding: "18px 16px 40px" }}>
+    <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       {cabecera}
       <PartidoLive partidoId={partidoId} inicial={partidoParaCliente} session={session} plantel={plantel} />
-      <IncidentesFeed partidoId={partidoId} />
       <FooterChip />
     </main>
   );

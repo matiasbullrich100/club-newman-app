@@ -20,7 +20,18 @@ const ETIQUETA_ROL: Record<SessionPayload["rol"], string> = {
 
 export default function SessionBar({ session }: { session: SessionPayload | null }) {
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, padding: "6px 4px 0", fontSize: "0.78rem" }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: 8,
+        fontSize: "0.78rem",
+        position: "fixed",
+        top: 12,
+        right: 12,
+        zIndex: 100,
+      }}
+    >
       {session ? (
         <>
           <span style={{ ...pillBase, border: `1px solid ${DORADO}`, color: TINTA, background: DORADO }}>
@@ -32,7 +43,7 @@ export default function SessionBar({ session }: { session: SessionPayload | null
               type="submit"
               style={{
                 ...pillBase,
-                background: "rgba(255,255,255,.06)",
+                background: "rgba(53,9,22,.92)",
                 border: "1px solid rgba(226,197,120,.35)",
                 color: DORADO_SUAVE,
               }}
@@ -44,7 +55,7 @@ export default function SessionBar({ session }: { session: SessionPayload | null
       ) : (
         <Link
           href="/login"
-          style={{ ...pillBase, background: "rgba(255,255,255,.06)", border: "1px solid rgba(226,197,120,.35)", color: DORADO_SUAVE }}
+          style={{ ...pillBase, background: "rgba(53,9,22,.92)", border: "1px solid rgba(226,197,120,.35)", color: DORADO_SUAVE }}
         >
           Iniciar sesión
         </Link>

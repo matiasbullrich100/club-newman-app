@@ -5,6 +5,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import Cronometro from "./Cronometro";
 import PanelDesignado from "./panel-designado/PanelDesignado";
+import IncidentesFeed from "./IncidentesFeed";
 import type { EstadoPartido, LiveState, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 import type { RosterJugador } from "./panel-designado/types";
@@ -94,8 +95,11 @@ export default function PartidoLive({
         </div>
       </div>
 
-      {puedeOperar && (
+      {puedeOperar ? (
+        // El feed para el Designado va adentro del panel (entre jugadas y cambios).
         <PanelDesignado partidoId={partidoId} partido={partido} plantel={plantel} periodo={periodo} />
+      ) : (
+        <IncidentesFeed partidoId={partidoId} />
       )}
     </div>
   );

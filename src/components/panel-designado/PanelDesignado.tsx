@@ -14,6 +14,7 @@ import type { LiveState, Partido } from "@/types/firestore";
 import type { RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
+import IncidentesFeed from "@/components/IncidentesFeed";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const btnStyle: React.CSSProperties = {
@@ -111,6 +112,9 @@ export default function PanelDesignado({
       {partido.estado === "en_juego" && (
         <div style={{ display: "grid", gap: "1rem" }}>
           <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
+          {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
+              pasando el bloque de cambios (que se usa menos) para verlo. */}
+          <IncidentesFeed partidoId={partidoId} />
           <CargaCambio partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}

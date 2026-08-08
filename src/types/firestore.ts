@@ -80,6 +80,7 @@ export interface JugadorPartido {
 
 export type TipoIncidente =
   | "try"
+  | "try_scrum"
   | "conversion"
   | "penal"
   | "drop"
@@ -88,14 +89,17 @@ export type TipoIncidente =
   | "tarjeta_roja"
   | "tarjeta_azul"
   | "cambio"
-  | "lesion";
+  | "lesion"
+  | "fin_1t"
+  | "fin_2t";
 
 export type Equipo = "newman" | "rival";
 
 // Subcollection `partidos/{id}/incidentes/{id}` — append-only.
 export interface Incidente {
   tipo: TipoIncidente;
-  equipo: Equipo;
+  // No aplica a fin_1t/fin_2t (marcan el cierre de un tiempo, no son de ningun equipo).
+  equipo?: Equipo;
   puntos?: number;
   jugadorId?: string;
   jugadorNombre?: string;
@@ -121,10 +125,11 @@ export interface JugadorAgregado {
 }
 
 export const PUNTOS_POR_TIPO: Record<
-  "try" | "conversion" | "penal" | "drop" | "try_penal",
+  "try" | "try_scrum" | "conversion" | "penal" | "drop" | "try_penal",
   number
 > = {
   try: 5,
+  try_scrum: 5,
   conversion: 2,
   penal: 3,
   drop: 3,

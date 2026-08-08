@@ -6,6 +6,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession, puedeOperarCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
+import { requierePlayerSelection } from "@/lib/incidentes";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
@@ -50,6 +51,7 @@ export async function iniciarPartido(partidoId: string): Promise<void> {
 export async function cortar1T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc();
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
@@ -69,6 +71,16 @@ export async function cortar1T(partidoId: string): Promise<void> {
       accumulatedSeconds: accumulated,
       period1DurationSeconds: accumulated,
     });
+
+    const incidente: Incidente = {
+      tipo: "fin_1t",
+      periodo: "1T",
+      minuto: Math.round(accumulated / 60),
+      segundoAbsoluto: Math.floor(accumulated),
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    tx.set(incidenteRef, incidente);
   });
 
   revalidatePath(`/partido/${partidoId}`);
@@ -186,6 +198,18 @@ export async function terminarPartido(partidoId: string): Promise<void> {
     period2DurationSeconds,
   });
 
+  if (liveState.periodo) {
+    const finIncidente: Incidente = {
+      tipo: liveState.periodo === "1T" ? "fin_1t" : "fin_2t",
+      periodo: liveState.periodo,
+      minuto: Math.round(accumulated / 60),
+      segundoAbsoluto: Math.floor(accumulated),
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    batch.set(partidoRef.collection("incidentes").doc(), finIncidente);
+  }
+
   for (const jugador of plantel) {
     const m = minutos[jugador.jugadorId];
     batch.update(partidoRef.collection("plantel").doc(jugador.jugadorId), {
@@ -229,7 +253,7 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
 
     let jugadorNombre: string | undefined;
     let dorsal: string | undefined;
-    if (input.equipo === "newman") {
+    if (input.equipo === "newman" && requierePlayerSelection(input.tipo)) {
       if (!input.jugadorId) throw new Error("Falta el jugador");
       if (!partido.enCanchaIds.includes(input.jugadorId)) throw new Error("El jugador no está en cancha");
       const jugadorSnap = await tx.get(partidoRef.collection("plantel").doc(input.jugadorId));

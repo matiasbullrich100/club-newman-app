@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
+import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
+import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
 import FixtureRowLive from "@/components/FixtureRowLive";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -21,14 +23,15 @@ export default async function VistaDeFecha({
   if (!Number.isInteger(numero) || numero < 1 || numero > 26) notFound();
 
   const refs = CATEGORIAS.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, numero)));
-  const snaps = await adminDb.getAll(...refs);
+  const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
   const filas = CATEGORIAS.map((cat, i) => ({ cat, partido: snaps[i].exists ? (snaps[i].data() as Partido) : null }));
 
   const primera = filas.find((f) => f.cat.id === "primera")?.partido;
 
   return (
-    <main style={{ maxWidth: 480, margin: "0 auto", padding: "18px 16px 40px" }}>
+    <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
+      <SessionBar session={session} />
       <Header rightLabel={`Fecha ${numero}`} />
 
       {primera && (
