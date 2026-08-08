@@ -18,8 +18,8 @@ export default async function CategoriasPage() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: 12,
+          gridTemplateColumns: "1fr 1fr",
+          gap: 8,
           marginTop: 20,
         }}
       >
@@ -30,15 +30,14 @@ export default async function CategoriasPage() {
             style={{
               background: "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
               border: "1px solid rgba(226,197,120,.25)",
-              borderRadius: 10,
-              padding: "14px 12px",
-              minHeight: 92,
+              borderRadius: 8,
+              padding: "10px 12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <div style={{ fontWeight: 600, letterSpacing: 0.5, fontSize: "0.95rem", textTransform: "uppercase", color: DORADO_SUAVE }}>
+            <div style={{ fontWeight: 600, letterSpacing: 0.5, fontSize: "0.85rem", textTransform: "uppercase", color: DORADO_SUAVE }}>
               {cat.nombre}
             </div>
           </Link>
