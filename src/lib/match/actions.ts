@@ -22,6 +22,11 @@ function refs(partidoId: string) {
   return { partidoRef, liveStateRef: partidoRef.collection("liveState").doc("state") };
 }
 
+// Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real,
+// pase lo que pase con el argumento que le llegue del cliente. Tambien se usa para no
+// contabilizar en jugadores/ las tarjetas azules cargadas en partidos simulados.
+const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
+
 // ---- Máquina de estados del partido -------------------------------------------------
 
 export async function iniciarPartido(partidoId: string): Promise<void> {
@@ -293,7 +298,9 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tarjeta_roja: "tarjetasRojas",
       tarjeta_azul: "tarjetasAzules",
     };
-    if (campoTarjeta[input.tipo] && input.equipo === "newman" && input.jugadorId) {
+    // Las tarjetas azules de partidos simulados no se contabilizan en las estadisticas reales.
+    const esAzulSimulada = input.tipo === "tarjeta_azul" && PARTIDOS_DEMO_IDS.includes(partidoId);
+    if (campoTarjeta[input.tipo] && input.equipo === "newman" && input.jugadorId && !esAzulSimulada) {
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
         { nombre: jugadorNombre, [campoTarjeta[input.tipo]!]: FieldValue.increment(1) },
@@ -367,10 +374,6 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
 }
 
 // ---- Solo para los partidos de prueba (Fase 1) ------------------------------------------
-
-// Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real,
-// pase lo que pase con el argumento que le llegue del cliente.
-const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
 
 /**
  * Vuelve un partido de prueba a "programado" (0-0, sin incidencias) para poder simularlo

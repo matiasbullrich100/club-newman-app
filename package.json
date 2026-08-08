@@ -10,6 +10,7 @@
     "seed": "tsx src/scripts/seed.ts",
     "reset-demo": "tsx src/scripts/reset-demo.ts",
     "seed-demo-extra": "tsx src/scripts/seed-demo-extra.ts",
+    "seed-designados": "tsx src/scripts/seed-designados.ts",
     "migrate-historical": "tsx src/scripts/migrate-historical.ts"
   },
   "dependencies": {
