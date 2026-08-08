@@ -59,6 +59,26 @@ export default async function Home() {
         >
           Ver por categoría
         </Link>
+        {(session?.rol === "manager" || session?.rol === "entrenador") && (
+          <>
+            {" "}
+            <Link
+              href="/estadisticas"
+              style={{
+                display: "inline-block",
+                textTransform: "uppercase",
+                letterSpacing: 1,
+                fontSize: "0.78rem",
+                padding: "10px 16px",
+                borderRadius: 8,
+                border: "1px solid rgba(226,197,120,.4)",
+                color: DORADO_SUAVE,
+              }}
+            >
+              Tarjetas y minutos
+            </Link>
+          </>
+        )}
       </p>
 
       <div

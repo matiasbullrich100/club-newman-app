@@ -219,6 +219,7 @@ async function main() {
     lote.set(adminDb.collection("jugadores").doc(id), {
       nombre: entry.nombre,
       tarjetasAmarillas: entry.amarillas,
+      tarjetasDobleAmarilla: 0,
       tarjetasRojas: entry.rojas,
       tarjetasAzules: 0,
       minutosJugadosTotal: 0,

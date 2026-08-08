@@ -14,6 +14,7 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; lab
   { tipo: "drop", label: "Drop (+3)" },
   { tipo: "try_penal", label: "Try Penal (+7)" },
   { tipo: "tarjeta_amarilla", label: "Tarjeta amarilla" },
+  { tipo: "tarjeta_doble_amarilla", label: "Doble amarilla" },
   { tipo: "tarjeta_roja", label: "Tarjeta roja" },
   { tipo: "tarjeta_azul", label: "Tarjeta azul" },
   { tipo: "lesion", label: "Lesión" },

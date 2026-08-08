@@ -8,6 +8,7 @@ export const ETIQUETAS_INCIDENTE: Record<Incidente["tipo"], string> = {
   drop: "Drop",
   try_penal: "Try Penal",
   tarjeta_amarilla: "Tarjeta amarilla",
+  tarjeta_doble_amarilla: "Doble amarilla",
   tarjeta_roja: "Tarjeta roja",
   tarjeta_azul: "Tarjeta azul",
   cambio: "Cambio",

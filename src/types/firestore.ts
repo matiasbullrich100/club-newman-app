@@ -86,6 +86,7 @@ export type TipoIncidente =
   | "drop"
   | "try_penal"
   | "tarjeta_amarilla"
+  | "tarjeta_doble_amarilla"
   | "tarjeta_roja"
   | "tarjeta_azul"
   | "cambio"
@@ -119,6 +120,7 @@ export interface Incidente {
 export interface JugadorAgregado {
   nombre: string;
   tarjetasAmarillas: number;
+  tarjetasDobleAmarilla: number;
   tarjetasRojas: number;
   tarjetasAzules: number;
   minutosJugadosTotal: number;

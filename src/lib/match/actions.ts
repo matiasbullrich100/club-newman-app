@@ -287,13 +287,16 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tx.update(partidoRef, { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() });
     }
 
-    const esTarjeta = input.tipo === "tarjeta_amarilla" || input.tipo === "tarjeta_roja" || input.tipo === "tarjeta_azul";
-    if (esTarjeta && input.equipo === "newman" && input.jugadorId) {
-      const campoTarjeta =
-        input.tipo === "tarjeta_amarilla" ? "tarjetasAmarillas" : input.tipo === "tarjeta_roja" ? "tarjetasRojas" : "tarjetasAzules";
+    const campoTarjeta: Partial<Record<TipoIncidente, string>> = {
+      tarjeta_amarilla: "tarjetasAmarillas",
+      tarjeta_doble_amarilla: "tarjetasDobleAmarilla",
+      tarjeta_roja: "tarjetasRojas",
+      tarjeta_azul: "tarjetasAzules",
+    };
+    if (campoTarjeta[input.tipo] && input.equipo === "newman" && input.jugadorId) {
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
-        { nombre: jugadorNombre, [campoTarjeta]: FieldValue.increment(1) },
+        { nombre: jugadorNombre, [campoTarjeta[input.tipo]!]: FieldValue.increment(1) },
         { merge: true }
       );
     }
