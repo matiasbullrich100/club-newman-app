@@ -69,7 +69,7 @@ export default function LiveBanner({
       </p>
       {enVivo && (
         <div style={{ marginTop: 10 }}>
-          <IncidentesList incidentes={incidentes} />
+          <IncidentesList incidentes={incidentes} rivalNombre={partido.rival} />
         </div>
       )}
     </Link>

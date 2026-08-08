@@ -363,20 +363,22 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
   revalidatePath(`/partido/${partidoId}`);
 }
 
-// ---- Solo para el partido de prueba (Fase 1) --------------------------------------------
+// ---- Solo para los partidos de prueba (Fase 1) ------------------------------------------
 
-const PARTIDO_DEMO_ID = "demo-partido-1";
+// Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real,
+// pase lo que pase con el argumento que le llegue del cliente.
+const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
 
 /**
- * Vuelve el partido de prueba a "programado" (0-0, sin incidencias) para poder simularlo
- * de nuevo. Hardcodeado a demo-partido-1 a proposito -- nunca debe poder tocar un partido
- * real (mismo efecto que scripts/reset-demo.ts, pero disparable desde la UI por el Manager).
+ * Vuelve un partido de prueba a "programado" (0-0, sin incidencias) para poder simularlo
+ * de nuevo (mismo efecto que scripts/reset-demo.ts, pero disparable desde la UI por el Manager).
  */
-export async function resetearPartidoDemo(): Promise<void> {
+export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> {
   const session = await getSession();
   if (!session || session.rol !== "manager") throw new Error("No autorizado");
+  if (!PARTIDOS_DEMO_IDS.includes(partidoDemoId)) throw new Error("Ese partido no se puede resetear");
 
-  const partidoRef = adminDb.collection("partidos").doc(PARTIDO_DEMO_ID);
+  const partidoRef = adminDb.collection("partidos").doc(partidoDemoId);
   const partidoSnap = await partidoRef.get();
   if (!partidoSnap.exists) throw new Error("El partido de prueba no existe");
 
@@ -412,6 +414,6 @@ export async function resetearPartidoDemo(): Promise<void> {
   }
 
   await batch.commit();
-  revalidatePath(`/partido/${PARTIDO_DEMO_ID}`);
+  revalidatePath(`/partido/${partidoDemoId}`);
   revalidatePath("/");
 }

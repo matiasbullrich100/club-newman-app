@@ -39,7 +39,7 @@ const ACCIONES_CONFIRMABLES: Record<AccionConfirmable, (id: string) => Promise<v
 };
 
 const PREGUNTAS_CONFIRMACION: Record<AccionConfirmable, string> = {
-  cortar1T: "¿Cortar el 1er tiempo?",
+  cortar1T: "¿Final del 1er tiempo?",
   terminarPartido: "¿Terminar el partido?",
 };
 
@@ -126,7 +126,7 @@ export default function PanelDesignado({
               </button>
               {periodo === "1T" && (
                 <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("cortar1T")}>
-                  Cortar 1er tiempo
+                  Final 1er tiempo
                 </button>
               )}
               <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("terminarPartido")}>
@@ -155,7 +155,7 @@ export default function PanelDesignado({
           <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
-          <IncidentesFeed partidoId={partidoId} />
+          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} />
           <CargaCambio partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}

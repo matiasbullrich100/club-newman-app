@@ -68,7 +68,7 @@ export default function PartidoHistorico({
       {jugado && (
         <div style={cardStyle}>
           <h3 style={cardTituloStyle}>Incidencias</h3>
-          <IncidentesList incidentes={incidentes} />
+          <IncidentesList incidentes={incidentes} rivalNombre={partido.rival} />
         </div>
       )}
     </div>

@@ -11,7 +11,15 @@ const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
   try_penal: "🏉",
 };
 
-export default function IncidentesList({ incidentes }: { incidentes: (Incidente & { id: string })[] }) {
+const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t"];
+
+export default function IncidentesList({
+  incidentes,
+  rivalNombre,
+}: {
+  incidentes: (Incidente & { id: string })[];
+  rivalNombre?: string;
+}) {
   if (incidentes.length === 0) {
     return <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Sin incidencias todavía.</p>;
   }
@@ -23,6 +31,7 @@ export default function IncidentesList({ incidentes }: { incidentes: (Incidente 
     <div>
       {ordenadas.map((inc, i) => {
         const cambioDePeriodo = i > 0 && ordenadas[i - 1].periodo !== inc.periodo;
+        const esFinDeTiempo = SIN_EQUIPO.includes(inc.tipo);
         return (
           <div key={inc.id}>
             {cambioDePeriodo && (
@@ -46,7 +55,9 @@ export default function IncidentesList({ incidentes }: { incidentes: (Incidente 
                 {inc.periodo} {inc.minuto}&apos;
               </div>
               <div style={{ minWidth: 20, textAlign: "center" }}>{ICONOS[inc.tipo] ?? ""}</div>
-              <div style={{ color: DORADO_SUAVE }}>{describirIncidente(inc)}</div>
+              <div style={{ color: DORADO_SUAVE, textTransform: esFinDeTiempo ? "uppercase" : "none", fontWeight: esFinDeTiempo ? 700 : 400 }}>
+                {describirIncidente(inc, rivalNombre)}
+              </div>
             </div>
           </div>
         );

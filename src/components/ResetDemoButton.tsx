@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { resetearPartidoDemo } from "@/lib/match/actions";
 import { DORADO_SUAVE } from "@/lib/colors";
 
-export default function ResetDemoButton() {
+export default function ResetDemoButton({ partidoId }: { partidoId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -15,7 +15,7 @@ export default function ResetDemoButton() {
     setError(null);
     startTransition(async () => {
       try {
-        await resetearPartidoDemo();
+        await resetearPartidoDemo(partidoId);
         setConfirmando(false);
         router.refresh();
       } catch (e) {

@@ -26,7 +26,8 @@ export default async function PartidoPage({
   if (!partidoSnap.exists) notFound();
   const partido = partidoSnap.data() as Partido;
   const categoriaNombre = CATEGORIAS.find((c) => c.id === partido.categoriaId)?.nombre ?? partido.categoriaId;
-  const mostrarReset = partidoId === "demo-partido-1" && session?.rol === "manager";
+  const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
+  const mostrarReset = PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager";
 
   const cabecera = (
     <>
@@ -62,7 +63,7 @@ export default async function PartidoPage({
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
         <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} />
-        {mostrarReset && <ResetDemoButton />}
+        {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );
@@ -109,7 +110,7 @@ export default async function PartidoPage({
             periodo={null}
           />
         )}
-        {mostrarReset && <ResetDemoButton />}
+        {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );
@@ -136,7 +137,7 @@ export default async function PartidoPage({
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       {cabecera}
       <PartidoLive partidoId={partidoId} inicial={partidoParaCliente} session={session} plantel={plantel} />
-      {mostrarReset && <ResetDemoButton />}
+      {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
       <FooterChip />
     </main>
   );

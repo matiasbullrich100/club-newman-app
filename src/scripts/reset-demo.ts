@@ -1,11 +1,12 @@
-// Resetea demo-partido-1 a estado "programado" para volver a probar el flujo del Designado
-// desde cero. Borra incidencias, reinicia el reloj y el plantel (enCancha = titular).
-// Correr con: npx tsx src/scripts/reset-demo.ts
+// Resetea un partido de prueba a estado "programado" para volver a probarlo desde cero.
+// Borra incidencias, reinicia el reloj y el plantel (enCancha = titular).
+// Correr con: npx tsx src/scripts/reset-demo.ts [demo-partido-1|demo-partido-2|demo-partido-3]
+// Sin argumento, resetea demo-partido-1.
 
 import { config } from "dotenv";
 import { resolve } from "path";
 
-const PARTIDO_ID = "demo-partido-1";
+const PARTIDO_ID = process.argv[2] ?? "demo-partido-1";
 
 async function main() {
   config({ path: resolve(__dirname, "../../.env.local") });
