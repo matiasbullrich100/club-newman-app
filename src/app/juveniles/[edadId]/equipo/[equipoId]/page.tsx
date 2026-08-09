@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS, partidoId } from "@/lib/categorias";
+import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -10,28 +10,27 @@ import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-const NUMERO_FECHAS = 26;
-
-export default async function CategoriaPage({
+export default async function EquipoJuvenilesPage({
   params,
 }: {
-  params: Promise<{ categoriaId: string }>;
+  params: Promise<{ edadId: string; equipoId: string }>;
 }) {
-  const { categoriaId } = await params;
-  const categoria = CATEGORIAS.find((c) => c.id === categoriaId && c.grupo === "superior");
-  if (!categoria) notFound();
+  const { edadId, equipoId } = await params;
+  const edad = EDADES.find((e) => e.id === edadId);
+  const equipo = edad ? equiposDeEdad(edadId).find((e) => e.id === equipoId) : undefined;
+  if (!edad || !equipo) notFound();
 
-  const refs = Array.from({ length: NUMERO_FECHAS }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
+  const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(equipoId, i + 1)));
   const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href="/categorias" />
+      <BackLink href={`/juveniles/${edadId}/equipos`} />
       <SessionBar session={session} />
-      <Header />
+      <Header rightLabel={edad.nombre} />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8 }}>{categoria.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8 }}>{equipo.nombre}</div>
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
         Fixture
       </div>
@@ -41,7 +40,7 @@ export default async function CategoriaPage({
           partido ? (
             <FixtureRow
               key={numeroFecha}
-              href={`/partido/${partidoId(categoriaId, numeroFecha)}`}
+              href={`/partido/${partidoId(equipoId, numeroFecha)}`}
               jugada={partido.estado === "terminado"}
               tituloPrincipal={
                 partido.notaEspecial ? (
@@ -55,7 +54,13 @@ export default async function CategoriaPage({
                   </>
                 )
               }
-              notaSecundaria={partido.fecha ? formatFecha(partido.fecha, "short") : ""}
+              notaSecundaria={
+                partido.fecha
+                  ? partido.hora && partido.estado !== "terminado"
+                    ? `${formatFecha(partido.fecha, "short")} · ${partido.hora}`
+                    : formatFecha(partido.fecha, "short")
+                  : ""
+              }
             />
           ) : null
         )}

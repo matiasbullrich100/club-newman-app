@@ -1,5 +1,6 @@
 import type { Incidente, Partido } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import Formaciones from "./Formaciones";
 import IncidentesList from "./IncidentesList";
@@ -52,7 +53,18 @@ export default function PartidoHistorico({
             <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} />
           </p>
         ) : (
-          <p style={{ opacity: 0.6, fontStyle: "italic", textAlign: "center" }}>Partido sin cargar</p>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: "1.05rem", margin: 0 }}>
+              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={partido.resultado} />
+            </p>
+            {(partido.fecha || partido.hora || partido.cancha) && (
+              <p style={{ opacity: 0.7, fontSize: "0.82rem", marginTop: 6 }}>
+                {partido.fecha && capitalizarPrimera(formatFecha(partido.fecha, "long"))}
+                {partido.hora && ` · ${partido.hora} hs`}
+                {partido.cancha && ` en ${partido.cancha}`}
+              </p>
+            )}
+          </div>
         )}
       </div>
 

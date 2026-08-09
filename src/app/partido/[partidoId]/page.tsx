@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS } from "@/lib/categorias";
+import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR } from "@/lib/categorias";
 import type { Incidente, JugadorPartido, Partido } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
 import PartidoHistorico from "@/components/PartidoHistorico";
@@ -25,13 +25,20 @@ export default async function PartidoPage({
   const [partidoSnap, session] = await Promise.all([partidoRef.get(), getSession()]);
   if (!partidoSnap.exists) notFound();
   const partido = partidoSnap.data() as Partido;
-  const categoriaNombre = CATEGORIAS.find((c) => c.id === partido.categoriaId)?.nombre ?? partido.categoriaId;
+  const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
+  const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
   const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
   const mostrarReset = PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager";
-  // numeroFecha "demo" (partidos de prueba, fuera del esquema real 1-26) no tiene vista de
-  // fecha propia -- /fecha/[numeroFecha] devuelve 404 para cualquier valor no numerico.
-  const numeroFechaValido = Number.isInteger(Number(partido.numeroFecha)) && Number(partido.numeroFecha) >= 1 && Number(partido.numeroFecha) <= 26;
-  const backHref = numeroFechaValido ? `/fecha/${partido.numeroFecha}` : "/";
+  // numeroFecha "demo" (partidos de prueba, fuera de cualquier esquema real) no tiene vista de
+  // fecha propia -- /fecha o /juveniles/.../fecha devuelven 404 para un numero fuera de rango.
+  const numero = Number(partido.numeroFecha);
+  const maxFechas = categoria?.grupo === "juveniles" ? NUMERO_FECHAS_JUVENILES : NUMERO_FECHAS_SUPERIOR;
+  const numeroFechaValido = Number.isInteger(numero) && numero >= 1 && numero <= maxFechas;
+  const backHref = !numeroFechaValido
+    ? "/"
+    : categoria?.grupo === "juveniles"
+      ? `/juveniles/${categoria.edadId}/fecha/${numero}`
+      : `/fecha/${numero}`;
 
   const cabecera = (
     <>

@@ -11,7 +11,9 @@
     "reset-demo": "tsx src/scripts/reset-demo.ts",
     "seed-demo-extra": "tsx src/scripts/seed-demo-extra.ts",
     "seed-designados": "tsx src/scripts/seed-designados.ts",
-    "migrate-historical": "tsx src/scripts/migrate-historical.ts"
+    "seed-designados-juveniles": "tsx src/scripts/seed-designados-juveniles.ts",
+    "migrate-historical": "tsx src/scripts/migrate-historical.ts",
+    "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",

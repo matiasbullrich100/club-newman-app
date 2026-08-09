@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
+import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -13,43 +13,47 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
-export default async function VistaDeFecha({
+export default async function FechaJuvenilesPage({
   params,
 }: {
-  params: Promise<{ numeroFecha: string }>;
+  params: Promise<{ edadId: string; numeroFecha: string }>;
 }) {
-  const { numeroFecha } = await params;
+  const { edadId, numeroFecha } = await params;
+  const edad = EDADES.find((e) => e.id === edadId);
   const numero = Number(numeroFecha);
-  if (!Number.isInteger(numero) || numero < 1 || numero > 26) notFound();
+  if (!edad || !Number.isInteger(numero) || numero < 1 || numero > NUMERO_FECHAS_JUVENILES) notFound();
 
-  const refs = CATEGORIAS_SUPERIOR.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, numero)));
+  const equipos = equiposDeEdad(edadId);
+  if (equipos.length === 0) notFound();
+
+  const refs = equipos.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, numero)));
   const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
-  const filas = CATEGORIAS_SUPERIOR.map((cat, i) => ({ cat, partido: snaps[i].exists ? (snaps[i].data() as Partido) : null }));
+  const filas = equipos.map((cat, i) => ({ cat, partido: snaps[i].exists ? (snaps[i].data() as Partido) : null }));
 
-  const primera = filas.find((f) => f.cat.id === "primera")?.partido;
+  const headline = filas[0]?.partido;
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href="/" />
+      <BackLink href={`/juveniles/${edadId}`} />
       <SessionBar session={session} />
-      <Header rightLabel={`Fecha ${numero}`} />
+      <Header rightLabel={`${edad.nombre} · Fecha ${numero}`} />
 
-      {primera && (
+      {headline && (
         <>
           <div style={{ fontWeight: 700, textAlign: "center", color: DORADO, fontSize: "1.15rem", textTransform: "uppercase", marginTop: 12, letterSpacing: 0.3 }}>
-            {primera.notaEspecial ?? (
-              <MatchupText esLocal={primera.esLocal} rival={primera.rival} jugado={primera.estado === "terminado"} resultado={primera.resultado} />
+            {headline.notaEspecial ?? (
+              <MatchupText esLocal={headline.esLocal} rival={headline.rival} jugado={headline.estado === "terminado"} resultado={headline.resultado} />
             )}
           </div>
-          {primera.fecha && (
+          {headline.fecha && (
             <div style={{ textAlign: "center", fontStyle: "italic", fontSize: "0.85rem", color: DORADO_SUAVE, opacity: 0.9, marginTop: 2, marginBottom: 14 }}>
-              {capitalizarPrimera(formatFecha(primera.fecha, "long"))}
+              {capitalizarPrimera(formatFecha(headline.fecha, "long"))}
             </div>
           )}
         </>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: primera ? 0 : "20px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: headline ? 0 : "20px" }}>
         {filas.map(({ cat, partido }) => {
           if (!partido) return null;
           const href = `/partido/${partidoId(cat.id, numero)}`;
@@ -71,7 +75,10 @@ export default async function VistaDeFecha({
               tituloPrincipal={cat.nombre}
               notaSecundaria={
                 partido.notaEspecial ?? (
-                  <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                  <>
+                    <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                    {partido.estado !== "terminado" && partido.hora && ` · ${partido.hora}`}
+                  </>
                 )
               }
             />

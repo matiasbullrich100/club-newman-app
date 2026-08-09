@@ -43,6 +43,7 @@ export interface Partido {
   rival: string;
   esLocal: boolean;
   cancha: string;
+  hora?: string; // "HH:MM", solo si se conoce el horario (ej. juveniles)
   estado: EstadoPartido;
   resultado: Resultado;
   enCanchaIds: string[];
