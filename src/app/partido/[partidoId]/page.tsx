@@ -28,10 +28,14 @@ export default async function PartidoPage({
   const categoriaNombre = CATEGORIAS.find((c) => c.id === partido.categoriaId)?.nombre ?? partido.categoriaId;
   const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
   const mostrarReset = PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager";
+  // numeroFecha "demo" (partidos de prueba, fuera del esquema real 1-26) no tiene vista de
+  // fecha propia -- /fecha/[numeroFecha] devuelve 404 para cualquier valor no numerico.
+  const numeroFechaValido = Number.isInteger(Number(partido.numeroFecha)) && Number(partido.numeroFecha) >= 1 && Number(partido.numeroFecha) <= 26;
+  const backHref = numeroFechaValido ? `/fecha/${partido.numeroFecha}` : "/";
 
   const cabecera = (
     <>
-      <BackLink href={`/fecha/${partido.numeroFecha}`} />
+      <BackLink href={backHref} />
       <Header rightLabel={`Fecha ${partido.numeroFecha}`} />
       <SessionBar session={session} />
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
