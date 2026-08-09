@@ -36,7 +36,7 @@ const EQUIPOS: EquipoFecha1[] = [
   {
     categoriaId: "m15-a",
     rival: "Regatas A",
-    cancha: "Regatas A",
+    cancha: "Newman",
     hora: "11:00",
     jugadores: titulares([
       "Llambi Bovino, Felipe",
@@ -59,7 +59,7 @@ const EQUIPOS: EquipoFecha1[] = [
   {
     categoriaId: "m15-b",
     rival: "Regatas B",
-    cancha: "Regatas B",
+    cancha: "Newman",
     hora: "09:30",
     jugadores: [
       ...titulares([
@@ -85,7 +85,7 @@ const EQUIPOS: EquipoFecha1[] = [
   {
     categoriaId: "m15-c",
     rival: "Regatas C",
-    cancha: "Regatas C",
+    cancha: "Newman",
     hora: "11:00",
     jugadores: titulares([
       "Waisman, Matias",
@@ -108,7 +108,7 @@ const EQUIPOS: EquipoFecha1[] = [
   {
     categoriaId: "m15-d",
     rival: "Regatas D",
-    cancha: "Regatas D",
+    cancha: "Newman",
     hora: "09:30",
     jugadores: [
       ...titulares([
@@ -153,7 +153,7 @@ async function main() {
       fecha: FECHA_ISO,
       hora: equipo.hora,
       rival: equipo.rival,
-      esLocal: false,
+      esLocal: true,
       cancha: equipo.cancha,
       estado: "programado",
       resultado: { newman: 0, rival: 0 },

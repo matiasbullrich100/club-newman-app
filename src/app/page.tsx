@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS } from "@/lib/categorias";
-import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
-import LiveBanner from "@/components/LiveBanner";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 // Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
@@ -30,10 +27,7 @@ const botonStyle: React.CSSProperties = {
 };
 
 export default async function Home() {
-  const [session, resumen] = await Promise.all([
-    getSession(),
-    partidosEnVivoOTerminadosHoy(CATEGORIAS.map((c) => c.id)),
-  ]);
+  const session = await getSession();
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -51,15 +45,6 @@ export default async function Home() {
           </span>
         ))}
       </p>
-
-      {resumen.map((p) => (
-        <LiveBanner
-          key={p.id}
-          partidoId={p.id}
-          categoriaNombre={CATEGORIAS.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
-        />
-      ))}
 
       <div style={{ display: "grid", gap: 12, marginTop: 24 }}>
         <Link href="/superior" style={botonStyle}>
