@@ -13,6 +13,14 @@ import { DORADO_SUAVE } from "@/lib/colors";
 const NUMERO_FECHAS = 26;
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
 
+// Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
+// que necesitan su propio link (nunca aparecen en /fecha ni /categoria).
+const PARTIDOS_DEMO = [
+  { id: "demo-partido-1", label: "Pre B" },
+  { id: "demo-partido-2", label: "M-22" },
+  { id: "demo-partido-3", label: "Pre A" },
+];
+
 export default async function Home() {
   const refs = Array.from({ length: NUMERO_FECHAS }, (_, i) => adminDb.collection("partidos").doc(partidoId("primera", i + 1)));
   const [snaps, session, enVivoSnap] = await Promise.all([
@@ -29,9 +37,15 @@ export default async function Home() {
       <SessionBar session={session} />
 
       <p style={{ marginTop: 16, fontSize: "0.85rem", textAlign: "center" }}>
-        <Link href="/partido/demo-partido-1" style={{ color: DORADO_SUAVE }}>
-          Partido de prueba (Fase 1)
-        </Link>
+        Partidos de prueba (Fase 1):{" "}
+        {PARTIDOS_DEMO.map((p, i) => (
+          <span key={p.id}>
+            {i > 0 && " · "}
+            <Link href={`/partido/${p.id}`} style={{ color: DORADO_SUAVE }}>
+              {p.label}
+            </Link>
+          </span>
+        ))}
       </p>
 
       {partidosEnVivo.map((p) => (
