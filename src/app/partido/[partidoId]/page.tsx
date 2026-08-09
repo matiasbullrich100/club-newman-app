@@ -12,6 +12,7 @@ import FooterChip from "@/components/FooterChip";
 import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import type { RosterJugador } from "@/components/panel-designado/types";
+import { ordenarPorDorsal } from "@/lib/players";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PartidoPage({
@@ -57,17 +58,19 @@ export default async function PartidoPage({
       partidoRef.collection("plantel").get(),
       partidoRef.collection("incidentes").orderBy("createdAt").get(),
     ]);
-    const plantel = plantelSnap.docs.map((d) => {
-      const data = d.data() as JugadorPartido;
-      return {
-        jugadorId: d.id,
-        nombre: data.nombre,
-        dorsal: data.dorsal,
-        titular: data.titular,
-        capitan: data.capitan,
-        debut: data.debut,
-      };
-    });
+    const plantel = ordenarPorDorsal(
+      plantelSnap.docs.map((d) => {
+        const data = d.data() as JugadorPartido;
+        return {
+          jugadorId: d.id,
+          nombre: data.nombre,
+          dorsal: data.dorsal,
+          titular: data.titular,
+          capitan: data.capitan,
+          debut: data.debut,
+        };
+      })
+    );
     const incidentes = incidentesSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Incidente) }));
 
     return (
@@ -84,17 +87,19 @@ export default async function PartidoPage({
   // mira puede operar esta categoria, el boton "Iniciar partido" para arrancarlo cuando toque.
   if (partido.estado === "programado") {
     const plantelSnap = await partidoRef.collection("plantel").get();
-    const plantel = plantelSnap.docs.map((d) => {
-      const data = d.data() as JugadorPartido;
-      return {
-        jugadorId: d.id,
-        nombre: data.nombre,
-        dorsal: data.dorsal,
-        titular: data.titular,
-        capitan: data.capitan,
-        debut: data.debut,
-      };
-    });
+    const plantel = ordenarPorDorsal(
+      plantelSnap.docs.map((d) => {
+        const data = d.data() as JugadorPartido;
+        return {
+          jugadorId: d.id,
+          nombre: data.nombre,
+          dorsal: data.dorsal,
+          titular: data.titular,
+          capitan: data.capitan,
+          debut: data.debut,
+        };
+      })
+    );
     const puedeOperar =
       !!session && (session.rol === "manager" || (session.rol === "designado" && session.categoriaId === partido.categoriaId));
     // createdAt/updatedAt son Timestamps de Firestore -- no se pueden pasar a un Client Component.
@@ -139,10 +144,12 @@ export default async function PartidoPage({
     resultado: partido.resultado,
     enCanchaIds: partido.enCanchaIds,
   };
-  const plantel: RosterJugador[] = plantelSnap.docs.map((d) => {
-    const data = d.data() as JugadorPartido;
-    return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular };
-  });
+  const plantel: RosterJugador[] = ordenarPorDorsal(
+    plantelSnap.docs.map((d) => {
+      const data = d.data() as JugadorPartido;
+      return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular };
+    })
+  );
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>

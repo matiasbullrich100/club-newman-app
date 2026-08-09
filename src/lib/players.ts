@@ -26,6 +26,12 @@ export function playerId(name: string): string {
   return norm(name).replace(",", " ").split(" ").filter(Boolean).sort().join(" ");
 }
 
+// Firestore no garantiza el orden de lectura de una subcoleccion (ver Formaciones.tsx) -- sin
+// esto, los botones de "elegir jugador" (incidencias/cambios) salen en orden aleatorio.
+export function ordenarPorDorsal<T extends { dorsal: string }>(lista: T[]): T[] {
+  return [...lista].sort((a, b) => Number(a.dorsal) - Number(b.dorsal));
+}
+
 // Heuristica ya validada por el club (portada del HTML de referencia de la sesion anterior):
 // si el nombre tiene coma, separa por coma; si no, la ultima palabra es el nombre de pila y
 // el resto el apellido (soporta apellidos compuestos como "De la Vega Joaquin").
