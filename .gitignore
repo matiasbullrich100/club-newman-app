@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# archivos de trabajo sueltos (nunca deberian quedar en el repo)
+*.pdf
