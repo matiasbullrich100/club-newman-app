@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { adminDb } from "@/lib/firebase-admin";
-import type { Partido } from "@/types/firestore";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS } from "@/lib/categorias";
+import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
 import { DORADO_SUAVE } from "@/lib/colors";
-
-const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
 
 // Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
 // que necesitan su propio link (nunca aparecen en /fecha ni /categoria).
@@ -33,11 +30,10 @@ const botonStyle: React.CSSProperties = {
 };
 
 export default async function Home() {
-  const [session, enVivoSnap] = await Promise.all([
+  const [session, resumen] = await Promise.all([
     getSession(),
-    adminDb.collection("partidos").where("estado", "in", ESTADOS_EN_VIVO).get(),
+    partidosEnVivoOTerminadosHoy(CATEGORIAS.map((c) => c.id)),
   ]);
-  const partidosEnVivo = enVivoSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Partido) }));
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -56,7 +52,7 @@ export default async function Home() {
         ))}
       </p>
 
-      {partidosEnVivo.map((p) => (
+      {resumen.map((p) => (
         <LiveBanner
           key={p.id}
           partidoId={p.id}
