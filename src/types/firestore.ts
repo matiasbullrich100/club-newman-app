@@ -88,6 +88,7 @@ export type TipoIncidente =
   | "tarjeta_amarilla"
   | "tarjeta_doble_amarilla"
   | "tarjeta_roja"
+  | "tarjeta_roja_20"
   | "tarjeta_azul"
   | "cambio"
   | "lesion"
@@ -122,6 +123,7 @@ export interface JugadorAgregado {
   tarjetasAmarillas: number;
   tarjetasDobleAmarilla: number;
   tarjetasRojas: number;
+  tarjetasRojas20: number;
   tarjetasAzules: number;
   minutosJugadosTotal: number;
 }

@@ -64,8 +64,10 @@ async function Tablas() {
   const jugadores = snap.docs.map((d) => ({ id: d.id, ...(d.data() as JugadorAgregado) }));
 
   const porTarjetas = [...jugadores].sort((a, b) => {
-    const totalA = a.tarjetasAmarillas + (a.tarjetasDobleAmarilla ?? 0) + a.tarjetasRojas + a.tarjetasAzules;
-    const totalB = b.tarjetasAmarillas + (b.tarjetasDobleAmarilla ?? 0) + b.tarjetasRojas + b.tarjetasAzules;
+    const totalA =
+      a.tarjetasAmarillas + (a.tarjetasDobleAmarilla ?? 0) + a.tarjetasRojas + (a.tarjetasRojas20 ?? 0) + a.tarjetasAzules;
+    const totalB =
+      b.tarjetasAmarillas + (b.tarjetasDobleAmarilla ?? 0) + b.tarjetasRojas + (b.tarjetasRojas20 ?? 0) + b.tarjetasAzules;
     return totalB - totalA || a.nombre.localeCompare(b.nombre);
   });
 
@@ -88,6 +90,7 @@ async function Tablas() {
                   <th style={thStyle}>🟨</th>
                   <th style={thStyle}>🟨🟨</th>
                   <th style={thStyle}>🟥</th>
+                  <th style={thStyle}>🟥20</th>
                   <th style={thStyle}>🟦</th>
                 </tr>
               </thead>
@@ -98,6 +101,7 @@ async function Tablas() {
                     <td style={tdStyle}>{j.tarjetasAmarillas || 0}</td>
                     <td style={tdStyle}>{j.tarjetasDobleAmarilla || 0}</td>
                     <td style={tdStyle}>{j.tarjetasRojas || 0}</td>
+                    <td style={tdStyle}>{j.tarjetasRojas20 || 0}</td>
                     <td style={tdStyle}>{j.tarjetasAzules || 0}</td>
                   </tr>
                 ))}

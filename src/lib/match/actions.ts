@@ -296,6 +296,7 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tarjeta_amarilla: "tarjetasAmarillas",
       tarjeta_doble_amarilla: "tarjetasDobleAmarilla",
       tarjeta_roja: "tarjetasRojas",
+      tarjeta_roja_20: "tarjetasRojas20",
       tarjeta_azul: "tarjetasAzules",
     };
     // Las tarjetas azules de partidos simulados no se contabilizan en las estadisticas reales.

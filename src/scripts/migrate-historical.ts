@@ -221,6 +221,7 @@ async function main() {
       tarjetasAmarillas: entry.amarillas,
       tarjetasDobleAmarilla: 0,
       tarjetasRojas: entry.rojas,
+      tarjetasRojas20: 0,
       tarjetasAzules: 0,
       minutosJugadosTotal: 0,
     });

@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
-import type { EstadoPartido, Incidente, Resultado } from "@/types/firestore";
+import type { EstadoPartido, Resultado } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { MatchupText } from "./FixtureRow";
-import IncidentesList from "./IncidentesList";
+import Cronometro from "./Cronometro";
 
 const ESTADOS_EN_VIVO = new Set<EstadoPartido>(["en_juego", "entretiempo", "suspendido"]);
 
@@ -28,17 +28,10 @@ export default function LiveBanner({
   inicial: EstadoPartidoLive;
 }) {
   const [partido, setPartido] = useState<EstadoPartidoLive>(inicial);
-  const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
 
   useEffect(() => {
     return onSnapshot(doc(db, "partidos", partidoId), (snap) => {
       if (snap.exists()) setPartido(snap.data() as EstadoPartidoLive);
-    });
-  }, [partidoId]);
-
-  useEffect(() => {
-    return onSnapshot(collection(db, "partidos", partidoId, "incidentes"), (snap) => {
-      setIncidentes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Incidente) })));
     });
   }, [partidoId]);
 
@@ -68,8 +61,8 @@ export default function LiveBanner({
         <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} />
       </p>
       {enVivo && (
-        <div style={{ marginTop: 10 }}>
-          <IncidentesList incidentes={incidentes} rivalNombre={partido.rival} />
+        <div style={{ marginTop: 8, textAlign: "center" }}>
+          <Cronometro partidoId={partidoId} />
         </div>
       )}
     </Link>
