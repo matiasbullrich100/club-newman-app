@@ -2,17 +2,23 @@ import Link from "next/link";
 import { adminDb } from "@/lib/firebase-admin";
 import type { Partido } from "@/types/firestore";
 import { getSession } from "@/lib/auth/session";
-import { NUMERO_FECHAS_SUPERIOR, partidoId } from "@/lib/categorias";
+import { CATEGORIAS_SUPERIOR, NUMERO_FECHAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { formatFecha } from "@/lib/fecha";
+import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
+import LiveBanner from "@/components/LiveBanner";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PlantelSuperiorPage() {
   const refs = Array.from({ length: NUMERO_FECHAS_SUPERIOR }, (_, i) => adminDb.collection("partidos").doc(partidoId("primera", i + 1)));
-  const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
+  const [snaps, session, resumen] = await Promise.all([
+    adminDb.getAll(...refs),
+    getSession(),
+    partidosEnVivoOTerminadosHoy(CATEGORIAS_SUPERIOR.map((c) => c.id)),
+  ]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
 
   return (
@@ -20,6 +26,15 @@ export default async function PlantelSuperiorPage() {
       <BackLink href="/" />
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
+
+      {resumen.map((p) => (
+        <LiveBanner
+          key={p.id}
+          partidoId={p.id}
+          categoriaNombre={CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
+          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+        />
+      ))}
 
       <p style={{ textAlign: "center", marginTop: 16 }}>
         <Link

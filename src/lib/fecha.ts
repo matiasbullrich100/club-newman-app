@@ -11,3 +11,10 @@ export function formatFecha(iso: string, weekday: "short" | "long" = "short"): s
 export function capitalizarPrimera(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+// Compara por dia calendario en Argentina, sin importar en que huso horario corre el server
+// (Vercel corre en UTC) -- "en_CA" da "YYYY-MM-DD" listo para comparar como string.
+export function esHoyEnArgentina(fecha: Date): boolean {
+  const diaDe = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+  return diaDe(fecha) === diaDe(new Date());
+}

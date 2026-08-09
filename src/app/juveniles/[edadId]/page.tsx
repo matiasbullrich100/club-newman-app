@@ -5,10 +5,12 @@ import type { Partido } from "@/types/firestore";
 import { getSession } from "@/lib/auth/session";
 import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, partidoId } from "@/lib/categorias";
 import { formatFecha } from "@/lib/fecha";
+import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
+import LiveBanner from "@/components/LiveBanner";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function EdadPage({ params }: { params: Promise<{ edadId: string }> }) {
@@ -34,7 +36,10 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
 
   const headline = equipos[0];
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(headline.id, i + 1)));
-  const snaps = await adminDb.getAll(...refs);
+  const [snaps, resumen] = await Promise.all([
+    adminDb.getAll(...refs),
+    partidosEnVivoOTerminadosHoy(equipos.map((e) => e.id)),
+  ]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
 
   return (
@@ -42,6 +47,15 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
       <BackLink href="/juveniles" />
       <SessionBar session={session} />
       <Header rightLabel={edad.nombre} />
+
+      {resumen.map((p) => (
+        <LiveBanner
+          key={p.id}
+          partidoId={p.id}
+          categoriaNombre={equipos.find((e) => e.id === p.categoriaId)?.nombre ?? p.categoriaId}
+          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+        />
+      ))}
 
       <p style={{ textAlign: "center", marginTop: 16 }}>
         <Link
