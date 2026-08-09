@@ -34,7 +34,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
     );
   }
 
-  const headline = equipos[0];
+  const headline = equipos.find((e) => "destacado" in e && e.destacado) ?? equipos[0];
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(headline.id, i + 1)));
   const [snaps, resumen] = await Promise.all([
     adminDb.getAll(...refs),
