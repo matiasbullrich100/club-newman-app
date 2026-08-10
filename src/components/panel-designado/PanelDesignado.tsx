@@ -16,6 +16,7 @@ import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
 import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
+import { nombreNewmanDe } from "@/lib/categorias";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const btnStyle: React.CSSProperties = {
@@ -92,6 +93,8 @@ export default function PanelDesignado({
     setEligiendoMotivo(false);
     ejecutar((id) => suspender(id, motivo));
   }
+
+  const nombreNewman = nombreNewmanDe(partido.categoriaId);
 
   return (
     <div
@@ -181,7 +184,7 @@ export default function PanelDesignado({
           <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
-          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar />
+          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} />
           <CargaCambio partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}

@@ -142,7 +142,7 @@ export async function suspender(partidoId: string, motivo: "medico" | "clima"): 
 
     const accumulated = elapsedSeconds(liveState);
     tx.update(partidoRef, { estado: "suspendido", updatedAt: FieldValue.serverTimestamp() });
-    tx.update(liveStateRef, { clockRunning: false, clockAnchor: null, accumulatedSeconds: accumulated });
+    tx.update(liveStateRef, { clockRunning: false, clockAnchor: null, accumulatedSeconds: accumulated, motivoInterrupcion: motivo });
 
     const incidente: Incidente = {
       tipo: motivo === "medico" ? "interrupcion_medica" : "interrupcion_clima",
@@ -170,7 +170,7 @@ export async function reanudar(partidoId: string): Promise<void> {
     if (partido.estado !== "suspendido") throw new Error("El partido no está suspendido");
 
     tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
-    tx.update(liveStateRef, { clockRunning: true, clockAnchor: Timestamp.now() });
+    tx.update(liveStateRef, { clockRunning: true, clockAnchor: Timestamp.now(), motivoInterrupcion: null });
   });
 
   revalidatePath(`/partido/${partidoId}`);

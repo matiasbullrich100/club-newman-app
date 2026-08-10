@@ -65,6 +65,7 @@ export interface LiveState {
   accumulatedSeconds: number;
   period1DurationSeconds?: number;
   period2DurationSeconds?: number;
+  motivoInterrupcion?: "medico" | "clima" | null;
 }
 
 // Subcollection `partidos/{id}/plantel/{jugadorId}`.

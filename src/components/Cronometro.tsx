@@ -28,12 +28,14 @@ export default function Cronometro({ partidoId }: { partidoId: string }) {
     return <div style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.75, color: DORADO_SUAVE }}>—</div>;
   }
 
+  const motivoLabel = liveState.motivoInterrupcion === "medico" ? "Médico" : liveState.motivoInterrupcion === "clima" ? "Clima" : null;
+
   return (
     <div style={{ fontVariantNumeric: "tabular-nums", fontSize: "1.15rem", letterSpacing: 1, color: DORADO }}>
       {formatMMSS(elapsedSeconds(liveState))}
       <div style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.75, color: DORADO_SUAVE }}>
-        {liveState.periodo}
-        {!liveState.clockRunning && " · detenido"}
+        {motivoLabel ? `Partido interrumpido · ${motivoLabel}` : liveState.periodo}
+        {!motivoLabel && !liveState.clockRunning && " · detenido"}
       </div>
     </div>
   );

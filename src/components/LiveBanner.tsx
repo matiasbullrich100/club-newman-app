@@ -22,10 +22,12 @@ export default function LiveBanner({
   partidoId,
   categoriaNombre,
   inicial,
+  nombreNewman,
 }: {
   partidoId: string;
   categoriaNombre: string;
   inicial: EstadoPartidoLive;
+  nombreNewman?: string;
 }) {
   const [partido, setPartido] = useState<EstadoPartidoLive>(inicial);
 
@@ -58,7 +60,7 @@ export default function LiveBanner({
         </span>
       </div>
       <p style={{ fontSize: "1.15rem", textAlign: "center", margin: "8px 0 0" }}>
-        <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} />
+        <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
       </p>
       {enVivo && (
         <div style={{ marginTop: 8, textAlign: "center" }}>

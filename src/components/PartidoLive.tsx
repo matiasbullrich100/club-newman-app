@@ -9,6 +9,7 @@ import IncidentesFeed from "./IncidentesFeed";
 import type { EstadoPartido, LiveState, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 import type { RosterJugador } from "./panel-designado/types";
+import { nombreNewmanDe } from "@/lib/categorias";
 import { CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADO_BADGE: Record<EstadoPartido, { label: string; bg: string; color: string }> = {
@@ -32,6 +33,7 @@ export default function PartidoLive({
 }) {
   const [partido, setPartido] = useState<Partido>(inicial);
   const [periodo, setPeriodo] = useState<LiveState["periodo"]>(null);
+  const [motivoInterrupcion, setMotivoInterrupcion] = useState<LiveState["motivoInterrupcion"]>(null);
 
   useEffect(() => {
     const ref = doc(db, "partidos", partidoId);
@@ -43,13 +45,19 @@ export default function PartidoLive({
   useEffect(() => {
     const ref = doc(db, "partidos", partidoId, "liveState", "state");
     return onSnapshot(ref, (snap) => {
-      if (snap.exists()) setPeriodo((snap.data() as LiveState).periodo);
+      if (snap.exists()) {
+        const liveState = snap.data() as LiveState;
+        setPeriodo(liveState.periodo);
+        setMotivoInterrupcion(liveState.motivoInterrupcion ?? null);
+      }
     });
   }, [partidoId]);
 
   const puedeOperar =
     !!session && (session.rol === "manager" || (session.rol === "designado" && session.categoriaId === partido.categoriaId));
   const badge = ESTADO_BADGE[partido.estado];
+  const motivoLabel = motivoInterrupcion === "medico" ? "Médico" : motivoInterrupcion === "clima" ? "Clima" : null;
+  const badgeLabel = partido.estado === "suspendido" && motivoLabel ? `${badge.label} · ${motivoLabel}` : badge.label;
 
   return (
     <div>
@@ -85,7 +93,7 @@ export default function PartidoLive({
                 color: badge.color,
               }}
             >
-              {badge.label}
+              {badgeLabel}
             </span>
           </div>
         </div>
@@ -99,7 +107,7 @@ export default function PartidoLive({
         // El feed para el Designado va adentro del panel (entre jugadas y cambios).
         <PanelDesignado partidoId={partidoId} partido={partido} plantel={plantel} periodo={periodo} />
       ) : (
-        <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} />
+        <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} nombreNewman={nombreNewmanDe(partido.categoriaId)} />
       )}
     </div>
   );

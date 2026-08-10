@@ -11,10 +11,12 @@ export default function IncidentesFeed({
   partidoId,
   rivalNombre,
   puedeEditar,
+  nombreNewman,
 }: {
   partidoId: string;
   rivalNombre?: string;
   puedeEditar?: boolean;
+  nombreNewman?: string;
 }) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
 
@@ -40,7 +42,13 @@ export default function IncidentesFeed({
       }}
     >
       <h3 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginBottom: 10 }}>Incidencias</h3>
-      <IncidentesList incidentes={incidentes} rivalNombre={rivalNombre} partidoId={partidoId} puedeEditar={puedeEditar} />
+      <IncidentesList
+        incidentes={incidentes}
+        rivalNombre={rivalNombre}
+        partidoId={partidoId}
+        puedeEditar={puedeEditar}
+        nombreNewman={nombreNewman}
+      />
     </div>
   );
 }

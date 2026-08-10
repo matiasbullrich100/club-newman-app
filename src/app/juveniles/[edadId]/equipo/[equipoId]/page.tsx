@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, partidoId } from "@/lib/categorias";
+import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -20,6 +20,7 @@ export default async function EquipoJuvenilesPage({
   const equipo = edad ? equiposDeEdad(edadId).find((e) => e.id === equipoId) : undefined;
   if (!edad || !equipo) notFound();
 
+  const nombreNewman = nombreNewmanDe(equipoId);
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(equipoId, i + 1)));
   const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
@@ -50,7 +51,13 @@ export default async function EquipoJuvenilesPage({
                 ) : (
                   <>
                     # {numeroFecha}.{" "}
-                    <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                    <MatchupText
+                      esLocal={partido.esLocal}
+                      rival={partido.rival}
+                      jugado={partido.estado === "terminado"}
+                      resultado={partido.resultado}
+                      nombreNewman={nombreNewman}
+                    />
                   </>
                 )
               }

@@ -40,16 +40,22 @@ export function requierePlayerSelection(tipo: Incidente["tipo"]): boolean {
   return !SIN_JUGADOR_PUNTUAL.includes(tipo);
 }
 
-/** rivalNombre: nombre real del rival (ej. "SIC") para mostrar en vez del generico "Rival". */
-export function describirIncidente(inc: Incidente, rivalNombre?: string): string {
+/**
+ * rivalNombre: nombre real del rival (ej. "SIC") para mostrar en vez del generico "Rival".
+ * nombreNewman: "Newman" salvo en Juveniles, donde se pide aclarar el equipo (ej. "Newman A").
+ */
+export function describirIncidente(inc: Incidente, rivalNombre?: string, nombreNewman = "Newman"): string {
   if (inc.tipo === "cambio") {
-    return `Sale ${inc.jugadorSaleNombre ?? "?"}, entra ${inc.jugadorEntraNombre ?? "?"}`;
+    return `Cambio — ${nombreNewman} — Sale ${inc.jugadorSaleNombre ?? "?"}, entra ${inc.jugadorEntraNombre ?? "?"}`;
   }
   if (SIN_EQUIPO.includes(inc.tipo)) {
     return ETIQUETAS_INCIDENTE[inc.tipo];
   }
-  const quien = inc.equipo === "newman" ? inc.jugadorNombre ?? "Newman" : rivalNombre ?? "Rival";
-  return `${ETIQUETAS_INCIDENTE[inc.tipo]} — ${quien}`;
+  if (inc.equipo === "newman") {
+    const quien = inc.jugadorNombre ? `${nombreNewman} — ${inc.jugadorNombre}` : nombreNewman;
+    return `${ETIQUETAS_INCIDENTE[inc.tipo]} — ${quien}`;
+  }
+  return `${ETIQUETAS_INCIDENTE[inc.tipo]} — ${rivalNombre ?? "Rival"}`;
 }
 
 const PRIORIDAD_PERIODO: Record<string, number> = { "1T": 0, "2T": 1 };

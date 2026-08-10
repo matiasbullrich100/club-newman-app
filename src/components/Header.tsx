@@ -76,7 +76,19 @@ export default function Header({
           }}
         >
           {rightLabel && (
-            <span style={{ marginRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{rightLabel}</span>
+            <span
+              style={{
+                marginRight: 8,
+                // Etiquetas largas ("M15 · Fecha 1") no entran en una linea a este tamano --
+                // en vez de cortarlas con "...", se achican y se dejan envolver en 2 lineas.
+                fontSize: rightLabel.length > 8 ? "0.72rem" : "1em",
+                lineHeight: 1.15,
+                letterSpacing: rightLabel.length > 8 ? 0.5 : undefined,
+                whiteSpace: "normal",
+              }}
+            >
+              {rightLabel}
+            </span>
           )}
           <span style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Image

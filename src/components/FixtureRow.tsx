@@ -18,20 +18,25 @@ function golesDe(equipo: Equipo, resultado: Resultado) {
   );
 }
 
-/** "Newman 31 (B) - 3 BACRC" (jugado) o "Newman vs BACRC" (sin jugar) — reusado en filas y títulos. */
+/**
+ * "Newman 31 (B) - 3 BACRC" (jugado) o "Newman vs BACRC" (sin jugar) — reusado en filas y títulos.
+ * nombreNewman: "Newman" salvo en Juveniles, donde se aclara el equipo (ej. "Newman A").
+ */
 export function MatchupText({
   esLocal,
   rival,
   jugado,
   resultado,
+  nombreNewman = "Newman",
 }: {
   esLocal: boolean;
   rival: string;
   jugado: boolean;
   resultado: Resultado;
+  nombreNewman?: string;
 }) {
-  const local = esLocal ? "Newman" : rival;
-  const visitante = esLocal ? rival : "Newman";
+  const local = esLocal ? nombreNewman : rival;
+  const visitante = esLocal ? rival : nombreNewman;
   const equipoLocal: Equipo = esLocal ? "newman" : "rival";
   const equipoVisitante: Equipo = esLocal ? "rival" : "newman";
 

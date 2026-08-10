@@ -19,6 +19,7 @@ export default function FixtureRowLive({
   esLocal,
   rival,
   inicial,
+  nombreNewman,
 }: {
   partidoId: string;
   href: string;
@@ -26,6 +27,7 @@ export default function FixtureRowLive({
   esLocal: boolean;
   rival: string;
   inicial: EstadoVivo;
+  nombreNewman?: string;
 }) {
   const [vivo, setVivo] = useState<EstadoVivo>(inicial);
 
@@ -46,7 +48,7 @@ export default function FixtureRowLive({
       notaSecundaria={
         vivo.notaEspecial ?? (
           <>
-            <MatchupText esLocal={esLocal} rival={rival} jugado={false} resultado={vivo.resultado} /> · en vivo
+            <MatchupText esLocal={esLocal} rival={rival} jugado={false} resultado={vivo.resultado} nombreNewman={nombreNewman} /> · en vivo
           </>
         )
       }

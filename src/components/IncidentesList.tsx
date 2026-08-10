@@ -33,11 +33,13 @@ export default function IncidentesList({
   rivalNombre,
   partidoId,
   puedeEditar,
+  nombreNewman,
 }: {
   incidentes: (Incidente & { id: string })[];
   rivalNombre?: string;
   partidoId?: string;
   puedeEditar?: boolean;
+  nombreNewman?: string;
 }) {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<string | null>(null);
@@ -121,7 +123,7 @@ export default function IncidentesList({
                   fontWeight: esFinDeTiempo ? 700 : 400,
                 }}
               >
-                {describirIncidente(inc, rivalNombre)}
+                {describirIncidente(inc, rivalNombre, nombreNewman)}
               </div>
               {editable && !editando && (
                 <button

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, partidoId } from "@/lib/categorias";
+import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -31,6 +31,7 @@ export default async function FechaJuvenilesPage({
   const filas = equipos.map((cat, i) => ({ cat, partido: snaps[i].exists ? (snaps[i].data() as Partido) : null }));
 
   const headline = filas[0]?.partido;
+  const nombreNewmanHeadline = nombreNewmanDe(equipos[0].id);
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -42,7 +43,7 @@ export default async function FechaJuvenilesPage({
         <>
           <div style={{ fontWeight: 700, textAlign: "center", color: DORADO, fontSize: "1.15rem", textTransform: "uppercase", marginTop: 12, letterSpacing: 0.3 }}>
             {headline.notaEspecial ?? (
-              <MatchupText esLocal={headline.esLocal} rival={headline.rival} jugado={headline.estado === "terminado"} resultado={headline.resultado} />
+              <MatchupText esLocal={headline.esLocal} rival={headline.rival} jugado={headline.estado === "terminado"} resultado={headline.resultado} nombreNewman={nombreNewmanHeadline} />
             )}
           </div>
           {headline.fecha && (
@@ -57,6 +58,7 @@ export default async function FechaJuvenilesPage({
         {filas.map(({ cat, partido }) => {
           if (!partido) return null;
           const href = `/partido/${partidoId(cat.id, numero)}`;
+          const nombreNewman = nombreNewmanDe(cat.id);
           return ESTADOS_EN_VIVO.has(partido.estado) ? (
             <FixtureRowLive
               key={cat.id}
@@ -66,6 +68,7 @@ export default async function FechaJuvenilesPage({
               esLocal={partido.esLocal}
               rival={partido.rival}
               inicial={{ estado: partido.estado, resultado: partido.resultado, notaEspecial: partido.notaEspecial }}
+              nombreNewman={nombreNewman}
             />
           ) : (
             <FixtureRow
@@ -76,7 +79,7 @@ export default async function FechaJuvenilesPage({
               notaSecundaria={
                 partido.notaEspecial ?? (
                   <>
-                    <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                    <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} nombreNewman={nombreNewman} />
                     {partido.estado !== "terminado" && partido.hora && ` · ${partido.hora}`}
                   </>
                 )

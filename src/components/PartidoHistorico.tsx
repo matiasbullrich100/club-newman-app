@@ -1,6 +1,7 @@
 import type { Incidente, Partido } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
+import { nombreNewmanDe } from "@/lib/categorias";
 import { MatchupText } from "./FixtureRow";
 import Formaciones from "./Formaciones";
 import IncidentesList from "./IncidentesList";
@@ -44,6 +45,7 @@ export default function PartidoHistorico({
   puedeEditar?: boolean;
 }) {
   const jugado = partido.estado === "terminado";
+  const nombreNewman = nombreNewmanDe(partido.categoriaId);
 
   return (
     <div>
@@ -54,12 +56,12 @@ export default function PartidoHistorico({
           </p>
         ) : jugado ? (
           <p style={{ fontSize: "1.1rem", textAlign: "center" }}>
-            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} />
+            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
           </p>
         ) : (
           <div style={{ textAlign: "center" }}>
             <p style={{ fontSize: "1.05rem", margin: 0 }}>
-              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={partido.resultado} />
+              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={partido.resultado} nombreNewman={nombreNewman} />
             </p>
             {(partido.fecha || partido.hora || partido.cancha) && (
               <p style={{ opacity: 0.7, fontSize: "0.82rem", marginTop: 6 }}>
@@ -84,7 +86,13 @@ export default function PartidoHistorico({
       {jugado && (
         <div style={cardStyle}>
           <h3 style={cardTituloStyle}>Incidencias</h3>
-          <IncidentesList incidentes={incidentes} rivalNombre={partido.rival} partidoId={partidoId} puedeEditar={puedeEditar} />
+          <IncidentesList
+            incidentes={incidentes}
+            rivalNombre={partido.rival}
+            partidoId={partidoId}
+            puedeEditar={puedeEditar}
+            nombreNewman={nombreNewman}
+          />
         </div>
       )}
     </div>

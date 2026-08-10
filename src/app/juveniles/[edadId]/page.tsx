@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import type { Partido } from "@/types/firestore";
 import { getSession } from "@/lib/auth/session";
-import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, partidoId } from "@/lib/categorias";
+import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import { formatFecha } from "@/lib/fecha";
 import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
 import Header from "@/components/Header";
@@ -35,6 +35,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
   }
 
   const headline = equipos.find((e) => "destacado" in e && e.destacado) ?? equipos[0];
+  const nombreNewmanHeadline = nombreNewmanDe(headline.id);
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(headline.id, i + 1)));
   const [snaps, resumen] = await Promise.all([
     adminDb.getAll(...refs),
@@ -54,6 +55,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           partidoId={p.id}
           categoriaNombre={equipos.find((e) => e.id === p.categoriaId)?.nombre ?? p.categoriaId}
           inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+          nombreNewman={nombreNewmanDe(p.categoriaId)}
         />
       ))}
 
@@ -90,7 +92,13 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
                 ) : (
                   <>
                     # {numeroFecha}.{" "}
-                    <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                    <MatchupText
+                      esLocal={partido.esLocal}
+                      rival={partido.rival}
+                      jugado={partido.estado === "terminado"}
+                      resultado={partido.resultado}
+                      nombreNewman={nombreNewmanHeadline}
+                    />
                   </>
                 )
               }

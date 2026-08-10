@@ -40,6 +40,16 @@ export function equiposDeEdad(edadId: string) {
   return CATEGORIAS.filter((c) => c.grupo === "juveniles" && c.edadId === edadId);
 }
 
+// En Juveniles, "Newman" solo no alcanza -- hay 4 equipos de la misma edad jugando la misma
+// fecha. Se pide aclarar "Newman A/B/C/D" en los resumenes/incidencias; en Plantel Superior
+// (una sola categoria = un solo equipo) no aplica.
+export function nombreNewmanDe(categoriaId: string): string {
+  const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+  if (!cat || cat.grupo !== "juveniles") return "Newman";
+  const letra = cat.nombre.split(" ").pop();
+  return letra ? `Newman ${letra}` : "Newman";
+}
+
 export const NUMERO_FECHAS_SUPERIOR = 26;
 export const NUMERO_FECHAS_JUVENILES = 11;
 
