@@ -15,8 +15,8 @@ export const CATEGORIAS = [
   { id: "pre-f", nombre: "Pre F", orden: 8, grupo: "superior" },
   { id: "pre-g", nombre: "Pre G", orden: 9, grupo: "superior" },
   { id: "pre-h", nombre: "Pre H", orden: 10, grupo: "superior" },
-  { id: "m15-a", nombre: "M15 A", orden: 0, grupo: "juveniles", edadId: "m15" },
-  { id: "m15-b", nombre: "M15 B", orden: 1, grupo: "juveniles", edadId: "m15", destacado: true },
+  { id: "m15-a", nombre: "M15 A", orden: 0, grupo: "juveniles", edadId: "m15", destacado: true },
+  { id: "m15-b", nombre: "M15 B", orden: 1, grupo: "juveniles", edadId: "m15" },
   { id: "m15-c", nombre: "M15 C", orden: 2, grupo: "juveniles", edadId: "m15" },
   { id: "m15-d", nombre: "M15 D", orden: 3, grupo: "juveniles", edadId: "m15" },
 ] as const;

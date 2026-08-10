@@ -18,3 +18,10 @@ export function esHoyEnArgentina(fecha: Date): boolean {
   const diaDe = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
   return diaDe(fecha) === diaDe(new Date());
 }
+
+// Para un ISO "YYYY-MM-DD" (la fecha calendario del partido, no de la ultima edicion) -- una
+// correccion cargada dias despues no debe hacer que el partido "reaparezca" como si fuera hoy.
+export function fechaIsoEsHoyEnArgentina(fechaIso: string): boolean {
+  const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+  return fechaIso === hoy;
+}
