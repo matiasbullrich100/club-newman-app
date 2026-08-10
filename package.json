@@ -12,6 +12,8 @@
     "seed-demo-extra": "tsx src/scripts/seed-demo-extra.ts",
     "seed-designados": "tsx src/scripts/seed-designados.ts",
     "seed-designados-juveniles": "tsx src/scripts/seed-designados-juveniles.ts",
+    "seed-managers-juveniles": "tsx src/scripts/seed-managers-juveniles.ts",
+    "rebuild-jugadores": "tsx src/scripts/rebuild-jugadores.ts",
     "migrate-historical": "tsx src/scripts/migrate-historical.ts",
     "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts",
     "migrate-m15-fecha2": "tsx src/scripts/migrate-juveniles-m15-fecha2.ts"

@@ -11,7 +11,7 @@ import {
   terminarPartido,
 } from "@/lib/match/actions";
 import type { LiveState, Partido } from "@/types/firestore";
-import type { RosterJugador } from "./types";
+import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
 import IncidentesFeed from "@/components/IncidentesFeed";
@@ -50,11 +50,13 @@ export default function PanelDesignado({
   partidoId,
   partido,
   plantel,
+  plantelCompleto = [],
   periodo,
 }: {
   partidoId: string;
   partido: Partido;
   plantel: RosterJugador[];
+  plantelCompleto?: JugadorBusqueda[];
   periodo: LiveState["periodo"];
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -185,7 +187,7 @@ export default function PanelDesignado({
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
           <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} />
-          <CargaCambio partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
+          <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}
     </div>

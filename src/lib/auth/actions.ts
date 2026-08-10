@@ -39,6 +39,7 @@ export async function login(formData: FormData): Promise<LoginResult> {
     rol: cuenta.rol,
     username: cuenta.username,
     categoriaId: cuenta.categoriaId,
+    alcance: cuenta.alcance,
   });
 
   return { ok: true };

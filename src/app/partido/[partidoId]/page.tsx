@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR } from "@/lib/categorias";
-import type { Incidente, JugadorPartido, Partido } from "@/types/firestore";
+import { puedeOperarCategoria } from "@/lib/auth/scope";
+import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
+import type { Incidente, JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
 import PartidoHistorico from "@/components/PartidoHistorico";
 import Header from "@/components/Header";
@@ -30,7 +31,7 @@ export default async function PartidoPage({
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
   const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
-  const mostrarReset = PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager";
+  const mostrarReset = PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager" && !session.alcance;
   // numeroFecha "demo" (partidos de prueba, fuera de cualquier esquema real) no tiene vista de
   // fecha propia -- /fecha o /juveniles/.../fecha devuelven 404 para un numero fuera de rango.
   const numero = Number(partido.numeroFecha);
@@ -41,8 +42,7 @@ export default async function PartidoPage({
     : categoria?.grupo === "juveniles"
       ? `/juveniles/${categoria.edadId}/fecha/${numero}`
       : `/fecha/${numero}`;
-  const puedeOperar =
-    !!session && (session.rol === "manager" || (session.rol === "designado" && session.categoriaId === partido.categoriaId));
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
 
   const cabecera = (
     <>
@@ -164,7 +164,16 @@ export default async function PartidoPage({
   }
 
   // en_juego | entretiempo | suspendido: motor en vivo (Fase 1, sin cambios).
-  const plantelSnap = await partidoRef.collection("plantel").get();
+  const grupo = grupoDeCategoria(partido.categoriaId);
+  const jugadoresQuery =
+    grupo.grupo === "superior"
+      ? adminDb.collection("jugadores").where("grupo", "==", "superior")
+      : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
+  const [plantelSnap, jugadoresSnap] = await Promise.all([partidoRef.collection("plantel").get(), jugadoresQuery.get()]);
+  const plantelCompleto = jugadoresSnap.docs.map((d) => ({
+    jugadorId: d.id,
+    nombre: (d.data() as JugadorAgregado).nombre,
+  }));
   const partidoParaCliente: Partido = {
     categoriaId: partido.categoriaId,
     numeroFecha: partido.numeroFecha,
@@ -185,7 +194,13 @@ export default async function PartidoPage({
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       {cabecera}
-      <PartidoLive partidoId={partidoId} inicial={partidoParaCliente} session={session} plantel={plantel} />
+      <PartidoLive
+        partidoId={partidoId}
+        inicial={partidoParaCliente}
+        session={session}
+        plantel={plantel}
+        plantelCompleto={plantelCompleto}
+      />
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
       <FooterChip />
     </main>

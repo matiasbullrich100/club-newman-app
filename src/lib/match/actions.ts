@@ -7,6 +7,7 @@ import { getSession, puedeOperarCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
 import { FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
+import { grupoDeCategoria } from "@/lib/categorias";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
@@ -249,7 +250,7 @@ export async function terminarPartido(partidoId: string): Promise<void> {
     const nombre = plantelSnap.docs.find((d) => d.id === jugador.jugadorId)?.data().nombre ?? "";
     batch.set(
       adminDb.collection("jugadores").doc(jugador.jugadorId),
-      { nombre, minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
+      { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
       { merge: true }
     );
   }
@@ -350,7 +351,7 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     if (CAMPO_TARJETA[input.tipo] && input.equipo === "newman" && input.jugadorId && !esAzulSimulada) {
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
-        { nombre: jugadorNombre, [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1) },
+        { nombre: jugadorNombre, ...grupoDeCategoria(partido.categoriaId), [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1) },
         { merge: true }
       );
     }
@@ -403,8 +404,9 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
         const campoViejo = CAMPO_TARJETA[inc.tipo];
         const campoNuevo = CAMPO_TARJETA[nuevoTipo];
         const jugadorRef = adminDb.collection("jugadores").doc(inc.jugadorId);
-        if (campoViejo) tx.set(jugadorRef, { [campoViejo]: FieldValue.increment(-1) }, { merge: true });
-        if (campoNuevo) tx.set(jugadorRef, { [campoNuevo]: FieldValue.increment(1) }, { merge: true });
+        const grupo = grupoDeCategoria(partido.categoriaId);
+        if (campoViejo) tx.set(jugadorRef, { ...grupo, [campoViejo]: FieldValue.increment(-1) }, { merge: true });
+        if (campoNuevo) tx.set(jugadorRef, { ...grupo, [campoNuevo]: FieldValue.increment(1) }, { merge: true });
       }
       tx.update(incidenteRef, { tipo: nuevoTipo });
     }
@@ -459,6 +461,10 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
 export interface PublicarCambioInput {
   jugadorSaleId: string;
   jugadorEntraId: string;
+  // Solo si el que entra no estaba en la formacion inicial subida para este partido (banco
+  // improvisado con alguien de otro equipo de la misma edad/plantel) -- ver CargaCambio.tsx.
+  // Con esto, publicarCambio crea su doc en plantel/ sobre la marcha en vez de exigir que exista.
+  jugadorEntraNombre?: string;
 }
 
 export async function publicarCambio(partidoId: string, input: PublicarCambioInput): Promise<void> {
@@ -475,13 +481,19 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       tx.get(saleRef),
       tx.get(entraRef),
     ]);
-    if (!partidoSnap.exists || !liveSnap.exists || !saleSnap.exists || !entraSnap.exists) {
+    const entraEsNuevo = !entraSnap.exists;
+    if (!partidoSnap.exists || !liveSnap.exists || !saleSnap.exists) {
       throw new Error("Datos del partido incompletos");
+    }
+    if (entraEsNuevo && !input.jugadorEntraNombre) {
+      throw new Error("Jugador no encontrado en el plantel");
     }
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
     const sale = saleSnap.data() as JugadorPartido;
-    const entra = entraSnap.data() as JugadorPartido;
+    const entra: JugadorPartido = entraEsNuevo
+      ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false }
+      : (entraSnap.data() as JugadorPartido);
 
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
     if (partido.estado !== "en_juego" || !liveState.periodo) throw new Error("El partido no está en juego");
@@ -495,7 +507,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       .concat(input.jugadorEntraId);
 
     tx.update(saleRef, { enCancha: false });
-    tx.update(entraRef, { enCancha: true });
+    tx.set(entraRef, { ...entra, enCancha: true }, { merge: true });
     tx.update(partidoRef, { enCanchaIds: nuevoEnCancha, updatedAt: FieldValue.serverTimestamp() });
 
     const incidente: Incidente = {

@@ -3,6 +3,10 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { Rol } from "@/types/firestore";
+// Re-exportado desde scope.ts (archivo sin "server-only", importable desde Client Components)
+// para no romper los imports server-side existentes de `puedeOperarCategoria`.
+export { puedeOperarCategoria, puedeVerEstadisticas } from "./scope";
+import { puedeOperarCategoria } from "./scope";
 
 const COOKIE_NAME = "cn_session";
 const SESSION_DURATION = "24h";
@@ -17,7 +21,8 @@ export interface SessionPayload {
   cuentaId: string;
   rol: Rol;
   username: string;
-  categoriaId?: string;
+  categoriaId?: string; // solo rol "designado"
+  alcance?: string; // solo rol "manager" -- edadId de Juveniles; ausente = sin restriccion
 }
 
 export async function createSession(payload: SessionPayload): Promise<void> {
@@ -58,16 +63,6 @@ export async function requireRole(rolesPermitidos: Rol[]): Promise<SessionPayloa
     throw new Error("No autorizado");
   }
   return session;
-}
-
-/** Pure check (no cookies) — safe to call from inside a Firestore transaction after reading the partido. */
-export function puedeOperarCategoria(
-  session: SessionPayload | null,
-  categoriaId: string
-): boolean {
-  if (!session) return false;
-  if (session.rol === "manager") return true;
-  return session.rol === "designado" && session.categoriaId === categoriaId;
 }
 
 /** Throws unless the session is the Designado scoped to `categoriaId`, or a Manager (who can act on any category). */

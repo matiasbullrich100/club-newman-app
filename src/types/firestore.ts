@@ -19,6 +19,7 @@ export interface Cuenta {
   username: string;
   passwordHash: string;
   categoriaId?: string; // only rol === "designado"
+  alcance?: string; // only rol === "manager" -- edadId de Juveniles; ausente = sin restriccion
   createdAt: Timestamp | Date;
 }
 
@@ -124,6 +125,8 @@ export interface Incidente {
 // Top-level collection `jugadores/{jugadorId}` — cross-match aggregate.
 export interface JugadorAgregado {
   nombre: string;
+  grupo: "superior" | "juveniles";
+  edadId?: string; // solo grupo === "juveniles"
   tarjetasAmarillas: number;
   tarjetasDobleAmarilla: number;
   tarjetasRojas: number;

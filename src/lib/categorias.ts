@@ -50,6 +50,15 @@ export function nombreNewmanDe(categoriaId: string): string {
   return letra ? `Newman ${letra}` : "Newman";
 }
 
+// Con que plantel se etiqueta cada jugador en la coleccion global `jugadores/` -- para poder
+// separar Plantel Superior de cada division de Juveniles en /estadisticas y en el buscador de
+// cambios (ver src/lib/match/actions.ts).
+export function grupoDeCategoria(categoriaId: string): { grupo: "superior" | "juveniles"; edadId?: string } {
+  const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+  if (cat?.grupo === "juveniles") return { grupo: "juveniles", edadId: cat.edadId };
+  return { grupo: "superior" };
+}
+
 export const NUMERO_FECHAS_SUPERIOR = 26;
 export const NUMERO_FECHAS_JUVENILES = 11;
 

@@ -8,8 +8,9 @@ import PanelDesignado from "./panel-designado/PanelDesignado";
 import IncidentesFeed from "./IncidentesFeed";
 import type { EstadoPartido, LiveState, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
-import type { RosterJugador } from "./panel-designado/types";
+import type { JugadorBusqueda, RosterJugador } from "./panel-designado/types";
 import { nombreNewmanDe } from "@/lib/categorias";
+import { puedeOperarCategoria } from "@/lib/auth/scope";
 import { CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADO_BADGE: Record<EstadoPartido, { label: string; bg: string; color: string }> = {
@@ -25,11 +26,13 @@ export default function PartidoLive({
   inicial,
   session,
   plantel,
+  plantelCompleto,
 }: {
   partidoId: string;
   inicial: Partido;
   session: SessionPayload | null;
   plantel: RosterJugador[];
+  plantelCompleto: JugadorBusqueda[];
 }) {
   const [partido, setPartido] = useState<Partido>(inicial);
   const [periodo, setPeriodo] = useState<LiveState["periodo"]>(null);
@@ -53,8 +56,7 @@ export default function PartidoLive({
     });
   }, [partidoId]);
 
-  const puedeOperar =
-    !!session && (session.rol === "manager" || (session.rol === "designado" && session.categoriaId === partido.categoriaId));
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
   const badge = ESTADO_BADGE[partido.estado];
   const motivoLabel = motivoInterrupcion === "medico" ? "Médico" : motivoInterrupcion === "clima" ? "Clima" : null;
   const badgeLabel = partido.estado === "suspendido" && motivoLabel ? `${badge.label} · ${motivoLabel}` : badge.label;
@@ -105,7 +107,7 @@ export default function PartidoLive({
 
       {puedeOperar ? (
         // El feed para el Designado va adentro del panel (entre jugadas y cambios).
-        <PanelDesignado partidoId={partidoId} partido={partido} plantel={plantel} periodo={periodo} />
+        <PanelDesignado partidoId={partidoId} partido={partido} plantel={plantel} plantelCompleto={plantelCompleto} periodo={periodo} />
       ) : (
         <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} nombreNewman={nombreNewmanDe(partido.categoriaId)} />
       )}

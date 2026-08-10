@@ -47,7 +47,7 @@ export default async function Home() {
         ))}
       </p>
 
-      {session?.rol === "manager" && (
+      {session?.rol === "manager" && !session.alcance && (
         <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
           {PARTIDOS_DEMO.map((p) => (
             <ResetDemoButton key={p.id} partidoId={p.id} label={p.label} />

@@ -37,6 +37,7 @@ export default function SessionBar({ session }: { session: SessionPayload | null
           <span style={{ ...pillBase, border: `1px solid ${DORADO}`, color: TINTA, background: DORADO }}>
             {ETIQUETA_ROL[session.rol]}
             {session.categoriaId ? ` · ${session.categoriaId}` : ""}
+            {session.alcance ? ` · ${session.alcance.toUpperCase()}` : ""}
           </span>
           <form action={logout}>
             <button
