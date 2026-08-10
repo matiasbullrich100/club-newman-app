@@ -277,19 +277,31 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    if (partido.estado !== "en_juego" || !liveState.periodo) throw new Error("El partido no está en juego");
+    // Correccion post-partido: el Designado/Manager puede agregar una jugada que se olvido
+    // cargar en su momento (ej. un try que el arbitro convalido y no se anoto). El minuto queda
+    // como aproximado (el reloj ya esta congelado) y no exige que el jugador siga "en cancha".
+    const esCorreccionPostPartido = partido.estado === "terminado";
+    if (!esCorreccionPostPartido && (partido.estado !== "en_juego" || !liveState.periodo)) {
+      throw new Error("El partido no está en juego");
+    }
 
     let jugadorNombre: string | undefined;
     let dorsal: string | undefined;
     if (input.equipo === "newman" && requierePlayerSelection(input.tipo)) {
       if (!input.jugadorId) throw new Error("Falta el jugador");
-      if (!partido.enCanchaIds.includes(input.jugadorId)) throw new Error("El jugador no está en cancha");
+      if (!esCorreccionPostPartido && !partido.enCanchaIds.includes(input.jugadorId)) {
+        throw new Error("El jugador no está en cancha");
+      }
       const jugadorSnap = await tx.get(partidoRef.collection("plantel").doc(input.jugadorId));
       if (!jugadorSnap.exists) throw new Error("Jugador no encontrado en el plantel");
       const jugador = jugadorSnap.data() as JugadorPartido;
       jugadorNombre = jugador.nombre;
       dorsal = jugador.dorsal;
     }
+
+    // Correccion post-partido con un liveState viejo que nunca llego a tener periodo (no deberia
+    // pasar en la practica -- terminarPartido() siempre lo deja seteado -- pero el tipo es nullable).
+    if (!liveState.periodo) throw new Error("El partido no tiene periodo registrado");
 
     const minuto = minutoActual(liveState);
     const segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
@@ -378,6 +390,49 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
       }
       tx.update(incidenteRef, { tipo: nuevoTipo });
     }
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
+ * Elimina una incidencia publicada por error (ej. el arbitro anulo un try despues de cargado).
+ * Deshace su efecto en el resultado o en el acumulado de tarjetas segun corresponda. Solo
+ * puntos y tarjetas -- cambios/fin de tiempo/interrupciones no se pueden borrar desde aca (tocan
+ * el reloj o quien esta en cancha, no son "una jugada" suelta).
+ */
+export async function eliminarIncidente(partidoId: string, incidenteId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, incSnap] = await Promise.all([tx.get(partidoRef), tx.get(incidenteRef)]);
+    if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
+    const partido = partidoSnap.data() as Partido;
+    const inc = incSnap.data() as Incidente;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
+      throw new Error("El partido tiene que estar en juego o terminado para eliminar una jugada");
+    }
+
+    if (FAMILIA_PUNTOS.includes(inc.tipo)) {
+      const puntos = (PUNTOS_POR_TIPO as Record<string, number>)[inc.tipo] ?? 0;
+      if (puntos !== 0) {
+        const campo = inc.equipo === "newman" ? "resultado.newman" : "resultado.rival";
+        tx.update(partidoRef, { [campo]: FieldValue.increment(-puntos), updatedAt: FieldValue.serverTimestamp() });
+      }
+    } else if (FAMILIA_TARJETA.includes(inc.tipo)) {
+      const esAzulSimulada = inc.tipo === "tarjeta_azul" && PARTIDOS_DEMO_IDS.includes(partidoId);
+      if (inc.equipo === "newman" && inc.jugadorId && !esAzulSimulada) {
+        const campo = CAMPO_TARJETA[inc.tipo];
+        if (campo) tx.set(adminDb.collection("jugadores").doc(inc.jugadorId), { [campo]: FieldValue.increment(-1) }, { merge: true });
+      }
+    } else {
+      throw new Error("Este tipo de incidencia no se puede eliminar");
+    }
+
+    tx.delete(incidenteRef);
   });
 
   revalidatePath(`/partido/${partidoId}`);

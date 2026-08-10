@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Incidente } from "@/types/firestore";
 import { describirIncidente, ETIQUETAS_INCIDENTE, FAMILIA_PUNTOS, FAMILIA_TARJETA, ordenarIncidentes } from "@/lib/incidentes";
-import { corregirTipoIncidente } from "@/lib/match/actions";
+import { corregirTipoIncidente, eliminarIncidente } from "@/lib/match/actions";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
@@ -40,6 +40,7 @@ export default function IncidentesList({
   puedeEditar?: boolean;
 }) {
   const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -61,6 +62,21 @@ export default function IncidentesList({
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo corregir");
+      }
+    });
+  }
+
+  function eliminar(incidenteId: string) {
+    if (!partidoId) return;
+    setError(null);
+    startTransition(async () => {
+      try {
+        await eliminarIncidente(partidoId, incidenteId);
+        setConfirmandoEliminarId(null);
+        setEditandoId(null);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo eliminar");
       }
     });
   }
@@ -123,7 +139,7 @@ export default function IncidentesList({
                 </button>
               )}
             </div>
-            {editable && editando && (
+            {editable && editando && confirmandoEliminarId !== inc.id && (
               <div style={{ padding: "6px 4px 12px 44px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <span style={{ fontSize: "0.78rem", opacity: 0.75, width: "100%" }}>Cambiar por:</span>
                 {familia!
@@ -147,7 +163,58 @@ export default function IncidentesList({
                   ))}
                 <button
                   disabled={isPending}
+                  onClick={() => setConfirmandoEliminarId(inc.id)}
+                  style={{
+                    fontSize: "0.78rem",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    background: "rgba(194,59,59,.12)",
+                    border: "1px solid rgba(194,59,59,.5)",
+                    color: "#f3caca",
+                  }}
+                >
+                  Eliminar jugada
+                </button>
+                <button
+                  disabled={isPending}
                   onClick={() => setEditandoId(null)}
+                  style={{
+                    fontSize: "0.78rem",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    background: "transparent",
+                    border: "1px solid rgba(226,197,120,.2)",
+                    color: DORADO_SUAVE,
+                  }}
+                >
+                  Cancelar
+                </button>
+                {error && <p style={{ color: "#f3caca", fontSize: "0.78rem", width: "100%", margin: 0 }}>{error}</p>}
+              </div>
+            )}
+            {editable && confirmandoEliminarId === inc.id && (
+              <div style={{ padding: "6px 4px 12px 44px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ fontSize: "0.78rem", width: "100%", color: "#f3caca" }}>
+                  ¿Eliminar esta jugada? Se descuenta del resultado o de las tarjetas.
+                </span>
+                <button
+                  disabled={isPending}
+                  onClick={() => eliminar(inc.id)}
+                  style={{
+                    fontSize: "0.78rem",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    background: "#c23b3b",
+                    border: "none",
+                    color: "#fff",
+                    fontWeight: 700,
+                  }}
+                >
+                  {isPending ? "Eliminando…" : "Sí, eliminar"}
+                </button>
+                <button
+                  disabled={isPending}
+                  onClick={() => setConfirmandoEliminarId(null)}
                   style={{
                     fontSize: "0.78rem",
                     padding: "8px 12px",

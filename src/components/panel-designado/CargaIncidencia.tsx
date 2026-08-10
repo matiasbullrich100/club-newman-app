@@ -29,10 +29,14 @@ export default function CargaIncidencia({
   partidoId,
   plantel,
   enCanchaIds,
+  soloEnCancha = true,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
   enCanchaIds: string[];
+  /** false en correcciones post-partido: cualquiera del plantel pudo haber anotado, no solo
+   * quien estaba en cancha al momento de cortar (ya no hay forma de saberlo con certeza). */
+  soloEnCancha?: boolean;
 }) {
   const [paso, setPaso] = useState<Paso>("tipo");
   const [tipo, setTipo] = useState<(typeof TIPOS)[number]["tipo"] | null>(null);
@@ -41,7 +45,7 @@ export default function CargaIncidencia({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const enCancha = plantel.filter((j) => enCanchaIds.includes(j.jugadorId));
+  const enCancha = soloEnCancha ? plantel.filter((j) => enCanchaIds.includes(j.jugadorId)) : plantel;
   // Try Penal / Try Scrum se le dan al equipo entero, no a un jugador puntual.
   const requiereJugador = equipo === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
   const jugador = plantel.find((j) => j.jugadorId === jugadorId);
@@ -116,7 +120,7 @@ export default function CargaIncidencia({
 
       {paso === "jugador" && requiereJugador && (
         <div style={listaOpciones}>
-          {enCancha.length === 0 && <p>No hay jugadores en cancha.</p>}
+          {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
           {enCancha.map((j) => (
             <button key={j.jugadorId} style={botonOpcion} onClick={() => { setJugadorId(j.jugadorId); setPaso("confirmar"); }}>
               {j.dorsal} — {j.nombre}

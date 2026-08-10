@@ -10,10 +10,11 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
 import PanelDesignado from "@/components/panel-designado/PanelDesignado";
+import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
-import { DORADO_SUAVE } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PartidoPage({
   params,
@@ -85,6 +86,30 @@ export default async function PartidoPage({
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
         <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} partidoId={partidoId} puedeEditar={puedeOperar} />
+        {puedeOperar && (
+          <div
+            style={{
+              background: "rgba(255,255,255,.045)",
+              border: "1px solid rgba(226,197,120,.2)",
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 14,
+            }}
+          >
+            <h2 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 4 }}>
+              Corregir el partido
+            </h2>
+            <p style={{ fontSize: "0.8rem", opacity: 0.75, marginTop: 0, marginBottom: 10 }}>
+              Para agregar una jugada que faltó cargar. El minuto queda aproximado.
+            </p>
+            <CargaIncidencia
+              partidoId={partidoId}
+              plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
+              enCanchaIds={partido.enCanchaIds}
+              soloEnCancha={false}
+            />
+          </div>
+        )}
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
