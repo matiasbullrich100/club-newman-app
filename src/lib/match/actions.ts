@@ -14,6 +14,7 @@ import {
   type JugadorPartido,
   type LiveState,
   type Partido,
+  type Periodo,
   type TipoIncidente,
 } from "@/types/firestore";
 
@@ -264,6 +265,10 @@ export interface PublicarIncidenteInput {
   tipo: Exclude<TipoIncidente, "cambio">;
   equipo: Equipo;
   jugadorId?: string;
+  // Solo para corregir un partido terminado: el reloj ya esta congelado, asi que el momento de
+  // la jugada lo elige quien la carga (para que quede ordenada cronologicamente entre las demas).
+  periodoManual?: Periodo;
+  minutoManual?: number;
 }
 
 export async function publicarIncidente(partidoId: string, input: PublicarIncidenteInput): Promise<void> {
@@ -299,18 +304,31 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       dorsal = jugador.dorsal;
     }
 
-    // Correccion post-partido con un liveState viejo que nunca llego a tener periodo (no deberia
-    // pasar en la practica -- terminarPartido() siempre lo deja seteado -- pero el tipo es nullable).
-    if (!liveState.periodo) throw new Error("El partido no tiene periodo registrado");
-
-    const minuto = minutoActual(liveState);
-    const segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+    let periodo: Periodo;
+    let minuto: number;
+    let segundoAbsoluto: number;
+    if (esCorreccionPostPartido) {
+      if (!input.periodoManual || !input.minutoManual || input.minutoManual < 1) {
+        throw new Error("Falta el tiempo y el minuto de la jugada");
+      }
+      periodo = input.periodoManual;
+      minuto = input.minutoManual;
+      segundoAbsoluto = (minuto - 1) * 60;
+    } else {
+      // Correccion post-partido con un liveState viejo que nunca llego a tener periodo (no
+      // deberia pasar en la practica -- terminarPartido() siempre lo deja seteado -- pero el
+      // tipo es nullable).
+      if (!liveState.periodo) throw new Error("El partido no tiene periodo registrado");
+      periodo = liveState.periodo;
+      minuto = minutoActual(liveState);
+      segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+    }
     const puntos = (PUNTOS_POR_TIPO as Record<string, number>)[input.tipo];
 
     const incidente: Incidente = {
       tipo: input.tipo,
       equipo: input.equipo,
-      periodo: liveState.periodo,
+      periodo,
       minuto,
       segundoAbsoluto,
       publicadoPorCuentaId: session!.cuentaId,

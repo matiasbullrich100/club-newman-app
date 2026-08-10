@@ -2,11 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
-import type { Equipo, TipoIncidente } from "@/types/firestore";
+import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
 import { requierePlayerSelection } from "@/lib/incidentes";
 import type { RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
-import { DORADO } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; label: string }[] = [
   { tipo: "try", label: "Try (+5)" },
@@ -23,7 +23,7 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; lab
   { tipo: "lesion", label: "Lesión" },
 ];
 
-type Paso = "tipo" | "equipo" | "jugador" | "confirmar";
+type Paso = "tipo" | "equipo" | "jugador" | "cuando" | "confirmar";
 
 export default function CargaIncidencia({
   partidoId,
@@ -42,8 +42,14 @@ export default function CargaIncidencia({
   const [tipo, setTipo] = useState<(typeof TIPOS)[number]["tipo"] | null>(null);
   const [equipo, setEquipo] = useState<Equipo | null>(null);
   const [jugadorId, setJugadorId] = useState<string | null>(null);
+  const [periodoManual, setPeriodoManual] = useState<Periodo | null>(null);
+  const [minutoManual, setMinutoManual] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // En correcciones post-partido el reloj ya esta congelado -- hay que preguntar en que
+  // momento paso la jugada para que quede ordenada cronologicamente entre las demas.
+  const esCorreccion = !soloEnCancha;
 
   const enCancha = soloEnCancha ? plantel.filter((j) => enCanchaIds.includes(j.jugadorId)) : plantel;
   // Try Penal / Try Scrum se le dan al equipo entero, no a un jugador puntual.
@@ -55,7 +61,13 @@ export default function CargaIncidencia({
     setTipo(null);
     setEquipo(null);
     setJugadorId(null);
+    setPeriodoManual(null);
+    setMinutoManual("");
     setError(null);
+  }
+
+  function siguientePasoTrasJugador() {
+    setPaso(esCorreccion ? "cuando" : "confirmar");
   }
 
   function elegirTipo(t: (typeof TIPOS)[number]["tipo"]) {
@@ -71,13 +83,22 @@ export default function CargaIncidencia({
   function elegirEquipo(e: Equipo) {
     setEquipo(e);
     const necesitaJugador = e === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
-    setPaso(necesitaJugador ? "jugador" : "confirmar");
+    if (necesitaJugador) {
+      setPaso("jugador");
+    } else {
+      setPaso(esCorreccion ? "cuando" : "confirmar");
+    }
   }
 
   function confirmar() {
     if (!tipo || !equipo) return;
     setError(null);
-    const input: PublicarIncidenteInput = { tipo, equipo, jugadorId: jugadorId ?? undefined };
+    const input: PublicarIncidenteInput = {
+      tipo,
+      equipo,
+      jugadorId: jugadorId ?? undefined,
+      ...(esCorreccion ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) } : {}),
+    };
     startTransition(async () => {
       try {
         await publicarIncidente(partidoId, input);
@@ -122,10 +143,62 @@ export default function CargaIncidencia({
         <div style={listaOpciones}>
           {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
           {enCancha.map((j) => (
-            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setJugadorId(j.jugadorId); setPaso("confirmar"); }}>
+            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setJugadorId(j.jugadorId); siguientePasoTrasJugador(); }}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
+          <button style={botonSecundario} onClick={reset}>
+            Cancelar
+          </button>
+        </div>
+      )}
+
+      {paso === "cuando" && (
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿En qué momento pasó?</p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              style={periodoManual === "1T" ? botonPrimario : botonOpcion}
+              onClick={() => setPeriodoManual("1T")}
+            >
+              1er tiempo
+            </button>
+            <button
+              style={periodoManual === "2T" ? botonPrimario : botonOpcion}
+              onClick={() => setPeriodoManual("2T")}
+            >
+              2do tiempo
+            </button>
+          </div>
+          <label style={{ fontSize: "0.85rem", color: DORADO_SUAVE }}>
+            Minuto
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={99}
+              value={minutoManual}
+              onChange={(e) => setMinutoManual(e.target.value)}
+              style={{
+                display: "block",
+                marginTop: 6,
+                width: "100%",
+                fontSize: "1.1rem",
+                padding: "12px 14px",
+                borderRadius: 10,
+                border: "1px solid rgba(226,197,120,.35)",
+                background: "rgba(255,255,255,.06)",
+                color: "#f7f1e4",
+              }}
+            />
+          </label>
+          <button
+            style={botonPrimario}
+            disabled={!periodoManual || !minutoManual || Number(minutoManual) < 1}
+            onClick={() => setPaso("confirmar")}
+          >
+            Continuar
+          </button>
           <button style={botonSecundario} onClick={reset}>
             Cancelar
           </button>
@@ -137,6 +210,12 @@ export default function CargaIncidencia({
           <p style={{ fontSize: "1.02rem" }}>
             Confirmar: <strong>{TIPOS.find((t) => t.tipo === tipo)?.label}</strong> —{" "}
             {equipo === "newman" ? (requiereJugador ? jugador?.nombre ?? "" : "Newman") : "Rival"}
+            {esCorreccion && periodoManual && minutoManual && (
+              <>
+                {" "}
+                ({periodoManual} {minutoManual}&apos;)
+              </>
+            )}
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
