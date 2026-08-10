@@ -40,6 +40,8 @@ export default async function PartidoPage({
     : categoria?.grupo === "juveniles"
       ? `/juveniles/${categoria.edadId}/fecha/${numero}`
       : `/fecha/${numero}`;
+  const puedeOperar =
+    !!session && (session.rol === "manager" || (session.rol === "designado" && session.categoriaId === partido.categoriaId));
 
   const cabecera = (
     <>
@@ -71,12 +73,18 @@ export default async function PartidoPage({
         };
       })
     );
-    const incidentes = incidentesSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Incidente) }));
+    // IncidentesList es un Client Component (necesita interactividad para "Corregir") -- un
+    // Timestamp crudo del Admin SDK no cruza el limite servidor->cliente, hay que pasarlo a Date.
+    const incidentes = incidentesSnap.docs.map((d) => {
+      const data = d.data() as Incidente;
+      const createdAt = data.createdAt as unknown as FirebaseFirestore.Timestamp;
+      return { id: d.id, ...data, createdAt: createdAt?.toDate?.() ?? data.createdAt };
+    });
 
     return (
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
-        <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} />
+        <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} partidoId={partidoId} puedeEditar={puedeOperar} />
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
@@ -100,8 +108,6 @@ export default async function PartidoPage({
         };
       })
     );
-    const puedeOperar =
-      !!session && (session.rol === "manager" || (session.rol === "designado" && session.categoriaId === partido.categoriaId));
     // createdAt/updatedAt son Timestamps de Firestore -- no se pueden pasar a un Client Component.
     const partidoParaCliente: Partido = {
       categoriaId: partido.categoriaId,

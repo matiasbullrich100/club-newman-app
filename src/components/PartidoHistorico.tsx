@@ -34,10 +34,14 @@ export default function PartidoHistorico({
   partido,
   plantel,
   incidentes,
+  partidoId,
+  puedeEditar,
 }: {
   partido: Partido;
   plantel: RosterJugadorHistorico[];
   incidentes: (Incidente & { id: string })[];
+  partidoId?: string;
+  puedeEditar?: boolean;
 }) {
   const jugado = partido.estado === "terminado";
 
@@ -80,7 +84,7 @@ export default function PartidoHistorico({
       {jugado && (
         <div style={cardStyle}>
           <h3 style={cardTituloStyle}>Incidencias</h3>
-          <IncidentesList incidentes={incidentes} rivalNombre={partido.rival} />
+          <IncidentesList incidentes={incidentes} rivalNombre={partido.rival} partidoId={partidoId} puedeEditar={puedeEditar} />
         </div>
       )}
     </div>

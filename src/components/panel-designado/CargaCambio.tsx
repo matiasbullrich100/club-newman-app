@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { publicarCambio } from "@/lib/match/actions";
 import type { RosterJugador } from "./types";
+import { botonOpcion, botonPrimario, botonSecundario, listaOpciones } from "./estilos";
+import { DORADO } from "@/lib/colors";
 
 type Paso = "sale" | "entra" | "confirmar";
 
@@ -47,14 +49,16 @@ export default function CargaCambio({
   }
 
   return (
-    <div style={{ borderTop: "1px solid #eee", paddingTop: "0.75rem" }}>
-      <h3 style={{ fontSize: "0.9rem", margin: "0 0 0.5rem" }}>Cambio</h3>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: "1rem" }}>
+      <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        Cambio
+      </h3>
 
       {paso === "sale" && (
-        <div style={{ display: "grid", gap: "0.4rem" }}>
-          <p style={{ margin: 0, fontSize: "0.85rem" }}>¿Quién sale?</p>
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién sale?</p>
           {enCancha.map((j) => (
-            <button key={j.jugadorId} onClick={() => { setSaleId(j.jugadorId); setPaso("entra"); }}>
+            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setSaleId(j.jugadorId); setPaso("entra"); }}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
@@ -62,29 +66,33 @@ export default function CargaCambio({
       )}
 
       {paso === "entra" && (
-        <div style={{ display: "grid", gap: "0.4rem" }}>
-          <p style={{ margin: 0, fontSize: "0.85rem" }}>¿Quién entra?</p>
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién entra?</p>
           {banco.map((j) => (
-            <button key={j.jugadorId} onClick={() => { setEntraId(j.jugadorId); setPaso("confirmar"); }}>
+            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setEntraId(j.jugadorId); setPaso("confirmar"); }}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
-          <button onClick={reset}>Cancelar</button>
+          <button style={botonSecundario} onClick={reset}>
+            Cancelar
+          </button>
         </div>
       )}
 
       {paso === "confirmar" && (
         <div>
-          <p>
+          <p style={{ fontSize: "1.02rem" }}>
             Confirmar: sale <strong>{sale?.nombre}</strong>, entra <strong>{entra?.nombre}</strong>
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
-          <button disabled={isPending} onClick={confirmar}>
-            {isPending ? "Publicando…" : "Publicar"}
-          </button>{" "}
-          <button disabled={isPending} onClick={reset}>
-            Cancelar
-          </button>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button style={botonPrimario} disabled={isPending} onClick={confirmar}>
+              {isPending ? "Publicando…" : "Publicar"}
+            </button>
+            <button style={botonSecundario} disabled={isPending} onClick={reset}>
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
     </div>

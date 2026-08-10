@@ -15,7 +15,7 @@ const ESTADO_BADGE: Record<EstadoPartido, { label: string; bg: string; color: st
   programado: { label: "No iniciado", bg: "rgba(255,255,255,.1)", color: "#ccc" },
   en_juego: { label: "En juego", bg: "#245c2c", color: "#c6f0cc" },
   entretiempo: { label: "Entretiempo", bg: "#5c4a15", color: DORADO_SUAVE },
-  suspendido: { label: "Suspendido", bg: "#5c1515", color: "#f3caca" },
+  suspendido: { label: "Interrumpido", bg: "#5c1515", color: "#f3caca" },
   terminado: { label: "Terminado", bg: "#3a3a3a", color: "#ddd" },
 };
 

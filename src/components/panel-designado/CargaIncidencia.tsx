@@ -5,6 +5,8 @@ import { publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/acti
 import type { Equipo, TipoIncidente } from "@/types/firestore";
 import { requierePlayerSelection } from "@/lib/incidentes";
 import type { RosterJugador } from "./types";
+import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
+import { DORADO } from "@/lib/colors";
 
 const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; label: string }[] = [
   { tipo: "try", label: "Try (+5)" },
@@ -83,13 +85,15 @@ export default function CargaIncidencia({
   }
 
   return (
-    <div style={{ borderTop: "1px solid #eee", paddingTop: "0.75rem" }}>
-      <h3 style={{ fontSize: "0.9rem", margin: "0 0 0.5rem" }}>Cargar jugada</h3>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: "1rem" }}>
+      <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        Cargar jugada
+      </h3>
 
       {paso === "tipo" && (
-        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+        <div style={grillaOpciones}>
           {TIPOS.map(({ tipo: t, label }) => (
-            <button key={t} onClick={() => elegirTipo(t)}>
+            <button key={t} style={{ ...botonOpcion, textAlign: "center" }} onClick={() => elegirTipo(t)}>
               {label}
             </button>
           ))}
@@ -97,38 +101,48 @@ export default function CargaIncidencia({
       )}
 
       {paso === "equipo" && (
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => elegirEquipo("newman")}>Newman</button>
-          <button onClick={() => elegirEquipo("rival")}>Rival</button>
-          <button onClick={reset}>Cancelar</button>
+        <div style={listaOpciones}>
+          <button style={botonPrimario} onClick={() => elegirEquipo("newman")}>
+            Newman
+          </button>
+          <button style={botonPrimario} onClick={() => elegirEquipo("rival")}>
+            Rival
+          </button>
+          <button style={botonSecundario} onClick={reset}>
+            Cancelar
+          </button>
         </div>
       )}
 
       {paso === "jugador" && requiereJugador && (
-        <div style={{ display: "grid", gap: "0.4rem" }}>
+        <div style={listaOpciones}>
           {enCancha.length === 0 && <p>No hay jugadores en cancha.</p>}
           {enCancha.map((j) => (
-            <button key={j.jugadorId} onClick={() => { setJugadorId(j.jugadorId); setPaso("confirmar"); }}>
+            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setJugadorId(j.jugadorId); setPaso("confirmar"); }}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
-          <button onClick={reset}>Cancelar</button>
+          <button style={botonSecundario} onClick={reset}>
+            Cancelar
+          </button>
         </div>
       )}
 
       {paso === "confirmar" && tipo && equipo && (
         <div>
-          <p>
+          <p style={{ fontSize: "1.02rem" }}>
             Confirmar: <strong>{TIPOS.find((t) => t.tipo === tipo)?.label}</strong> —{" "}
             {equipo === "newman" ? (requiereJugador ? jugador?.nombre ?? "" : "Newman") : "Rival"}
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
-          <button disabled={isPending} onClick={confirmar}>
-            {isPending ? "Publicando…" : "Publicar"}
-          </button>{" "}
-          <button disabled={isPending} onClick={reset}>
-            Cancelar
-          </button>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button style={botonPrimario} disabled={isPending} onClick={confirmar}>
+              {isPending ? "Publicando…" : "Publicar"}
+            </button>
+            <button style={botonSecundario} disabled={isPending} onClick={reset}>
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
     </div>

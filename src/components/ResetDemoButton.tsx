@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { resetearPartidoDemo } from "@/lib/match/actions";
 import { DORADO_SUAVE } from "@/lib/colors";
 
-export default function ResetDemoButton({ partidoId }: { partidoId: string }) {
+export default function ResetDemoButton({ partidoId, label }: { partidoId: string; label?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -50,7 +50,7 @@ export default function ResetDemoButton({ partidoId }: { partidoId: string }) {
           }}
           onClick={() => setConfirmando(true)}
         >
-          Resetear partido de prueba
+          Resetear {label ?? "partido de prueba"}
         </button>
       )}
       {error && <p style={{ color: "#f3caca", fontSize: "0.8rem" }}>{error}</p>}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
+import ResetDemoButton from "@/components/ResetDemoButton";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 // Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
@@ -45,6 +46,14 @@ export default async function Home() {
           </span>
         ))}
       </p>
+
+      {session?.rol === "manager" && (
+        <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+          {PARTIDOS_DEMO.map((p) => (
+            <ResetDemoButton key={p.id} partidoId={p.id} label={p.label} />
+          ))}
+        </div>
+      )}
 
       <div style={{ display: "grid", gap: 12, marginTop: 24 }}>
         <Link href="/superior" style={botonStyle}>

@@ -28,9 +28,9 @@ export default function Header({
     >
       <div
         style={{
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "1fr auto 1fr",
           alignItems: "center",
-          justifyContent: "space-between",
           width: "100%",
           maxWidth: 400,
           margin: "0 auto",
@@ -43,8 +43,9 @@ export default function Header({
             letterSpacing: 1.5,
             textTransform: "uppercase",
             color: DORADO,
-            minWidth: 60,
+            textAlign: "left",
             whiteSpace: "nowrap",
+            minWidth: 0,
           }}
         >
           Rugby
@@ -61,7 +62,6 @@ export default function Header({
         </div>
         <div
           style={{
-            minWidth: 60,
             textAlign: "right",
             display: "flex",
             justifyContent: "flex-end",
@@ -72,9 +72,12 @@ export default function Header({
             letterSpacing: 1.5,
             textTransform: "uppercase",
             color: DORADO,
+            minWidth: 0,
           }}
         >
-          {rightLabel && <span style={{ marginRight: 8, whiteSpace: "nowrap" }}>{rightLabel}</span>}
+          {rightLabel && (
+            <span style={{ marginRight: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{rightLabel}</span>
+          )}
           <span style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Image
               src="/logo-top14.png"

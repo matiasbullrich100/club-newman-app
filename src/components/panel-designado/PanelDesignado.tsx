@@ -15,16 +15,18 @@ import type { RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
 import IncidentesFeed from "@/components/IncidentesFeed";
+import { botonSecundario } from "./estilos";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const btnStyle: React.CSSProperties = {
-  fontSize: "0.78rem",
-  padding: "10px 16px",
-  borderRadius: 8,
+  fontSize: "0.92rem",
+  padding: "14px 20px",
+  minHeight: 50,
+  borderRadius: 10,
   border: "none",
   background: DORADO,
   color: "#451526",
-  fontWeight: 600,
+  fontWeight: 700,
   textTransform: "uppercase",
   letterSpacing: 1,
 };
@@ -56,6 +58,7 @@ export default function PanelDesignado({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
+  const [eligiendoMotivo, setEligiendoMotivo] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -85,6 +88,11 @@ export default function PanelDesignado({
     setPendiente(null);
   }
 
+  function interrumpirPor(motivo: "medico" | "clima") {
+    setEligiendoMotivo(false);
+    ejecutar((id) => suspender(id, motivo));
+  }
+
   return (
     <div
       style={{
@@ -99,18 +107,36 @@ export default function PanelDesignado({
         Panel del Designado
       </h2>
 
-      {pendiente ? (
+      {eligiendoMotivo ? (
+        <div style={{ marginBottom: "1rem" }}>
+          <p style={{ color: DORADO_SUAVE }}>¿Por qué se interrumpe el partido?</p>
+          {error && <p style={{ color: "#f3caca" }}>{error}</p>}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button style={btnStyle} disabled={isPending} onClick={() => interrumpirPor("medico")}>
+              Médico
+            </button>
+            <button style={btnStyle} disabled={isPending} onClick={() => interrumpirPor("clima")}>
+              Clima
+            </button>
+            <button style={botonSecundario} disabled={isPending} onClick={() => setEligiendoMotivo(false)}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : pendiente ? (
         <div style={{ marginBottom: "1rem" }}>
           <p style={{ color: DORADO_SUAVE }}>
             Confirmar: <strong>{PREGUNTAS_CONFIRMACION[pendiente]}</strong>
           </p>
           {error && <p style={{ color: "#f3caca" }}>{error}</p>}
-          <button style={btnStyle} disabled={isPending} onClick={confirmarPendiente}>
-            {isPending ? "Confirmando…" : "Confirmar"}
-          </button>{" "}
-          <button disabled={isPending} onClick={() => setPendiente(null)}>
-            Cancelar
-          </button>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button style={btnStyle} disabled={isPending} onClick={confirmarPendiente}>
+              {isPending ? "Confirmando…" : "Confirmar"}
+            </button>
+            <button style={botonSecundario} disabled={isPending} onClick={() => setPendiente(null)}>
+              Cancelar
+            </button>
+          </div>
         </div>
       ) : (
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem" }}>
@@ -121,8 +147,8 @@ export default function PanelDesignado({
           )}
           {partido.estado === "en_juego" && (
             <>
-              <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(suspender)}>
-                Suspender
+              <button style={btnStyle} disabled={isPending} onClick={() => { setError(null); setEligiendoMotivo(true); }}>
+                Interrumpir
               </button>
               {periodo === "1T" && (
                 <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("cortar1T")}>
@@ -148,14 +174,14 @@ export default function PanelDesignado({
         </div>
       )}
 
-      {!pendiente && error && <p style={{ color: "#f3caca" }}>{error}</p>}
+      {!pendiente && !eligiendoMotivo && error && <p style={{ color: "#f3caca" }}>{error}</p>}
 
       {partido.estado === "en_juego" && (
         <div style={{ display: "grid", gap: "1rem" }}>
           <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
-          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} />
+          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar />
           <CargaCambio partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}

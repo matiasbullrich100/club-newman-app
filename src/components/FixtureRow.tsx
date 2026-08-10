@@ -38,7 +38,8 @@ export function MatchupText({
   if (jugado) {
     return (
       <>
-        {nombreEquipo(local)} <b>{golesDe(equipoLocal, resultado)}</b> - <b>{golesDe(equipoVisitante, resultado)}</b>{" "}
+        {nombreEquipo(local)} <b style={{ margin: "0 6px" }}>{golesDe(equipoLocal, resultado)}</b> -{" "}
+        <b style={{ margin: "0 6px" }}>{golesDe(equipoVisitante, resultado)}</b>{" "}
         {nombreEquipo(visitante)}
       </>
     );

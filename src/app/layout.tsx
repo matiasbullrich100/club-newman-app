@@ -12,6 +12,9 @@ const lato = Lato({
 export const metadata: Metadata = {
   title: "Club Newman — En vivo",
   description: "Resultados en vivo de los partidos del Club Newman",
+  // iOS subraya telefonos/direcciones/emails que "detecta" en el texto (ej. nombres de
+  // jugadores que matchean un patron) y los vuelve tocables -- esto lo desactiva.
+  formatDetection: { telephone: false, address: false, email: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

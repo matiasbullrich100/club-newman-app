@@ -16,11 +16,25 @@ export const ETIQUETAS_INCIDENTE: Record<Incidente["tipo"], string> = {
   lesion: "Lesión",
   fin_1t: "Final 1er tiempo",
   fin_2t: "Final 2do tiempo",
+  interrupcion_medica: "Partido interrumpido — Médico",
+  interrupcion_clima: "Partido interrumpido — Clima",
 };
 
 // Try Penal y Try Scrum se le dan al equipo, no a un jugador puntual.
 const SIN_JUGADOR_PUNTUAL: Incidente["tipo"][] = ["try_penal", "try_scrum"];
-const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t"];
+const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t", "interrupcion_medica", "interrupcion_clima"];
+
+// Una incidencia mal cargada solo se puede corregir dentro de su propia familia (puntos<->puntos
+// o tarjeta<->tarjeta) -- cambiar de familia dejaria campos inconsistentes (una tarjeta no tiene
+// puntos, un cambio no tiene este jugadorId, etc). Usado tanto por el server action como por la UI.
+export const FAMILIA_PUNTOS: Incidente["tipo"][] = ["try", "try_scrum", "conversion", "penal", "drop", "try_penal"];
+export const FAMILIA_TARJETA: Incidente["tipo"][] = [
+  "tarjeta_amarilla",
+  "tarjeta_doble_amarilla",
+  "tarjeta_roja",
+  "tarjeta_roja_20",
+  "tarjeta_azul",
+];
 
 export function requierePlayerSelection(tipo: Incidente["tipo"]): boolean {
   return !SIN_JUGADOR_PUNTUAL.includes(tipo);

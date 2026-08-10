@@ -6,7 +6,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession, puedeOperarCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
-import { requierePlayerSelection } from "@/lib/incidentes";
+import { FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
@@ -26,6 +26,17 @@ function refs(partidoId: string) {
 // pase lo que pase con el argumento que le llegue del cliente. Tambien se usa para no
 // contabilizar en jugadores/ las tarjetas azules cargadas en partidos simulados.
 const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
+
+// Campo en jugadores/{id} que acumula cada tipo de tarjeta -- compartido entre publicarIncidente
+// y corregirTipoIncidente (corregir un try por un drop, o una amarilla por una roja, etc.).
+const CAMPO_TARJETA: Partial<Record<TipoIncidente, string>> = {
+  tarjeta_amarilla: "tarjetasAmarillas",
+  tarjeta_doble_amarilla: "tarjetasDobleAmarilla",
+  tarjeta_roja: "tarjetasRojas",
+  tarjeta_roja_20: "tarjetasRojas20",
+  tarjeta_azul: "tarjetasAzules",
+};
+
 
 // ---- Máquina de estados del partido -------------------------------------------------
 
@@ -114,9 +125,10 @@ export async function iniciar2T(partidoId: string): Promise<void> {
   revalidatePath(`/partido/${partidoId}`);
 }
 
-export async function suspender(partidoId: string): Promise<void> {
+export async function suspender(partidoId: string, motivo: "medico" | "clima"): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc();
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
@@ -124,11 +136,22 @@ export async function suspender(partidoId: string): Promise<void> {
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    if (partido.estado !== "en_juego") throw new Error("Solo se puede suspender un partido en juego");
+    if (partido.estado !== "en_juego") throw new Error("Solo se puede interrumpir un partido en juego");
+    if (!liveState.periodo) throw new Error("El partido no está en juego");
 
     const accumulated = elapsedSeconds(liveState);
     tx.update(partidoRef, { estado: "suspendido", updatedAt: FieldValue.serverTimestamp() });
     tx.update(liveStateRef, { clockRunning: false, clockAnchor: null, accumulatedSeconds: accumulated });
+
+    const incidente: Incidente = {
+      tipo: motivo === "medico" ? "interrupcion_medica" : "interrupcion_clima",
+      periodo: liveState.periodo,
+      minuto: Math.floor(accumulated / 60) + 1,
+      segundoAbsoluto: Math.floor(accumulated),
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    tx.set(incidenteRef, incidente);
   });
 
   revalidatePath(`/partido/${partidoId}`);
@@ -292,21 +315,68 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tx.update(partidoRef, { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() });
     }
 
-    const campoTarjeta: Partial<Record<TipoIncidente, string>> = {
-      tarjeta_amarilla: "tarjetasAmarillas",
-      tarjeta_doble_amarilla: "tarjetasDobleAmarilla",
-      tarjeta_roja: "tarjetasRojas",
-      tarjeta_roja_20: "tarjetasRojas20",
-      tarjeta_azul: "tarjetasAzules",
-    };
     // Las tarjetas azules de partidos simulados no se contabilizan en las estadisticas reales.
     const esAzulSimulada = input.tipo === "tarjeta_azul" && PARTIDOS_DEMO_IDS.includes(partidoId);
-    if (campoTarjeta[input.tipo] && input.equipo === "newman" && input.jugadorId && !esAzulSimulada) {
+    if (CAMPO_TARJETA[input.tipo] && input.equipo === "newman" && input.jugadorId && !esAzulSimulada) {
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
-        { nombre: jugadorNombre, [campoTarjeta[input.tipo]!]: FieldValue.increment(1) },
+        { nombre: jugadorNombre, [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1) },
         { merge: true }
       );
+    }
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
+ * Corrige el tipo de una incidencia ya publicada (ej. cargaron Try y era Drop) sin tocar
+ * equipo/jugador. Solo permite moverse dentro de la misma familia -- puntos<->puntos o
+ * tarjeta<->tarjeta -- para no dejar una incidencia en un estado inconsistente (ej. una
+ * tarjeta no tiene puntos, un cambio no tiene jugadorId de esta forma). Funciona con el
+ * partido en juego o ya terminado (la correccion tipica llega despues, revisando el resultado).
+ */
+export async function corregirTipoIncidente(partidoId: string, incidenteId: string, nuevoTipo: TipoIncidente): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, incSnap] = await Promise.all([tx.get(partidoRef), tx.get(incidenteRef)]);
+    if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
+    const partido = partidoSnap.data() as Partido;
+    const inc = incSnap.data() as Incidente;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
+      throw new Error("El partido tiene que estar en juego o terminado para corregir una jugada");
+    }
+    if (inc.tipo === nuevoTipo) return;
+
+    const esPuntos = FAMILIA_PUNTOS.includes(inc.tipo) && FAMILIA_PUNTOS.includes(nuevoTipo);
+    const esTarjeta = FAMILIA_TARJETA.includes(inc.tipo) && FAMILIA_TARJETA.includes(nuevoTipo);
+    if (!esPuntos && !esTarjeta) {
+      throw new Error("Solo se puede corregir entre jugadas de puntos o entre tarjetas, no entre las dos");
+    }
+
+    if (esPuntos) {
+      const puntosViejos = (PUNTOS_POR_TIPO as Record<string, number>)[inc.tipo] ?? 0;
+      const puntosNuevos = (PUNTOS_POR_TIPO as Record<string, number>)[nuevoTipo] ?? 0;
+      const delta = puntosNuevos - puntosViejos;
+      if (delta !== 0) {
+        const campo = inc.equipo === "newman" ? "resultado.newman" : "resultado.rival";
+        tx.update(partidoRef, { [campo]: FieldValue.increment(delta), updatedAt: FieldValue.serverTimestamp() });
+      }
+      tx.update(incidenteRef, { tipo: nuevoTipo, puntos: puntosNuevos });
+    } else {
+      const esAzulSimulada = (inc.tipo === "tarjeta_azul" || nuevoTipo === "tarjeta_azul") && PARTIDOS_DEMO_IDS.includes(partidoId);
+      if (inc.equipo === "newman" && inc.jugadorId && !esAzulSimulada) {
+        const campoViejo = CAMPO_TARJETA[inc.tipo];
+        const campoNuevo = CAMPO_TARJETA[nuevoTipo];
+        const jugadorRef = adminDb.collection("jugadores").doc(inc.jugadorId);
+        if (campoViejo) tx.set(jugadorRef, { [campoViejo]: FieldValue.increment(-1) }, { merge: true });
+        if (campoNuevo) tx.set(jugadorRef, { [campoNuevo]: FieldValue.increment(1) }, { merge: true });
+      }
+      tx.update(incidenteRef, { tipo: nuevoTipo });
     }
   });
 

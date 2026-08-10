@@ -7,7 +7,15 @@ import type { Incidente } from "@/types/firestore";
 import { DORADO } from "@/lib/colors";
 import IncidentesList from "./IncidentesList";
 
-export default function IncidentesFeed({ partidoId, rivalNombre }: { partidoId: string; rivalNombre?: string }) {
+export default function IncidentesFeed({
+  partidoId,
+  rivalNombre,
+  puedeEditar,
+}: {
+  partidoId: string;
+  rivalNombre?: string;
+  puedeEditar?: boolean;
+}) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
 
   useEffect(() => {
@@ -32,7 +40,7 @@ export default function IncidentesFeed({ partidoId, rivalNombre }: { partidoId: 
       }}
     >
       <h3 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginBottom: 10 }}>Incidencias</h3>
-      <IncidentesList incidentes={incidentes} rivalNombre={rivalNombre} />
+      <IncidentesList incidentes={incidentes} rivalNombre={rivalNombre} partidoId={partidoId} puedeEditar={puedeEditar} />
     </div>
   );
 }

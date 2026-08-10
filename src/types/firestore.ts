@@ -94,7 +94,9 @@ export type TipoIncidente =
   | "cambio"
   | "lesion"
   | "fin_1t"
-  | "fin_2t";
+  | "fin_2t"
+  | "interrupcion_medica"
+  | "interrupcion_clima";
 
 export type Equipo = "newman" | "rival";
 
