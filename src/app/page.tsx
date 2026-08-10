@@ -11,6 +11,7 @@ const PARTIDOS_DEMO = [
   { id: "demo-partido-1", label: "Pre B" },
   { id: "demo-partido-2", label: "M-22" },
   { id: "demo-partido-3", label: "Pre A" },
+  { id: "pre-a-test-cambio", label: "Cambio Test" },
 ];
 
 const botonStyle: React.CSSProperties = {
