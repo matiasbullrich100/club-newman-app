@@ -27,7 +27,7 @@ function refs(partidoId: string) {
 // Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real,
 // pase lo que pase con el argumento que le llegue del cliente. Tambien se usa para no
 // contabilizar en jugadores/ las tarjetas azules cargadas en partidos simulados.
-const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3"];
+const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3", "pre-a-test-cambio"];
 
 // Campo en jugadores/{id} que acumula cada tipo de tarjeta -- compartido entre publicarIncidente
 // y corregirTipoIncidente (corregir un try por un drop, o una amarilla por una roja, etc.).
