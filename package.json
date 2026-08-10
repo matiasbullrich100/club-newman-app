@@ -13,7 +13,8 @@
     "seed-designados": "tsx src/scripts/seed-designados.ts",
     "seed-designados-juveniles": "tsx src/scripts/seed-designados-juveniles.ts",
     "migrate-historical": "tsx src/scripts/migrate-historical.ts",
-    "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts"
+    "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts",
+    "migrate-m15-fecha2": "tsx src/scripts/migrate-juveniles-m15-fecha2.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",
