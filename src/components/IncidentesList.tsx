@@ -18,6 +18,7 @@ const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
   try_penal: "🏉",
   interrupcion_medica: "🏥",
   interrupcion_clima: "⛈️",
+  walkover: "🚫",
 };
 
 const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t", "interrupcion_medica", "interrupcion_clima"];

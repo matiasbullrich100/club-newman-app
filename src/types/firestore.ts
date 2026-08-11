@@ -98,7 +98,8 @@ export type TipoIncidente =
   | "fin_1t"
   | "fin_2t"
   | "interrupcion_medica"
-  | "interrupcion_clima";
+  | "interrupcion_clima"
+  | "walkover";
 
 export type Equipo = "newman" | "rival";
 

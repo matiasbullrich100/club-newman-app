@@ -260,6 +260,57 @@ export async function terminarPartido(partidoId: string): Promise<void> {
   revalidatePath("/");
 }
 
+/**
+ * Walkover: el equipo indicado no presento primera linea (3 jugadores entrenados para el
+ * scrum -- pilar, hooker, pilar) y pierde el partido por default 0-8. Termina el partido en el
+ * acto, sea cual sea su estado previo (incluso "programado", si todavia no arranco). No calcula
+ * minutos jugados -- un partido dado por walkover no se llego a jugar.
+ */
+export async function registrarWalkover(partidoId: string, equipoSinPrimeraLinea: Equipo): Promise<void> {
+  const session = await getSession();
+  const { partidoRef, liveStateRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc();
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado === "terminado") throw new Error("El partido ya está terminado");
+
+    const resultado = equipoSinPrimeraLinea === "newman" ? { newman: 0, rival: 8 } : { newman: 8, rival: 0 };
+
+    let periodo: Periodo = "1T";
+    let minuto = 0;
+    let segundoAbsoluto = 0;
+    const liveState = liveSnap.exists ? (liveSnap.data() as LiveState) : null;
+    if (liveState?.periodo) {
+      periodo = liveState.periodo;
+      minuto = minutoActual(liveState);
+      segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+    }
+
+    tx.update(partidoRef, { estado: "terminado", resultado, updatedAt: FieldValue.serverTimestamp() });
+    if (liveSnap.exists) {
+      tx.update(liveStateRef, { clockRunning: false, clockAnchor: null });
+    }
+
+    const incidente: Incidente = {
+      tipo: "walkover",
+      equipo: equipoSinPrimeraLinea,
+      periodo,
+      minuto,
+      segundoAbsoluto,
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    tx.set(incidenteRef, incidente);
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+  revalidatePath("/");
+}
+
 // ---- Incidencias ----------------------------------------------------------------------
 
 export interface PublicarIncidenteInput {

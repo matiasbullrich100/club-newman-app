@@ -7,6 +7,7 @@ import {
   iniciar2T,
   iniciarPartido,
   reanudar,
+  registrarWalkover,
   suspender,
   terminarPartido,
 } from "@/lib/match/actions";
@@ -62,6 +63,7 @@ export default function PanelDesignado({
   const [error, setError] = useState<string | null>(null);
   const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
   const [eligiendoMotivo, setEligiendoMotivo] = useState(false);
+  const [eligiendoWalkover, setEligiendoWalkover] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -96,6 +98,11 @@ export default function PanelDesignado({
     ejecutar((id) => suspender(id, motivo));
   }
 
+  function walkoverDe(equipo: "newman" | "rival") {
+    setEligiendoWalkover(false);
+    ejecutar((id) => registrarWalkover(id, equipo));
+  }
+
   const nombreNewman = nombreNewmanDe(partido.categoriaId);
 
   return (
@@ -124,6 +131,22 @@ export default function PanelDesignado({
               Clima
             </button>
             <button style={botonSecundario} disabled={isPending} onClick={() => setEligiendoMotivo(false)}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : eligiendoWalkover ? (
+        <div style={{ marginBottom: "1rem" }}>
+          <p style={{ color: DORADO_SUAVE }}>¿Quién no presentó primera línea (pilar, hooker, pilar)?</p>
+          {error && <p style={{ color: "#f3caca" }}>{error}</p>}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button style={btnStyle} disabled={isPending} onClick={() => walkoverDe("newman")}>
+              {nombreNewman}
+            </button>
+            <button style={btnStyle} disabled={isPending} onClick={() => walkoverDe("rival")}>
+              {partido.rival}
+            </button>
+            <button style={botonSecundario} disabled={isPending} onClick={() => setEligiendoWalkover(false)}>
               Cancelar
             </button>
           </div>
@@ -175,11 +198,17 @@ export default function PanelDesignado({
               Reanudar
             </button>
           )}
-          {partido.estado === "terminado" && <p style={{ color: DORADO_SUAVE, fontSize: "0.85rem" }}>Partido terminado.</p>}
+          {partido.estado === "terminado" ? (
+            <p style={{ color: DORADO_SUAVE, fontSize: "0.85rem" }}>Partido terminado.</p>
+          ) : (
+            <button style={botonSecundario} disabled={isPending} onClick={() => { setError(null); setEligiendoWalkover(true); }}>
+              Walkover
+            </button>
+          )}
         </div>
       )}
 
-      {!pendiente && !eligiendoMotivo && error && <p style={{ color: "#f3caca" }}>{error}</p>}
+      {!pendiente && !eligiendoMotivo && !eligiendoWalkover && error && <p style={{ color: "#f3caca" }}>{error}</p>}
 
       {partido.estado === "en_juego" && (
         <div style={{ display: "grid", gap: "1rem" }}>
