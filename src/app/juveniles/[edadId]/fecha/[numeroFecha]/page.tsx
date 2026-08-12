@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
+import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId, rivalGenerico } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -31,7 +31,6 @@ export default async function FechaJuvenilesPage({
   const filas = equipos.map((cat, i) => ({ cat, partido: snaps[i].exists ? (snaps[i].data() as Partido) : null }));
 
   const headline = filas[0]?.partido;
-  const nombreNewmanHeadline = nombreNewmanDe(equipos[0].id);
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -43,7 +42,7 @@ export default async function FechaJuvenilesPage({
         <>
           <div style={{ fontWeight: 700, textAlign: "center", color: DORADO, fontSize: "1.15rem", textTransform: "uppercase", marginTop: 12, letterSpacing: 0.3 }}>
             {headline.notaEspecial ?? (
-              <MatchupText esLocal={headline.esLocal} rival={headline.rival} jugado={headline.estado === "terminado"} resultado={headline.resultado} nombreNewman={nombreNewmanHeadline} />
+              <MatchupText esLocal={headline.esLocal} rival={rivalGenerico(headline.rival)} jugado={headline.estado === "terminado"} resultado={headline.resultado} />
             )}
           </div>
           {headline.fecha && (

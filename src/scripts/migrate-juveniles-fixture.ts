@@ -1,16 +1,27 @@
-// Carga el fixture (fechas 2 a 11, sin formaciones -- todavia no hay) de M16/M17/M19 desde el
-// excel del club. Correr con: npm run migrate-m16-m17-m19-fixture
-// Idempotente: pisa el doc si ya existe.
+// Carga el fixture (fechas 2 a 11, sin formaciones -- todavia no hay) de M15/M16/M17/M19 desde
+// el excel del club. Correr con: npm run migrate-juveniles-fixture
+// Idempotente: pisa el doc si ya existe (incluye M15, que ya tenia la fecha 2 cargada -- la
+// vuelve a escribir con la letra del rival corregida; NO toca la fecha 1 de M15, esa no esta en
+// este archivo).
 //
 // La fecha 3 de M17 A/B esta reprogramada para el 8/11 (vs Los Matreros) -- en el excel del club
 // aparece al final de la hoja con el numero de fecha "F3" pero fuera de orden cronologico; se
 // carga con numeroFecha=3 y fecha=8/11, no con el fixture "normal" del 23/8 (donde esos dos
 // equipos no tienen fila -- ese domingo no jugaron).
 //
-// Nombres de club corregidos a mano: el excel original tiene mojibake (acentos perdidos,
-// reemplazados por el caracter de reemplazo Unicode U+FFFD) en Hindú/Pucará/Las Cañas/San
-// Andrés/San Martín/Vicente López -- irrecuperable del archivo, reconstruido por nombre de club
-// conocido de URBA.
+// Nombres de club: iguales a los que ya usa Plantel Superior donde coinciden ("Regatas" no
+// "Regatas BV", "Hindu" sin tilde -- asi lo tiene cargado el club, "BACRC" no "Buenos Aires").
+// Para el resto (sin equivalente en Plantel Superior) se uso la ortografia correcta con tilde --
+// el excel original tenia mojibake (acentos perdidos, reemplazados por el caracter de reemplazo
+// Unicode U+FFFD) en Hindu/Pucará/Las Cañas/San Andrés/San Martín/Vicente López, irrecuperable
+// del archivo, reconstruido por nombre de club conocido de URBA.
+//
+// Letra del rival: SIEMPRE se agrega, en todos los partidos -- letra propia del equipo del rival
+// (no la de Newman), asignada secuencial (A, B, C...) dentro de cada grupo de (edad, club rival)
+// esa fecha, en el orden en que aparecen los equipos de Newman. Ej.: si Newman C y Newman D
+// juegan contra Virreyes esa fecha (y ningun otro equipo de Newman), es "Virreyes A" (para C) y
+// "Virreyes B" (para D) -- la letra la pone el rival, no nosotros. Un rival que le da equipo a
+// un solo Newman ese dia igual arranca en "A".
 
 import { config } from "dotenv";
 import { resolve } from "path";
@@ -21,7 +32,7 @@ const NEWMAN = "Newman";
 
 interface FilaFixture {
   categoriaId: string;
-  rival: string | null; // null = fecha libre
+  rivalBase: string | null; // null = fecha libre
   esLocal: boolean;
   hora: string;
 }
@@ -32,8 +43,13 @@ interface Fecha {
   filas: FilaFixture[];
 }
 
-function f(categoriaId: string, rival: string | null, esLocal: boolean, hora: string): FilaFixture {
-  return { categoriaId, rival, esLocal, hora };
+function f(categoriaId: string, rivalBase: string | null, esLocal: boolean, hora: string): FilaFixture {
+  return { categoriaId, rivalBase, esLocal, hora };
+}
+
+// "m16-a" -> "m16"
+function edadDe(categoriaId: string): string {
+  return categoriaId.split("-")[0];
 }
 
 const FECHAS: Fecha[] = [
@@ -41,6 +57,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 2,
     fechaISO: "2026-08-16",
     filas: [
+      f("m15-a", "CASI", false, "11:00"),
+      f("m15-b", "CASI", false, "09:30"),
+      f("m15-c", "CASI", false, "11:00"),
+      f("m15-d", "CASI", false, "09:30"),
       f("m16-a", "CASI", true, "11:00"),
       f("m16-b", "CASI", true, "09:30"),
       f("m16-c", "CASI", true, "11:00"),
@@ -59,6 +79,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 3,
     fechaISO: "2026-08-23",
     filas: [
+      f("m15-a", "CUBA", true, "11:00"),
+      f("m15-b", "CUBA", true, "09:30"),
+      f("m15-c", "CUBA", true, "11:00"),
+      f("m15-d", "CUBA", true, "09:30"),
       f("m16-a", "Pucará", false, "11:00"),
       f("m16-b", "Pucará", false, "09:30"),
       f("m16-c", "Virreyes", false, "12:30"),
@@ -75,6 +99,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 4,
     fechaISO: "2026-08-30",
     filas: [
+      f("m15-a", "Pucará", false, "11:00"),
+      f("m15-b", "Pucará", false, "09:30"),
+      f("m15-c", "Pucará", false, "11:00"),
+      f("m15-d", "Pucará", false, "09:30"),
       f("m16-a", "Belgrano Athletic", true, "11:00"),
       f("m16-b", "Belgrano Athletic", true, "09:30"),
       f("m16-c", "Belgrano Athletic", true, "11:00"),
@@ -93,6 +121,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 5,
     fechaISO: "2026-09-06",
     filas: [
+      f("m15-a", "Liceo Naval", true, "11:00"),
+      f("m15-b", "Liceo Naval", true, "09:30"),
+      f("m15-c", null, true, ""),
+      f("m15-d", "San Andrés", true, "09:30"),
       f("m16-a", "CUBA", false, "11:00"),
       f("m16-b", "CUBA", false, "09:30"),
       f("m16-c", "CUBA", false, "11:00"),
@@ -111,6 +143,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 6,
     fechaISO: "2026-09-13",
     filas: [
+      f("m15-a", "La Plata", true, "11:00"),
+      f("m15-b", "La Plata", true, "09:30"),
+      f("m15-c", "La Plata", true, "11:00"),
+      f("m15-d", "Los Pinos", true, "09:30"),
       f("m16-a", "Alumni", false, "11:00"),
       f("m16-b", "Alumni", false, "09:30"),
       f("m16-c", "Alumni", false, "11:00"),
@@ -129,6 +165,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 7,
     fechaISO: "2026-09-27",
     filas: [
+      f("m15-a", "Alumni", false, "11:00"),
+      f("m15-b", "Alumni", false, "09:30"),
+      f("m15-c", "Alumni", false, "11:00"),
+      f("m15-d", "Los Molinos", false, "11:00"),
       f("m16-a", "SIC", true, "11:00"),
       f("m16-b", "SIC", true, "09:30"),
       f("m16-c", "SIC", true, "11:00"),
@@ -136,17 +176,21 @@ const FECHAS: Fecha[] = [
       f("m17-a", "A.D. Francesa", false, "14:00"),
       f("m17-b", "A.D. Francesa", false, "12:30"),
       f("m17-c", "A.D. Francesa", false, "14:00"),
-      f("m19-a", "Buenos Aires", true, "14:00"),
-      f("m19-b", "Buenos Aires", true, "12:30"),
-      f("m19-c", "Buenos Aires", true, "12:30"),
-      f("m19-d", "Buenos Aires", true, "11:00"),
-      f("m19-e", "Buenos Aires", true, "12:30"),
+      f("m19-a", "BACRC", true, "14:00"),
+      f("m19-b", "BACRC", true, "12:30"),
+      f("m19-c", "BACRC", true, "12:30"),
+      f("m19-d", "BACRC", true, "11:00"),
+      f("m19-e", "BACRC", true, "12:30"),
     ],
   },
   {
     numeroFecha: 8,
     fechaISO: "2026-10-04",
     filas: [
+      f("m15-a", "SIC", true, "11:00"),
+      f("m15-b", "SIC", true, "09:30"),
+      f("m15-c", "SIC", true, "11:00"),
+      f("m15-d", null, true, ""),
       f("m16-a", "San Cirano", false, "11:00"),
       f("m16-b", "San Cirano", false, "09:30"),
       f("m16-c", "Hurling", false, "11:00"),
@@ -165,6 +209,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 9,
     fechaISO: "2026-10-11",
     filas: [
+      f("m15-a", "Champagnat", false, "11:00"),
+      f("m15-b", "Champagnat", false, "09:30"),
+      f("m15-c", "Champagnat", false, "11:00"),
+      f("m15-d", null, true, ""),
       f("m16-a", "Champagnat", true, "11:00"),
       f("m16-b", "Champagnat", true, "09:30"),
       f("m16-c", "Champagnat", true, "11:00"),
@@ -183,17 +231,21 @@ const FECHAS: Fecha[] = [
     numeroFecha: 10,
     fechaISO: "2026-10-25",
     filas: [
+      f("m15-a", "Olivos", true, "11:00"),
+      f("m15-b", "Olivos", true, "09:30"),
+      f("m15-c", "Olivos", true, "11:00"),
+      f("m15-d", null, true, ""),
       f("m16-a", "Los Tilos", false, "11:00"),
       f("m16-b", "Los Tilos", false, "09:30"),
       f("m16-c", null, true, ""),
       f("m16-d", null, true, ""),
-      f("m17-a", "Hindú", true, "14:00"),
-      f("m17-b", "Hindú", true, "12:30"),
+      f("m17-a", "Hindu", true, "14:00"),
+      f("m17-b", "Hindu", true, "12:30"),
       f("m17-c", null, true, ""),
-      f("m19-a", "Hindú", false, "14:00"),
-      f("m19-b", "Hindú", false, "12:30"),
-      f("m19-c", "Hindú", false, "12:30"),
-      f("m19-d", "Hindú", false, "11:00"),
+      f("m19-a", "Hindu", false, "14:00"),
+      f("m19-b", "Hindu", false, "12:30"),
+      f("m19-c", "Hindu", false, "12:30"),
+      f("m19-d", "Hindu", false, "11:00"),
       f("m19-e", null, true, ""),
     ],
   },
@@ -201,6 +253,10 @@ const FECHAS: Fecha[] = [
     numeroFecha: 11,
     fechaISO: "2026-11-01",
     filas: [
+      f("m15-a", "A.D. Francesa", false, "11:00"),
+      f("m15-b", "A.D. Francesa", false, "09:30"),
+      f("m15-c", null, true, ""),
+      f("m15-d", "BACRC", false, "11:00"),
       f("m16-a", "San Albano", true, "11:00"),
       f("m16-b", "San Albano", true, "09:30"),
       f("m16-c", "C.U. de Quilmes", true, "11:00"),
@@ -223,6 +279,24 @@ const FECHAS: Fecha[] = [
   },
 ];
 
+/** Asigna la letra del rival (secuencial por grupo de edad+club, en el orden de las filas). */
+function conLetraDeRival(filas: FilaFixture[]): Map<string, { rival: string; esLibre: boolean }> {
+  const contadores = new Map<string, number>();
+  const resultado = new Map<string, { rival: string; esLibre: boolean }>();
+  for (const fila of filas) {
+    if (fila.rivalBase === null) {
+      resultado.set(fila.categoriaId, { rival: "Libre", esLibre: true });
+      continue;
+    }
+    const key = `${edadDe(fila.categoriaId)}|${fila.rivalBase}`;
+    const n = (contadores.get(key) ?? 0) + 1;
+    contadores.set(key, n);
+    const letra = String.fromCharCode(64 + n); // 1 -> A, 2 -> B, ...
+    resultado.set(fila.categoriaId, { rival: `${fila.rivalBase} ${letra}`, esLibre: false });
+  }
+  return resultado;
+}
+
 async function main() {
   config({ path: resolve(__dirname, "../../.env.local") });
   const { adminDb } = await import("../lib/firebase-admin");
@@ -231,17 +305,18 @@ async function main() {
   let count = 0;
 
   for (const fecha of FECHAS) {
+    const letras = conLetraDeRival(fecha.filas);
     for (const fila of fecha.filas) {
+      const { rival, esLibre } = letras.get(fila.categoriaId)!;
       const pid = partidoId(fila.categoriaId, fecha.numeroFecha);
-      const esLibre = fila.rival === null;
       const partido: Partido = {
         categoriaId: fila.categoriaId,
         numeroFecha: fecha.numeroFecha,
         fecha: fecha.fechaISO,
         ...(fila.hora ? { hora: fila.hora } : {}),
-        rival: esLibre ? "Libre" : fila.rival!,
+        rival,
         esLocal: fila.esLocal,
-        cancha: esLibre ? "-" : fila.esLocal ? NEWMAN : fila.rival!,
+        cancha: esLibre ? "-" : fila.esLocal ? NEWMAN : fila.rivalBase!,
         estado: "programado",
         resultado: { newman: 0, rival: 0 },
         enCanchaIds: [],

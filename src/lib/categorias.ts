@@ -61,6 +61,17 @@ export function nombreNewmanDe(categoriaId: string): string {
   return letra ? `Newman ${letra}` : "Newman";
 }
 
+// Los resumenes "de division" (ej. la grilla de 11 fechas en /juveniles/[edadId], o el titulo de
+// /juveniles/[edadId]/fecha/[n]) usan el partido de un solo equipo "destacado" como muestra de
+// toda la edad -- pero esa letra puntual (ej. "Newman A vs Regatas A") no corresponde ahi, porque
+// esa fila representa a la division entera, no a un equipo puntual (y la mayoria de las veces
+// todos los equipos de esa edad juegan contra el mismo club esa fecha). Saca la letra final del
+// nombre del rival ("Regatas A" -> "Regatas") para esos contextos genericos; el detalle por
+// equipo (fixture de cada letra, vista de fecha con las 4 filas) sigue mostrando la letra.
+export function rivalGenerico(rival: string): string {
+  return rival.replace(/ [A-Z]$/, "");
+}
+
 // Con que plantel se etiqueta cada jugador en la coleccion global `jugadores/` -- para poder
 // separar Plantel Superior de cada division de Juveniles en /estadisticas y en el buscador de
 // cambios (ver src/lib/match/actions.ts).
