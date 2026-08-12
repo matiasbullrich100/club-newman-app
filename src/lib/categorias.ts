@@ -19,14 +19,25 @@ export const CATEGORIAS = [
   { id: "m15-b", nombre: "M15 B", orden: 1, grupo: "juveniles", edadId: "m15" },
   { id: "m15-c", nombre: "M15 C", orden: 2, grupo: "juveniles", edadId: "m15" },
   { id: "m15-d", nombre: "M15 D", orden: 3, grupo: "juveniles", edadId: "m15" },
+  { id: "m16-a", nombre: "M16 A", orden: 0, grupo: "juveniles", edadId: "m16", destacado: true },
+  { id: "m16-b", nombre: "M16 B", orden: 1, grupo: "juveniles", edadId: "m16" },
+  { id: "m16-c", nombre: "M16 C", orden: 2, grupo: "juveniles", edadId: "m16" },
+  { id: "m16-d", nombre: "M16 D", orden: 3, grupo: "juveniles", edadId: "m16" },
+  { id: "m17-a", nombre: "M17 A", orden: 0, grupo: "juveniles", edadId: "m17", destacado: true },
+  { id: "m17-b", nombre: "M17 B", orden: 1, grupo: "juveniles", edadId: "m17" },
+  { id: "m17-c", nombre: "M17 C", orden: 2, grupo: "juveniles", edadId: "m17" },
+  { id: "m19-a", nombre: "M19 A", orden: 0, grupo: "juveniles", edadId: "m19", destacado: true },
+  { id: "m19-b", nombre: "M19 B", orden: 1, grupo: "juveniles", edadId: "m19" },
+  { id: "m19-c", nombre: "M19 C", orden: 2, grupo: "juveniles", edadId: "m19" },
+  { id: "m19-d", nombre: "M19 D", orden: 3, grupo: "juveniles", edadId: "m19" },
+  { id: "m19-e", nombre: "M19 E", orden: 4, grupo: "juveniles", edadId: "m19" },
+  { id: "m19-f", nombre: "M19 F", orden: 5, grupo: "juveniles", edadId: "m19" },
 ] as const;
 
 export type CategoriaId = (typeof CATEGORIAS)[number]["id"];
 
 export const CATEGORIAS_SUPERIOR = CATEGORIAS.filter((c) => c.grupo === "superior");
 
-// M16/M17/M19 todavia no tienen equipos cargados -- aparecen en el menu de Juveniles como
-// "Proximamente" hasta que se sumen (ver EDADES).
 export const EDADES = [
   { id: "m15", nombre: "M15" },
   { id: "m16", nombre: "M16" },
