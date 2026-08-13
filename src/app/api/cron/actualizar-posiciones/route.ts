@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { actualizarPosiciones } from "@/lib/posiciones/actualizar";
 
-// Disparado 1 vez por semana por Vercel Cron (ver vercel.json). Vercel manda automaticamente
-// "Authorization: Bearer $CRON_SECRET" en cada invocacion programada si esa env var esta seteada
-// en el proyecto -- sin CRON_SECRET configurado, el endpoint queda abierto (util en local).
+// Disparado por el workflow de GitHub Actions (.github/workflows/actualizar-posiciones.yml),
+// que maneja el cronograma real (sabados por hora para Plantel Superior, domingos por minuto
+// para Juveniles -- Vercel Cron en el plan gratis no permite mas de 1 corrida por dia). Ese
+// workflow manda "Authorization: Bearer $CRON_SECRET" -- sin esa env var configurada, el
+// endpoint queda abierto (util en local).
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (secret && request.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const resultados = await actualizarPosiciones();
+  const grupoParam = request.nextUrl.searchParams.get("grupo");
+  const grupo = grupoParam === "superior" || grupoParam === "juveniles" ? grupoParam : undefined;
+
+  const resultados = await actualizarPosiciones(grupo);
   return NextResponse.json({ resultados });
 }
