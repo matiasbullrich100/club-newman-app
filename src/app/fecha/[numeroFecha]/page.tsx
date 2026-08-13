@@ -28,6 +28,12 @@ export default async function VistaDeFecha({
 
   const primera = filas.find((f) => f.cat.id === "primera")?.partido;
 
+  const jugados = filas.filter((f) => f.partido?.estado === "terminado").map((f) => f.partido!);
+  const ganados = jugados.filter((p) => p.resultado.newman > p.resultado.rival).length;
+  const empatados = jugados.filter((p) => p.resultado.newman === p.resultado.rival).length;
+  const perdidos = jugados.filter((p) => p.resultado.newman < p.resultado.rival).length;
+  const fullHouse = jugados.length > 0 && ganados === jugados.length;
+
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
@@ -49,7 +55,27 @@ export default async function VistaDeFecha({
         </>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: primera ? 0 : "20px" }}>
+      {jugados.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 6,
+            fontSize: "0.78rem",
+            color: DORADO_SUAVE,
+            marginBottom: 14,
+          }}
+        >
+          <span>
+            Partidos Ganados: {ganados} · Partidos Empatados: {empatados} · Partidos Perdidos: {perdidos}
+          </span>
+          {fullHouse && <span style={{ color: DORADO, fontWeight: 700, letterSpacing: 1 }}>FULL HOUSE</span>}
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: primera || jugados.length > 0 ? 0 : "20px" }}>
         {filas.map(({ cat, partido }) => {
           if (!partido) return null;
           const href = `/partido/${partidoId(cat.id, numero)}`;
