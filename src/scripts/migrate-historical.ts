@@ -91,7 +91,8 @@ async function main() {
   config({ path: resolve(__dirname, "../../.env.local") });
   const { adminDb } = await import("../lib/firebase-admin");
 
-  const sourceDir = process.argv[2] ?? "C:\\Users\\Matias\\Downloads\\handoff";
+  // La carpeta "handoff" ya no existe -- los mismos JSON quedaron sueltos directo en Downloads.
+  const sourceDir = process.argv[2] ?? "C:\\Users\\Matias\\Downloads";
   console.log("Leyendo datos desde:", sourceDir);
 
   const fixtureBase = loadJson<FixtureBaseEntry[]>(sourceDir, "fixture_base.json");

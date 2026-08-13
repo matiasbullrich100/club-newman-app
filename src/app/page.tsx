@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
+import { puedeOperarCategoria } from "@/lib/auth/scope";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
 import ResetDemoButton from "@/components/ResetDemoButton";
@@ -48,7 +49,7 @@ export default async function Home() {
         ))}
       </p>
 
-      {session?.rol === "manager" && !session.alcance && (
+      {session?.rol === "manager" && puedeOperarCategoria(session, "demo") && (
         <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
           {PARTIDOS_DEMO.map((p) => (
             <ResetDemoButton key={p.id} partidoId={p.id} label={p.label} />

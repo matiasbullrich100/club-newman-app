@@ -72,7 +72,8 @@ async function main() {
     }
   }
 
-  const sourceDir = process.argv[2] ?? "C:\\Users\\Matias\\Downloads\\handoff";
+  // La carpeta "handoff" ya no existe -- los mismos JSON quedaron sueltos directo en Downloads.
+  const sourceDir = process.argv[2] ?? "C:\\Users\\Matias\\Downloads";
 
   console.log("Borrando jugadores/ actual...");
   const actualSnap = await adminDb.collection("jugadores").get();
