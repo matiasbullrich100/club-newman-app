@@ -4,11 +4,12 @@ import { getSession } from "@/lib/auth/session";
 import { puedeVerEstadisticas } from "@/lib/auth/scope";
 import { EDADES } from "@/lib/categorias";
 import { splitNombre } from "@/lib/players";
-import { obtenerHistorialTarjetas, tituloFechas } from "@/lib/tarjetasHistorial";
+import { obtenerHistorialTarjetas } from "@/lib/tarjetasHistorial";
 import type { JugadorAgregado } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
+import TablaTarjetas, { type JugadorTarjetasRow } from "@/components/TablaTarjetas";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const cardStyle: React.CSSProperties = {
@@ -101,6 +102,36 @@ async function Tablas({ grupoId }: { grupoId: string }) {
   // arriba); empatados en Saldo, alfabetico por apellido.
   const porTarjetas = jugadores.filter(tieneTarjeta).sort((a, b) => saldoDe(b.id) - saldoDe(a.id) || porApellido(a, b));
 
+  // Datos planos (sin Timestamps de Firestore) para el componente cliente que arma el panel
+  // tap-to-expand de cada jugador.
+  const filasTarjetas: JugadorTarjetasRow[] = porTarjetas.map((j) => {
+    const h = historial.get(j.id) ?? {};
+    const amarillas = h.tarjeta_amarilla ?? [];
+    const fechaSuspension = Math.floor(amarillas.length / 3);
+    const saldo = amarillas.length % 3;
+    // La 3ra, 6ta, 9na... amarilla (en orden cronologico) es la que dispara cada fecha de
+    // suspension -- eso es lo que se muestra en el panel de esa columna.
+    const fechasDisparadoras = Array.from({ length: fechaSuspension }, (_, i) => amarillas[i * 3 + 2]);
+
+    return {
+      id: j.id,
+      nombre: j.nombre,
+      amarillas: j.tarjetasAmarillas || 0,
+      dobleAmarilla: j.tarjetasDobleAmarilla || 0,
+      rojas: j.tarjetasRojas || 0,
+      rojas20: j.tarjetasRojas20 || 0,
+      azules: j.tarjetasAzules || 0,
+      fechaSuspension,
+      saldo,
+      fechasAmarillas: amarillas,
+      fechasDobleAmarilla: h.tarjeta_doble_amarilla ?? [],
+      fechasRojas: h.tarjeta_roja ?? [],
+      fechasRojas20: h.tarjeta_roja_20 ?? [],
+      fechasAzules: h.tarjeta_azul ?? [],
+      fechasDisparadoras,
+    };
+  });
+
   // Alfabetico por ahora (no hay todavia un criterio mejor que ordenar por minutos, ya que el
   // historico no tiene ese detalle) -- pedido explicito del club.
   const porMinutos = [...jugadores].sort(porApellido);
@@ -114,61 +145,10 @@ async function Tablas({ grupoId }: { grupoId: string }) {
         ) : (
           <>
             <p style={{ opacity: 0.6, fontSize: "0.78rem", marginBottom: 8 }}>
-              Pasá el mouse sobre un número para ver en qué fecha fue cada tarjeta. 3 amarillas = 1 fecha de
+              Tocá el nombre de un jugador para ver en qué fecha fue cada tarjeta. 3 amarillas = 1 fecha de
               suspensión (roja, doble amarilla y roja de 20 las define el tribunal, no se calculan solas).
             </p>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={thStyle}>Jugador</th>
-                    <th style={thStyle}>🟨</th>
-                    <th style={thStyle}>🟨🟨</th>
-                    <th style={thStyle}>🟥</th>
-                    <th style={thStyle}>🟥20</th>
-                    <th style={thStyle}>🟦</th>
-                    <th style={thStyle}>Fecha Susp.</th>
-                    <th style={thStyle}>Saldo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {porTarjetas.map((j) => {
-                    const h = historial.get(j.id) ?? {};
-                    const amarillas = h.tarjeta_amarilla ?? [];
-                    const fechaSuspension = Math.floor(amarillas.length / 3);
-                    const saldo = amarillas.length % 3;
-                    // La 3ra, 6ta, 9na... amarilla (en orden cronologico) es la que dispara cada
-                    // fecha de suspension -- eso es lo que se muestra en el tooltip de esa columna.
-                    const fechasDisparadoras = Array.from({ length: fechaSuspension }, (_, i) => amarillas[i * 3 + 2]);
-
-                    return (
-                      <tr key={j.id}>
-                        <td style={{ ...tdStyle, color: DORADO_SUAVE }}>{j.nombre}</td>
-                        <td style={tdStyle} title={tituloFechas(amarillas)}>
-                          {j.tarjetasAmarillas || 0}
-                        </td>
-                        <td style={tdStyle} title={tituloFechas(h.tarjeta_doble_amarilla)}>
-                          {j.tarjetasDobleAmarilla || 0}
-                        </td>
-                        <td style={tdStyle} title={tituloFechas(h.tarjeta_roja)}>
-                          {j.tarjetasRojas || 0}
-                        </td>
-                        <td style={tdStyle} title={tituloFechas(h.tarjeta_roja_20)}>
-                          {j.tarjetasRojas20 || 0}
-                        </td>
-                        <td style={tdStyle} title={tituloFechas(h.tarjeta_azul)}>
-                          {j.tarjetasAzules || 0}
-                        </td>
-                        <td style={tdStyle} title={tituloFechas(fechasDisparadoras)}>
-                          {fechaSuspension}
-                        </td>
-                        <td style={tdStyle}>{saldo}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <TablaTarjetas jugadores={filasTarjetas} />
           </>
         )}
       </div>

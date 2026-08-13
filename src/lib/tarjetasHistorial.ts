@@ -1,6 +1,9 @@
 import { adminDb } from "@/lib/firebase-admin";
 import { CATEGORIAS_SUPERIOR, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, equiposDeEdad, partidoId } from "@/lib/categorias";
 import type { Incidente, Partido, TipoIncidente } from "@/types/firestore";
+import type { FechaTarjeta } from "@/lib/tarjetasFormato";
+
+export type { FechaTarjeta } from "@/lib/tarjetasFormato";
 
 const TIPOS_TARJETA: TipoIncidente[] = [
   "tarjeta_amarilla",
@@ -10,20 +13,7 @@ const TIPOS_TARJETA: TipoIncidente[] = [
   "tarjeta_azul",
 ];
 
-export interface FechaTarjeta {
-  numeroFecha: number | string;
-  rival: string;
-}
-
 export type HistorialTarjetasPorJugador = Map<string, Partial<Record<TipoIncidente, FechaTarjeta[]>>>;
-
-function etiquetaFecha(f: FechaTarjeta): string {
-  return `Fecha ${f.numeroFecha} vs ${f.rival}`;
-}
-
-export function tituloFechas(fechas: FechaTarjeta[] | undefined): string | undefined {
-  return fechas && fechas.length > 0 ? fechas.map(etiquetaFecha).join("\n") : undefined;
-}
 
 /**
  * Junta, para cada jugador de `jugadorIds`, en que fecha (numero + rival) tuvo cada tipo de
