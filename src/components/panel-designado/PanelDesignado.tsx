@@ -202,7 +202,7 @@ export default function PanelDesignado({
             <p style={{ color: DORADO_SUAVE, fontSize: "0.85rem" }}>Partido terminado.</p>
           ) : (
             <button style={botonSecundario} disabled={isPending} onClick={() => { setError(null); setEligiendoWalkover(true); }}>
-              Walkover
+              W.O.
             </button>
           )}
         </div>

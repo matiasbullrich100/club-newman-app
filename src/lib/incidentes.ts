@@ -18,7 +18,7 @@ export const ETIQUETAS_INCIDENTE: Record<Incidente["tipo"], string> = {
   fin_2t: "Final 2do tiempo",
   interrupcion_medica: "Partido interrumpido — Médico",
   interrupcion_clima: "Partido interrumpido — Clima",
-  walkover: "Walkover — sin primera línea",
+  walkover: "W.O. — sin primera línea",
 };
 
 // Try Penal y Try Scrum se le dan al equipo, no a un jugador puntual.
