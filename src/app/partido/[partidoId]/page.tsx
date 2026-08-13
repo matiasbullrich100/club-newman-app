@@ -39,11 +39,13 @@ export default async function PartidoPage({
   const numero = Number(partido.numeroFecha);
   const maxFechas = categoria?.grupo === "juveniles" ? NUMERO_FECHAS_JUVENILES : NUMERO_FECHAS_SUPERIOR;
   const numeroFechaValido = Number.isInteger(numero) && numero >= 1 && numero <= maxFechas;
-  const backHref = !numeroFechaValido
-    ? "/"
-    : categoria?.grupo === "juveniles"
-      ? `/juveniles/${categoria.edadId}/fecha/${numero}`
-      : `/fecha/${numero}`;
+  const backHref = PARTIDOS_DEMO_IDS.includes(partidoId)
+    ? "/pruebas"
+    : !numeroFechaValido
+      ? "/"
+      : categoria?.grupo === "juveniles"
+        ? `/juveniles/${categoria.edadId}/fecha/${numero}`
+        : `/fecha/${numero}`;
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
 
   const cabecera = (
