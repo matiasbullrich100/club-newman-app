@@ -1,19 +1,8 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
-import { puedeOperarCategoria } from "@/lib/auth/scope";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
-import ResetDemoButton from "@/components/ResetDemoButton";
 import { DORADO_SUAVE } from "@/lib/colors";
-
-// Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
-// que necesitan su propio link (nunca aparecen en /fecha ni /categoria).
-const PARTIDOS_DEMO = [
-  { id: "demo-partido-1", label: "Pre B" },
-  { id: "demo-partido-2", label: "M-22" },
-  { id: "demo-partido-3", label: "Pre A" },
-  { id: "pre-a-test-cambio", label: "Cambio Test" },
-];
 
 const botonStyle: React.CSSProperties = {
   display: "block",
@@ -37,32 +26,15 @@ export default async function Home() {
       <Header tituloHome />
       <SessionBar session={session} />
 
-      <p style={{ marginTop: 16, fontSize: "0.85rem", textAlign: "center" }}>
-        Partidos de prueba (Fase 1):{" "}
-        {PARTIDOS_DEMO.map((p, i) => (
-          <span key={p.id}>
-            {i > 0 && " · "}
-            <Link href={`/partido/${p.id}`} style={{ color: DORADO_SUAVE }}>
-              {p.label}
-            </Link>
-          </span>
-        ))}
-      </p>
-
-      {session?.rol === "manager" && puedeOperarCategoria(session, "demo") && (
-        <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-          {PARTIDOS_DEMO.map((p) => (
-            <ResetDemoButton key={p.id} partidoId={p.id} label={p.label} />
-          ))}
-        </div>
-      )}
-
       <div style={{ display: "grid", gap: 12, marginTop: 24 }}>
         <Link href="/superior" style={botonStyle}>
           Plantel Superior
         </Link>
         <Link href="/juveniles" style={botonStyle}>
           Juveniles
+        </Link>
+        <Link href="/pruebas" style={botonStyle}>
+          Partidos de Prueba
         </Link>
       </div>
 

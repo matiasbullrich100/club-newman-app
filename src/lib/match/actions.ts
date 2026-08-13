@@ -29,7 +29,7 @@ function refs(partidoId: string) {
 // pase en estos partidos (tarjetas, minutos jugados) se contabilice en jugadores/ -- algunos se
 // cargan con nombres de jugadores reales (para simular formaciones realistas), asi que sin este
 // filtro contaminarian las estadisticas reales de esos jugadores.
-const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3", "pre-a-test-cambio", "pre-a-test-beromama"];
+const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "pre-a-test-cambio", "pre-a-test-beromama"];
 
 // Campo en jugadores/{id} que acumula cada tipo de tarjeta -- compartido entre publicarIncidente
 // y corregirTipoIncidente (corregir un try por un drop, o una amarilla por una roja, etc.).
