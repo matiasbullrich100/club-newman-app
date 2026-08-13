@@ -14,16 +14,25 @@ const thStyle: React.CSSProperties = {
   letterSpacing: 0.5,
   fontSize: "0.65rem",
   color: DORADO,
-  padding: "4px 6px",
+  padding: "4px 3px",
   borderBottom: "1px solid rgba(226,197,120,.3)",
   whiteSpace: "nowrap",
 };
 
 const tdStyle: React.CSSProperties = {
-  padding: "6px 6px",
-  fontSize: "0.82rem",
+  padding: "6px 3px",
+  fontSize: "0.78rem",
   borderBottom: "1px solid rgba(255,255,255,.06)",
   whiteSpace: "nowrap",
+};
+
+// Nombres largos ("Atletico del Rosario B", "Buenos Aires C&RC B") empujaban la tabla entera mas
+// alla del ancho de la pantalla -- esta columna especificamente puede envolver en 2 lineas en vez
+// de forzar scroll horizontal en todo el resto de columnas (numericas, angostas).
+const tdEquipoStyle: React.CSSProperties = {
+  ...tdStyle,
+  whiteSpace: "normal",
+  maxWidth: 78,
 };
 
 export default async function PosicionesPage({
@@ -116,7 +125,7 @@ function Tabla({ data }: { data: PosicionesTorneo }) {
               return (
                 <tr key={f.posicion} style={esNewman ? { background: "rgba(226,197,120,.12)" } : undefined}>
                   <td style={tdStyle}>{f.posicion}</td>
-                  <td style={{ ...tdStyle, color: DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
+                  <td style={{ ...tdEquipoStyle, color: DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
                   <td style={tdStyle}>{f.jugados}</td>
                   <td style={tdStyle}>{f.ganados}</td>
                   <td style={tdStyle}>{f.empatados}</td>
