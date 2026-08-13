@@ -24,6 +24,17 @@ interface FilaPosicionUrbaRaw {
   championship: { name: string };
 }
 
+// URBA nombra a Regatas Bella Vista distinto segun la categoria -- "Regatas Bella Vista" entero
+// en Plantel Superior, "Regatas B. Vista" + la letra de grupo pegada en Juveniles (ej. "Regatas
+// B. Vista A"). El club ya tiene su propia convencion corta para este rival en todo el resto de
+// la app (ver el comentario en migrate-juveniles-fixture.ts: "Regatas" no "Regatas BV/de Bella
+// Vista") -- se normaliza aca para que las tablas de posiciones respeten lo mismo.
+function normalizarNombreEquipo(nombre: string): string {
+  const match = nombre.match(/^Regatas\s+(?:Bella|B\.?)\s*Vista\s*([A-Za-z])?$/i);
+  if (match) return match[1] ? `Regatas ${match[1].toUpperCase()}` : "Regatas";
+  return nombre;
+}
+
 export async function fetchPosicionesUrba(
   championshipId: number
 ): Promise<{ championshipName: string; filas: FilaPosicion[] }> {
@@ -35,7 +46,7 @@ export async function fetchPosicionesUrba(
   const filas: FilaPosicion[] = crudo
     .map((f) => ({
       posicion: f.position,
-      equipo: f.team.name,
+      equipo: normalizarNombreEquipo(f.team.name),
       jugados: f.played,
       ganados: f.won,
       empatados: f.tied,
