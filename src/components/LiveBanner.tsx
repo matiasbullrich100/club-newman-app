@@ -64,7 +64,7 @@ export default function LiveBanner({
       </p>
       {enVivo && (
         <div style={{ marginTop: 8, textAlign: "center" }}>
-          <Cronometro partidoId={partidoId} />
+          <Cronometro partidoId={partidoId} estado={partido.estado} />
         </div>
       )}
     </Link>

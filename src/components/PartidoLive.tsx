@@ -80,7 +80,7 @@ export default function PartidoLive({
           <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>{partido.resultado.newman}</div>
         </div>
         <div style={{ textAlign: "center", padding: "0 8px" }}>
-          <Cronometro partidoId={partidoId} />
+          <Cronometro partidoId={partidoId} estado={partido.estado} />
           <div>
             <span
               style={{
