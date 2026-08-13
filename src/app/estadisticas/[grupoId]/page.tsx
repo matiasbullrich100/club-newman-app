@@ -93,22 +93,24 @@ async function Tablas({ grupoId }: { grupoId: string }) {
   const snap = await query.get();
   const jugadores = snap.docs.map((d) => ({ id: d.id, ...(d.data() as JugadorAgregado) }));
 
-  // Primero los que tienen alguna tarjeta (cualquier tipo), alfabetico por apellido; despues el
-  // resto del plantel sin tarjetas, tambien alfabetico por apellido -- pedido explicito del club.
-  const porTarjetas = [...jugadores.filter(tieneTarjeta).sort(porApellido), ...jugadores.filter((j) => !tieneTarjeta(j)).sort(porApellido)];
-
   const historial = await obtenerHistorialTarjetas(grupoId, new Set(jugadores.map((j) => j.id)));
+  const saldoDe = (id: string) => (historial.get(id)?.tarjeta_amarilla?.length ?? 0) % 3;
 
-  const porMinutos = [...jugadores].sort(
-    (a, b) => (b.minutosJugadosTotal ?? 0) - (a.minutosJugadosTotal ?? 0) || a.nombre.localeCompare(b.nombre)
-  );
+  // Un jugador que nunca tuvo ninguna tarjeta ni aparece en esta tabla -- pedido explicito del
+  // club. De mayor a menor Saldo (cuanto mas cerca esta de la proxima fecha de suspension, mas
+  // arriba); empatados en Saldo, alfabetico por apellido.
+  const porTarjetas = jugadores.filter(tieneTarjeta).sort((a, b) => saldoDe(b.id) - saldoDe(a.id) || porApellido(a, b));
+
+  // Alfabetico por ahora (no hay todavia un criterio mejor que ordenar por minutos, ya que el
+  // historico no tiene ese detalle) -- pedido explicito del club.
+  const porMinutos = [...jugadores].sort(porApellido);
 
   return (
     <>
       <div style={cardStyle}>
         <h3 style={cardTituloStyle}>Tarjetas</h3>
         {jugadores.length === 0 ? (
-          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Todavía no hay jugadores registrados.</p>
+          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Datos sin cargar.</p>
         ) : (
           <>
             <p style={{ opacity: 0.6, fontSize: "0.78rem", marginBottom: 8 }}>
@@ -174,7 +176,7 @@ async function Tablas({ grupoId }: { grupoId: string }) {
       <div style={cardStyle}>
         <h3 style={cardTituloStyle}>Minutos jugados</h3>
         {jugadores.length === 0 ? (
-          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Todavía no hay jugadores registrados.</p>
+          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Datos sin cargar.</p>
         ) : (
           <>
             <p style={{ opacity: 0.6, fontSize: "0.78rem", marginBottom: 8 }}>
