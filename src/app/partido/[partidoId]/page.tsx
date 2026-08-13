@@ -12,6 +12,7 @@ import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
 import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
+import EditarFormacion from "@/components/panel-designado/EditarFormacion";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
@@ -119,7 +120,16 @@ export default async function PartidoPage({
   // Partido todavia no arranco: vista estatica (resultado/formaciones aun no hay) + si quien
   // mira puede operar esta categoria, el boton "Iniciar partido" para arrancarlo cuando toque.
   if (partido.estado === "programado") {
-    const plantelSnap = await partidoRef.collection("plantel").get();
+    const grupo = grupoDeCategoria(partido.categoriaId);
+    const jugadoresQuery =
+      grupo.grupo === "superior"
+        ? adminDb.collection("jugadores").where("grupo", "==", "superior")
+        : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
+    const [plantelSnap, jugadoresSnap] = await Promise.all([partidoRef.collection("plantel").get(), jugadoresQuery.get()]);
+    const plantelCompleto = jugadoresSnap.docs.map((d) => ({
+      jugadorId: d.id,
+      nombre: (d.data() as JugadorAgregado).nombre,
+    }));
     const plantel = ordenarPorDorsal(
       plantelSnap.docs.map((d) => {
         const data = d.data() as JugadorPartido;
@@ -155,6 +165,13 @@ export default async function PartidoPage({
             partido={partidoParaCliente}
             plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
             periodo={null}
+          />
+        )}
+        {puedeOperar && plantel.length > 0 && (
+          <EditarFormacion
+            partidoId={partidoId}
+            plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
+            plantelCompleto={plantelCompleto}
           />
         )}
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}

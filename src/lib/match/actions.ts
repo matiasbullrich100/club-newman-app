@@ -580,6 +580,55 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
   revalidatePath(`/partido/${partidoId}`);
 }
 
+/**
+ * Reemplaza a un jugador de la formacion oficial ANTES de que arranque el partido (ej. se
+ * enfermo un titular la mañana del partido) -- el que entra hereda el dorsal y el puesto
+ * (titular/suplente) del que sale, no arma una jugada nueva ni pasa por el reloj (el partido
+ * todavia no empezo). El buscador que llama a esto (EditarFormacion.tsx) ya filtra por el
+ * plantel completo correcto (todo Plantel Superior, o solo la division de Juveniles que
+ * corresponda) -- ver docs/live-match-engine.md.
+ */
+export async function reemplazarJugadorFormacion(
+  partidoId: string,
+  viejoJugadorId: string,
+  nuevoJugadorId: string,
+  nuevoJugadorNombre: string
+): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const viejoRef = partidoRef.collection("plantel").doc(viejoJugadorId);
+  const nuevoRef = partidoRef.collection("plantel").doc(nuevoJugadorId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, viejoSnap, nuevoSnap] = await Promise.all([tx.get(partidoRef), tx.get(viejoRef), tx.get(nuevoRef)]);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "programado") throw new Error("Solo se puede editar la formación antes de que arranque el partido");
+    if (!viejoSnap.exists) throw new Error("Ese jugador no está en la formación");
+    if (nuevoSnap.exists) throw new Error("Ese jugador ya está en la formación");
+    if (viejoJugadorId === nuevoJugadorId) throw new Error("Elegí un jugador distinto");
+
+    const viejo = viejoSnap.data() as JugadorPartido;
+    const nuevo: JugadorPartido = {
+      nombre: nuevoJugadorNombre,
+      dorsal: viejo.dorsal,
+      titular: viejo.titular,
+      enCancha: viejo.titular,
+    };
+
+    tx.delete(viejoRef);
+    tx.set(nuevoRef, nuevo);
+
+    if (partido.enCanchaIds.includes(viejoJugadorId)) {
+      const nuevosEnCancha = partido.enCanchaIds.filter((id) => id !== viejoJugadorId).concat(nuevoJugadorId);
+      tx.update(partidoRef, { enCanchaIds: nuevosEnCancha, updatedAt: FieldValue.serverTimestamp() });
+    }
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
 // ---- Solo para los partidos de prueba (Fase 1) ------------------------------------------
 
 /**
