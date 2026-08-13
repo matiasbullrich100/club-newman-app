@@ -79,6 +79,11 @@ export interface JugadorPartido {
   debut?: boolean;
   minutosJugados1T?: number;
   minutosJugados2T?: number;
+  // true si este jugador no estaba en la formacion subida originalmente y se agrego despues via
+  // el buscador de "otro jugador" (en un Cambio en vivo o editando la formacion antes de
+  // arrancar) -- resetearPartidoDemo lo usa para saber a quien borrar del todo al resetear un
+  // partido de prueba, en vez de solo reiniciarle las banderas.
+  agregadoEnVivo?: boolean;
 }
 
 export type TipoIncidente =

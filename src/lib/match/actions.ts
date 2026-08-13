@@ -551,7 +551,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
     const liveState = liveSnap.data() as LiveState;
     const sale = saleSnap.data() as JugadorPartido;
     const entra: JugadorPartido = entraEsNuevo
-      ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false }
+      ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false, agregadoEnVivo: true }
       : (entraSnap.data() as JugadorPartido);
 
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
@@ -623,6 +623,7 @@ export async function reemplazarJugadorFormacion(
       dorsal: viejo.dorsal,
       titular: viejo.titular,
       enCancha: viejo.titular,
+      agregadoEnVivo: true,
     };
 
     tx.delete(viejoRef);
@@ -659,7 +660,14 @@ export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> 
 
   const batch = adminDb.batch();
 
-  const titularesIds = plantelSnap.docs.filter((d) => d.data().titular).map((d) => d.id);
+  // Los jugadores agregados en vivo (buscador de "otro jugador", en un Cambio o editando la
+  // formacion) no forman parte de la formacion original -- resetear tiene que borrarlos del
+  // todo, no solo reiniciarles las banderas, o quedan pegados para siempre en el partido de
+  // prueba (bug real: se acumulaban entre sesiones de prueba distintas).
+  const originales = plantelSnap.docs.filter((d) => !d.data().agregadoEnVivo);
+  const agregados = plantelSnap.docs.filter((d) => d.data().agregadoEnVivo);
+
+  const titularesIds = originales.filter((d) => d.data().titular).map((d) => d.id);
   batch.update(partidoRef, {
     estado: "programado",
     resultado: { newman: 0, rival: 0 },
@@ -674,9 +682,12 @@ export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> 
     accumulatedSeconds: 0,
   });
 
-  for (const doc of plantelSnap.docs) {
+  for (const doc of originales) {
     const titular = doc.data().titular as boolean;
     batch.update(doc.ref, { enCancha: titular, minutosJugados1T: 0, minutosJugados2T: 0 });
+  }
+  for (const doc of agregados) {
+    batch.delete(doc.ref);
   }
 
   for (const doc of incidentesSnap.docs) {
