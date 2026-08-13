@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Incidente, Partido } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
@@ -37,18 +38,50 @@ export default function PartidoHistorico({
   incidentes,
   partidoId,
   puedeEditar,
+  posicionesHref,
+  posicionesActualizado,
 }: {
   partido: Partido;
   plantel: RosterJugadorHistorico[];
   incidentes: (Incidente & { id: string })[];
   partidoId?: string;
   puedeEditar?: boolean;
+  // Boton "Tabla de posiciones al [fecha]" -- la fecha es de la ULTIMA ACTUALIZACION de la tabla
+  // cacheada (ver /posiciones/[categoriaId]), no la fecha de este partido puntual, para dejar
+  // claro que no es "la tabla como estaba ese dia".
+  posicionesHref?: string;
+  posicionesActualizado?: Date | null;
 }) {
   const jugado = partido.estado === "terminado";
   const nombreNewman = nombreNewmanDe(partido.categoriaId);
 
   return (
     <div>
+      {posicionesHref && (
+        <p style={{ textAlign: "center", margin: "0 0 10px" }}>
+          <Link
+            href={posicionesHref}
+            style={{
+              display: "inline-block",
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              fontSize: "0.78rem",
+              padding: "10px 16px",
+              borderRadius: 8,
+              border: "1px solid rgba(226,197,120,.4)",
+              color: DORADO_SUAVE,
+            }}
+          >
+            Tabla de posiciones
+            {posicionesActualizado &&
+              ` al ${posicionesActualizado.toLocaleDateString("es-AR", {
+                timeZone: "America/Argentina/Buenos_Aires",
+                day: "2-digit",
+                month: "2-digit",
+              })}`}
+          </Link>
+        </p>
+      )}
       <div style={cardStyle}>
         {partido.notaEspecial ? (
           <p style={{ fontStyle: "italic", color: DORADO_SUAVE, textAlign: "center", fontSize: "1rem" }}>

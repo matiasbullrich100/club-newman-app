@@ -3,7 +3,8 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { puedeOperarCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
-import type { Incidente, JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
+import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import type { Incidente, JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
 import PartidoHistorico from "@/components/PartidoHistorico";
 import Header from "@/components/Header";
@@ -48,6 +49,16 @@ export default async function PartidoPage({
         : `/fecha/${numero}`;
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
 
+  // Boton "Tabla de posiciones al [fecha]" en PartidoHistorico -- la fecha es la de la ULTIMA
+  // actualizacion de la tabla cacheada (ver /posiciones/[categoriaId]), no la fecha de ESTE
+  // partido, para no confundir "posiciones al dia de hoy" con "posiciones al dia de esta fecha".
+  const tienePosiciones = TORNEOS_URBA[partido.categoriaId] !== undefined;
+  const posicionesSnap = tienePosiciones ? await adminDb.collection("posiciones").doc(partido.categoriaId).get() : null;
+  const posicionesActualizado = posicionesSnap?.exists
+    ? ((posicionesSnap.data() as PosicionesTorneo).updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? null
+    : null;
+  const posicionesHref = tienePosiciones ? `/posiciones/${partido.categoriaId}` : undefined;
+
   const cabecera = (
     <>
       <BackLink href={backHref} />
@@ -89,7 +100,15 @@ export default async function PartidoPage({
     return (
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
-        <PartidoHistorico partido={partido} plantel={plantel} incidentes={incidentes} partidoId={partidoId} puedeEditar={puedeOperar} />
+        <PartidoHistorico
+          partido={partido}
+          plantel={plantel}
+          incidentes={incidentes}
+          partidoId={partidoId}
+          puedeEditar={puedeOperar}
+          posicionesHref={posicionesHref}
+          posicionesActualizado={posicionesActualizado}
+        />
         {puedeOperar && (
           <div
             style={{
@@ -161,7 +180,13 @@ export default async function PartidoPage({
     return (
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
-        <PartidoHistorico partido={partido} plantel={plantel} incidentes={[]} />
+        <PartidoHistorico
+          partido={partido}
+          plantel={plantel}
+          incidentes={[]}
+          posicionesHref={posicionesHref}
+          posicionesActualizado={posicionesActualizado}
+        />
         {puedeOperar && (
           <PanelDesignado
             partidoId={partidoId}
