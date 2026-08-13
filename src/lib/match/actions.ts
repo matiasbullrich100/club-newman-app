@@ -24,10 +24,12 @@ function refs(partidoId: string) {
   return { partidoRef, liveStateRef: partidoRef.collection("liveState").doc("state") };
 }
 
-// Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real,
-// pase lo que pase con el argumento que le llegue del cliente. Tambien se usa para no
-// contabilizar en jugadores/ las tarjetas azules cargadas en partidos simulados.
-const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3", "pre-a-test-cambio"];
+// Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real, pase
+// lo que pase con el argumento que le llegue del cliente. Tambien se usa para que NADA de lo que
+// pase en estos partidos (tarjetas, minutos jugados) se contabilice en jugadores/ -- algunos se
+// cargan con nombres de jugadores reales (para simular formaciones realistas), asi que sin este
+// filtro contaminarian las estadisticas reales de esos jugadores.
+const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "demo-partido-3", "pre-a-test-cambio", "pre-a-test-beromama"];
 
 // Campo en jugadores/{id} que acumula cada tipo de tarjeta -- compartido entre publicarIncidente
 // y corregirTipoIncidente (corregir un try por un drop, o una amarilla por una roja, etc.).
@@ -240,6 +242,9 @@ export async function terminarPartido(partidoId: string): Promise<void> {
     batch.set(partidoRef.collection("incidentes").doc(), finIncidente);
   }
 
+  // Los partidos de prueba (whitelist mas abajo) nunca deben sumar minutos reales a jugadores/,
+  // incluso si se cargan con nombres de jugadores reales para simular cambios de forma realista.
+  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   for (const jugador of plantel) {
     const m = minutos[jugador.jugadorId];
     batch.update(partidoRef.collection("plantel").doc(jugador.jugadorId), {
@@ -247,12 +252,14 @@ export async function terminarPartido(partidoId: string): Promise<void> {
       minutosJugados2T: m.minutos2T,
     });
 
-    const nombre = plantelSnap.docs.find((d) => d.id === jugador.jugadorId)?.data().nombre ?? "";
-    batch.set(
-      adminDb.collection("jugadores").doc(jugador.jugadorId),
-      { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
-      { merge: true }
-    );
+    if (!esPartidoDePrueba) {
+      const nombre = plantelSnap.docs.find((d) => d.id === jugador.jugadorId)?.data().nombre ?? "";
+      batch.set(
+        adminDb.collection("jugadores").doc(jugador.jugadorId),
+        { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
+        { merge: true }
+      );
+    }
   }
 
   await batch.commit();
@@ -397,9 +404,10 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tx.update(partidoRef, { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() });
     }
 
-    // Las tarjetas azules de partidos simulados no se contabilizan en las estadisticas reales.
-    const esAzulSimulada = input.tipo === "tarjeta_azul" && PARTIDOS_DEMO_IDS.includes(partidoId);
-    if (CAMPO_TARJETA[input.tipo] && input.equipo === "newman" && input.jugadorId && !esAzulSimulada) {
+    // Las tarjetas de partidos de prueba no se contabilizan en las estadisticas reales, aunque
+    // se hayan cargado con nombres de jugadores reales para simular una formacion realista.
+    const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+    if (CAMPO_TARJETA[input.tipo] && input.equipo === "newman" && input.jugadorId && !esPartidoDePrueba) {
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
         { nombre: jugadorNombre, ...grupoDeCategoria(partido.categoriaId), [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1) },
@@ -450,8 +458,8 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
       }
       tx.update(incidenteRef, { tipo: nuevoTipo, puntos: puntosNuevos });
     } else {
-      const esAzulSimulada = (inc.tipo === "tarjeta_azul" || nuevoTipo === "tarjeta_azul") && PARTIDOS_DEMO_IDS.includes(partidoId);
-      if (inc.equipo === "newman" && inc.jugadorId && !esAzulSimulada) {
+      const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+      if (inc.equipo === "newman" && inc.jugadorId && !esPartidoDePrueba) {
         const campoViejo = CAMPO_TARJETA[inc.tipo];
         const campoNuevo = CAMPO_TARJETA[nuevoTipo];
         const jugadorRef = adminDb.collection("jugadores").doc(inc.jugadorId);
@@ -494,8 +502,8 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
         tx.update(partidoRef, { [campo]: FieldValue.increment(-puntos), updatedAt: FieldValue.serverTimestamp() });
       }
     } else if (FAMILIA_TARJETA.includes(inc.tipo)) {
-      const esAzulSimulada = inc.tipo === "tarjeta_azul" && PARTIDOS_DEMO_IDS.includes(partidoId);
-      if (inc.equipo === "newman" && inc.jugadorId && !esAzulSimulada) {
+      const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+      if (inc.equipo === "newman" && inc.jugadorId && !esPartidoDePrueba) {
         const campo = CAMPO_TARJETA[inc.tipo];
         if (campo) tx.set(adminDb.collection("jugadores").doc(inc.jugadorId), { [campo]: FieldValue.increment(-1) }, { merge: true });
       }

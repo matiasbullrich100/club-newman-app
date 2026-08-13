@@ -15,6 +15,7 @@
     "seed-managers-juveniles": "tsx src/scripts/seed-managers-juveniles.ts",
     "rebuild-jugadores": "tsx src/scripts/rebuild-jugadores.ts",
     "seed-test-cambio": "tsx src/scripts/seed-test-cambio.ts",
+    "seed-test-beromama": "tsx src/scripts/seed-test-beromama.ts",
     "migrate-historical": "tsx src/scripts/migrate-historical.ts",
     "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts",
     "migrate-m15-fecha2": "tsx src/scripts/migrate-juveniles-m15-fecha2.ts",
