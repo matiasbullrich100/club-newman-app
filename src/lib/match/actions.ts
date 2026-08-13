@@ -6,6 +6,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession, puedeOperarCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
+import { calcularBonus } from "./bonus";
 import { FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
 import { grupoDeCategoria } from "@/lib/categorias";
 import {
@@ -199,29 +200,35 @@ export async function terminarPartido(partidoId: string): Promise<void> {
   const period2DurationSeconds =
     liveState.periodo === "2T" ? accumulated : liveState.period2DurationSeconds ?? 0;
 
-  const [plantelSnap, cambiosSnap] = await Promise.all([
+  const [plantelSnap, incidentesSnap] = await Promise.all([
     partidoRef.collection("plantel").get(),
-    partidoRef.collection("incidentes").where("tipo", "==", "cambio").get(),
+    partidoRef.collection("incidentes").get(),
   ]);
+  const incidentes = incidentesSnap.docs.map((d) => d.data() as Incidente);
 
   const plantel: JugadorInput[] = plantelSnap.docs.map((d) => ({
     jugadorId: d.id,
     titular: (d.data() as JugadorPartido).titular,
   }));
-  const cambios: CambioEvento[] = cambiosSnap.docs.map((d) => {
-    const data = d.data() as Incidente;
-    return {
+  const cambios: CambioEvento[] = incidentes
+    .filter((data) => data.tipo === "cambio")
+    .map((data) => ({
       periodo: data.periodo,
       minuto: data.minuto,
       jugadorSaleId: data.jugadorSaleId,
       jugadorEntraId: data.jugadorEntraId,
-    };
-  });
+    }));
 
   const minutos = calcularMinutos(plantel, cambios, period1DurationSeconds / 60, period2DurationSeconds / 60);
+  const { bonusNewman, bonusRival } = calcularBonus(incidentes, partido.resultado);
 
   const batch = adminDb.batch();
-  batch.update(partidoRef, { estado: "terminado", updatedAt: FieldValue.serverTimestamp() });
+  batch.update(partidoRef, {
+    estado: "terminado",
+    "resultado.bonusNewman": bonusNewman,
+    "resultado.bonusRival": bonusRival,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
   batch.update(liveStateRef, {
     clockRunning: false,
     clockAnchor: null,
@@ -432,7 +439,11 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
 
   await adminDb.runTransaction(async (tx) => {
-    const [partidoSnap, incSnap] = await Promise.all([tx.get(partidoRef), tx.get(incidenteRef)]);
+    const [partidoSnap, incSnap, incidentesSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(incidenteRef),
+      tx.get(partidoRef.collection("incidentes")),
+    ]);
     if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
@@ -452,10 +463,27 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
       const puntosViejos = (PUNTOS_POR_TIPO as Record<string, number>)[inc.tipo] ?? 0;
       const puntosNuevos = (PUNTOS_POR_TIPO as Record<string, number>)[nuevoTipo] ?? 0;
       const delta = puntosNuevos - puntosViejos;
+      const nuevoResultado = {
+        newman: partido.resultado.newman + (inc.equipo === "newman" ? delta : 0),
+        rival: partido.resultado.rival + (inc.equipo === "rival" ? delta : 0),
+      };
+
+      const cambiosPartido: Record<string, unknown> = { updatedAt: FieldValue.serverTimestamp() };
       if (delta !== 0) {
         const campo = inc.equipo === "newman" ? "resultado.newman" : "resultado.rival";
-        tx.update(partidoRef, { [campo]: FieldValue.increment(delta), updatedAt: FieldValue.serverTimestamp() });
+        cambiosPartido[campo] = inc.equipo === "newman" ? nuevoResultado.newman : nuevoResultado.rival;
       }
+      // Corregir un try (agregarlo o sacarlo) despues de terminado puede cambiar el bonus --
+      // recalcular con el tipo ya corregido, no hace falta esperar a un nuevo terminarPartido.
+      if (partido.estado === "terminado") {
+        const incidentesActualizados = incidentesSnap.docs.map((d) =>
+          d.id === incidenteId ? { ...(d.data() as Incidente), tipo: nuevoTipo } : (d.data() as Incidente)
+        );
+        const { bonusNewman, bonusRival } = calcularBonus(incidentesActualizados, nuevoResultado);
+        cambiosPartido["resultado.bonusNewman"] = bonusNewman;
+        cambiosPartido["resultado.bonusRival"] = bonusRival;
+      }
+      tx.update(partidoRef, cambiosPartido);
       tx.update(incidenteRef, { tipo: nuevoTipo, puntos: puntosNuevos });
     } else {
       const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
@@ -486,7 +514,11 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
 
   await adminDb.runTransaction(async (tx) => {
-    const [partidoSnap, incSnap] = await Promise.all([tx.get(partidoRef), tx.get(incidenteRef)]);
+    const [partidoSnap, incSnap, incidentesSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(incidenteRef),
+      tx.get(partidoRef.collection("incidentes")),
+    ]);
     if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
@@ -497,10 +529,25 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
 
     if (FAMILIA_PUNTOS.includes(inc.tipo)) {
       const puntos = (PUNTOS_POR_TIPO as Record<string, number>)[inc.tipo] ?? 0;
+      const nuevoResultado = {
+        newman: partido.resultado.newman - (inc.equipo === "newman" ? puntos : 0),
+        rival: partido.resultado.rival - (inc.equipo === "rival" ? puntos : 0),
+      };
+
+      const cambiosPartido: Record<string, unknown> = { updatedAt: FieldValue.serverTimestamp() };
       if (puntos !== 0) {
         const campo = inc.equipo === "newman" ? "resultado.newman" : "resultado.rival";
-        tx.update(partidoRef, { [campo]: FieldValue.increment(-puntos), updatedAt: FieldValue.serverTimestamp() });
+        cambiosPartido[campo] = inc.equipo === "newman" ? nuevoResultado.newman : nuevoResultado.rival;
       }
+      // Borrar un try despues de terminado puede cambiar el bonus -- ver el mismo comentario en
+      // corregirTipoIncidente.
+      if (partido.estado === "terminado") {
+        const incidentesActualizados = incidentesSnap.docs.filter((d) => d.id !== incidenteId).map((d) => d.data() as Incidente);
+        const { bonusNewman, bonusRival } = calcularBonus(incidentesActualizados, nuevoResultado);
+        cambiosPartido["resultado.bonusNewman"] = bonusNewman;
+        cambiosPartido["resultado.bonusRival"] = bonusRival;
+      }
+      tx.update(partidoRef, cambiosPartido);
     } else if (FAMILIA_TARJETA.includes(inc.tipo)) {
       const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
       if (inc.equipo === "newman" && inc.jugadorId && !esPartidoDePrueba) {
