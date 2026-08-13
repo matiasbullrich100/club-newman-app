@@ -44,13 +44,15 @@ export default function EditarFormacion({
   const suplentes = [...plantel].filter((j) => !j.titular).sort(porDorsal);
   const editando = plantel.find((j) => j.jugadorId === editandoId);
 
-  // No repetir en el buscador a quien ya esta en esta formacion.
-  const idsPlantel = useMemo(() => new Set(plantel.map((j) => j.jugadorId)), [plantel]);
+  // El elegido puede ser cualquiera del plantel completo, incluso alguien que ya esta en esta
+  // formacion (ej. un suplente que pasa a titular) -- reemplazarJugadorFormacion ya lo maneja
+  // (su puesto anterior queda vacio). Solo se excluye al que se esta reemplazando.
+  const enFormacion = useMemo(() => new Map(plantel.map((j) => [j.jugadorId, j])), [plantel]);
   const resultados = useMemo(() => {
     const q = norm(busqueda.trim());
     if (q.length < 2) return [];
-    return plantelCompleto.filter((j) => !idsPlantel.has(j.jugadorId) && norm(j.nombre).includes(q)).slice(0, 8);
-  }, [busqueda, plantelCompleto, idsPlantel]);
+    return plantelCompleto.filter((j) => j.jugadorId !== editandoId && norm(j.nombre).includes(q)).slice(0, 8);
+  }, [busqueda, plantelCompleto, editandoId]);
 
   function cerrar() {
     setEditandoId(null);
@@ -129,11 +131,17 @@ export default function EditarFormacion({
           {busqueda.trim().length >= 2 && resultados.length === 0 && (
             <p style={{ margin: 0, fontSize: "0.82rem", color: DORADO_SUAVE, opacity: 0.75 }}>Sin resultados.</p>
           )}
-          {resultados.map((j) => (
-            <button key={j.jugadorId} style={botonOpcion} onClick={() => setSeleccionado(j)}>
-              {j.nombre}
-            </button>
-          ))}
+          {resultados.map((j) => {
+            const actual = enFormacion.get(j.jugadorId);
+            return (
+              <button key={j.jugadorId} style={botonOpcion} onClick={() => setSeleccionado(j)}>
+                {j.nombre}
+                {actual && (
+                  <span style={{ opacity: 0.65 }}> — ya es {actual.titular ? "titular" : "suplente"} ({actual.dorsal})</span>
+                )}
+              </button>
+            );
+          })}
           <button style={botonSecundario} onClick={cerrar}>
             Cancelar
           </button>
@@ -145,6 +153,11 @@ export default function EditarFormacion({
           <p style={{ fontSize: "1.02rem" }}>
             Confirmar: sale <strong>{editando?.nombre}</strong>, entra <strong>{seleccionado.nombre}</strong>
           </p>
+          {enFormacion.get(seleccionado.jugadorId) && (
+            <p style={{ margin: 0, fontSize: "0.8rem", color: DORADO_SUAVE, opacity: 0.8 }}>
+              {seleccionado.nombre} deja de ser {enFormacion.get(seleccionado.jugadorId)!.titular ? "titular" : "suplente"} — ese puesto queda vacío.
+            </p>
+          )}
           {error && <p style={{ color: "crimson" }}>{error}</p>}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button style={botonPrimario} disabled={isPending} onClick={confirmar}>

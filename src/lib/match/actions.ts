@@ -614,25 +614,28 @@ export async function reemplazarJugadorFormacion(
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
     if (partido.estado !== "programado") throw new Error("Solo se puede editar la formación antes de que arranque el partido");
     if (!viejoSnap.exists) throw new Error("Ese jugador no está en la formación");
-    if (nuevoSnap.exists) throw new Error("Ese jugador ya está en la formación");
     if (viejoJugadorId === nuevoJugadorId) throw new Error("Elegí un jugador distinto");
 
     const viejo = viejoSnap.data() as JugadorPartido;
+    // El elegido puede ya estar en esta formacion (ej. de suplente) -- en ese caso su doc se
+    // sobreescribe con el puesto/dorsal del que sale, asi que su puesto anterior queda vacio
+    // solo (mismo doc, una entrada por jugador). Si ya venia marcado agregadoEnVivo (lo metio el
+    // buscador en algun momento) se mantiene esa marca para que el reset lo siga borrando entero.
+    const nuevoPrevio = nuevoSnap.exists ? (nuevoSnap.data() as JugadorPartido) : null;
     const nuevo: JugadorPartido = {
       nombre: nuevoJugadorNombre,
       dorsal: viejo.dorsal,
       titular: viejo.titular,
       enCancha: viejo.titular,
-      agregadoEnVivo: true,
+      ...(nuevoPrevio ? { ...(nuevoPrevio.agregadoEnVivo ? { agregadoEnVivo: true } : {}) } : { agregadoEnVivo: true }),
     };
 
     tx.delete(viejoRef);
     tx.set(nuevoRef, nuevo);
 
-    if (partido.enCanchaIds.includes(viejoJugadorId)) {
-      const nuevosEnCancha = partido.enCanchaIds.filter((id) => id !== viejoJugadorId).concat(nuevoJugadorId);
-      tx.update(partidoRef, { enCanchaIds: nuevosEnCancha, updatedAt: FieldValue.serverTimestamp() });
-    }
+    const enCanchaIds = partido.enCanchaIds.filter((id) => id !== viejoJugadorId && id !== nuevoJugadorId);
+    if (nuevo.enCancha) enCanchaIds.push(nuevoJugadorId);
+    tx.update(partidoRef, { enCanchaIds, updatedAt: FieldValue.serverTimestamp() });
   });
 
   revalidatePath(`/partido/${partidoId}`);
