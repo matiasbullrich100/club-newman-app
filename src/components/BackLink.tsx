@@ -1,10 +1,24 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { DORADO } from "@/lib/colors";
 
+// "Atrás" retrocede UN paso en el historial real del navegador (asi Primera -> Tabla de
+// posiciones -> Atrás vuelve a Primera, no al listado de Plantel Superior) -- pedido explicito
+// del club, valido para todas las pantallas. `href` es solo el fallback para cuando esta pagina
+// es la primera de la pestaña (llegada por link externo/directo), sin nada antes en el historial.
 export default function BackLink({ href }: { href: string }) {
+  const router = useRouter();
+
   return (
-    <Link
-      href={href}
+    <button
+      onClick={() => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+          router.back();
+        } else {
+          router.push(href);
+        }
+      }}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -25,7 +39,7 @@ export default function BackLink({ href }: { href: string }) {
         width: "fit-content",
       }}
     >
-      ← Volver
-    </Link>
+      ← Atrás
+    </button>
   );
 }
