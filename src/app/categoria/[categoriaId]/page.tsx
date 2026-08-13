@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
+import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import type { Partido } from "@/types/firestore";
 import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -32,6 +34,27 @@ export default async function CategoriaPage({
       <Header />
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8 }}>{categoria.nombre}</div>
+
+      {TORNEOS_URBA[categoriaId] !== undefined && (
+        <p style={{ textAlign: "center", margin: "10px 0 0" }}>
+          <Link
+            href={`/posiciones/${categoriaId}`}
+            style={{
+              display: "inline-block",
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              fontSize: "0.78rem",
+              padding: "10px 16px",
+              borderRadius: 8,
+              border: "1px solid rgba(226,197,120,.4)",
+              color: DORADO_SUAVE,
+            }}
+          >
+            Tabla de posiciones
+          </Link>
+        </p>
+      )}
+
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
         Fixture
       </div>

@@ -56,6 +56,32 @@ export interface Partido {
   updatedAt?: Timestamp | Date;
 }
 
+export interface FilaPosicion {
+  posicion: number;
+  equipo: string;
+  jugados: number;
+  ganados: number;
+  empatados: number;
+  perdidos: number;
+  puntosFavor: number;
+  puntosContra: number;
+  diferencia: number;
+  bonusOfensivo: number;
+  bonusDefensivo: number;
+  puntos: number;
+}
+
+// Collection `posiciones/{categoriaId}` -- cache semanal de la tabla de posiciones oficial de
+// URBA (ver src/lib/urba.ts y src/scripts/actualizar-posiciones.ts), para no pegarle a la API
+// externa en cada visita de un usuario. categoriaId es el mismo id que en categorias.ts.
+export interface PosicionesTorneo {
+  championshipId: number;
+  championshipName: string;
+  nuestroEquipo: string;
+  filas: FilaPosicion[];
+  updatedAt: Timestamp | Date;
+}
+
 export type Periodo = "1T" | "2T";
 
 // Subcollection `partidos/{id}/liveState`, single doc with id "state".
