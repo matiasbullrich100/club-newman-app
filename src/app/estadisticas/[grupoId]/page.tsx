@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { puedeVerEstadisticas } from "@/lib/auth/scope";
 import { EDADES } from "@/lib/categorias";
 import { splitNombre } from "@/lib/players";
+import { obtenerHistorialTarjetas, tituloFechas } from "@/lib/tarjetasHistorial";
 import type { JugadorAgregado } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -96,6 +97,8 @@ async function Tablas({ grupoId }: { grupoId: string }) {
   // resto del plantel sin tarjetas, tambien alfabetico por apellido -- pedido explicito del club.
   const porTarjetas = [...jugadores.filter(tieneTarjeta).sort(porApellido), ...jugadores.filter((j) => !tieneTarjeta(j)).sort(porApellido)];
 
+  const historial = await obtenerHistorialTarjetas(grupoId, new Set(jugadores.map((j) => j.id)));
+
   const porMinutos = [...jugadores].sort(
     (a, b) => (b.minutosJugadosTotal ?? 0) - (a.minutosJugadosTotal ?? 0) || a.nombre.localeCompare(b.nombre)
   );
@@ -107,32 +110,64 @@ async function Tablas({ grupoId }: { grupoId: string }) {
         {jugadores.length === 0 ? (
           <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Todavía no hay jugadores registrados.</p>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Jugador</th>
-                  <th style={thStyle}>🟨</th>
-                  <th style={thStyle}>🟨🟨</th>
-                  <th style={thStyle}>🟥</th>
-                  <th style={thStyle}>🟥20</th>
-                  <th style={thStyle}>🟦</th>
-                </tr>
-              </thead>
-              <tbody>
-                {porTarjetas.map((j) => (
-                  <tr key={j.id}>
-                    <td style={{ ...tdStyle, color: DORADO_SUAVE }}>{j.nombre}</td>
-                    <td style={tdStyle}>{j.tarjetasAmarillas || 0}</td>
-                    <td style={tdStyle}>{j.tarjetasDobleAmarilla || 0}</td>
-                    <td style={tdStyle}>{j.tarjetasRojas || 0}</td>
-                    <td style={tdStyle}>{j.tarjetasRojas20 || 0}</td>
-                    <td style={tdStyle}>{j.tarjetasAzules || 0}</td>
+          <>
+            <p style={{ opacity: 0.6, fontSize: "0.78rem", marginBottom: 8 }}>
+              Pasá el mouse sobre un número para ver en qué fecha fue cada tarjeta. 3 amarillas = 1 fecha de
+              suspensión (roja, doble amarilla y roja de 20 las define el tribunal, no se calculan solas).
+            </p>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Jugador</th>
+                    <th style={thStyle}>🟨</th>
+                    <th style={thStyle}>🟨🟨</th>
+                    <th style={thStyle}>🟥</th>
+                    <th style={thStyle}>🟥20</th>
+                    <th style={thStyle}>🟦</th>
+                    <th style={thStyle}>Fecha Susp.</th>
+                    <th style={thStyle}>Saldo</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {porTarjetas.map((j) => {
+                    const h = historial.get(j.id) ?? {};
+                    const amarillas = h.tarjeta_amarilla ?? [];
+                    const fechaSuspension = Math.floor(amarillas.length / 3);
+                    const saldo = amarillas.length % 3;
+                    // La 3ra, 6ta, 9na... amarilla (en orden cronologico) es la que dispara cada
+                    // fecha de suspension -- eso es lo que se muestra en el tooltip de esa columna.
+                    const fechasDisparadoras = Array.from({ length: fechaSuspension }, (_, i) => amarillas[i * 3 + 2]);
+
+                    return (
+                      <tr key={j.id}>
+                        <td style={{ ...tdStyle, color: DORADO_SUAVE }}>{j.nombre}</td>
+                        <td style={tdStyle} title={tituloFechas(amarillas)}>
+                          {j.tarjetasAmarillas || 0}
+                        </td>
+                        <td style={tdStyle} title={tituloFechas(h.tarjeta_doble_amarilla)}>
+                          {j.tarjetasDobleAmarilla || 0}
+                        </td>
+                        <td style={tdStyle} title={tituloFechas(h.tarjeta_roja)}>
+                          {j.tarjetasRojas || 0}
+                        </td>
+                        <td style={tdStyle} title={tituloFechas(h.tarjeta_roja_20)}>
+                          {j.tarjetasRojas20 || 0}
+                        </td>
+                        <td style={tdStyle} title={tituloFechas(h.tarjeta_azul)}>
+                          {j.tarjetasAzules || 0}
+                        </td>
+                        <td style={tdStyle} title={tituloFechas(fechasDisparadoras)}>
+                          {fechaSuspension}
+                        </td>
+                        <td style={tdStyle}>{saldo}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
