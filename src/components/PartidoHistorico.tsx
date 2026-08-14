@@ -40,6 +40,7 @@ export default function PartidoHistorico({
   puedeEditar,
   posicionesHref,
   posicionesActualizado,
+  formacionPendientePublicar,
 }: {
   partido: Partido;
   plantel: RosterJugadorHistorico[];
@@ -51,6 +52,10 @@ export default function PartidoHistorico({
   // claro que no es "la tabla como estaba ese dia".
   posicionesHref?: string;
   posicionesActualizado?: Date | null;
+  // true cuando `plantel` viene vacio A PROPOSITO porque hay una formacion cargada pero todavia
+  // sin publicar (ver formacionPublicada en types/firestore.ts) y quien mira esta pagina no
+  // puede operar esta categoria -- distingue ese caso de "todavia no se cargo nada".
+  formacionPendientePublicar?: boolean;
 }) {
   const jugado = partido.estado === "terminado";
   const nombreNewman = nombreNewmanDe(partido.categoriaId);
@@ -111,6 +116,10 @@ export default function PartidoHistorico({
         <h3 style={cardTituloStyle}>Formaciones</h3>
         {plantel.length > 0 ? (
           <Formaciones plantel={plantel} />
+        ) : formacionPendientePublicar ? (
+          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>
+            La formación todavía no fue publicada por el club.
+          </p>
         ) : (
           <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Aún sin formación cargada.</p>
         )}

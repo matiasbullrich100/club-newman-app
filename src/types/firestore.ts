@@ -52,6 +52,12 @@ export interface Partido {
   // "Suspendido por tormenta eléctrica". No confundir con estado "suspendido", que es
   // exclusivamente para un partido EN CURSO pausado por el Designado (ver match/actions.ts).
   notaEspecial?: string;
+  // Solo aplica a un partido "programado" -- ausente o true = la formacion es publica (default,
+  // asi ningun partido historico/ya migrado se ve afectado). false = alguien ya cargo la
+  // formacion pero el club todavia no la comunico; solo quien puede operar esta categoria la ve,
+  // el resto ve "aun no publicada" hasta que se aprieta "Publicar formacion" (ver
+  // publicarFormacion en match/actions.ts).
+  formacionPublicada?: boolean;
   createdAt?: Timestamp | Date;
   updatedAt?: Timestamp | Date;
 }

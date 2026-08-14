@@ -688,6 +688,29 @@ export async function reemplazarJugadorFormacion(
   revalidatePath(`/partido/${partidoId}`);
 }
 
+/**
+ * Hace publica la formacion de un partido "programado" que se cargo como borrador
+ * (`formacionPublicada: false` -- ver el comentario en el tipo Partido). Pensado para el flujo
+ * "cargo la formacion el jueves/viernes pero el club recien la comunica mas cerca del partido":
+ * hasta que se llama a esto, solo quien puede operar esta categoria ve la formacion real, el
+ * resto ve "aun no publicada".
+ */
+export async function publicarFormacion(partidoId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const partidoSnap = await tx.get(partidoRef);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "programado") throw new Error("Solo se puede publicar la formación de un partido que no arrancó");
+    tx.update(partidoRef, { formacionPublicada: true, updatedAt: FieldValue.serverTimestamp() });
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
 // ---- Solo para los partidos de prueba (Fase 1) ------------------------------------------
 
 /**

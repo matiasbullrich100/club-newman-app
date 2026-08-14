@@ -23,7 +23,8 @@
     "migrate-m16-m17-m19-fecha1": "tsx src/scripts/migrate-juveniles-m16-m17-m19-fecha1.ts",
     "migrate-juveniles-fixture": "tsx src/scripts/migrate-juveniles-fixture.ts",
     "actualizar-posiciones": "tsx src/scripts/actualizar-posiciones.ts",
-    "resolver-torneos-urba": "tsx src/scripts/resolver-torneos-urba.ts"
+    "resolver-torneos-urba": "tsx src/scripts/resolver-torneos-urba.ts",
+    "seed-admin": "tsx src/scripts/seed-admin.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",

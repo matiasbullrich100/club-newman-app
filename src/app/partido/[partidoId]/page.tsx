@@ -15,6 +15,7 @@ import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
 import EditarFormacion from "@/components/panel-designado/EditarFormacion";
 import ResetDemoButton from "@/components/ResetDemoButton";
+import PublicarFormacionButton from "@/components/PublicarFormacionButton";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -177,16 +178,24 @@ export default async function PartidoPage({
       enCanchaIds: partido.enCanchaIds,
     };
 
+    // Formacion cargada como borrador (ver formacionPublicada en types/firestore.ts) -- quien no
+    // puede operar esta categoria no ve la formacion real hasta que se publique.
+    const formacionPublicada = partido.formacionPublicada !== false;
+    const ocultarFormacion = !formacionPublicada && !puedeOperar;
+    const plantelParaMostrar = ocultarFormacion ? [] : plantel;
+
     return (
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
         <PartidoHistorico
           partido={partido}
-          plantel={plantel}
+          plantel={plantelParaMostrar}
           incidentes={[]}
           posicionesHref={posicionesHref}
           posicionesActualizado={posicionesActualizado}
+          formacionPendientePublicar={ocultarFormacion}
         />
+        {puedeOperar && !formacionPublicada && plantel.length > 0 && <PublicarFormacionButton partidoId={partidoId} />}
         {puedeOperar && (
           <PanelDesignado
             partidoId={partidoId}
