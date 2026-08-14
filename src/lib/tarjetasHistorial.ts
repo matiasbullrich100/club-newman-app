@@ -1,66 +1,43 @@
-import { adminDb } from "@/lib/firebase-admin";
-import { partidoIdsDeGrupo } from "@/lib/categorias";
-import type { Incidente, Partido, TipoIncidente } from "@/types/firestore";
+import type { JugadorAgregado, TipoIncidente } from "@/types/firestore";
 import type { FechaTarjeta } from "@/lib/tarjetasFormato";
 
 export type { FechaTarjeta } from "@/lib/tarjetasFormato";
 
-const TIPOS_TARJETA: TipoIncidente[] = [
-  "tarjeta_amarilla",
-  "tarjeta_doble_amarilla",
-  "tarjeta_roja",
-  "tarjeta_roja_20",
-  "tarjeta_azul",
-];
-
 export type HistorialTarjetasPorJugador = Map<string, Partial<Record<TipoIncidente, FechaTarjeta[]>>>;
 
+const CAMPO_HISTORIAL_POR_TIPO: Partial<Record<TipoIncidente, keyof JugadorAgregado>> = {
+  tarjeta_amarilla: "fechasAmarillas",
+  tarjeta_doble_amarilla: "fechasDobleAmarilla",
+  tarjeta_roja: "fechasRojas",
+  tarjeta_roja_20: "fechasRojas20",
+  tarjeta_azul: "fechasAzules",
+};
+
 /**
- * Junta, para cada jugador de `jugadorIds`, en que fecha (numero + rival) tuvo cada tipo de
- * tarjeta -- para los tooltips de la tabla de Tarjetas en /estadisticas/[grupoId].
+ * Arma, para cada jugador, en que fecha (numero + rival) tuvo cada tipo de tarjeta -- para los
+ * paneles tap-to-expand de la tabla de Tarjetas en /estadisticas/[grupoId].
  *
- * A proposito NO usa collectionGroup("incidentes") -- esa consulta pide un indice manual en
- * Firestore que hay que crear a mano en la consola (friccion innecesaria). En cambio, arma los
- * partidoId de todas las fechas de este grupo (deterministicos, ver categorias.ts), los trae de
- * una sola vez con adminDb.getAll(), se queda solo con los "terminado", y busca las incidencias
- * de tarjeta en la subcoleccion de CADA UNO de esos -- una query normal por partido (no
- * collectionGroup), que no necesita ningun indice extra.
+ * A diferencia de la version vieja (obtenerHistorialTarjetas), esto NO pega contra Firestore: los
+ * arrays fechasAmarillas/fechasDobleAmarilla/fechasRojas/fechasRojas20/fechasAzules ya vienen
+ * mantenidos incrementalmente en cada jugadores/{id} (ver CAMPO_HISTORIAL_TARJETA en
+ * match/actions.ts, actualizado en publicarIncidente/corregirTipoIncidente/eliminarIncidente) --
+ * la pagina ya trae esos documentos para la tabla, asi que esto es una transformacion sincronica
+ * en memoria, sin ninguna lectura extra.
  */
-export async function obtenerHistorialTarjetas(grupoId: string, jugadorIds: Set<string>): Promise<HistorialTarjetasPorJugador> {
+export function construirHistorialTarjetas(jugadores: (JugadorAgregado & { id: string })[]): HistorialTarjetasPorJugador {
   const resultado: HistorialTarjetasPorJugador = new Map();
-  if (jugadorIds.size === 0) return resultado;
 
-  const idsPartidos = partidoIdsDeGrupo(grupoId);
-  if (idsPartidos.length === 0) return resultado;
-
-  const partidoSnaps = await adminDb.getAll(...idsPartidos.map((id) => adminDb.collection("partidos").doc(id)));
-  const terminados = partidoSnaps.filter((s) => s.exists && (s.data() as Partido).estado === "terminado");
-
-  const porPartido = await Promise.all(
-    terminados.map(async (snap) => {
-      const p = snap.data() as Partido;
-      const incSnap = await snap.ref.collection("incidentes").where("tipo", "in", TIPOS_TARJETA).get();
-      return incSnap.docs
-        .map((d) => d.data() as Incidente)
-        .filter((inc) => inc.equipo === "newman" && inc.jugadorId && jugadorIds.has(inc.jugadorId))
-        .map((inc) => ({ jugadorId: inc.jugadorId as string, tipo: inc.tipo, info: { numeroFecha: p.numeroFecha, rival: p.rival } }));
-    })
-  );
-
-  for (const fila of porPartido.flat()) {
-    const porTipo = resultado.get(fila.jugadorId) ?? {};
-    const lista = porTipo[fila.tipo] ?? [];
-    lista.push(fila.info);
-    porTipo[fila.tipo] = lista;
-    resultado.set(fila.jugadorId, porTipo);
-  }
-
-  // Orden cronologico -- necesario para que "cada 3 amarillas = 1 fecha de suspension" tome las
-  // primeras 3 en el tiempo, no el orden en que llegaron las respuestas de Firestore.
-  for (const porTipo of resultado.values()) {
-    for (const tipo of Object.keys(porTipo) as TipoIncidente[]) {
-      porTipo[tipo]!.sort((a, b) => Number(a.numeroFecha) - Number(b.numeroFecha));
+  for (const jugador of jugadores) {
+    const porTipo: Partial<Record<TipoIncidente, FechaTarjeta[]>> = {};
+    for (const tipo of Object.keys(CAMPO_HISTORIAL_POR_TIPO) as TipoIncidente[]) {
+      const campo = CAMPO_HISTORIAL_POR_TIPO[tipo]!;
+      const filas = jugador[campo] as FechaTarjeta[] | undefined;
+      if (!filas || filas.length === 0) continue;
+      // Orden cronologico -- necesario para que "cada 3 amarillas = 1 fecha de suspension" tome
+      // las primeras 3 en el tiempo, no el orden en que quedaron guardadas en el array.
+      porTipo[tipo] = [...filas].sort((a, b) => Number(a.numeroFecha) - Number(b.numeroFecha));
     }
+    if (Object.keys(porTipo).length > 0) resultado.set(jugador.id, porTipo);
   }
 
   return resultado;

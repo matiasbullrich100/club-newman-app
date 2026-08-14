@@ -160,6 +160,18 @@ export interface Incidente {
   createdAt: Timestamp | Date;
 }
 
+// Una fila del historial de tarjetas de un jugador -- misma forma que FechaTarjeta en
+// tarjetasFormato.ts (numeroFecha + rival), mas incidenteId. Ese id (el del doc en
+// partidos/{id}/incidentes/{incidenteId}) es necesario para poder sacar UNA entrada puntual con
+// arrayRemove sin arrastrar otras identicas -- ej. 2 amarillas en la misma fecha contra el mismo
+// rival tendrian el mismo {numeroFecha, rival} pero distinto incidenteId, y Firestore necesita un
+// match exacto (deep-equal) para remover precisamente una del array.
+export interface FilaHistorialTarjeta {
+  numeroFecha: number | string;
+  rival: string;
+  incidenteId: string;
+}
+
 // Top-level collection `jugadores/{jugadorId}` — cross-match aggregate.
 export interface JugadorAgregado {
   nombre: string;
@@ -171,6 +183,14 @@ export interface JugadorAgregado {
   tarjetasRojas20: number;
   tarjetasAzules: number;
   minutosJugadosTotal: number;
+  // Historial fecha-por-fecha de cada tipo de tarjeta, mantenido incrementalmente en los mismos
+  // call sites que los contadores de arriba (ver CAMPO_HISTORIAL_TARJETA en match/actions.ts) --
+  // asi /estadisticas/[grupoId] puede armar la tabla de Tarjetas sin volver a escanear Firestore.
+  fechasAmarillas?: FilaHistorialTarjeta[];
+  fechasDobleAmarilla?: FilaHistorialTarjeta[];
+  fechasRojas?: FilaHistorialTarjeta[];
+  fechasRojas20?: FilaHistorialTarjeta[];
+  fechasAzules?: FilaHistorialTarjeta[];
 }
 
 export const PUNTOS_POR_TIPO: Record<

@@ -12,6 +12,7 @@ import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
+  type FilaHistorialTarjeta,
   type Incidente,
   type JugadorPartido,
   type LiveState,
@@ -40,6 +41,18 @@ const CAMPO_TARJETA: Partial<Record<TipoIncidente, string>> = {
   tarjeta_roja: "tarjetasRojas",
   tarjeta_roja_20: "tarjetasRojas20",
   tarjeta_azul: "tarjetasAzules",
+};
+
+// Campo en jugadores/{id} con el historial fecha-por-fecha de cada tipo de tarjeta -- parejo con
+// CAMPO_TARJETA de arriba, mantenido en los mismos tres call sites (publicarIncidente,
+// corregirTipoIncidente, eliminarIncidente) para que /estadisticas/[grupoId] pueda leerlo directo
+// de jugadores/ sin volver a escanear partidos.
+const CAMPO_HISTORIAL_TARJETA: Partial<Record<TipoIncidente, string>> = {
+  tarjeta_amarilla: "fechasAmarillas",
+  tarjeta_doble_amarilla: "fechasDobleAmarilla",
+  tarjeta_roja: "fechasRojas",
+  tarjeta_roja_20: "fechasRojas20",
+  tarjeta_azul: "fechasAzules",
 };
 
 
@@ -415,9 +428,23 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     // se hayan cargado con nombres de jugadores reales para simular una formacion realista.
     const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
     if (CAMPO_TARJETA[input.tipo] && input.equipo === "newman" && input.jugadorId && !esPartidoDePrueba) {
+      const campoHistorial = CAMPO_HISTORIAL_TARJETA[input.tipo];
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
-        { nombre: jugadorNombre, ...grupoDeCategoria(partido.categoriaId), [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1) },
+        {
+          nombre: jugadorNombre,
+          ...grupoDeCategoria(partido.categoriaId),
+          [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1),
+          ...(campoHistorial
+            ? {
+                [campoHistorial]: FieldValue.arrayUnion({
+                  numeroFecha: partido.numeroFecha,
+                  rival: partido.rival,
+                  incidenteId: incidenteRef.id,
+                } satisfies FilaHistorialTarjeta),
+              }
+            : {}),
+        },
         { merge: true }
       );
     }
@@ -490,10 +517,27 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
       if (inc.equipo === "newman" && inc.jugadorId && !esPartidoDePrueba) {
         const campoViejo = CAMPO_TARJETA[inc.tipo];
         const campoNuevo = CAMPO_TARJETA[nuevoTipo];
+        const historialViejo = CAMPO_HISTORIAL_TARJETA[inc.tipo];
+        const historialNuevo = CAMPO_HISTORIAL_TARJETA[nuevoTipo];
         const jugadorRef = adminDb.collection("jugadores").doc(inc.jugadorId);
         const grupo = grupoDeCategoria(partido.categoriaId);
-        if (campoViejo) tx.set(jugadorRef, { ...grupo, [campoViejo]: FieldValue.increment(-1) }, { merge: true });
-        if (campoNuevo) tx.set(jugadorRef, { ...grupo, [campoNuevo]: FieldValue.increment(1) }, { merge: true });
+        // Solo cambia el tipo, no el partido en el que paso -- misma numeroFecha/rival/incidenteId
+        // en la entrada que se saca del campo viejo y en la que se agrega al campo nuevo.
+        const entrada: FilaHistorialTarjeta = { numeroFecha: partido.numeroFecha, rival: partido.rival, incidenteId };
+        if (campoViejo) {
+          tx.set(
+            jugadorRef,
+            { ...grupo, [campoViejo]: FieldValue.increment(-1), ...(historialViejo ? { [historialViejo]: FieldValue.arrayRemove(entrada) } : {}) },
+            { merge: true }
+          );
+        }
+        if (campoNuevo) {
+          tx.set(
+            jugadorRef,
+            { ...grupo, [campoNuevo]: FieldValue.increment(1), ...(historialNuevo ? { [historialNuevo]: FieldValue.arrayUnion(entrada) } : {}) },
+            { merge: true }
+          );
+        }
       }
       tx.update(incidenteRef, { tipo: nuevoTipo });
     }
@@ -552,7 +596,23 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
       const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
       if (inc.equipo === "newman" && inc.jugadorId && !esPartidoDePrueba) {
         const campo = CAMPO_TARJETA[inc.tipo];
-        if (campo) tx.set(adminDb.collection("jugadores").doc(inc.jugadorId), { [campo]: FieldValue.increment(-1) }, { merge: true });
+        const campoHistorial = CAMPO_HISTORIAL_TARJETA[inc.tipo];
+        tx.set(
+          adminDb.collection("jugadores").doc(inc.jugadorId),
+          {
+            ...(campo ? { [campo]: FieldValue.increment(-1) } : {}),
+            ...(campoHistorial
+              ? {
+                  [campoHistorial]: FieldValue.arrayRemove({
+                    numeroFecha: partido.numeroFecha,
+                    rival: partido.rival,
+                    incidenteId,
+                  } satisfies FilaHistorialTarjeta),
+                }
+              : {}),
+          },
+          { merge: true }
+        );
       }
     } else {
       throw new Error("Este tipo de incidencia no se puede eliminar");

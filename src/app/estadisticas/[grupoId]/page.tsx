@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { puedeVerEstadisticas } from "@/lib/auth/scope";
 import { EDADES } from "@/lib/categorias";
 import { splitNombre } from "@/lib/players";
-import { obtenerHistorialTarjetas } from "@/lib/tarjetasHistorial";
+import { construirHistorialTarjetas } from "@/lib/tarjetasHistorial";
 import type { JugadorAgregado } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -94,7 +94,7 @@ async function Tablas({ grupoId }: { grupoId: string }) {
   const snap = await query.get();
   const jugadores = snap.docs.map((d) => ({ id: d.id, ...(d.data() as JugadorAgregado) }));
 
-  const historial = await obtenerHistorialTarjetas(grupoId, new Set(jugadores.map((j) => j.id)));
+  const historial = construirHistorialTarjetas(jugadores);
   const saldoDe = (id: string) => (historial.get(id)?.tarjeta_amarilla?.length ?? 0) % 3;
 
   // Un jugador que nunca tuvo ninguna tarjeta ni aparece en esta tabla -- pedido explicito del
