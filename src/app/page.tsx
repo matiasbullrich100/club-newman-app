@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
 import PublicarDivisionButton from "@/components/PublicarDivisionButton";
+import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonStyle: React.CSSProperties = {
@@ -26,6 +27,7 @@ export default async function Home() {
   // Juveniles", pero publicarFormacionesGrupo se salta las edades que no puede operar.
   const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
   const puedeJuveniles = session?.rol === "manager" && (!session.alcance || session.alcance !== "superior");
+  const mostrarPruebas = pruebasVisiblesPara(session);
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -45,9 +47,11 @@ export default async function Home() {
             {puedeJuveniles && <PublicarDivisionButton grupo="juveniles" label="Juveniles" />}
           </div>
         )}
-        <Link href="/pruebas" style={botonStyle}>
-          Partidos de Prueba
-        </Link>
+        {mostrarPruebas && (
+          <Link href="/pruebas" style={botonStyle}>
+            Partidos de Prueba
+          </Link>
+        )}
       </div>
 
       {(session?.rol === "manager" || session?.rol === "entrenador") && (

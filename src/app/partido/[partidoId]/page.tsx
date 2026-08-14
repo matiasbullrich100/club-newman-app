@@ -3,6 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { puedeOperarCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
+import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import type { Incidente, JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
@@ -33,7 +34,6 @@ export default async function PartidoPage({
   const partido = partidoSnap.data() as Partido;
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
-  const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "pre-a-test-cambio", "pre-a-test-beromama"];
   const mostrarReset =
     PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager" && puedeOperarCategoria(session, partido.categoriaId);
   // numeroFecha "demo" (partidos de prueba, fuera de cualquier esquema real) no tiene vista de

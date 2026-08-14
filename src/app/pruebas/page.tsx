@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { puedeOperarCategoria } from "@/lib/auth/scope";
+import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -17,6 +19,7 @@ const PARTIDOS_DEMO = [
 
 export default async function PruebasPage() {
   const session = await getSession();
+  if (!pruebasVisiblesPara(session)) redirect("/");
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>

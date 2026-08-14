@@ -9,6 +9,7 @@ import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes
 import { calcularBonus } from "./bonus";
 import { FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
 import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
+import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
@@ -25,13 +26,6 @@ function refs(partidoId: string) {
   const partidoRef = adminDb.collection("partidos").doc(partidoId);
   return { partidoRef, liveStateRef: partidoRef.collection("liveState").doc("state") };
 }
-
-// Lista blanca a proposito -- resetearPartidoDemo nunca debe poder tocar un partido real, pase
-// lo que pase con el argumento que le llegue del cliente. Tambien se usa para que NADA de lo que
-// pase en estos partidos (tarjetas, minutos jugados) se contabilice en jugadores/ -- algunos se
-// cargan con nombres de jugadores reales (para simular formaciones realistas), asi que sin este
-// filtro contaminarian las estadisticas reales de esos jugadores.
-const PARTIDOS_DEMO_IDS = ["demo-partido-1", "demo-partido-2", "pre-a-test-cambio", "pre-a-test-beromama"];
 
 // Campo en jugadores/{id} que acumula cada tipo de tarjeta -- compartido entre publicarIncidente
 // y corregirTipoIncidente (corregir un try por un drop, o una amarilla por una roja, etc.).

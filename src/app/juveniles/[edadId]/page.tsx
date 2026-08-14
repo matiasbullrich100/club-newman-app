@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
 import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
+import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -33,7 +34,11 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
     );
   }
 
-  const resumen = await partidosEnVivoOTerminadosHoy(equipos.map((e) => e.id));
+  const resumenCompleto = await partidosEnVivoOTerminadosHoy(equipos.map((e) => e.id));
+  // Ver el mismo comentario en /superior/page.tsx -- una categoria de prueba puede coincidir con
+  // una real, asi que se marca "PRUEBA" y, pasado el corte, se oculta para quien no sea Admin.
+  const pruebasVisibles = pruebasVisiblesPara(session);
+  const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -48,6 +53,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           categoriaNombre={equipos.find((e) => e.id === p.categoriaId)?.nombre ?? p.categoriaId}
           inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
           nombreNewman={nombreNewmanDe(p.categoriaId)}
+          esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
         />
       ))}
 
