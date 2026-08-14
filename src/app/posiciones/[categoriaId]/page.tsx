@@ -55,7 +55,7 @@ export default async function PosicionesPage({
       <SessionBar session={session} />
       <Header rightLabel="Posiciones" />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8 }}>{categoria.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
       <div
         style={{
           textAlign: "center",

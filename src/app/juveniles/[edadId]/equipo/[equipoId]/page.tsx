@@ -33,7 +33,7 @@ export default async function EquipoJuvenilesPage({
       <SessionBar session={session} />
       <Header rightLabel={edad.nombre} />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8 }}>{equipo.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{equipo.nombre}</div>
 
       {TORNEOS_URBA[equipoId] !== undefined && (
         <p style={{ textAlign: "center", margin: "10px 0 0" }}>

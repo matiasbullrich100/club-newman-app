@@ -33,7 +33,7 @@ export default async function CategoriaPage({
       <SessionBar session={session} />
       <Header />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8 }}>{categoria.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
 
       {TORNEOS_URBA[categoriaId] !== undefined && (
         <p style={{ textAlign: "center", margin: "10px 0 0" }}>
