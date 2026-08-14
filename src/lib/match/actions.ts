@@ -8,7 +8,7 @@ import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
 import { calcularBonus } from "./bonus";
 import { FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
-import { grupoDeCategoria } from "@/lib/categorias";
+import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
@@ -709,6 +709,37 @@ export async function publicarFormacion(partidoId: string): Promise<void> {
   });
 
   revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
+ * Publica de una sola vez TODAS las formaciones en borrador de un grupo ("superior", "juveniles"
+ * -- las 4 edades juntas -- o un edadId puntual) -- para cuando se cargaron muchos partidos como
+ * borrador de punta (ej. toda la temporada via Excel) y no tiene sentido publicarlos uno por uno.
+ * Se salta silenciosamente cualquier partido que la sesion no pueda operar (asi un manager de una
+ * sola division puede usar el mismo boton "Subir Juveniles" sin publicar de mas) y cualquiera que
+ * no este en estado "programado" o que ya este publicado.
+ */
+export async function publicarFormacionesGrupo(grupo: string): Promise<{ publicados: number }> {
+  const session = await getSession();
+  if (!session || session.rol !== "manager") throw new Error("No autorizado");
+
+  const idsPartidos = grupo === "juveniles" ? EDADES.flatMap((e) => partidoIdsDeGrupo(e.id)) : partidoIdsDeGrupo(grupo);
+  const snaps = await adminDb.getAll(...idsPartidos.map((id) => adminDb.collection("partidos").doc(id)));
+
+  const batch = adminDb.batch();
+  let publicados = 0;
+  for (const snap of snaps) {
+    if (!snap.exists) continue;
+    const partido = snap.data() as Partido;
+    if (partido.estado !== "programado" || partido.formacionPublicada !== false) continue;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) continue;
+    batch.update(snap.ref, { formacionPublicada: true, updatedAt: FieldValue.serverTimestamp() });
+    publicados++;
+  }
+  if (publicados > 0) await batch.commit();
+
+  revalidatePath("/");
+  return { publicados };
 }
 
 // ---- Solo para los partidos de prueba (Fase 1) ------------------------------------------

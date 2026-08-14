@@ -1,5 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
-import { CATEGORIAS_SUPERIOR, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, equiposDeEdad, partidoId } from "@/lib/categorias";
+import { partidoIdsDeGrupo } from "@/lib/categorias";
 import type { Incidente, Partido, TipoIncidente } from "@/types/firestore";
 import type { FechaTarjeta } from "@/lib/tarjetasFormato";
 
@@ -30,14 +30,7 @@ export async function obtenerHistorialTarjetas(grupoId: string, jugadorIds: Set<
   const resultado: HistorialTarjetasPorJugador = new Map();
   if (jugadorIds.size === 0) return resultado;
 
-  const categoriaIds =
-    grupoId === "superior" ? CATEGORIAS_SUPERIOR.map((c) => c.id) : equiposDeEdad(grupoId).map((e) => e.id);
-  const numeroFechas = grupoId === "superior" ? NUMERO_FECHAS_SUPERIOR : NUMERO_FECHAS_JUVENILES;
-
-  const idsPartidos: string[] = [];
-  for (const catId of categoriaIds) {
-    for (let n = 1; n <= numeroFechas; n++) idsPartidos.push(partidoId(catId, n));
-  }
+  const idsPartidos = partidoIdsDeGrupo(grupoId);
   if (idsPartidos.length === 0) return resultado;
 
   const partidoSnaps = await adminDb.getAll(...idsPartidos.map((id) => adminDb.collection("partidos").doc(id)));

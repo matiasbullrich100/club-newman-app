@@ -88,6 +88,20 @@ export function partidoId(categoriaId: string, numeroFecha: number | string): st
   return `${categoriaId}-f${numeroFecha}`;
 }
 
+// Todos los partidoId posibles de un grupo ("superior" o un edadId de Juveniles) -- ids
+// deterministicos, no hace falta ninguna query para armar la lista. Usado por
+// tarjetasHistorial.ts (recorrer partidos terminados) y por publicarFormacionesGrupo en
+// match/actions.ts (publicar en bloque toda la division de una vez).
+export function partidoIdsDeGrupo(grupo: string): string[] {
+  const categoriaIds = grupo === "superior" ? CATEGORIAS_SUPERIOR.map((c) => c.id) : equiposDeEdad(grupo).map((e) => e.id);
+  const numeroFechas = grupo === "superior" ? NUMERO_FECHAS_SUPERIOR : NUMERO_FECHAS_JUVENILES;
+  const ids: string[] = [];
+  for (const catId of categoriaIds) {
+    for (let n = 1; n <= numeroFechas; n++) ids.push(partidoId(catId, n));
+  }
+  return ids;
+}
+
 const NOMBRE_A_ID = new Map<string, string>(CATEGORIAS.map((c) => [c.nombre, c.id]));
 
 export function categoriaIdPorNombre(nombre: string): string {

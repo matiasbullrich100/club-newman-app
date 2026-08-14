@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
+import PublicarDivisionButton from "@/components/PublicarDivisionButton";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonStyle: React.CSSProperties = {
@@ -20,6 +21,11 @@ const botonStyle: React.CSSProperties = {
 
 export default async function Home() {
   const session = await getSession();
+  // Solo Administrador (sin alcance) y el Manager de la division correspondiente ven el boton de
+  // publicar en bloque -- un manager de Juveniles acotado a una sola edad igual ve "Subir
+  // Juveniles", pero publicarFormacionesGrupo se salta las edades que no puede operar.
+  const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
+  const puedeJuveniles = session?.rol === "manager" && (!session.alcance || session.alcance !== "superior");
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -33,6 +39,12 @@ export default async function Home() {
         <Link href="/juveniles" style={botonStyle}>
           Juveniles
         </Link>
+        {(puedeSuperior || puedeJuveniles) && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {puedeSuperior && <PublicarDivisionButton grupo="superior" label="Plantel" />}
+            {puedeJuveniles && <PublicarDivisionButton grupo="juveniles" label="Juveniles" />}
+          </div>
+        )}
         <Link href="/pruebas" style={botonStyle}>
           Partidos de Prueba
         </Link>
