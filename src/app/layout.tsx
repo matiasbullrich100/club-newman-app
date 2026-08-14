@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
+import FontSizeControl from "@/components/FontSizeControl";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -29,7 +30,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           paddingBottom: 60,
         }}
       >
+        {/* Aplica el tamano de letra guardado ANTES de que React hidrate -- si no, se ve un
+            flash al tamano por defecto y despues un salto al tamano elegido. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var t=localStorage.getItem("tamanoFuente");if(t)document.documentElement.style.fontSize=t+"%";}catch(e){}',
+          }}
+        />
         {children}
+        <FontSizeControl />
       </body>
     </html>
   );
