@@ -36,7 +36,7 @@ async function main() {
   const cuentas: Record<string, Omit<Cuenta, "createdAt">> = {
     demo: { rol: "designado", username: "demo", passwordHash: await hashPassword("dalebordo"), categoriaId: CATEGORIA_ID },
     coach: { rol: "entrenador", username: "coach", passwordHash: await hashPassword("pica") },
-    manager: { rol: "manager", username: "manager", passwordHash: await hashPassword("fede") },
+    manager: { rol: "manager", username: "manager", passwordHash: await hashPassword("pelu") },
   };
   await Promise.all(
     Object.entries(cuentas).map(([id, cuenta]) =>
@@ -98,7 +98,7 @@ async function main() {
   console.log("Listo. Cuentas de prueba:");
   console.log("  Designado -> usuario: demo       contraseña: dalebordo");
   console.log("  Entrenador -> usuario: coach      contraseña: pica");
-  console.log("  Manager    -> usuario: manager    contraseña: fede");
+  console.log("  Manager    -> usuario: manager    contraseña: pelu");
   console.log(`Partido de prueba: /partido/${PARTIDO_ID}`);
 }
 

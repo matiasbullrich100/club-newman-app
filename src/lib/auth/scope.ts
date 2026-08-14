@@ -10,7 +10,7 @@ import type { SessionPayload } from "./session";
  * partido, o desde un Client Component para decidir que mostrar.
  *
  * Hay 5 divisiones, cada una con su propio manager acotado solo a la suya: `alcance: "superior"`
- * (Plantel Superior, cuenta "manager"/"fede") o `alcance` = un edadId de Juveniles
+ * (Plantel Superior, cuenta "manager"/"pelu") o `alcance` = un edadId de Juveniles
  * (m15/m16/m17/m19). `alcance` ausente = sin restriccion -- hoy ninguna cuenta usa este caso,
  * queda como resguardo si se crea una cuenta manager nueva sin setearlo.
  */

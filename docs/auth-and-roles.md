@@ -11,10 +11,10 @@ Detalle de archivos: [`src/lib/auth/CLAUDE.md`](../src/lib/auth/CLAUDE.md). Esto
 3. **`entrenador`** — solo lectura de `/estadisticas` (todas las divisiones), no opera partidos.
 4. **`manager`** — el rol con más poder. Con `alcance` **ausente**, sin restricción: opera
    cualquier categoría (Plantel Superior + las 4 divisiones de Juveniles) y ve `/estadisticas`
-   completo. Con `alcance` seteado a un `edadId` (`"m15"|"m16"|"m17"|"m19"`), queda acotado a esa
-   división de Juveniles — mismos poderes que el manager sin restricción, pero solo ahí. Cuentas:
-   `manager`/`fede` (sin alcance) + `managerm15`/`managerm16`/`managerm17`/`managerm19` (con
-   alcance), sembradas por `npm run seed-managers-juveniles`.
+   completo. Con `alcance` seteado a `"superior"` o a un `edadId` (`"m15"|"m16"|"m17"|"m19"`),
+   queda acotado a esa división — mismos poderes que el manager sin restricción, pero solo ahí.
+   Cuentas: `manager`/`pelu` (alcance `"superior"`) + `managerm15`/`managerm16`/`managerm17`/
+   `managerm19` (con alcance de su edad), más `administrador`/`admin` (sin alcance, acceso total).
 
 ## Dónde vive la lógica de alcance
 
