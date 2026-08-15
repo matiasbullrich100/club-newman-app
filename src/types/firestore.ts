@@ -156,6 +156,10 @@ export interface Incidente {
   periodo: Periodo;
   minuto: number;
   segundoAbsoluto: number;
+  // true si se publicó con el partido en "entretiempo" (ej. un cambio táctico en el descanso) --
+  // periodo/minuto igual quedan con el valor del cierre del 1T (para el orden cronológico), pero
+  // el feed tiene que mostrar "Entretiempo" en vez de "1T X'", que sería engañoso.
+  enEntretiempo?: boolean;
   publicadoPorCuentaId: string;
   createdAt: Timestamp | Date;
 }

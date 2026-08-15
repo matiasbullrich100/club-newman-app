@@ -757,6 +757,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       periodo: liveState.periodo,
       minuto,
       segundoAbsoluto,
+      ...(partido.estado === "entretiempo" ? { enEntretiempo: true } : {}),
       publicadoPorCuentaId: session!.cuentaId,
       createdAt: Timestamp.now(),
     };

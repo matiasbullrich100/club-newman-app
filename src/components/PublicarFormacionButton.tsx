@@ -24,17 +24,17 @@ export default function PublicarFormacionButton({ partidoId }: { partidoId: stri
     });
   }
 
-  // Fijo abajo (mismo patron que BackLink arriba) -- el manager suele revisar toda la
-  // formacion antes de publicar, y sin esto el boton se perdia scrolleando la lista.
-  // bottom:60 para no pisar el control de tamaño de letra, tambien fijo en la esquina
-  // inferior derecha (ver FontSizeControl.tsx).
+  // Fijo abajo del todo (bottom:12, igual que BackLink arriba con top:12) -- el manager suele
+  // revisar toda la formacion antes de publicar, y sin esto el boton se perdia scrolleando la
+  // lista. right:95 en vez de 0 para no pisar el control de tamaño de letra, tambien fijo pero
+  // en la esquina inferior derecha (ver FontSizeControl.tsx).
   return (
     <div
       style={{
         position: "fixed",
         left: 0,
-        right: 0,
-        bottom: 60,
+        right: 95,
+        bottom: 12,
         zIndex: 100,
         display: "flex",
         justifyContent: "center",

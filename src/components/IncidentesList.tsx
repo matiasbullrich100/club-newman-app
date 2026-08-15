@@ -134,8 +134,12 @@ export default function IncidentesList({
                 alignItems: "center",
               }}
             >
-              <div style={{ color: DORADO, minWidth: 34, fontSize: "0.8rem" }}>
-                {inc.periodo} {inc.minuto}&apos;
+              <div style={{ color: DORADO, minWidth: inc.enEntretiempo ? 76 : 34, fontSize: "0.8rem" }}>
+                {inc.enEntretiempo ? "Entretiempo" : (
+                  <>
+                    {inc.periodo} {inc.minuto}&apos;
+                  </>
+                )}
               </div>
               <div style={{ minWidth: 20, textAlign: "center" }}>{ICONOS[inc.tipo] ?? ""}</div>
               <div
