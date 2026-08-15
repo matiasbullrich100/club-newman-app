@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase-client";
 import Cronometro from "./Cronometro";
 import PanelDesignado from "./panel-designado/PanelDesignado";
 import IncidentesFeed from "./IncidentesFeed";
+import Formaciones from "./Formaciones";
 import type { EstadoPartido, LiveState, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 import type { JugadorBusqueda, RosterJugador } from "./panel-designado/types";
@@ -104,6 +105,23 @@ export default function PartidoLive({
           <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>{partido.resultado.rival}</div>
         </div>
       </div>
+
+      {plantel.length > 0 && (
+        <div
+          style={{
+            background: "rgba(255,255,255,.045)",
+            border: "1px solid rgba(226,197,120,.2)",
+            borderRadius: 12,
+            padding: 16,
+            marginBottom: 14,
+          }}
+        >
+          <h3 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 10 }}>
+            Formaciones
+          </h3>
+          <Formaciones plantel={plantel} />
+        </div>
+      )}
 
       {puedeOperar ? (
         // El feed para el Designado va adentro del panel (entre jugadas y cambios).
