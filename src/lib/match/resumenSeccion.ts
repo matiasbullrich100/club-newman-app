@@ -1,6 +1,7 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina } from "@/lib/fecha";
+import { CATEGORIAS } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
@@ -44,7 +45,15 @@ export async function partidosEnVivoOTerminadosHoy(categoriaIds: string[]): Prom
       return esHoyEnArgentina(updatedAt instanceof Date ? updatedAt : updatedAt.toDate());
     });
 
-  return [...enVivo, ...terminadosHoy].map((p) => ({
+  // Firestore no garantiza el orden de un where().get() -- sin esto, cada visita podia mostrar
+  // las categorias en un orden distinto (bug real: Primera terminaba al final de la lista en vez
+  // de primera, aunque estuviera ahi). Se ordena por el mismo "orden" que ya define el orden
+  // canonico de categorias.ts (Primera, Intermedia, Pre A... o M15 A, M15 B... segun corresponda).
+  const ordenPorCategoria = new Map<string, number>(CATEGORIAS.map((c) => [c.id, c.orden]));
+  const porOrden = (a: { categoriaId: string }, b: { categoriaId: string }) =>
+    (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
+
+  return [...enVivo.sort(porOrden), ...terminadosHoy.sort(porOrden)].map((p) => ({
     id: p.id,
     categoriaId: p.categoriaId,
     esLocal: p.esLocal,
