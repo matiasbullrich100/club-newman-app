@@ -16,6 +16,7 @@ import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
 import EditarFormacion from "@/components/panel-designado/EditarFormacion";
 import ResetDemoButton from "@/components/ResetDemoButton";
+import ReiniciarPartidoButton from "@/components/ReiniciarPartidoButton";
 import PublicarFormacionButton from "@/components/PublicarFormacionButton";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
@@ -34,8 +35,8 @@ export default async function PartidoPage({
   const partido = partidoSnap.data() as Partido;
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
-  const mostrarReset =
-    PARTIDOS_DEMO_IDS.includes(partidoId) && session?.rol === "manager" && puedeOperarCategoria(session, partido.categoriaId);
+  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const mostrarReset = esPartidoDePrueba && session?.rol === "manager" && puedeOperarCategoria(session, partido.categoriaId);
   // numeroFecha "demo" (partidos de prueba, fuera de cualquier esquema real) no tiene vista de
   // fecha propia -- /fecha o /juveniles/.../fecha devuelven 404 para un numero fuera de rango.
   const numero = Number(partido.numeroFecha);
@@ -135,6 +136,7 @@ export default async function PartidoPage({
           </div>
         )}
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
+        {puedeOperar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );
@@ -212,6 +214,7 @@ export default async function PartidoPage({
           />
         )}
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
+        {puedeOperar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );

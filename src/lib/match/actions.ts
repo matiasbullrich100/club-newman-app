@@ -856,3 +856,102 @@ export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> 
   revalidatePath(`/partido/${partidoDemoId}`);
   revalidatePath("/");
 }
+
+// ---- Reinicio de un partido real (por error de operación) --------------------------------
+
+/**
+ * Vuelve CUALQUIER partido a "programado" desde cero -- mismo efecto que resetearPartidoDemo,
+ * pero pensado para un partido real que se inició/terminó por error (ej. se apretó "Iniciar" en
+ * la categoría equivocada). A diferencia de los partidos de prueba, un partido real puede haber
+ * sumado tarjetas o minutos jugados a jugadores/ -- este reinicio los revierte antes de borrar
+ * las incidencias, para no dejar estadísticas fantasma pegadas en el jugador.
+ */
+export async function reiniciarPartido(partidoId: string): Promise<void> {
+  const session = await getSession();
+  const partidoRef = adminDb.collection("partidos").doc(partidoId);
+  const partidoSnap = await partidoRef.get();
+  if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+  const partido = partidoSnap.data() as Partido;
+  if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+
+  const [plantelSnap, incidentesSnap] = await Promise.all([
+    partidoRef.collection("plantel").get(),
+    partidoRef.collection("incidentes").get(),
+  ]);
+
+  const batch = adminDb.batch();
+  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+
+  const originales = plantelSnap.docs.filter((d) => !d.data().agregadoEnVivo);
+  const agregados = plantelSnap.docs.filter((d) => d.data().agregadoEnVivo);
+
+  const titularesIds = originales.filter((d) => d.data().titular).map((d) => d.id);
+  batch.update(partidoRef, {
+    estado: "programado",
+    resultado: { newman: 0, rival: 0 },
+    enCanchaIds: titularesIds,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  batch.set(partidoRef.collection("liveState").doc("state"), {
+    periodo: null,
+    clockRunning: false,
+    clockAnchor: null,
+    accumulatedSeconds: 0,
+  });
+
+  for (const doc of originales) {
+    const data = doc.data() as JugadorPartido;
+    // terminarPartido ya sumo estos minutos a jugadores/{id}.minutosJugadosTotal -- revertirlo
+    // antes de poner los campos del plantel en 0 de nuevo.
+    const totalMinutos = (data.minutosJugados1T ?? 0) + (data.minutosJugados2T ?? 0);
+    if (!esPartidoDePrueba && totalMinutos > 0) {
+      batch.set(
+        adminDb.collection("jugadores").doc(doc.id),
+        { minutosJugadosTotal: FieldValue.increment(-totalMinutos) },
+        { merge: true }
+      );
+    }
+    batch.update(doc.ref, { enCancha: data.titular, minutosJugados1T: 0, minutosJugados2T: 0 });
+  }
+  for (const doc of agregados) {
+    batch.delete(doc.ref);
+  }
+
+  // Revertir las tarjetas ya sumadas a jugadores/ (mismo campo/historial que publicarIncidente),
+  // usando el tipo ACTUAL de cada incidencia -- si alguna fue corregida con corregirTipoIncidente,
+  // jugadores/ ya refleja el tipo corregido, no el original.
+  if (!esPartidoDePrueba) {
+    for (const doc of incidentesSnap.docs) {
+      const inc = doc.data() as Incidente;
+      const campo = CAMPO_TARJETA[inc.tipo];
+      const campoHistorial = CAMPO_HISTORIAL_TARJETA[inc.tipo];
+      if (campo && inc.equipo === "newman" && inc.jugadorId) {
+        batch.set(
+          adminDb.collection("jugadores").doc(inc.jugadorId),
+          {
+            [campo]: FieldValue.increment(-1),
+            ...(campoHistorial
+              ? {
+                  [campoHistorial]: FieldValue.arrayRemove({
+                    numeroFecha: partido.numeroFecha,
+                    rival: partido.rival,
+                    incidenteId: doc.id,
+                  } satisfies FilaHistorialTarjeta),
+                }
+              : {}),
+          },
+          { merge: true }
+        );
+      }
+    }
+  }
+
+  for (const doc of incidentesSnap.docs) {
+    batch.delete(doc.ref);
+  }
+
+  await batch.commit();
+  revalidatePath(`/partido/${partidoId}`);
+  revalidatePath("/");
+}
