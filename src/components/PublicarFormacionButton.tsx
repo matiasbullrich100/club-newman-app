@@ -24,40 +24,66 @@ export default function PublicarFormacionButton({ partidoId }: { partidoId: stri
     });
   }
 
+  // Fijo abajo (mismo patron que BackLink arriba) -- el manager suele revisar toda la
+  // formacion antes de publicar, y sin esto el boton se perdia scrolleando la lista.
+  // bottom:60 para no pisar el control de tamaño de letra, tambien fijo en la esquina
+  // inferior derecha (ver FontSizeControl.tsx).
   return (
-    <div style={{ textAlign: "center", margin: "10px 0" }}>
-      {confirmando ? (
-        <>
-          <span style={{ color: DORADO_SUAVE, fontSize: "0.8rem", marginRight: 8 }}>
-            ¿Publicar la formación? Va a quedar visible para todos.
-          </span>
-          <button disabled={isPending} onClick={confirmar}>
-            {isPending ? "Publicando…" : "Confirmar"}
-          </button>{" "}
-          <button disabled={isPending} onClick={() => setConfirmando(false)}>
-            Cancelar
+    <div
+      style={{
+        position: "fixed",
+        left: 0,
+        right: 0,
+        bottom: 60,
+        zIndex: 100,
+        display: "flex",
+        justifyContent: "center",
+        padding: "0 16px",
+      }}
+    >
+      <div
+        style={{
+          textAlign: "center",
+          background: "rgba(53,9,22,.92)",
+          border: `2px solid ${DORADO}`,
+          borderRadius: 20,
+          padding: confirmando ? "10px 16px" : 4,
+          maxWidth: 480,
+        }}
+      >
+        {confirmando ? (
+          <>
+            <span style={{ color: DORADO_SUAVE, fontSize: "0.8rem", marginRight: 8 }}>
+              ¿Publicar la formación? Va a quedar visible para todos.
+            </span>
+            <button disabled={isPending} onClick={confirmar}>
+              {isPending ? "Publicando…" : "Confirmar"}
+            </button>{" "}
+            <button disabled={isPending} onClick={() => setConfirmando(false)}>
+              Cancelar
+            </button>
+          </>
+        ) : (
+          <button
+            style={{
+              fontSize: "0.85rem",
+              padding: "10px 18px",
+              borderRadius: 16,
+              background: DORADO,
+              border: "none",
+              color: "#3a0f1c",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              cursor: "pointer",
+            }}
+            onClick={() => setConfirmando(true)}
+          >
+            Publicar formación
           </button>
-        </>
-      ) : (
-        <button
-          style={{
-            fontSize: "0.85rem",
-            padding: "10px 18px",
-            borderRadius: 8,
-            background: DORADO,
-            border: "none",
-            color: "#3a0f1c",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            cursor: "pointer",
-          }}
-          onClick={() => setConfirmando(true)}
-        >
-          Publicar formación
-        </button>
-      )}
-      {error && <p style={{ color: "#f3caca", fontSize: "0.8rem" }}>{error}</p>}
+        )}
+        {error && <p style={{ color: "#f3caca", fontSize: "0.8rem", margin: "4px 0 0" }}>{error}</p>}
+      </div>
     </div>
   );
 }

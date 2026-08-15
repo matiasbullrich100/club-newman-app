@@ -728,7 +728,12 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       : (entraSnap.data() as JugadorPartido);
 
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    if (partido.estado !== "en_juego" || !liveState.periodo) throw new Error("El partido no está en juego");
+    // Se permite tambien en el entretiempo -- es cuando mas cambios tacticos se hacen en la
+    // practica, y el reloj ya esta frenado (elapsedSeconds/minutoActual usan accumulatedSeconds
+    // congelado, no hace falta nada especial para que el minuto quede bien registrado).
+    if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
+      throw new Error("El partido no está en juego");
+    }
     if (!sale.enCancha) throw new Error("Ese jugador no está en cancha");
     if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
 

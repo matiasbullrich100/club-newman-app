@@ -210,9 +210,13 @@ export default function PanelDesignado({
 
       {!pendiente && !eligiendoMotivo && !eligiendoWalkover && error && <p style={{ color: "#f3caca" }}>{error}</p>}
 
-      {partido.estado === "en_juego" && (
+      {(partido.estado === "en_juego" || partido.estado === "entretiempo") && (
         <div style={{ display: "grid", gap: "1rem" }}>
-          <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
+          {/* Try/tarjeta solo tienen sentido con la pelota en juego -- en el entretiempo el
+              reloj esta frenado, no hay jugadas nuevas, pero si se hacen cambios tacticos. */}
+          {partido.estado === "en_juego" && (
+            <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
+          )}
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
           <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} plantel={plantel} />
