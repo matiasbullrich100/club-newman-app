@@ -63,7 +63,16 @@ export async function iniciarPartido(partidoId: string): Promise<void> {
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
     if (partido.estado !== "programado") throw new Error("El partido ya fue iniciado");
 
-    tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
+    // Salvaguarda: si quien cargo el plantel (ej. una carga masiva desde Excel) se olvido de
+    // completar este campo, se deriva de los titulares en vez de arrancar el partido sin nadie
+    // "en cancha" -- eso rompe la seleccion de jugador en Cargar Jugada/Cambio (bug real, Fecha 18).
+    let enCanchaIds = partido.enCanchaIds;
+    if (enCanchaIds.length === 0) {
+      const plantelSnap = await tx.get(partidoRef.collection("plantel").where("titular", "==", true));
+      enCanchaIds = plantelSnap.docs.map((d) => d.id);
+    }
+
+    tx.update(partidoRef, { estado: "en_juego", enCanchaIds, updatedAt: FieldValue.serverTimestamp() });
     tx.set(liveStateRef, {
       periodo: "1T",
       clockRunning: true,
