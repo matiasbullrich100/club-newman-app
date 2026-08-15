@@ -12,11 +12,13 @@ export default function IncidentesFeed({
   rivalNombre,
   puedeEditar,
   nombreNewman,
+  plantel,
 }: {
   partidoId: string;
   rivalNombre?: string;
   puedeEditar?: boolean;
   nombreNewman?: string;
+  plantel?: { jugadorId: string; nombre: string; dorsal: string }[];
 }) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
 
@@ -48,6 +50,7 @@ export default function IncidentesFeed({
         partidoId={partidoId}
         puedeEditar={puedeEditar}
         nombreNewman={nombreNewman}
+        plantel={plantel}
       />
     </div>
   );

@@ -550,6 +550,69 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
 }
 
 /**
+ * Reasigna el jugador de una jugada de Newman ya publicada (ej. cargaron el Penal sin elegir
+ * quien lo pateo, o eligieron al jugador equivocado). A diferencia de corregirTipoIncidente, esto
+ * no cambia el tipo -- solo a quien esta asignada. Si es una tarjeta, revierte el acumulado del
+ * jugador viejo (si tenia uno) y se lo suma al nuevo; si es una jugada de puntos, nadie lleva un
+ * acumulado por jugador asi que solo cambia el nombre que se muestra en el feed.
+ */
+export async function corregirJugadorIncidente(partidoId: string, incidenteId: string, nuevoJugadorId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, incSnap, nuevoJugadorSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(incidenteRef),
+      tx.get(partidoRef.collection("plantel").doc(nuevoJugadorId)),
+    ]);
+    if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
+    if (!nuevoJugadorSnap.exists) throw new Error("Jugador no encontrado en el plantel");
+    const partido = partidoSnap.data() as Partido;
+    const inc = incSnap.data() as Incidente;
+    const nuevoJugador = nuevoJugadorSnap.data() as JugadorPartido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
+      throw new Error("El partido tiene que estar en juego o terminado para corregir una jugada");
+    }
+    if (inc.equipo !== "newman" || !requierePlayerSelection(inc.tipo)) {
+      throw new Error("Esta jugada no tiene un jugador asociado");
+    }
+    if (inc.jugadorId === nuevoJugadorId) return;
+
+    tx.update(incidenteRef, { jugadorId: nuevoJugadorId, jugadorNombre: nuevoJugador.nombre, dorsal: nuevoJugador.dorsal });
+
+    const campo = CAMPO_TARJETA[inc.tipo];
+    const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+    if (campo && !esPartidoDePrueba) {
+      const campoHistorial = CAMPO_HISTORIAL_TARJETA[inc.tipo];
+      const grupo = grupoDeCategoria(partido.categoriaId);
+      const entrada: FilaHistorialTarjeta = { numeroFecha: partido.numeroFecha, rival: partido.rival, incidenteId };
+      if (inc.jugadorId) {
+        tx.set(
+          adminDb.collection("jugadores").doc(inc.jugadorId),
+          { [campo]: FieldValue.increment(-1), ...(campoHistorial ? { [campoHistorial]: FieldValue.arrayRemove(entrada) } : {}) },
+          { merge: true }
+        );
+      }
+      tx.set(
+        adminDb.collection("jugadores").doc(nuevoJugadorId),
+        {
+          nombre: nuevoJugador.nombre,
+          ...grupo,
+          [campo]: FieldValue.increment(1),
+          ...(campoHistorial ? { [campoHistorial]: FieldValue.arrayUnion(entrada) } : {}),
+        },
+        { merge: true }
+      );
+    }
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
  * Elimina una incidencia publicada por error (ej. el arbitro anulo un try despues de cargado).
  * Deshace su efecto en el resultado o en el acumulado de tarjetas segun corresponda. Solo
  * puntos y tarjetas -- cambios/fin de tiempo/interrupciones no se pueden borrar desde aca (tocan

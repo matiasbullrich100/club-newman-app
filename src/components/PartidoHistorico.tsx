@@ -134,6 +134,7 @@ export default function PartidoHistorico({
             partidoId={partidoId}
             puedeEditar={puedeEditar}
             nombreNewman={nombreNewman}
+            plantel={plantel}
           />
         </div>
       )}

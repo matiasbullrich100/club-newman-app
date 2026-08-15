@@ -215,7 +215,7 @@ export default function PanelDesignado({
           <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
-          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} />
+          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} plantel={plantel} />
           <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}

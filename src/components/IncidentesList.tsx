@@ -3,8 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Incidente } from "@/types/firestore";
-import { describirIncidente, ETIQUETAS_INCIDENTE, FAMILIA_PUNTOS, FAMILIA_TARJETA, ordenarIncidentes } from "@/lib/incidentes";
-import { corregirTipoIncidente, eliminarIncidente } from "@/lib/match/actions";
+import { describirIncidente, ETIQUETAS_INCIDENTE, FAMILIA_PUNTOS, FAMILIA_TARJETA, ordenarIncidentes, requierePlayerSelection } from "@/lib/incidentes";
+import { corregirJugadorIncidente, corregirTipoIncidente, eliminarIncidente } from "@/lib/match/actions";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
@@ -35,15 +35,20 @@ export default function IncidentesList({
   partidoId,
   puedeEditar,
   nombreNewman,
+  plantel = [],
 }: {
   incidentes: (Incidente & { id: string })[];
   rivalNombre?: string;
   partidoId?: string;
   puedeEditar?: boolean;
   nombreNewman?: string;
+  // Para "Cambiar jugador" -- solo hace falta jugadorId/nombre/dorsal, asi sirve tanto el roster
+  // de un partido en vivo como el historico (formas ligeramente distintas, mismos 3 campos).
+  plantel?: { jugadorId: string; nombre: string; dorsal: string }[];
 }) {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<string | null>(null);
+  const [cambiandoJugadorId, setCambiandoJugadorId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -65,6 +70,21 @@ export default function IncidentesList({
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo corregir");
+      }
+    });
+  }
+
+  function cambiarJugador(incidenteId: string, nuevoJugadorId: string) {
+    if (!partidoId) return;
+    setError(null);
+    startTransition(async () => {
+      try {
+        await corregirJugadorIncidente(partidoId, incidenteId, nuevoJugadorId);
+        setCambiandoJugadorId(null);
+        setEditandoId(null);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo cambiar el jugador");
       }
     });
   }
@@ -92,6 +112,8 @@ export default function IncidentesList({
         const familia = familiaDe(inc.tipo);
         const editable = puedeEditar && partidoId && familia;
         const editando = editandoId === inc.id;
+        const puedeCambiarJugador = editable && inc.equipo === "newman" && requierePlayerSelection(inc.tipo) && plantel.length > 0;
+        const cambiandoJugador = cambiandoJugadorId === inc.id;
         return (
           <div key={inc.id}>
             {cambioDePeriodo && (
@@ -142,7 +164,7 @@ export default function IncidentesList({
                 </button>
               )}
             </div>
-            {editable && editando && confirmandoEliminarId !== inc.id && (
+            {editable && editando && confirmandoEliminarId !== inc.id && !cambiandoJugador && (
               <div style={{ padding: "6px 4px 12px 44px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <span style={{ fontSize: "0.78rem", opacity: 0.75, width: "100%" }}>Cambiar por:</span>
                 {familia!
@@ -164,6 +186,22 @@ export default function IncidentesList({
                       {ETIQUETAS_INCIDENTE[t]}
                     </button>
                   ))}
+                {puedeCambiarJugador && (
+                  <button
+                    disabled={isPending}
+                    onClick={() => setCambiandoJugadorId(inc.id)}
+                    style={{
+                      fontSize: "0.78rem",
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      background: "rgba(255,255,255,.06)",
+                      border: "1px solid rgba(226,197,120,.35)",
+                      color: "#f7f1e4",
+                    }}
+                  >
+                    Cambiar jugador
+                  </button>
+                )}
                 <button
                   disabled={isPending}
                   onClick={() => setConfirmandoEliminarId(inc.id)}
@@ -218,6 +256,43 @@ export default function IncidentesList({
                 <button
                   disabled={isPending}
                   onClick={() => setConfirmandoEliminarId(null)}
+                  style={{
+                    fontSize: "0.78rem",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    background: "transparent",
+                    border: "1px solid rgba(226,197,120,.2)",
+                    color: DORADO_SUAVE,
+                  }}
+                >
+                  Cancelar
+                </button>
+                {error && <p style={{ color: "#f3caca", fontSize: "0.78rem", width: "100%", margin: 0 }}>{error}</p>}
+              </div>
+            )}
+            {puedeCambiarJugador && cambiandoJugador && (
+              <div style={{ padding: "6px 4px 12px 44px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ fontSize: "0.78rem", opacity: 0.75, width: "100%" }}>¿Quién fue?</span>
+                {plantel.map((j) => (
+                  <button
+                    key={j.jugadorId}
+                    disabled={isPending}
+                    onClick={() => cambiarJugador(inc.id, j.jugadorId)}
+                    style={{
+                      fontSize: "0.78rem",
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      background: "rgba(255,255,255,.06)",
+                      border: "1px solid rgba(226,197,120,.35)",
+                      color: "#f7f1e4",
+                    }}
+                  >
+                    {j.dorsal} — {j.nombre}
+                  </button>
+                ))}
+                <button
+                  disabled={isPending}
+                  onClick={() => setCambiandoJugadorId(null)}
                   style={{
                     fontSize: "0.78rem",
                     padding: "8px 12px",
