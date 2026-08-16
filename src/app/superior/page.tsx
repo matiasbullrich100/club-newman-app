@@ -14,7 +14,10 @@ import { DORADO_SUAVE } from "@/lib/colors";
 export default async function PlantelSuperiorPage() {
   const [session, resumenCompleto] = await Promise.all([
     getSession(),
-    partidosEnVivoOTerminadosHoy(CATEGORIAS_SUPERIOR.map((c) => c.id)),
+    partidosEnVivoOTerminadosHoy(
+      CATEGORIAS_SUPERIOR.map((c) => c.id),
+      true
+    ),
   ]);
   // Algunas categorias de prueba (ej. "pre-a", "m-22") coinciden con categorias reales, asi que
   // un partido de PARTIDOS_DEMO_IDS puede aparecer en este mismo banner -- se marca "PRUEBA" y,

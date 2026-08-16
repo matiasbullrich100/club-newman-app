@@ -15,14 +15,26 @@ export interface PartidoResumen {
   resultado: Partido["resultado"];
 }
 
+function toMillis(value: Partido["updatedAt"]): number {
+  if (!value) return 0;
+  if (value instanceof Date) return value.getTime();
+  return (value as { toMillis: () => number }).toMillis();
+}
+
 /**
  * Partidos en vivo (cualquier categoria dentro de `categoriaIds`) mas los que se jugaron HOY
  * (por `partido.fecha`, no por cuando se toco el documento por ultima vez -- una correccion
  * cargada dias despues no debe hacer "reaparecer" un partido como si fuera de hoy). No hace
  * falta indice compuesto: se trae "estado==terminado" entero (el volumen de partidos de este
  * club es chico) y se filtra categoria/fecha en memoria.
+ *
+ * ordenarPorHorario: Plantel Superior (una sola categoria por partido) se ordena por cuando se
+ * jugo de verdad -- el ultimo en terminar arriba, `updatedAt` desc -- para que el resumen siga el
+ * orden real de la tarde. Juveniles (varios equipos de la misma edad juegan la misma fecha) sigue
+ * ordenado por division/equipo (M15 A, M15 B... M19 A...), default, porque ahi lo que importa es
+ * poder ubicar el equipo, no cuando termino cada uno.
  */
-export async function partidosEnVivoOTerminadosHoy(categoriaIds: string[]): Promise<PartidoResumen[]> {
+export async function partidosEnVivoOTerminadosHoy(categoriaIds: string[], ordenarPorHorario = false): Promise<PartidoResumen[]> {
   const idsSet = new Set(categoriaIds);
   const [enVivoSnap, terminadosSnap] = await Promise.all([
     adminDb.collection("partidos").where("estado", "in", ESTADOS_EN_VIVO).get(),
@@ -48,10 +60,13 @@ export async function partidosEnVivoOTerminadosHoy(categoriaIds: string[]): Prom
   // Firestore no garantiza el orden de un where().get() -- sin esto, cada visita podia mostrar
   // las categorias en un orden distinto (bug real: Primera terminaba al final de la lista en vez
   // de primera, aunque estuviera ahi). Se ordena por el mismo "orden" que ya define el orden
-  // canonico de categorias.ts (Primera, Intermedia, Pre A... o M15 A, M15 B... segun corresponda).
+  // canonico de categorias.ts (Primera, Intermedia, Pre A... o M15 A, M15 B... segun corresponda),
+  // o por updatedAt desc si ordenarPorHorario (ver comentario de la funcion).
   const ordenPorCategoria = new Map<string, number>(CATEGORIAS.map((c) => [c.id, c.orden]));
-  const porOrden = (a: { categoriaId: string }, b: { categoriaId: string }) =>
-    (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
+  const porOrden = ordenarPorHorario
+    ? (a: { updatedAt?: Partido["updatedAt"] }, b: { updatedAt?: Partido["updatedAt"] }) => toMillis(b.updatedAt) - toMillis(a.updatedAt)
+    : (a: { categoriaId: string }, b: { categoriaId: string }) =>
+        (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
 
   return [...enVivo.sort(porOrden), ...terminadosHoy.sort(porOrden)].map((p) => ({
     id: p.id,
