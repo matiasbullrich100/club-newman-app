@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { publicarCambio } from "@/lib/match/actions";
 import type { JugadorBusqueda, RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, listaOpciones } from "./estilos";
+import BarraAccionFija from "./BarraAccionFija";
 import { norm } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
@@ -155,14 +156,14 @@ export default function CargaCambio({
             Confirmar: sale <strong>{sale?.nombre}</strong>, entra <strong>{entra?.nombre}</strong>
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <BarraAccionFija>
             <button style={botonPrimario} disabled={isPending} onClick={confirmar}>
               {isPending ? "Publicando…" : "Publicar"}
             </button>
             <button style={botonSecundario} disabled={isPending} onClick={reset}>
               Cancelar
             </button>
-          </div>
+          </BarraAccionFija>
         </div>
       )}
     </div>

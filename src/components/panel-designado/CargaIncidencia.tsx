@@ -6,6 +6,7 @@ import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
 import { requierePlayerSelection } from "@/lib/incidentes";
 import type { RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
+import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; label: string }[] = [
@@ -235,12 +236,14 @@ export default function CargaIncidencia({
       {paso === "convirtio" && (
         <div style={listaOpciones}>
           <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió?</p>
-          <button style={botonPrimario} onClick={() => elegirConvirtio(true)}>
-            Sí, convirtió
-          </button>
-          <button style={botonSecundario} onClick={() => elegirConvirtio(false)}>
-            No convirtió
-          </button>
+          <BarraAccionFija>
+            <button style={botonPrimario} onClick={() => elegirConvirtio(true)}>
+              Sí, convirtió
+            </button>
+            <button style={botonSecundario} onClick={() => elegirConvirtio(false)}>
+              No convirtió
+            </button>
+          </BarraAccionFija>
         </div>
       )}
 
@@ -257,14 +260,14 @@ export default function CargaIncidencia({
             )}
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <BarraAccionFija>
             <button style={botonPrimario} disabled={isPending} onClick={confirmar}>
               {isPending ? "Publicando…" : "Publicar"}
             </button>
             <button style={botonSecundario} disabled={isPending} onClick={reset}>
               Cancelar
             </button>
-          </div>
+          </BarraAccionFija>
         </div>
       )}
     </div>
