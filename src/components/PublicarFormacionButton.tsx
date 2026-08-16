@@ -27,14 +27,16 @@ export default function PublicarFormacionButton({ partidoId }: { partidoId: stri
   // Fijo abajo del todo (bottom:12, igual que BackLink arriba con top:12) -- el manager suele
   // revisar toda la formacion antes de publicar, y sin esto el boton se perdia scrolleando la
   // lista. right:95 en vez de 0 para no pisar el control de tamaño de letra, tambien fijo pero
-  // en la esquina inferior derecha (ver FontSizeControl.tsx).
+  // en la esquina inferior derecha (ver FontSizeControl.tsx). bottom usa env(safe-area-inset-bottom)
+  // porque, a diferencia de los elementos fijos arriba, la barra inferior de Safari en iOS puede
+  // tapar contenido fijo anclado abajo -- los de arriba no tienen ese problema.
   return (
     <div
       style={{
         position: "fixed",
         left: 0,
         right: 95,
-        bottom: 12,
+        bottom: "max(12px, env(safe-area-inset-bottom))",
         zIndex: 100,
         display: "flex",
         justifyContent: "center",

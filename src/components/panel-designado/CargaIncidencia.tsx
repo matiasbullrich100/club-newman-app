@@ -23,7 +23,11 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; lab
   { tipo: "lesion", label: "Lesión" },
 ];
 
-type Paso = "tipo" | "equipo" | "jugador" | "cuando" | "confirmar";
+type Paso = "tipo" | "equipo" | "jugador" | "cuando" | "confirmar" | "convirtio";
+
+// Try y Try Scrum pueden convertirse -- Try Penal ya suma los 7 puntos (try+conversion
+// automatica), no se le vuelve a preguntar.
+const TIPOS_CON_CONVERSION: (typeof TIPOS)[number]["tipo"][] = ["try", "try_scrum"];
 
 export default function CargaIncidencia({
   partidoId,
@@ -93,6 +97,7 @@ export default function CargaIncidencia({
   function confirmar() {
     if (!tipo || !equipo) return;
     setError(null);
+    const tipoPublicado = tipo;
     const input: PublicarIncidenteInput = {
       tipo,
       equipo,
@@ -102,11 +107,33 @@ export default function CargaIncidencia({
     startTransition(async () => {
       try {
         await publicarIncidente(partidoId, input);
-        reset();
+        if (TIPOS_CON_CONVERSION.includes(tipoPublicado)) {
+          // Encadenar la pregunta de conversion en vez de forzar a buscarla despues como jugada
+          // aparte -- se mantiene el equipo (y periodoManual/minutoManual si es correccion), se
+          // limpia tipo/jugador para la proxima eleccion.
+          setTipo(null);
+          setJugadorId(null);
+          setPaso("convirtio");
+        } else {
+          reset();
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo publicar");
       }
     });
+  }
+
+  function elegirConvirtio(convirtio: boolean) {
+    if (!convirtio) {
+      reset();
+      return;
+    }
+    setTipo("conversion");
+    if (equipo === "newman") {
+      setPaso("jugador");
+    } else {
+      setPaso(esCorreccion ? "cuando" : "confirmar");
+    }
   }
 
   return (
@@ -201,6 +228,18 @@ export default function CargaIncidencia({
           </button>
           <button style={botonSecundario} onClick={reset}>
             Cancelar
+          </button>
+        </div>
+      )}
+
+      {paso === "convirtio" && (
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió?</p>
+          <button style={botonPrimario} onClick={() => elegirConvirtio(true)}>
+            Sí, convirtió
+          </button>
+          <button style={botonSecundario} onClick={() => elegirConvirtio(false)}>
+            No convirtió
           </button>
         </div>
       )}

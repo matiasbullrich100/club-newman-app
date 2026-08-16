@@ -7,7 +7,7 @@ import { getSession, puedeOperarCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
 import { calcularBonus } from "./bonus";
-import { FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
+import { DURACION_SANCION_SEGUNDOS, FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
 import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import {
@@ -427,6 +427,37 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tx.update(partidoRef, { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() });
     }
 
+    // Amarilla/roja de 20 sacan al jugador de la cancha en el momento (10'/20' de sancion) -- se
+    // registra como un "cambio" sin entra (solo jugadorSaleId) para que calcularMinutos() le corte
+    // los minutos ahi mismo, y para que vuelva a aparecer en el banco de Cambios/reingresarSancion.
+    if (
+      DURACION_SANCION_SEGUNDOS[input.tipo] !== undefined &&
+      input.equipo === "newman" &&
+      input.jugadorId &&
+      !esCorreccionPostPartido &&
+      partido.enCanchaIds.includes(input.jugadorId)
+    ) {
+      const jugadorRef = partidoRef.collection("plantel").doc(input.jugadorId);
+      tx.update(jugadorRef, { enCancha: false });
+      tx.update(partidoRef, {
+        enCanchaIds: partido.enCanchaIds.filter((id) => id !== input.jugadorId),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      const salidaRef = partidoRef.collection("incidentes").doc();
+      const salida: Incidente = {
+        tipo: "cambio",
+        equipo: "newman",
+        jugadorSaleId: input.jugadorId,
+        jugadorSaleNombre: jugadorNombre,
+        periodo,
+        minuto,
+        segundoAbsoluto,
+        publicadoPorCuentaId: session!.cuentaId,
+        createdAt: Timestamp.now(),
+      };
+      tx.set(salidaRef, salida);
+    }
+
     // Las tarjetas de partidos de prueba no se contabilizan en las estadisticas reales, aunque
     // se hayan cargado con nombres de jugadores reales para simular una formacion realista.
     const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
@@ -752,6 +783,69 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       equipo: "newman",
       jugadorSaleId: input.jugadorSaleId,
       jugadorSaleNombre: sale.nombre,
+      jugadorEntraId: input.jugadorEntraId,
+      jugadorEntraNombre: entra.nombre,
+      periodo: liveState.periodo,
+      minuto,
+      segundoAbsoluto,
+      ...(partido.estado === "entretiempo" ? { enEntretiempo: true } : {}),
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    tx.set(incidenteRef, incidente);
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+export interface ReingresarSancionInput {
+  jugadorEntraId: string;
+  // Solo si el que entra no estaba en el plantel de este partido (mismo patron que publicarCambio).
+  jugadorEntraNombre?: string;
+}
+
+/**
+ * Llena el puesto que dejo vacante una amarilla/roja de 20 -- a diferencia de un cambio comun no
+ * hay "sale" (ya salio con la tarjeta, ver DURACION_SANCION_SEGUNDOS en publicarIncidente): puede
+ * reingresar el mismo jugador sancionado o cualquier otro (banco, alguien que ya salio antes, o
+ * del plantel completo via el buscador).
+ */
+export async function reingresarSancion(partidoId: string, input: ReingresarSancionInput): Promise<void> {
+  const session = await getSession();
+  const { partidoRef, liveStateRef } = refs(partidoId);
+  const entraRef = partidoRef.collection("plantel").doc(input.jugadorEntraId);
+  const incidenteRef = partidoRef.collection("incidentes").doc();
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, liveSnap, entraSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef), tx.get(entraRef)]);
+    if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Datos del partido incompletos");
+    const entraEsNuevo = !entraSnap.exists;
+    if (entraEsNuevo && !input.jugadorEntraNombre) throw new Error("Jugador no encontrado en el plantel");
+    const partido = partidoSnap.data() as Partido;
+    const liveState = liveSnap.data() as LiveState;
+    const entra: JugadorPartido = entraEsNuevo
+      ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false, agregadoEnVivo: true }
+      : (entraSnap.data() as JugadorPartido);
+
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
+      throw new Error("El partido no está en juego");
+    }
+    if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
+    if (partido.enCanchaIds.length >= 15) throw new Error("Ya hay 15 jugadores en cancha");
+
+    const minuto = minutoActual(liveState);
+    const segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+
+    tx.set(entraRef, { ...entra, enCancha: true }, { merge: true });
+    tx.update(partidoRef, {
+      enCanchaIds: [...partido.enCanchaIds, input.jugadorEntraId],
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    const incidente: Incidente = {
+      tipo: "cambio",
+      equipo: "newman",
       jugadorEntraId: input.jugadorEntraId,
       jugadorEntraNombre: entra.nombre,
       periodo: liveState.periodo,

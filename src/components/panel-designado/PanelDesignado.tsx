@@ -15,6 +15,7 @@ import type { LiveState, Partido } from "@/types/firestore";
 import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
+import SancionesActivas from "./SancionesActivas";
 import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
 import { nombreNewmanDe } from "@/lib/categorias";
@@ -217,6 +218,7 @@ export default function PanelDesignado({
           {partido.estado === "en_juego" && (
             <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
           )}
+          <SancionesActivas partidoId={partidoId} enCanchaIds={partido.enCanchaIds} plantel={plantel} plantelCompleto={plantelCompleto} />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
           <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} plantel={plantel} />

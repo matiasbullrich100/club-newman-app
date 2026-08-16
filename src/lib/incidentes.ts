@@ -37,6 +37,14 @@ export const FAMILIA_TARJETA: Incidente["tipo"][] = [
   "tarjeta_azul",
 ];
 
+// Duracion de la sancion en cancha -- solo amarilla y roja de 20 tienen reingreso (roja comun y
+// doble amarilla son expulsion definitiva, no aplica). Compartido entre el server action que saca
+// al jugador de la cancha y el cliente que muestra la cuenta regresiva, para no duplicar el numero.
+export const DURACION_SANCION_SEGUNDOS: Partial<Record<Incidente["tipo"], number>> = {
+  tarjeta_amarilla: 10 * 60,
+  tarjeta_roja_20: 20 * 60,
+};
+
 export function requierePlayerSelection(tipo: Incidente["tipo"]): boolean {
   return !SIN_JUGADOR_PUNTUAL.includes(tipo);
 }
@@ -47,6 +55,14 @@ export function requierePlayerSelection(tipo: Incidente["tipo"]): boolean {
  */
 export function describirIncidente(inc: Incidente, rivalNombre?: string, nombreNewman = "Newman"): string {
   if (inc.tipo === "cambio") {
+    // Salida/reingreso por sancion (amarilla/roja de 20): un solo lado, sin par (ver
+    // DURACION_SANCION_SEGUNDOS en match/actions.ts) -- no tiene sentido mostrar el otro como "?".
+    if (inc.jugadorSaleNombre && !inc.jugadorEntraNombre) {
+      return `Sale ${inc.jugadorSaleNombre} — ${nombreNewman} (sanción)`;
+    }
+    if (inc.jugadorEntraNombre && !inc.jugadorSaleNombre) {
+      return `Entra ${inc.jugadorEntraNombre} — ${nombreNewman} (reingreso)`;
+    }
     return `Cambio — ${nombreNewman} — Sale ${inc.jugadorSaleNombre ?? "?"}, entra ${inc.jugadorEntraNombre ?? "?"}`;
   }
   if (SIN_EQUIPO.includes(inc.tipo)) {
