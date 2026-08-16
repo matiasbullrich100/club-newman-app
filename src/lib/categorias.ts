@@ -37,6 +37,7 @@ export const CATEGORIAS = [
 export type CategoriaId = (typeof CATEGORIAS)[number]["id"];
 
 export const CATEGORIAS_SUPERIOR = CATEGORIAS.filter((c) => c.grupo === "superior");
+export const CATEGORIAS_JUVENILES = CATEGORIAS.filter((c) => c.grupo === "juveniles");
 
 export const EDADES = [
   { id: "m15", nombre: "M15" },

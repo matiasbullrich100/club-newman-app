@@ -65,7 +65,7 @@ export default async function CategoriaPage({
             <FixtureRow
               key={numeroFecha}
               href={`/partido/${partidoId(categoriaId, numeroFecha)}`}
-              jugada={partido.estado === "terminado"}
+              jugada={partido.estado === "terminado" || !!partido.notaEspecial}
               tituloPrincipal={
                 partido.notaEspecial ? (
                   <>

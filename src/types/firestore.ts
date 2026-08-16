@@ -52,6 +52,10 @@ export interface Partido {
   // "Suspendido por tormenta eléctrica". No confundir con estado "suspendido", que es
   // exclusivamente para un partido EN CURSO pausado por el Designado (ver match/actions.ts).
   notaEspecial?: string;
+  // true si es un amistoso arreglado por el club para llenar una fecha libre del fixture oficial
+  // (no cuenta para la tabla de posiciones) -- se aclara junto al resultado/matchup, a diferencia
+  // de notaEspecial que reemplaza el matchup entero.
+  amistoso?: boolean;
   // Solo aplica a un partido "programado" -- ausente o true = la formacion es publica (default,
   // asi ningun partido historico/ya migrado se ve afectado). false = alguien ya cargo la
   // formacion pero el club todavia no la comunico; solo quien puede operar esta categoria la ve,

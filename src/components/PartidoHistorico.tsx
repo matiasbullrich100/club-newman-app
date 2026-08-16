@@ -88,6 +88,11 @@ export default function PartidoHistorico({
         </p>
       )}
       <div style={cardStyle}>
+        {partido.amistoso && (
+          <p style={{ textAlign: "center", margin: "0 0 6px", fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, color: DORADO }}>
+            Amistoso
+          </p>
+        )}
         {partido.notaEspecial ? (
           <p style={{ fontStyle: "italic", color: DORADO_SUAVE, textAlign: "center", fontSize: "1rem" }}>
             {partido.notaEspecial}

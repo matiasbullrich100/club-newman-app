@@ -17,7 +17,7 @@ export default async function EquiposJuvenilesPage({ params }: { params: Promise
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href={`/juveniles/${edadId}`} />
+      <BackLink href="/juveniles" />
       <SessionBar session={session} />
       <Header rightLabel={edad.nombre} />
 

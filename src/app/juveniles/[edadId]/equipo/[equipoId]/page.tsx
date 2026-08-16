@@ -1,15 +1,15 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
-import type { Partido } from "@/types/firestore";
+import type { Partido, PosicionesTorneo } from "@/types/firestore";
 import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
+import TablaPosiciones from "@/components/TablaPosiciones";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default async function EquipoJuvenilesPage({
@@ -24,7 +24,12 @@ export default async function EquipoJuvenilesPage({
 
   const nombreNewman = nombreNewmanDe(equipoId);
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(equipoId, i + 1)));
-  const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
+  const tieneTorneo = TORNEOS_URBA[equipoId] !== undefined;
+  const [snaps, posicionesSnap, session] = await Promise.all([
+    adminDb.getAll(...refs),
+    tieneTorneo ? adminDb.collection("posiciones").doc(equipoId).get() : Promise.resolve(null),
+    getSession(),
+  ]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
 
   return (
@@ -35,24 +40,19 @@ export default async function EquipoJuvenilesPage({
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{equipo.nombre}</div>
 
-      {TORNEOS_URBA[equipoId] !== undefined && (
-        <p style={{ textAlign: "center", margin: "10px 0 0" }}>
-          <Link
-            href={`/posiciones/${equipoId}`}
-            style={{
-              display: "inline-block",
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              fontSize: "0.78rem",
-              padding: "10px 16px",
-              borderRadius: 8,
-              border: "1px solid rgba(226,197,120,.4)",
-              color: DORADO_SUAVE,
-            }}
-          >
+      {tieneTorneo && (
+        <>
+          <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
             Tabla de posiciones
-          </Link>
-        </p>
+          </div>
+          {posicionesSnap?.exists ? (
+            <TablaPosiciones data={posicionesSnap.data() as PosicionesTorneo} />
+          ) : (
+            <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem", textAlign: "center" }}>
+              Todavía no hay tabla de posiciones cargada.
+            </p>
+          )}
+        </>
       )}
 
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
@@ -65,7 +65,7 @@ export default async function EquipoJuvenilesPage({
             <FixtureRow
               key={numeroFecha}
               href={`/partido/${partidoId(equipoId, numeroFecha)}`}
-              jugada={partido.estado === "terminado"}
+              jugada={partido.estado === "terminado" || !!partido.notaEspecial}
               tituloPrincipal={
                 partido.notaEspecial ? (
                   <>
@@ -85,11 +85,14 @@ export default async function EquipoJuvenilesPage({
                 )
               }
               notaSecundaria={
-                partido.fecha
-                  ? partido.hora && partido.estado !== "terminado"
-                    ? `${formatFecha(partido.fecha, "short")} · ${partido.hora}`
-                    : formatFecha(partido.fecha, "short")
-                  : ""
+                <>
+                  {partido.fecha
+                    ? partido.hora && partido.estado !== "terminado"
+                      ? `${formatFecha(partido.fecha, "short")} · ${partido.hora}`
+                      : formatFecha(partido.fecha, "short")
+                    : ""}
+                  {partido.amistoso && " · Amistoso"}
+                </>
               }
             />
           ) : null
