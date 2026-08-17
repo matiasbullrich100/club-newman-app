@@ -1,7 +1,7 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina } from "@/lib/fecha";
-import { CATEGORIAS } from "@/lib/categorias";
+import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
@@ -78,14 +78,24 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ord
 
   // Firestore no garantiza el orden de un where().get() -- sin esto, cada visita podia mostrar
   // las categorias en un orden distinto (bug real: Primera terminaba al final de la lista en vez
-  // de primera, aunque estuviera ahi). Se ordena por el mismo "orden" que ya define el orden
-  // canonico de categorias.ts (Primera, Intermedia, Pre A... o M15 A, M15 B... segun corresponda),
-  // o por updatedAt desc si ordenarPorHorario (ver comentario de la funcion).
+  // de primera, aunque estuviera ahi). Plantel Superior se ordena por updatedAt (ver
+  // ordenarPorHorario en el comentario de la funcion). Juveniles se ordena por division/equipo,
+  // pero PRIMERO por edad (M19, M17, M16, M15 -- pedido explicito, orden inverso al de
+  // categorias.ts) y DESPUES por letra ascendente dentro de esa edad (A, B, C... ) -- el campo
+  // `orden` de categorias.ts arranca en 0 para cada edad, asi que ordenar solo por ese campo
+  // intercalaba las letras entre divisiones (M15 A, M17 A, M19 A, M15 B...) en vez de agrupar.
   const ordenPorCategoria = new Map<string, number>(CATEGORIAS.map((c) => [c.id, c.orden]));
+  const RANGO_EDAD: Record<string, number> = { m19: 0, m17: 1, m16: 2, m15: 3 };
   const porOrden = ordenarPorHorario
     ? (a: { updatedAt?: Partido["updatedAt"] }, b: { updatedAt?: Partido["updatedAt"] }) => toMillis(b.updatedAt) - toMillis(a.updatedAt)
-    : (a: { categoriaId: string }, b: { categoriaId: string }) =>
-        (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
+    : (a: { categoriaId: string }, b: { categoriaId: string }) => {
+        const edadA = grupoDeCategoria(a.categoriaId).edadId;
+        const edadB = grupoDeCategoria(b.categoriaId).edadId;
+        const rangoA = edadA ? (RANGO_EDAD[edadA] ?? 99) : 99;
+        const rangoB = edadB ? (RANGO_EDAD[edadB] ?? 99) : 99;
+        if (rangoA !== rangoB) return rangoA - rangoB;
+        return (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
+      };
 
   return [...enVivo.sort(porOrden), ...terminadosHoy.sort(porOrden)].map((p) => ({
     id: p.id,
