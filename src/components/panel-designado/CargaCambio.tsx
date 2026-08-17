@@ -109,9 +109,17 @@ export default function CargaCambio({
           ))}
 
           {!buscando ? (
-            <button style={botonSecundario} onClick={() => setBuscando(true)}>
-              Buscar otro jugador
-            </button>
+            // Fijo abajo (BarraAccionFija) -- con poco banco (a veces 1 solo suplente) esta lista
+            // queda muy corta y el boton terminaba scrolleado arriba, fuera de la pantalla (mismo
+            // bug real que ya se arreglo para "Publicar" -- ver BarraAccionFija.tsx).
+            <BarraAccionFija>
+              <button style={botonPrimario} onClick={() => setBuscando(true)}>
+                Buscar otro jugador
+              </button>
+              <button style={botonSecundario} onClick={reset}>
+                Cancelar
+              </button>
+            </BarraAccionFija>
           ) : (
             <div style={{ display: "grid", gap: 8 }}>
               <input
@@ -141,12 +149,11 @@ export default function CargaCambio({
                   {j.nombre}
                 </button>
               ))}
+              <button style={botonSecundario} onClick={reset}>
+                Cancelar
+              </button>
             </div>
           )}
-
-          <button style={botonSecundario} onClick={reset}>
-            Cancelar
-          </button>
         </div>
       )}
 
