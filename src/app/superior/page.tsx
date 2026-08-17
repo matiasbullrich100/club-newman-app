@@ -41,23 +41,28 @@ export default async function PlantelSuperiorPage() {
         />
       ))}
 
-      <p style={{ textAlign: "center", marginTop: 16 }}>
-        <Link
-          href="/categorias"
-          style={{
-            display: "inline-block",
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            fontSize: "0.78rem",
-            padding: "10px 16px",
-            borderRadius: 8,
-            border: "1px solid rgba(226,197,120,.4)",
-            color: DORADO_SUAVE,
-          }}
-        >
-          Ver por categoría
-        </Link>
-      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 16 }}>
+        {CATEGORIAS_SUPERIOR.map((cat) => (
+          <Link
+            key={cat.id}
+            href={`/categoria/${cat.id}`}
+            style={{
+              background: "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
+              border: "1px solid rgba(226,197,120,.25)",
+              borderRadius: 8,
+              padding: "8px 6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontWeight: 600, letterSpacing: 0.3, fontSize: "0.72rem", textTransform: "uppercase", color: DORADO_SUAVE }}>
+              {cat.nombre}
+            </div>
+          </Link>
+        ))}
+      </div>
     </main>
   );
 }

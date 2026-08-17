@@ -49,30 +49,25 @@ export default function LiveBanner({
       href={`/partido/${partidoId}`}
       style={{
         display: "block",
+        textAlign: "center",
         background: "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
         border: `1px solid ${DORADO}`,
-        borderRadius: 14,
-        padding: "14px 16px",
-        marginBottom: 16,
+        borderRadius: 10,
+        padding: "8px 14px",
+        marginBottom: 8,
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.72rem", color: DORADO }}>
-          {enVivo ? "● Partido en juego" : "Partido terminado"}
-        </span>
-        <span style={{ textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.72rem", color: DORADO_SUAVE }}>
-          {categoriaNombre}
-        </span>
-      </div>
-      <p style={{ fontSize: "1.15rem", textAlign: "center", margin: "8px 0 0" }}>
+      <div style={{ textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.68rem", color: DORADO_SUAVE }}>{categoriaNombre}</div>
+      <div style={{ fontSize: "0.98rem", margin: "2px 0" }}>
         {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
         <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
-      </p>
-      {enVivo && (
-        <div style={{ marginTop: 8, textAlign: "center" }}>
-          <Cronometro partidoId={partidoId} estado={partido.estado} />
-        </div>
-      )}
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}>
+        <span style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.62rem", color: DORADO }}>
+          {enVivo ? "● En juego" : "Terminado"}
+        </span>
+        {enVivo && <Cronometro partidoId={partidoId} estado={partido.estado} />}
+      </div>
     </Link>
   );
 }
