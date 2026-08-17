@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
-import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -14,7 +14,7 @@ import { DORADO_SUAVE } from "@/lib/colors";
 export default async function PlantelSuperiorPage() {
   const [session, resumenCompleto] = await Promise.all([
     getSession(),
-    partidosEnVivoOTerminadosHoy(
+    partidosEnVivoOUltimoTerminado(
       CATEGORIAS_SUPERIOR.map((c) => c.id),
       true
     ),

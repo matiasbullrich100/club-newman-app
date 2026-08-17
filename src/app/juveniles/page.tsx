@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, CATEGORIAS_JUVENILES, EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
-import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -15,7 +15,7 @@ export default async function JuvenilesPage() {
   // Mismo patron que /superior y /juveniles/[edadId], pero con las 4 divisiones juntas -- para no
   // tener que entrar a cada edad para ver que se esta jugando/se jugo hoy (antes solo aparecia un
   // nivel mas abajo, division por division).
-  const resumenCompleto = await partidosEnVivoOTerminadosHoy(CATEGORIAS_JUVENILES.map((c) => c.id));
+  const resumenCompleto = await partidosEnVivoOUltimoTerminado(CATEGORIAS_JUVENILES.map((c) => c.id));
   const pruebasVisibles = pruebasVisiblesPara(session);
   const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
 

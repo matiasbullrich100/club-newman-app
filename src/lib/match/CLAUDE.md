@@ -13,5 +13,6 @@ Modelo completo (estados, reloj, minutos, walkover): [`docs/live-match-engine.md
   tocan Firestore.
 - **`minutes.ts`** — `calcularMinutos()`, pura y testeable sin Firestore. Se llama solo desde
   `terminarPartido()` en `actions.ts`.
-- **`resumenSeccion.ts`** — `partidosEnVivoOTerminadosHoy()`, usado por las páginas de listado
-  (home de cada división) para mostrar el banner de partidos en vivo.
+- **`resumenSeccion.ts`** — `partidosEnVivoOUltimoTerminado()`, usado por las páginas de listado
+  (home de cada división) para mostrar el banner de partidos en vivo + el último terminado de cada
+  categoría (no "hoy" literal: se queda pegado toda la semana hasta que haya una fecha más nueva).

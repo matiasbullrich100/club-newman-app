@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
-import { partidosEnVivoOTerminadosHoy } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -34,7 +34,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
     );
   }
 
-  const resumenCompleto = await partidosEnVivoOTerminadosHoy(equipos.map((e) => e.id));
+  const resumenCompleto = await partidosEnVivoOUltimoTerminado(equipos.map((e) => e.id));
   // Ver el mismo comentario en /superior/page.tsx -- una categoria de prueba puede coincidir con
   // una real, asi que se marca "PRUEBA" y, pasado el corte, se oculta para quien no sea Admin.
   const pruebasVisibles = pruebasVisiblesPara(session);

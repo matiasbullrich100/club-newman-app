@@ -21,12 +21,18 @@ function toMillis(value: Partido["updatedAt"]): number {
   return (value as { toMillis: () => number }).toMillis();
 }
 
+function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
+  const n = Number(numeroFecha);
+  return Number.isFinite(n) ? n : -Infinity;
+}
+
 /**
- * Partidos en vivo (cualquier categoria dentro de `categoriaIds`) mas los que se jugaron HOY
- * (por `partido.fecha`, no por cuando se toco el documento por ultima vez -- una correccion
- * cargada dias despues no debe hacer "reaparecer" un partido como si fuera de hoy). No hace
- * falta indice compuesto: se trae "estado==terminado" entero (el volumen de partidos de este
- * club es chico) y se filtra categoria/fecha en memoria.
+ * Partidos en vivo (cualquier categoria dentro de `categoriaIds`) mas el ULTIMO terminado de cada
+ * categoria (mayor `numeroFecha`, no "jugado hoy" literal) -- el club juega una fecha por semana
+ * (Plantel Superior el sabado, Juveniles el domingo), asi que el resumen tiene que seguir
+ * mostrando los resultados del ultimo partido jugado toda la semana, hasta que haya uno mas nuevo
+ * (la fecha siguiente). No hace falta indice compuesto: se trae "estado==terminado" entero (el
+ * volumen de partidos de este club es chico) y se filtra/agrupa en memoria.
  *
  * ordenarPorHorario: Plantel Superior (una sola categoria por partido) se ordena por cuando se
  * jugo de verdad -- el ultimo en terminar arriba, `updatedAt` desc -- para que el resumen siga el
@@ -34,7 +40,7 @@ function toMillis(value: Partido["updatedAt"]): number {
  * ordenado por division/equipo (M15 A, M15 B... M19 A...), default, porque ahi lo que importa es
  * poder ubicar el equipo, no cuando termino cada uno.
  */
-export async function partidosEnVivoOTerminadosHoy(categoriaIds: string[], ordenarPorHorario = false): Promise<PartidoResumen[]> {
+export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ordenarPorHorario = false): Promise<PartidoResumen[]> {
   const idsSet = new Set(categoriaIds);
   const [enVivoSnap, terminadosSnap] = await Promise.all([
     adminDb.collection("partidos").where("estado", "in", ESTADOS_EN_VIVO).get(),
@@ -45,17 +51,30 @@ export async function partidosEnVivoOTerminadosHoy(categoriaIds: string[], orden
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
     .filter((p) => idsSet.has(p.categoriaId));
 
-  const terminadosHoy = terminadosSnap.docs
+  const terminados = terminadosSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
-    .filter((p) => {
-      if (!idsSet.has(p.categoriaId)) return false;
-      // Los partidos de prueba no tienen fecha calendario real (numeroFecha "demo") -- para
-      // esos, "recien terminado" sigue midiendose por la ultima edicion.
-      if (p.fecha) return fechaIsoEsHoyEnArgentina(p.fecha);
-      const updatedAt = p.updatedAt;
-      if (!updatedAt) return false;
-      return esHoyEnArgentina(updatedAt instanceof Date ? updatedAt : updatedAt.toDate());
-    });
+    .filter((p) => idsSet.has(p.categoriaId));
+
+  // Partidos reales (con fecha calendario): el de mayor numeroFecha por categoria.
+  const masRecientePorCategoria = new Map<string, (typeof terminados)[number]>();
+  for (const p of terminados) {
+    if (!p.fecha) continue;
+    const actual = masRecientePorCategoria.get(p.categoriaId);
+    if (!actual || comoNumero(p.numeroFecha) > comoNumero(actual.numeroFecha)) {
+      masRecientePorCategoria.set(p.categoriaId, p);
+    }
+  }
+
+  // Partidos de prueba (sin fecha calendario real, numeroFecha "demo") -- "recien terminado"
+  // sigue midiendose por la ultima edicion de hoy, no tiene sentido que queden pegados una semana.
+  const pruebasHoy = terminados.filter((p) => {
+    if (p.fecha) return false;
+    const updatedAt = p.updatedAt;
+    if (!updatedAt) return false;
+    return esHoyEnArgentina(updatedAt instanceof Date ? updatedAt : updatedAt.toDate());
+  });
+
+  const terminadosHoy = [...masRecientePorCategoria.values(), ...pruebasHoy];
 
   // Firestore no garantiza el orden de un where().get() -- sin esto, cada visita podia mostrar
   // las categorias en un orden distinto (bug real: Primera terminaba al final de la lista en vez
