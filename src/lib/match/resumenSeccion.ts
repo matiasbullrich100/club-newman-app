@@ -15,12 +15,6 @@ export interface PartidoResumen {
   resultado: Partido["resultado"];
 }
 
-function toMillis(value: Partido["updatedAt"]): number {
-  if (!value) return 0;
-  if (value instanceof Date) return value.getTime();
-  return (value as { toMillis: () => number }).toMillis();
-}
-
 function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
   const n = Number(numeroFecha);
   return Number.isFinite(n) ? n : -Infinity;
@@ -33,14 +27,8 @@ function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
  * mostrando los resultados del ultimo partido jugado toda la semana, hasta que haya uno mas nuevo
  * (la fecha siguiente). No hace falta indice compuesto: se trae "estado==terminado" entero (el
  * volumen de partidos de este club es chico) y se filtra/agrupa en memoria.
- *
- * ordenarPorHorario: Plantel Superior (una sola categoria por partido) se ordena por cuando se
- * jugo de verdad -- el ultimo en terminar arriba, `updatedAt` desc -- para que el resumen siga el
- * orden real de la tarde. Juveniles (varios equipos de la misma edad juegan la misma fecha) sigue
- * ordenado por division/equipo (M15 A, M15 B... M19 A...), default, porque ahi lo que importa es
- * poder ubicar el equipo, no cuando termino cada uno.
  */
-export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ordenarPorHorario = false): Promise<PartidoResumen[]> {
+export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Promise<PartidoResumen[]> {
   const idsSet = new Set(categoriaIds);
   const [enVivoSnap, terminadosSnap] = await Promise.all([
     adminDb.collection("partidos").where("estado", "in", ESTADOS_EN_VIVO).get(),
@@ -78,24 +66,24 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ord
 
   // Firestore no garantiza el orden de un where().get() -- sin esto, cada visita podia mostrar
   // las categorias en un orden distinto (bug real: Primera terminaba al final de la lista en vez
-  // de primera, aunque estuviera ahi). Plantel Superior se ordena por updatedAt (ver
-  // ordenarPorHorario en el comentario de la funcion). Juveniles se ordena por division/equipo,
-  // pero PRIMERO por edad (M19, M17, M16, M15 -- pedido explicito, orden inverso al de
-  // categorias.ts) y DESPUES por letra ascendente dentro de esa edad (A, B, C... ) -- el campo
-  // `orden` de categorias.ts arranca en 0 para cada edad, asi que ordenar solo por ese campo
-  // intercalaba las letras entre divisiones (M15 A, M17 A, M19 A, M15 B...) en vez de agrupar.
+  // de primera, aunque estuviera ahi). Plantel Superior se ordena por importancia (Primera arriba,
+  // Pre H abajo del todo -- el orden canonico de categorias.ts, sin edadId asi que cae directo al
+  // fallback). Juveniles se ordena por division/equipo, pero PRIMERO por edad (M19, M17, M16, M15
+  // -- pedido explicito, orden inverso al de categorias.ts) y DESPUES por letra ascendente dentro
+  // de esa edad (A, B, C...) -- el campo `orden` de categorias.ts arranca en 0 para cada edad, asi
+  // que ordenar solo por ese campo intercalaba las letras entre divisiones (M15 A, M17 A, M19 A,
+  // M15 B...) en vez de agrupar. En ambos casos, en vivo siempre va antes que terminado (arrays
+  // separados abajo), y dentro de cada grupo se aplica el mismo criterio de importancia/division.
   const ordenPorCategoria = new Map<string, number>(CATEGORIAS.map((c) => [c.id, c.orden]));
   const RANGO_EDAD: Record<string, number> = { m19: 0, m17: 1, m16: 2, m15: 3 };
-  const porOrden = ordenarPorHorario
-    ? (a: { updatedAt?: Partido["updatedAt"] }, b: { updatedAt?: Partido["updatedAt"] }) => toMillis(b.updatedAt) - toMillis(a.updatedAt)
-    : (a: { categoriaId: string }, b: { categoriaId: string }) => {
-        const edadA = grupoDeCategoria(a.categoriaId).edadId;
-        const edadB = grupoDeCategoria(b.categoriaId).edadId;
-        const rangoA = edadA ? (RANGO_EDAD[edadA] ?? 99) : 99;
-        const rangoB = edadB ? (RANGO_EDAD[edadB] ?? 99) : 99;
-        if (rangoA !== rangoB) return rangoA - rangoB;
-        return (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
-      };
+  const porOrden = (a: { categoriaId: string }, b: { categoriaId: string }) => {
+    const edadA = grupoDeCategoria(a.categoriaId).edadId;
+    const edadB = grupoDeCategoria(b.categoriaId).edadId;
+    const rangoA = edadA ? (RANGO_EDAD[edadA] ?? 99) : 99;
+    const rangoB = edadB ? (RANGO_EDAD[edadB] ?? 99) : 99;
+    if (rangoA !== rangoB) return rangoA - rangoB;
+    return (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0);
+  };
 
   return [...enVivo.sort(porOrden), ...terminadosHoy.sort(porOrden)].map((p) => ({
     id: p.id,
