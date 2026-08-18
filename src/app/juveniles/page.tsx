@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, CATEGORIAS_JUVENILES, EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
+import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
@@ -33,6 +34,7 @@ export default async function JuvenilesPage() {
           inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
           nombreNewman={nombreNewmanDe(p.categoriaId)}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+          posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
         />
       ))}
 
