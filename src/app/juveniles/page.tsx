@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS, CATEGORIAS_JUVENILES, EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
+import { CATEGORIAS, CATEGORIAS_JUVENILES, nombreNewmanDe } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
@@ -39,32 +39,27 @@ export default async function JuvenilesPage() {
         />
       ))}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 20 }}>
-        {EDADES.map((edad) => {
-          const tieneEquipos = equiposDeEdad(edad.id).length > 0;
-          return (
-            <Link
-              key={edad.id}
-              href={`/juveniles/${edad.id}/equipos`}
-              style={{
-                background: "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
-                border: "1px solid rgba(226,197,120,.25)",
-                borderRadius: 8,
-                padding: "10px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 2,
-              }}
-            >
-              <div style={{ fontWeight: 600, letterSpacing: 0.5, fontSize: "0.85rem", textTransform: "uppercase", color: DORADO_SUAVE }}>
-                {edad.nombre}
-              </div>
-              {!tieneEquipos && <div style={{ fontSize: "0.65rem", opacity: 0.55, fontStyle: "italic" }}>Próximamente</div>}
-            </Link>
-          );
-        })}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 20 }}>
+        {CATEGORIAS_JUVENILES.map((equipo) => (
+          <Link
+            key={equipo.id}
+            href={`/juveniles/${equipo.edadId}/equipo/${equipo.id}`}
+            style={{
+              background: "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
+              border: "1px solid rgba(226,197,120,.25)",
+              borderRadius: 8,
+              padding: "8px 6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontWeight: 600, letterSpacing: 0.3, fontSize: "0.72rem", textTransform: "uppercase", color: DORADO_SUAVE }}>
+              {equipo.nombre}
+            </div>
+          </Link>
+        ))}
       </div>
     </main>
   );
