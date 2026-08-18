@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import FontSizeControl from "@/components/FontSizeControl";
 
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         {children}
         <FontSizeControl />
+        <Analytics />
       </body>
     </html>
   );
