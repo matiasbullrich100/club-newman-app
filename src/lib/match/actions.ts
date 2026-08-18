@@ -644,6 +644,99 @@ export async function corregirJugadorIncidente(partidoId: string, incidenteId: s
 }
 
 /**
+ * Corrige QUIEN salio o entro en un cambio ya publicado (ej. se cargo mal el nombre) sin tocar el
+ * momento en que paso. A diferencia de corregirJugadorIncidente, un cambio tiene DOS jugadores --
+ * `lado` dice cual de los dos se esta corrigiendo. El jugador viejo de ese lado vuelve al estado
+ * en que estaba antes del cambio (en cancha si se corrige "sale", afuera si se corrige "entra") y
+ * el nuevo pasa al estado contrario; si el partido ya termino, se recalculan los minutos jugados
+ * de ambos (mismo patron que eliminarIncidente/publicarCambio).
+ */
+export async function corregirJugadorCambio(partidoId: string, incidenteId: string, lado: "sale" | "entra", nuevoJugadorId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef, liveStateRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, incSnap, nuevoSnap, liveSnap, incidentesSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(incidenteRef),
+      tx.get(partidoRef.collection("plantel").doc(nuevoJugadorId)),
+      tx.get(liveStateRef),
+      tx.get(partidoRef.collection("incidentes")),
+    ]);
+    if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
+    if (!nuevoSnap.exists) throw new Error("Jugador no encontrado en el plantel");
+    const partido = partidoSnap.data() as Partido;
+    const inc = incSnap.data() as Incidente;
+    const nuevo = nuevoSnap.data() as JugadorPartido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (inc.tipo !== "cambio") throw new Error("Esta incidencia no es un cambio");
+    if (partido.estado !== "en_juego" && partido.estado !== "entretiempo" && partido.estado !== "terminado") {
+      throw new Error("El partido tiene que estar en juego o terminado para corregir un cambio");
+    }
+    const viejoId = lado === "sale" ? inc.jugadorSaleId : inc.jugadorEntraId;
+    if (!viejoId) throw new Error("Este cambio no tiene ese lado para corregir");
+    if (viejoId === nuevoJugadorId) return;
+
+    const viejoRef = partidoRef.collection("plantel").doc(viejoId);
+    const viejoSnap = await tx.get(viejoRef);
+    if (!viejoSnap.exists) throw new Error("Datos del partido incompletos");
+    const viejo = viejoSnap.data() as JugadorPartido;
+    const nuevoRef = partidoRef.collection("plantel").doc(nuevoJugadorId);
+
+    let nuevoEnCanchaIds = partido.enCanchaIds;
+    if (lado === "sale") {
+      // El viejo en realidad nunca salio -- vuelve a cancha. El nuevo es quien salio de verdad.
+      tx.update(viejoRef, { enCancha: true });
+      tx.update(nuevoRef, { enCancha: false });
+      if (!nuevoEnCanchaIds.includes(viejoId)) nuevoEnCanchaIds = [...nuevoEnCanchaIds, viejoId];
+      nuevoEnCanchaIds = nuevoEnCanchaIds.filter((id) => id !== nuevoJugadorId);
+      tx.update(incidenteRef, { jugadorSaleId: nuevoJugadorId, jugadorSaleNombre: nuevo.nombre });
+    } else {
+      tx.update(viejoRef, { enCancha: false });
+      tx.update(nuevoRef, { enCancha: true });
+      nuevoEnCanchaIds = nuevoEnCanchaIds.filter((id) => id !== viejoId);
+      if (!nuevoEnCanchaIds.includes(nuevoJugadorId)) nuevoEnCanchaIds = [...nuevoEnCanchaIds, nuevoJugadorId];
+      tx.update(incidenteRef, { jugadorEntraId: nuevoJugadorId, jugadorEntraNombre: nuevo.nombre });
+    }
+    tx.update(partidoRef, { enCanchaIds: nuevoEnCanchaIds, updatedAt: FieldValue.serverTimestamp() });
+
+    if (partido.estado === "terminado" && liveSnap.exists) {
+      const liveState = liveSnap.data() as LiveState;
+      const campoId = lado === "sale" ? "jugadorSaleId" : "jugadorEntraId";
+      const cambiosConCorreccion: CambioEvento[] = incidentesSnap.docs
+        .map((d) => {
+          const data = d.data() as Incidente;
+          return d.id === incidenteId ? { ...data, [campoId]: nuevoJugadorId } : data;
+        })
+        .filter((data) => data.tipo === "cambio")
+        .map((data) => ({ periodo: data.periodo, minuto: data.minuto, jugadorSaleId: data.jugadorSaleId, jugadorEntraId: data.jugadorEntraId }));
+      const duracion1T = (liveState.period1DurationSeconds ?? 0) / 60;
+      const duracion2T = (liveState.period2DurationSeconds ?? 0) / 60;
+      const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+      for (const [jugadorId, datosViejos] of [
+        [viejoId, viejo],
+        [nuevoJugadorId, nuevo],
+      ] as const) {
+        const nm = calcularMinutos([{ jugadorId, titular: datosViejos.titular }], cambiosConCorreccion, duracion1T, duracion2T)[jugadorId];
+        const minutosViejos = (datosViejos.minutosJugados1T ?? 0) + (datosViejos.minutosJugados2T ?? 0);
+        const delta = nm.minutos1T + nm.minutos2T - minutosViejos;
+        tx.update(partidoRef.collection("plantel").doc(jugadorId), { minutosJugados1T: nm.minutos1T, minutosJugados2T: nm.minutos2T });
+        if (!esPartidoDePrueba && delta !== 0) {
+          tx.set(
+            adminDb.collection("jugadores").doc(jugadorId),
+            { nombre: datosViejos.nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(delta) },
+            { merge: true }
+          );
+        }
+      }
+    }
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
  * Elimina una incidencia publicada por error (ej. el arbitro anulo un try despues de cargado).
  * Deshace su efecto en el resultado o en el acumulado de tarjetas segun corresponda. Solo
  * puntos y tarjetas -- cambios/fin de tiempo/interrupciones no se pueden borrar desde aca (tocan
