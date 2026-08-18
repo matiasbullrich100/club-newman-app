@@ -5,7 +5,6 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import type { Partido } from "@/types/firestore";
-import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -78,7 +77,7 @@ export default async function CategoriaPage({
                   </>
                 )
               }
-              notaSecundaria={partido.fecha ? formatFecha(partido.fecha, "short") : ""}
+              notaSecundaria={partido.amistoso && "Amistoso"}
             />
           ) : null
         )}

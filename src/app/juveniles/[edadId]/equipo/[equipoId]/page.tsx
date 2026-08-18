@@ -4,7 +4,6 @@ import { getSession } from "@/lib/auth/session";
 import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import type { Partido, PosicionesTorneo } from "@/types/firestore";
-import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -84,16 +83,7 @@ export default async function EquipoJuvenilesPage({
                   </>
                 )
               }
-              notaSecundaria={
-                <>
-                  {partido.fecha
-                    ? partido.hora && partido.estado !== "terminado"
-                      ? `${formatFecha(partido.fecha, "short")} · ${partido.hora}`
-                      : formatFecha(partido.fecha, "short")
-                    : ""}
-                  {partido.amistoso && " · Amistoso"}
-                </>
-              }
+              notaSecundaria={partido.amistoso && "Amistoso"}
             />
           ) : null
         )}

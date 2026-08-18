@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Incidente, Partido } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
-import { formatFecha, capitalizarPrimera } from "@/lib/fecha";
+import { formatFechaCorta } from "@/lib/fecha";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { MatchupText } from "./FixtureRow";
 import Formaciones from "./Formaciones";
@@ -88,6 +88,11 @@ export default function PartidoHistorico({
         </p>
       )}
       <div style={cardStyle}>
+        {partido.fecha && (
+          <p style={{ textAlign: "center", margin: "0 0 4px", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, color: DORADO_SUAVE }}>
+            Fecha #{partido.numeroFecha} · {formatFechaCorta(partido.fecha)}
+          </p>
+        )}
         {partido.amistoso && (
           <p style={{ textAlign: "center", margin: "0 0 6px", fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, color: DORADO }}>
             Amistoso
@@ -106,10 +111,9 @@ export default function PartidoHistorico({
             <p style={{ fontSize: "1.05rem", margin: 0 }}>
               <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={partido.resultado} nombreNewman={nombreNewman} />
             </p>
-            {(partido.fecha || partido.hora || partido.cancha) && (
+            {(partido.hora || partido.cancha) && (
               <p style={{ opacity: 0.7, fontSize: "0.82rem", marginTop: 6 }}>
-                {partido.fecha && capitalizarPrimera(formatFecha(partido.fecha, "long"))}
-                {partido.hora && ` · ${partido.hora} hs`}
+                {partido.hora && `${partido.hora} hs`}
                 {partido.cancha && ` en ${partido.cancha}`}
               </p>
             )}

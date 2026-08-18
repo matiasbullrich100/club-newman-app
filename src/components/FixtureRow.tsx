@@ -76,12 +76,12 @@ export default function FixtureRow({
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "center",
-        gap: 4,
+        gap: 2,
         background: jugada ? NEGRO_JUGADA : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
         border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.25)"}`,
         borderRadius: 10,
-        padding: "14px 12px",
-        minHeight: 64,
+        padding: "9px 12px",
+        minHeight: 40,
         minWidth: 0,
         width: "100%",
       }}
@@ -90,16 +90,16 @@ export default function FixtureRow({
         style={{
           fontWeight: 700,
           letterSpacing: 0.3,
-          fontSize: "0.94rem",
+          fontSize: "0.88rem",
           textTransform: "uppercase",
           color: DORADO_SUAVE,
-          lineHeight: 1.3,
+          lineHeight: 1.25,
           width: "100%",
         }}
       >
         {tituloPrincipal}
       </div>
-      <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>{notaSecundaria}</div>
+      {notaSecundaria && <div style={{ fontSize: "0.72rem", opacity: 0.7 }}>{notaSecundaria}</div>}
     </Link>
   );
 }
