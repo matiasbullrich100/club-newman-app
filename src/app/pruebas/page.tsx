@@ -15,6 +15,7 @@ const PARTIDOS_DEMO = [
   { id: "pre-a-test-beromama", label: "Pre A", categoriaId: "pre-a" },
   { id: "demo-partido-1", label: "Pre B", categoriaId: "demo" },
   { id: "demo-partido-2", label: "M-22", categoriaId: "m-22" },
+  { id: "m15-c-test-cambio", label: "M15 C", categoriaId: "m15-c" },
 ];
 
 export default async function PruebasPage() {
