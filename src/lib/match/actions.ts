@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase-admin";
-import { getSession, puedeOperarCategoria } from "@/lib/auth/session";
+import { getSession, puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
 import { calcularBonus } from "./bonus";
@@ -1270,7 +1270,7 @@ export async function reiniciarPartido(partidoId: string): Promise<void> {
   const partidoSnap = await partidoRef.get();
   if (!partidoSnap.exists) throw new Error("Partido no encontrado");
   const partido = partidoSnap.data() as Partido;
-  if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+  if (!esManagerDeCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
 
   const [plantelSnap, incidentesSnap] = await Promise.all([
     partidoRef.collection("plantel").get(),

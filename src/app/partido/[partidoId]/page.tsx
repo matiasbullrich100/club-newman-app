@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { puedeOperarCategoria } from "@/lib/auth/scope";
+import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
@@ -37,7 +37,7 @@ export default async function PartidoPage({
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
-  const mostrarReset = esPartidoDePrueba && session?.rol === "manager" && puedeOperarCategoria(session, partido.categoriaId);
+  const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
   // numeroFecha "demo" (partidos de prueba, fuera de cualquier esquema real) no tiene vista de
   // fecha propia -- /fecha o /juveniles/.../fecha devuelven 404 para un numero fuera de rango.
   const numero = Number(partido.numeroFecha);
@@ -51,6 +51,7 @@ export default async function PartidoPage({
         ? `/juveniles/${categoria.edadId}/fecha/${numero}`
         : `/fecha/${numero}`;
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
+  const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
 
   // Boton "Tabla de posiciones al [fecha]" en PartidoHistorico -- la fecha es la de la ULTIMA
   // actualizacion de la tabla cacheada (ver /posiciones/[categoriaId]), no la fecha de ESTE
@@ -154,7 +155,7 @@ export default async function PartidoPage({
           </div>
         )}
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
-        {puedeOperar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
+        {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );
@@ -232,7 +233,7 @@ export default async function PartidoPage({
           />
         )}
         {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
-        {puedeOperar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
+        {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );

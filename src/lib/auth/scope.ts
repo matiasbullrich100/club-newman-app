@@ -16,13 +16,21 @@ import type { SessionPayload } from "./session";
  */
 export function puedeOperarCategoria(session: SessionPayload | null, categoriaId: string): boolean {
   if (!session) return false;
-  if (session.rol === "manager") {
-    if (!session.alcance) return true;
-    if (session.alcance === "superior") return grupoDeCategoria(categoriaId).grupo === "superior";
-    const cat = CATEGORIAS.find((c) => c.id === categoriaId);
-    return cat?.grupo === "juveniles" && cat.edadId === session.alcance;
-  }
+  if (session.rol === "manager") return esManagerDeCategoria(session, categoriaId);
   return session.rol === "designado" && session.categoriaId === categoriaId;
+}
+
+/**
+ * Igual que puedeOperarCategoria pero sin el caso "designado" -- para acciones reservadas al
+ * manager de la division (o al administrador sin alcance), como Reiniciar partido: el designado
+ * que corre el partido en vivo no debe poder borrar el resultado y las incidencias.
+ */
+export function esManagerDeCategoria(session: SessionPayload | null, categoriaId: string): boolean {
+  if (!session || session.rol !== "manager") return false;
+  if (!session.alcance) return true;
+  if (session.alcance === "superior") return grupoDeCategoria(categoriaId).grupo === "superior";
+  const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+  return cat?.grupo === "juveniles" && cat.edadId === session.alcance;
 }
 
 /** Mismo alcance que puedeOperarCategoria, pero para entrar a /estadisticas/[grupoId]. */
