@@ -37,6 +37,7 @@ export default async function PlantelSuperiorPage() {
           inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
+          fixtureHref={`/fixture/${p.categoriaId}`}
         />
       ))}
 

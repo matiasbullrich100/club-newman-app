@@ -15,6 +15,18 @@ const ESTADOS_EN_VIVO = new Set<EstadoPartido>(["en_juego", "entretiempo", "susp
 // encabezados) se sigue mostrando el nombre completo de categorias.ts.
 const NOMBRES_CORTOS: Record<string, string> = { Intermedia: "Inter" };
 
+const botonChico: React.CSSProperties = {
+  flex: "0 0 auto",
+  fontSize: "0.55rem",
+  fontWeight: 700,
+  textTransform: "uppercase",
+  letterSpacing: 0.3,
+  color: DORADO_SUAVE,
+  border: "1px solid rgba(226,197,120,.4)",
+  borderRadius: 6,
+  padding: "3px 5px",
+};
+
 interface EstadoPartidoLive {
   esLocal: boolean;
   rival: string;
@@ -29,6 +41,7 @@ export default function LiveBanner({
   nombreNewman,
   esPrueba,
   posicionesHref,
+  fixtureHref,
 }: {
   partidoId: string;
   categoriaNombre: string;
@@ -41,6 +54,8 @@ export default function LiveBanner({
   // Solo si la categoria tiene torneo de URBA asignado (ver TORNEOS_URBA) -- si no hay, no hay
   // tabla de posiciones para mostrar.
   posicionesHref?: string;
+  // Siempre presente -- lleva a /fixture/{categoriaId} (ver ese picker).
+  fixtureHref?: string;
 }) {
   const [partido, setPartido] = useState<EstadoPartidoLive>(inicial);
 
@@ -90,25 +105,17 @@ export default function LiveBanner({
               textAlign: "right",
             }}
           >
-            {enVivo ? "● En juego" : "Terminado"}
+            {enVivo ? "● En juego" : "Final"}
           </span>
         </Link>
         {posicionesHref && (
-          <Link
-            href={posicionesHref}
-            style={{
-              flex: "0 0 auto",
-              fontSize: "0.55rem",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: 0.3,
-              color: DORADO_SUAVE,
-              border: "1px solid rgba(226,197,120,.4)",
-              borderRadius: 6,
-              padding: "3px 5px",
-            }}
-          >
-            Pos
+          <Link href={posicionesHref} style={botonChico}>
+            Tabla
+          </Link>
+        )}
+        {fixtureHref && (
+          <Link href={fixtureHref} style={botonChico}>
+            Fixture
           </Link>
         )}
       </div>

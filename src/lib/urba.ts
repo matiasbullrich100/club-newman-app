@@ -40,6 +40,7 @@ const ABREVIATURAS_CLUB: { patron: RegExp; corto: string }[] = [
   { patron: /^Buenos\s+Aires(?:\s+C(?:ricket)?\s*&?\s*R(?:ugby)?\s*C(?:lub)?)?\s*([A-Za-z])?$/i, corto: "BACRC" },
   { patron: /^A\.?\s*D\.?\s*Francesa\s*([A-Za-z])?$/i, corto: "D. Francesa" },
   { patron: /^(?:Club\s+)?(?:C\.?\s*U\.?|Universitario)\s*(?:de\s+)?Quilmes\s*([A-Za-z])?$/i, corto: "C.U.Q." },
+  { patron: /^G(?:imnasia)?\.?\s*y\s*Esgrima(?:\s+(?:de\s+)?Buenos\s+Aires)?\s*([A-Za-z])?$/i, corto: "GEBA" },
 ];
 
 // Exportada porque tambien se usa para corregir el campo `rival` de partidos cargados a mano
