@@ -9,9 +9,9 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // Pantalla intermedia entre el resumen de partido y el fixture -- "Fixture Newman X" es el
 // fixture de nuestro equipo puntual (ya existe, ver /categoria o /juveniles/.../equipo). "Fixture
-// División" (el calendario completo del campeonato en URBA, todos los equipos) todavía no está --
-// la API pública de URBA no expone un endpoint de partidos/fixture, solo posiciones (ver
-// src/lib/urba.ts). Cuando se resuelva eso, se agrega el segundo botón acá.
+// División" (el calendario completo del campeonato en URBA, todos los equipos) todavía no tiene de
+// donde traer los datos -- la API pública de URBA no expone un endpoint de partidos/fixture, solo
+// posiciones (ver src/lib/urba.ts) -- asi que por ahora es un boton inerte con "Proximamente".
 export default async function FixturePickerPage({ params }: { params: Promise<{ categoriaId: string }> }) {
   const { categoriaId } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
@@ -52,6 +52,23 @@ export default async function FixturePickerPage({ params }: { params: Promise<{ 
         >
           Fixture {nombreNewman}
         </Link>
+        <div
+          style={{
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            padding: "16px",
+            borderRadius: 10,
+            border: "1px solid rgba(226,197,120,.25)",
+            color: DORADO_SUAVE,
+            opacity: 0.5,
+          }}
+        >
+          Fixture División
+          <div style={{ fontSize: "0.65rem", letterSpacing: 0.5, fontWeight: 400, fontStyle: "italic", marginTop: 4 }}>Próximamente</div>
+        </div>
       </div>
     </main>
   );
