@@ -63,7 +63,7 @@ export function describirIncidente(inc: Incidente, rivalNombre?: string, nombreN
     if (inc.jugadorEntraNombre && !inc.jugadorSaleNombre) {
       return `Entra ${inc.jugadorEntraNombre} — ${nombreNewman} (reingreso)`;
     }
-    return `Cambio — ${nombreNewman} — Sale ${inc.jugadorSaleNombre ?? "?"}, entra ${inc.jugadorEntraNombre ?? "?"}`;
+    return `Cambio ${nombreNewman} — Sale ${inc.jugadorSaleNombre ?? "?"}, entra ${inc.jugadorEntraNombre ?? "?"}`;
   }
   if (SIN_EQUIPO.includes(inc.tipo)) {
     return ETIQUETAS_INCIDENTE[inc.tipo];

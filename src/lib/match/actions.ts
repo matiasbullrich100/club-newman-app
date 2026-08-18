@@ -651,7 +651,7 @@ export async function corregirJugadorIncidente(partidoId: string, incidenteId: s
  */
 export async function eliminarIncidente(partidoId: string, incidenteId: string): Promise<void> {
   const session = await getSession();
-  const { partidoRef } = refs(partidoId);
+  const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
 
   await adminDb.runTransaction(async (tx) => {
@@ -666,6 +666,75 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
     if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
       throw new Error("El partido tiene que estar en juego o terminado para eliminar una jugada");
+    }
+
+    // "cambio" no pertenece a ninguna familia (FAMILIA_PUNTOS/FAMILIA_TARJETA) -- necesita sus
+    // propias lecturas (liveState + plantel de sale/entra) antes de escribir nada, asi que se
+    // resuelve aparte, ANTES de los otros dos casos (todas las lecturas de una transaccion tienen
+    // que ir antes que cualquier escritura).
+    let cambioLiveState: LiveState | null = null;
+    let cambioSale: JugadorPartido | null = null;
+    let cambioEntra: JugadorPartido | null = null;
+    if (inc.tipo === "cambio") {
+      const [liveSnap, saleSnap, entraSnap] = await Promise.all([
+        tx.get(liveStateRef),
+        inc.jugadorSaleId ? tx.get(partidoRef.collection("plantel").doc(inc.jugadorSaleId)) : Promise.resolve(null),
+        inc.jugadorEntraId ? tx.get(partidoRef.collection("plantel").doc(inc.jugadorEntraId)) : Promise.resolve(null),
+      ]);
+      cambioLiveState = liveSnap.exists ? (liveSnap.data() as LiveState) : null;
+      cambioSale = saleSnap?.exists ? (saleSnap.data() as JugadorPartido) : null;
+      cambioEntra = entraSnap?.exists ? (entraSnap.data() as JugadorPartido) : null;
+    }
+
+    if (inc.tipo === "cambio") {
+      // Revertir el efecto: quien salio vuelve a estar en cancha, quien entro deja de estarlo. No
+      // se borra su doc de plantel/ aunque se haya agregado sobre la marcha (agregadoEnVivo) --
+      // otras jugadas ya cargadas pueden nombrarlo, alcanza con sacarle el enCancha.
+      let nuevoEnCanchaIds = partido.enCanchaIds;
+      if (inc.jugadorSaleId && cambioSale) {
+        tx.update(partidoRef.collection("plantel").doc(inc.jugadorSaleId), { enCancha: true });
+        if (!nuevoEnCanchaIds.includes(inc.jugadorSaleId)) nuevoEnCanchaIds = [...nuevoEnCanchaIds, inc.jugadorSaleId];
+      }
+      if (inc.jugadorEntraId && cambioEntra) {
+        tx.update(partidoRef.collection("plantel").doc(inc.jugadorEntraId), { enCancha: false });
+        nuevoEnCanchaIds = nuevoEnCanchaIds.filter((id) => id !== inc.jugadorEntraId);
+      }
+      tx.update(partidoRef, { enCanchaIds: nuevoEnCanchaIds, updatedAt: FieldValue.serverTimestamp() });
+
+      // terminarPartido() ya calculo y sumo minutosJugados1T/2T al total acumulado en jugadores/ --
+      // si se borra un cambio despues, hay que recalcular los dos jugadores afectados con el
+      // historial de cambios ya sin este, y ajustar el total por la diferencia (mismo patron que
+      // la correccion post-partido en publicarCambio, pero al reves).
+      if (partido.estado === "terminado" && cambioLiveState) {
+        const cambiosRestantes: CambioEvento[] = incidentesSnap.docs
+          .filter((d) => d.id !== incidenteId)
+          .map((d) => d.data() as Incidente)
+          .filter((data) => data.tipo === "cambio")
+          .map((data) => ({ periodo: data.periodo, minuto: data.minuto, jugadorSaleId: data.jugadorSaleId, jugadorEntraId: data.jugadorEntraId }));
+        const duracion1T = (cambioLiveState.period1DurationSeconds ?? 0) / 60;
+        const duracion2T = (cambioLiveState.period2DurationSeconds ?? 0) / 60;
+        const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+        for (const [jugadorId, datosViejos] of [
+          [inc.jugadorSaleId, cambioSale],
+          [inc.jugadorEntraId, cambioEntra],
+        ] as const) {
+          if (!jugadorId || !datosViejos) continue;
+          const nm = calcularMinutos([{ jugadorId, titular: datosViejos.titular }], cambiosRestantes, duracion1T, duracion2T)[jugadorId];
+          const minutosViejos = (datosViejos.minutosJugados1T ?? 0) + (datosViejos.minutosJugados2T ?? 0);
+          const delta = nm.minutos1T + nm.minutos2T - minutosViejos;
+          tx.update(partidoRef.collection("plantel").doc(jugadorId), { minutosJugados1T: nm.minutos1T, minutosJugados2T: nm.minutos2T });
+          if (!esPartidoDePrueba && delta !== 0) {
+            tx.set(
+              adminDb.collection("jugadores").doc(jugadorId),
+              { nombre: datosViejos.nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(delta) },
+              { merge: true }
+            );
+          }
+        }
+      }
+
+      tx.delete(incidenteRef);
+      return;
     }
 
     if (FAMILIA_PUNTOS.includes(inc.tipo)) {

@@ -110,9 +110,10 @@ export default function IncidentesList({
         const cambioDePeriodo = i > 0 && ordenadas[i - 1].periodo !== inc.periodo;
         const esFinDeTiempo = SIN_EQUIPO.includes(inc.tipo);
         const familia = familiaDe(inc.tipo);
-        const editable = puedeEditar && partidoId && familia;
+        const esCambio = inc.tipo === "cambio";
+        const editable = puedeEditar && partidoId && (familia || esCambio);
         const editando = editandoId === inc.id;
-        const puedeCambiarJugador = editable && inc.equipo === "newman" && requierePlayerSelection(inc.tipo) && plantel.length > 0;
+        const puedeCambiarJugador = editable && !esCambio && inc.equipo === "newman" && requierePlayerSelection(inc.tipo) && plantel.length > 0;
         const cambiandoJugador = cambiandoJugadorId === inc.id;
         return (
           <div key={inc.id}>
@@ -170,26 +171,30 @@ export default function IncidentesList({
             </div>
             {editable && editando && confirmandoEliminarId !== inc.id && !cambiandoJugador && (
               <div style={{ padding: "6px 4px 12px 44px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: "0.78rem", opacity: 0.75, width: "100%" }}>Cambiar por:</span>
-                {familia!
-                  .filter((t) => t !== inc.tipo)
-                  .map((t) => (
-                    <button
-                      key={t}
-                      disabled={isPending}
-                      onClick={() => corregir(inc.id, t)}
-                      style={{
-                        fontSize: "0.78rem",
-                        padding: "8px 12px",
-                        borderRadius: 8,
-                        background: "rgba(255,255,255,.06)",
-                        border: "1px solid rgba(226,197,120,.35)",
-                        color: "#f7f1e4",
-                      }}
-                    >
-                      {ETIQUETAS_INCIDENTE[t]}
-                    </button>
-                  ))}
+                {familia && (
+                  <>
+                    <span style={{ fontSize: "0.78rem", opacity: 0.75, width: "100%" }}>Cambiar por:</span>
+                    {familia
+                      .filter((t) => t !== inc.tipo)
+                      .map((t) => (
+                        <button
+                          key={t}
+                          disabled={isPending}
+                          onClick={() => corregir(inc.id, t)}
+                          style={{
+                            fontSize: "0.78rem",
+                            padding: "8px 12px",
+                            borderRadius: 8,
+                            background: "rgba(255,255,255,.06)",
+                            border: "1px solid rgba(226,197,120,.35)",
+                            color: "#f7f1e4",
+                          }}
+                        >
+                          {ETIQUETAS_INCIDENTE[t]}
+                        </button>
+                      ))}
+                  </>
+                )}
                 {puedeCambiarJugador && (
                   <button
                     disabled={isPending}
@@ -240,7 +245,9 @@ export default function IncidentesList({
             {editable && confirmandoEliminarId === inc.id && (
               <div style={{ padding: "6px 4px 12px 44px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <span style={{ fontSize: "0.78rem", width: "100%", color: "#f3caca" }}>
-                  ¿Eliminar esta jugada? Se descuenta del resultado o de las tarjetas.
+                  {esCambio
+                    ? "¿Eliminar este cambio? Quien salió vuelve a estar en cancha, quien entró deja de estarlo, y se recalculan los minutos jugados."
+                    : "¿Eliminar esta jugada? Se descuenta del resultado o de las tarjetas."}
                 </span>
                 <button
                   disabled={isPending}
