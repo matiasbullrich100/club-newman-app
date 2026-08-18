@@ -2,13 +2,14 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { publicarCambio } from "@/lib/match/actions";
+import type { Periodo } from "@/types/firestore";
 import type { JugadorBusqueda, RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, listaOpciones } from "./estilos";
 import BarraAccionFija from "./BarraAccionFija";
 import { norm } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-type Paso = "sale" | "entra" | "confirmar";
+type Paso = "sale" | "entra" | "cuando" | "confirmar";
 
 interface Seleccion {
   jugadorId: string;
@@ -21,22 +22,29 @@ export default function CargaCambio({
   plantel,
   plantelCompleto,
   enCanchaIds,
+  soloEnCancha = true,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
   plantelCompleto: JugadorBusqueda[];
   enCanchaIds: string[];
+  /** false en correcciones post-partido: cualquiera del plantel pudo haber salido/entrado, no
+   * hay forma de saber con certeza quien estaba en cancha en ese momento pasado. */
+  soloEnCancha?: boolean;
 }) {
   const [paso, setPaso] = useState<Paso>("sale");
   const [saleId, setSaleId] = useState<string | null>(null);
   const [entra, setEntra] = useState<Seleccion | null>(null);
   const [buscando, setBuscando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [periodoManual, setPeriodoManual] = useState<Periodo | null>(null);
+  const [minutoManual, setMinutoManual] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const enCancha = plantel.filter((j) => enCanchaIds.includes(j.jugadorId));
-  const banco = plantel.filter((j) => !enCanchaIds.includes(j.jugadorId));
+  const esCorreccion = !soloEnCancha;
+  const enCancha = soloEnCancha ? plantel.filter((j) => enCanchaIds.includes(j.jugadorId)) : plantel;
+  const banco = soloEnCancha ? plantel.filter((j) => !enCanchaIds.includes(j.jugadorId)) : plantel;
   const sale = plantel.find((j) => j.jugadorId === saleId);
 
   // No repetir en el buscador a quien ya se ve arriba (banco de esta formacion).
@@ -53,12 +61,14 @@ export default function CargaCambio({
     setEntra(null);
     setBuscando(false);
     setBusqueda("");
+    setPeriodoManual(null);
+    setMinutoManual("");
     setError(null);
   }
 
   function elegirEntra(seleccion: Seleccion) {
     setEntra(seleccion);
-    setPaso("confirmar");
+    setPaso(esCorreccion ? "cuando" : "confirmar");
   }
 
   function confirmar() {
@@ -70,6 +80,7 @@ export default function CargaCambio({
           jugadorSaleId: saleId,
           jugadorEntraId: entra.jugadorId,
           ...(entra.esNuevo ? { jugadorEntraNombre: entra.nombre } : {}),
+          ...(esCorreccion ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) } : {}),
         });
         reset();
       } catch (e) {
@@ -157,10 +168,62 @@ export default function CargaCambio({
         </div>
       )}
 
+      {paso === "cuando" && (
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿En qué momento pasó?</p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={periodoManual === "1T" ? botonPrimario : botonOpcion} onClick={() => setPeriodoManual("1T")}>
+              1er tiempo
+            </button>
+            <button style={periodoManual === "2T" ? botonPrimario : botonOpcion} onClick={() => setPeriodoManual("2T")}>
+              2do tiempo
+            </button>
+          </div>
+          <label style={{ fontSize: "0.85rem", color: DORADO_SUAVE }}>
+            Minuto
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={99}
+              value={minutoManual}
+              onChange={(e) => setMinutoManual(e.target.value)}
+              style={{
+                display: "block",
+                marginTop: 6,
+                width: "100%",
+                fontSize: "1.1rem",
+                padding: "12px 14px",
+                borderRadius: 10,
+                border: "1px solid rgba(226,197,120,.35)",
+                background: "rgba(255,255,255,.06)",
+                color: "#f7f1e4",
+              }}
+            />
+          </label>
+          <button
+            style={botonPrimario}
+            disabled={!periodoManual || !minutoManual || Number(minutoManual) < 1}
+            onClick={() => setPaso("confirmar")}
+          >
+            Continuar
+          </button>
+          <button style={botonSecundario} onClick={reset}>
+            Cancelar
+          </button>
+        </div>
+      )}
+
       {paso === "confirmar" && (
         <div>
           <p style={{ fontSize: "1.02rem" }}>
             Confirmar: sale <strong>{sale?.nombre}</strong>, entra <strong>{entra?.nombre}</strong>
+            {esCorreccion && periodoManual && minutoManual && (
+              <>
+                {" "}
+                ({periodoManual} {minutoManual}&apos;)
+              </>
+            )}
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
           <BarraAccionFija>

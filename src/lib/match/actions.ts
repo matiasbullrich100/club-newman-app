@@ -728,6 +728,10 @@ export interface PublicarCambioInput {
   // improvisado con alguien de otro equipo de la misma edad/plantel) -- ver CargaCambio.tsx.
   // Con esto, publicarCambio crea su doc en plantel/ sobre la marcha en vez de exigir que exista.
   jugadorEntraNombre?: string;
+  // Solo para corregir un partido terminado: el reloj ya esta congelado, asi que el momento del
+  // cambio lo elige quien lo carga (mismo patron que PublicarIncidenteInput).
+  periodoManual?: Periodo;
+  minutoManual?: number;
 }
 
 export async function publicarCambio(partidoId: string, input: PublicarCambioInput): Promise<void> {
@@ -738,11 +742,12 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
   const incidenteRef = partidoRef.collection("incidentes").doc();
 
   await adminDb.runTransaction(async (tx) => {
-    const [partidoSnap, liveSnap, saleSnap, entraSnap] = await Promise.all([
+    const [partidoSnap, liveSnap, saleSnap, entraSnap, cambiosPreviosSnap] = await Promise.all([
       tx.get(partidoRef),
       tx.get(liveStateRef),
       tx.get(saleRef),
       tx.get(entraRef),
+      tx.get(partidoRef.collection("incidentes").where("tipo", "==", "cambio")),
     ]);
     const entraEsNuevo = !entraSnap.exists;
     if (!partidoSnap.exists || !liveSnap.exists || !saleSnap.exists) {
@@ -759,17 +764,36 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       : (entraSnap.data() as JugadorPartido);
 
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    // Se permite tambien en el entretiempo -- es cuando mas cambios tacticos se hacen en la
-    // practica, y el reloj ya esta frenado (elapsedSeconds/minutoActual usan accumulatedSeconds
-    // congelado, no hace falta nada especial para que el minuto quede bien registrado).
-    if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
-      throw new Error("El partido no está en juego");
-    }
-    if (!sale.enCancha) throw new Error("Ese jugador no está en cancha");
-    if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
 
-    const minuto = minutoActual(liveState);
-    const segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+    // Correccion post-partido: el Designado/Manager puede agregar un cambio que se olvido cargar
+    // en su momento (mismo patron que publicarIncidente). El minuto queda aproximado (el reloj ya
+    // esta congelado) y no exige que sale/entra reflejen el enCanchaIds real de ese momento --
+    // "quien estaba en cancha" ya no se puede saber con certeza despues del hecho.
+    const esCorreccionPostPartido = partido.estado === "terminado";
+    let periodo: Periodo;
+    let minuto: number;
+    let segundoAbsoluto: number;
+    if (esCorreccionPostPartido) {
+      if (!input.periodoManual || !input.minutoManual || input.minutoManual < 1) {
+        throw new Error("Falta el tiempo y el minuto del cambio");
+      }
+      periodo = input.periodoManual;
+      minuto = input.minutoManual;
+      segundoAbsoluto = (minuto - 1) * 60;
+    } else {
+      // Se permite tambien en el entretiempo -- es cuando mas cambios tacticos se hacen en la
+      // practica, y el reloj ya esta frenado (elapsedSeconds/minutoActual usan accumulatedSeconds
+      // congelado, no hace falta nada especial para que el minuto quede bien registrado).
+      if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
+        throw new Error("El partido no está en juego");
+      }
+      if (!sale.enCancha) throw new Error("Ese jugador no está en cancha");
+      if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
+      periodo = liveState.periodo;
+      minuto = minutoActual(liveState);
+      segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+    }
+
     const nuevoEnCancha = partido.enCanchaIds
       .filter((id) => id !== input.jugadorSaleId)
       .concat(input.jugadorEntraId);
@@ -785,7 +809,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       jugadorSaleNombre: sale.nombre,
       jugadorEntraId: input.jugadorEntraId,
       jugadorEntraNombre: entra.nombre,
-      periodo: liveState.periodo,
+      periodo,
       minuto,
       segundoAbsoluto,
       ...(partido.estado === "entretiempo" ? { enEntretiempo: true } : {}),
@@ -793,6 +817,46 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       createdAt: Timestamp.now(),
     };
     tx.set(incidenteRef, incidente);
+
+    // terminarPartido() ya calculo y guardo minutosJugados1T/2T (por partido) y sumo al total
+    // acumulado en jugadores/{id} -- si se corrige un cambio despues, hay que recalcular esos dos
+    // jugadores puntuales con el historial de cambios actualizado y ajustar el total por la
+    // diferencia (no pisarlo, porque ese campo acumula OTROS partidos tambien).
+    if (esCorreccionPostPartido) {
+      const cambiosExistentes: CambioEvento[] = cambiosPreviosSnap.docs.map((d) => {
+        const data = d.data() as Incidente;
+        return { periodo: data.periodo, minuto: data.minuto, jugadorSaleId: data.jugadorSaleId, jugadorEntraId: data.jugadorEntraId };
+      });
+      const todosLosCambios = [...cambiosExistentes, { periodo, minuto, jugadorSaleId: input.jugadorSaleId, jugadorEntraId: input.jugadorEntraId }];
+      const duracion1T = (liveState.period1DurationSeconds ?? 0) / 60;
+      const duracion2T = (liveState.period2DurationSeconds ?? 0) / 60;
+      const nuevosMinutos = calcularMinutos(
+        [
+          { jugadorId: input.jugadorSaleId, titular: sale.titular },
+          { jugadorId: input.jugadorEntraId, titular: entra.titular },
+        ],
+        todosLosCambios,
+        duracion1T,
+        duracion2T
+      );
+      const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+      for (const [jugadorId, jugadorRef, datosViejos, nombre] of [
+        [input.jugadorSaleId, saleRef, sale, sale.nombre],
+        [input.jugadorEntraId, entraRef, entra, entra.nombre],
+      ] as const) {
+        const nm = nuevosMinutos[jugadorId];
+        const minutosViejos = (datosViejos.minutosJugados1T ?? 0) + (datosViejos.minutosJugados2T ?? 0);
+        const delta = nm.minutos1T + nm.minutos2T - minutosViejos;
+        tx.update(jugadorRef, { minutosJugados1T: nm.minutos1T, minutosJugados2T: nm.minutos2T });
+        if (!esPartidoDePrueba && delta !== 0) {
+          tx.set(
+            adminDb.collection("jugadores").doc(jugadorId),
+            { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(delta) },
+            { merge: true }
+          );
+        }
+      }
+    }
   });
 
   revalidatePath(`/partido/${partidoId}`);

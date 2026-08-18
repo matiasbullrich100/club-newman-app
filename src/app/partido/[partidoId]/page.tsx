@@ -14,6 +14,7 @@ import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
 import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
+import CargaCambio from "@/components/panel-designado/CargaCambio";
 import EditarFormacion from "@/components/panel-designado/EditarFormacion";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import ReiniciarPartidoButton from "@/components/ReiniciarPartidoButton";
@@ -74,10 +75,20 @@ export default async function PartidoPage({
 
   // Partido ya jugado: vista estática, para siempre (nunca vuelve a estar operable).
   if (partido.estado === "terminado") {
-    const [plantelSnap, incidentesSnap] = await Promise.all([
+    const grupoTerminado = grupoDeCategoria(partido.categoriaId);
+    const jugadoresQueryTerminado =
+      grupoTerminado.grupo === "superior"
+        ? adminDb.collection("jugadores").where("grupo", "==", "superior")
+        : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupoTerminado.edadId);
+    const [plantelSnap, incidentesSnap, jugadoresSnapTerminado] = await Promise.all([
       partidoRef.collection("plantel").get(),
       partidoRef.collection("incidentes").orderBy("createdAt").get(),
+      jugadoresQueryTerminado.get(),
     ]);
+    const plantelCompletoTerminado = jugadoresSnapTerminado.docs.map((d) => ({
+      jugadorId: d.id,
+      nombre: (d.data() as JugadorAgregado).nombre,
+    }));
     const plantel = ordenarPorDorsal(
       plantelSnap.docs.map((d) => {
         const data = d.data() as JugadorPartido;
@@ -125,11 +136,18 @@ export default async function PartidoPage({
               Corregir el partido
             </h2>
             <p style={{ fontSize: "0.8rem", opacity: 0.75, marginTop: 0, marginBottom: 10 }}>
-              Para agregar una jugada que faltó cargar. El minuto queda aproximado.
+              Para agregar una jugada o un cambio que faltó cargar. El minuto queda aproximado.
             </p>
             <CargaIncidencia
               partidoId={partidoId}
               plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
+              enCanchaIds={partido.enCanchaIds}
+              soloEnCancha={false}
+            />
+            <CargaCambio
+              partidoId={partidoId}
+              plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
+              plantelCompleto={plantelCompletoTerminado}
               enCanchaIds={partido.enCanchaIds}
               soloEnCancha={false}
             />
