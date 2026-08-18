@@ -19,7 +19,7 @@ function golesDe(equipo: Equipo, resultado: Resultado) {
 }
 
 /**
- * "Newman 31 (B) - 3 BACRC" (jugado) o "Newman vs BACRC" (sin jugar) — reusado en filas y títulos.
+ * "Newman 31 (B) - 3 BACRC" (jugado) o "Newman - BACRC" (sin jugar) — reusado en filas y títulos.
  * nombreNewman: "Newman" salvo en Juveniles, donde se aclara el equipo (ej. "Newman A").
  */
 export function MatchupText({
@@ -51,7 +51,7 @@ export function MatchupText({
   }
   return (
     <>
-      {nombreEquipo(local)} <em style={{ fontSize: "0.65em", textTransform: "lowercase", fontWeight: 400, opacity: 0.75 }}>vs</em>{" "}
+      {nombreEquipo(local)} <em style={{ fontSize: "0.75em", fontWeight: 400, opacity: 0.75, margin: "0 2px" }}>-</em>{" "}
       {nombreEquipo(visitante)}
     </>
   );

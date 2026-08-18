@@ -24,15 +24,41 @@ interface FilaPosicionUrbaRaw {
   championship: { name: string };
 }
 
-// URBA nombra a Regatas Bella Vista distinto segun la categoria -- "Regatas Bella Vista" entero
-// en Plantel Superior, "Regatas B. Vista" + la letra de grupo pegada en Juveniles (ej. "Regatas
-// B. Vista A"). El club ya tiene su propia convencion corta para este rival en todo el resto de
-// la app (ver el comentario en migrate-juveniles-fixture.ts: "Regatas" no "Regatas BV/de Bella
-// Vista") -- se normaliza aca para que las tablas de posiciones respeten lo mismo.
-function normalizarNombreEquipo(nombre: string): string {
-  const match = nombre.match(/^Regatas\s+(?:Bella|B\.?)\s*Vista\s*([A-Za-z])?$/i);
-  if (match) return match[1] ? `Regatas ${match[1].toUpperCase()}` : "Regatas";
+// URBA nombra a varios rivales con el nombre largo/oficial, distinto por categoria (a veces con
+// una letra de grupo pegada al final, ej. "Regatas B. Vista A") -- el club tiene su propia
+// convencion corta para estos en toda la app (fixtures cargados a mano y tablas de posiciones).
+// Cada regla matchea el nombre completo (con la letra de grupo opcional al final) y devuelve la
+// version corta + esa misma letra. Orden importa: mas especifico primero (ej. "Manuel Belgrano"
+// antes que "Belgrano Athletic", dos clubes distintos que comparten la palabra "Belgrano").
+const ABREVIATURAS_CLUB: { patron: RegExp; corto: string }[] = [
+  { patron: /^Regatas\s+(?:Bella|B\.?)\s*Vista\s*([A-Za-z])?$/i, corto: "Regatas" },
+  { patron: /^Manuel\s+Belgrano\s*([A-Za-z])?$/i, corto: "M. Belgrano" },
+  { patron: /^Belgrano\s+Athl(?:etic|ético|\.)?\s*([A-Za-z])?$/i, corto: "Belgrano" },
+  { patron: /^Champagnat\s*([A-Za-z])?$/i, corto: "Champa" },
+  { patron: /^(?:Club\s+)?(?:Atl(?:ético|etico)\.?\s+)?(?:Los\s+)?Matreros\s*([A-Za-z])?$/i, corto: "Matreros" },
+  { patron: /^Atl(?:ético|etico)\.?\s+del\s+Rosario\s*([A-Za-z])?$/i, corto: "Atl. del Rosario" },
+  { patron: /^Buenos\s+Aires(?:\s+C(?:ricket)?\s*&?\s*R(?:ugby)?\s*C(?:lub)?)?\s*([A-Za-z])?$/i, corto: "BACRC" },
+  { patron: /^A\.?\s*D\.?\s*Francesa\s*([A-Za-z])?$/i, corto: "D. Francesa" },
+  { patron: /^(?:Club\s+)?(?:C\.?\s*U\.?|Universitario)\s*(?:de\s+)?Quilmes\s*([A-Za-z])?$/i, corto: "C.U.Q." },
+];
+
+// Exportada porque tambien se usa para corregir el campo `rival` de partidos cargados a mano
+// (fixtures que no vienen de URBA) con la misma convencion corta.
+export function normalizarNombreEquipo(nombre: string): string {
+  for (const { patron, corto } of ABREVIATURAS_CLUB) {
+    const match = nombre.match(patron);
+    if (match) return match[1] ? `${corto} ${match[1].toUpperCase()}` : corto;
+  }
   return nombre;
+}
+
+// "Menores de 15 - Segunda Rueda - Formativa A" -> "M15 - Formativa A" -- la rueda no aporta nada
+// util aca y "Menores de N" ocupa mucho espacio en una tarjeta angosta.
+function normalizarChampionshipName(nombre: string): string {
+  return nombre
+    .replace(/\s*-\s*(?:Primera|Segunda)\s+Rueda\s*-\s*/i, " - ")
+    .replace(/Menores de (\d+)/i, "M$1")
+    .trim();
 }
 
 export async function fetchPosicionesUrba(
@@ -61,7 +87,7 @@ export async function fetchPosicionesUrba(
     }))
     .sort((a, b) => a.posicion - b.posicion);
 
-  return { championshipName: crudo[0]?.championship.name ?? "", filas };
+  return { championshipName: normalizarChampionshipName(crudo[0]?.championship.name ?? ""), filas };
 }
 
 interface ChampionshipUrba {

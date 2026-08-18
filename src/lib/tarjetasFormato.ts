@@ -9,5 +9,5 @@ export interface FechaTarjeta {
 }
 
 export function etiquetaFecha(f: FechaTarjeta): string {
-  return `Fecha ${f.numeroFecha} vs ${f.rival}`;
+  return `Fecha ${f.numeroFecha} - ${f.rival}`;
 }
