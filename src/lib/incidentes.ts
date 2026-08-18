@@ -70,9 +70,9 @@ export function describirIncidente(inc: Incidente, rivalNombre?: string, nombreN
   }
   if (inc.equipo === "newman") {
     const quien = inc.jugadorNombre ? `${nombreNewman} — ${inc.jugadorNombre}` : nombreNewman;
-    return `${ETIQUETAS_INCIDENTE[inc.tipo]} — ${quien}`;
+    return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${quien}`;
   }
-  return `${ETIQUETAS_INCIDENTE[inc.tipo]} — ${rivalNombre ?? "Rival"}`;
+  return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${rivalNombre ?? "Rival"}`;
 }
 
 const PRIORIDAD_PERIODO: Record<string, number> = { "1T": 0, "2T": 1 };
