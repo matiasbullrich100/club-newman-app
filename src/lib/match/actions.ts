@@ -112,7 +112,9 @@ export async function cortar1T(partidoId: string): Promise<void> {
     const incidente: Incidente = {
       tipo: "fin_1t",
       periodo: "1T",
-      minuto: Math.round(accumulated / 60),
+      // Math.floor(seg/60)+1 -- misma convencion "minuto en curso" que minutoActual() y suspender(),
+      // para que no quede antes que una jugada publicada segundos antes dentro del mismo minuto.
+      minuto: Math.floor(accumulated / 60) + 1,
       segundoAbsoluto: Math.floor(accumulated),
       publicadoPorCuentaId: session!.cuentaId,
       createdAt: Timestamp.now(),
@@ -254,26 +256,15 @@ export async function terminarPartido(partidoId: string): Promise<void> {
   });
 
   if (liveState.periodo) {
-    const minutoFin = Math.round(accumulated / 60);
-    // Si se termina directo desde el entretiempo (sin arrancar el 2do tiempo), cortar1T() ya
-    // registro el "Final 1er tiempo" -- no duplicarlo, o queda pegado junto al entretiempo y
-    // "Final del partido" pierde su lugar como ultima incidencia.
-    if (partido.estado !== "entretiempo") {
-      const finIncidente: Incidente = {
-        tipo: liveState.periodo === "1T" ? "fin_1t" : "fin_2t",
-        periodo: liveState.periodo,
-        minuto: minutoFin,
-        segundoAbsoluto: Math.floor(accumulated),
-        publicadoPorCuentaId: session!.cuentaId,
-        createdAt: Timestamp.now(),
-      };
-      batch.set(partidoRef.collection("incidentes").doc(), finIncidente);
-    }
-
+    // Solo "Final del partido" -- "Final 1er tiempo" ya lo registra cortar1T() en el entretiempo
+    // real; duplicarlo (o agregar "Final 2do tiempo") junto a este es redundante, casi siempre en
+    // el mismo minuto.
     const finPartidoIncidente: Incidente = {
       tipo: "fin_partido",
       periodo: liveState.periodo,
-      minuto: minutoFin,
+      // Math.floor(seg/60)+1 -- misma convencion "minuto en curso" que minutoActual(), para que no
+      // quede antes que una jugada publicada segundos antes dentro del mismo minuto.
+      minuto: Math.floor(accumulated / 60) + 1,
       segundoAbsoluto: Math.floor(accumulated),
       publicadoPorCuentaId: session!.cuentaId,
       createdAt: Timestamp.now(),

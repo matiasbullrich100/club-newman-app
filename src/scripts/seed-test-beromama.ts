@@ -39,6 +39,10 @@ async function main() {
   const { adminDb } = await import("../lib/firebase-admin");
 
   const partidoRef = adminDb.collection("partidos").doc(PARTIDO_ID);
+
+  const incidentesSnap = await partidoRef.collection("incidentes").get();
+  for (const doc of incidentesSnap.docs) await doc.ref.delete();
+
   const partido: Partido = {
     categoriaId: "pre-a",
     numeroFecha: "test",
