@@ -20,6 +20,13 @@ export default async function JuvenilesPage() {
   const pruebasVisibles = pruebasVisiblesPara(session);
   const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
 
+  // Grilla de equipos al pie: M19 primero, M15 al final (orden pedido explicitamente, al reves
+  // del orden de CATEGORIAS_JUVENILES que va de menor a mayor edad).
+  const RANGO_EDAD_DESC: Record<string, number> = { m19: 0, m17: 1, m16: 2, m15: 3 };
+  const equiposOrdenados = [...CATEGORIAS_JUVENILES].sort(
+    (a, b) => RANGO_EDAD_DESC[a.edadId] - RANGO_EDAD_DESC[b.edadId] || a.orden - b.orden
+  );
+
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
@@ -40,7 +47,7 @@ export default async function JuvenilesPage() {
       ))}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 20 }}>
-        {CATEGORIAS_JUVENILES.map((equipo) => (
+        {equiposOrdenados.map((equipo) => (
           <Link
             key={equipo.id}
             href={`/juveniles/${equipo.edadId}/equipo/${equipo.id}`}
