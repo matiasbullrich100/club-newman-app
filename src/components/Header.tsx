@@ -12,9 +12,13 @@ function LineaDorada() {
 export default function Header({
   rightLabel,
   tituloHome,
+  logo = "top14",
 }: {
   rightLabel?: string;
   tituloHome?: boolean;
+  // Juveniles no juega el torneo "TOP 14" (eso es una categoria puntual de Plantel Superior) --
+  // ahi va el escudo generico de URBA en vez del de TOP 14.
+  logo?: "top14" | "urba";
 }) {
   return (
     <div
@@ -92,8 +96,8 @@ export default function Header({
           )}
           <span style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Image
-              src="/logo-top14.png"
-              alt="URBA Top 14"
+              src={logo === "urba" ? "/logo-urba.png" : "/logo-top14.png"}
+              alt={logo === "urba" ? "URBA" : "URBA Top 14"}
               width={48}
               height={48}
               style={{ width: "100%", height: "100%", objectFit: "contain" }}

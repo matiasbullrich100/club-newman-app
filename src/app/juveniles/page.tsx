@@ -31,7 +31,7 @@ export default async function JuvenilesPage() {
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
       <SessionBar session={session} />
-      <Header rightLabel="Juveniles" />
+      <Header rightLabel="Juveniles" logo="urba" />
 
       {resumen.map((p) => (
         <LiveBanner

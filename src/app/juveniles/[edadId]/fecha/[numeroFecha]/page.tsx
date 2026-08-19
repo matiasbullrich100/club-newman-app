@@ -42,7 +42,7 @@ export default async function FechaJuvenilesPage({
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href={`/juveniles/${edadId}`} />
       <SessionBar session={session} />
-      <Header rightLabel={`${edad.nombre} · Fecha ${numero}`} />
+      <Header rightLabel={`${edad.nombre} · Fecha ${numero}`} logo="urba" />
 
       {headline && (
         <>

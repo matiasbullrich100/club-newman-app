@@ -72,7 +72,7 @@ export default async function EstadisticasGrupoPage({
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/estadisticas" />
       <SessionBar session={session} />
-      <Header rightLabel={titulo} />
+      <Header rightLabel={titulo} logo={grupoId === "superior" ? "top14" : "urba"} />
 
       {!puedeVerEstadisticas(session, grupoId) ? (
         <p style={{ textAlign: "center", color: DORADO_SUAVE, marginTop: 20 }}>

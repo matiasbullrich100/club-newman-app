@@ -66,7 +66,7 @@ export default async function PartidoPage({
   const cabecera = (
     <>
       <BackLink href={backHref} />
-      <Header rightLabel={`Fecha ${partido.numeroFecha}`} />
+      <Header rightLabel={`Fecha ${partido.numeroFecha}`} logo={categoria?.grupo === "juveniles" ? "urba" : "top14"} />
       <SessionBar session={session} />
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
         {categoriaNombre}

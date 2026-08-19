@@ -27,7 +27,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         <BackLink href="/juveniles" />
         <SessionBar session={session} />
-        <Header rightLabel={edad.nombre} />
+        <Header rightLabel={edad.nombre} logo="urba" />
         <p style={{ textAlign: "center", color: DORADO_SUAVE, marginTop: 24, fontStyle: "italic", opacity: 0.75 }}>
           Todavía no hay equipos ni fixture cargado para {edad.nombre}.
         </p>
@@ -45,7 +45,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/juveniles" />
       <SessionBar session={session} />
-      <Header rightLabel={edad.nombre} />
+      <Header rightLabel={edad.nombre} logo="urba" />
 
       {resumen.map((p) => (
         <LiveBanner

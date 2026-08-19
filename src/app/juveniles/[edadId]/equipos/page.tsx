@@ -19,7 +19,7 @@ export default async function EquiposJuvenilesPage({ params }: { params: Promise
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/juveniles" />
       <SessionBar session={session} />
-      <Header rightLabel={edad.nombre} />
+      <Header rightLabel={edad.nombre} logo="urba" />
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 20 }}>
         {equipos.map((eq) => (
