@@ -4,6 +4,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import { formatFechaCorta } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -68,12 +69,22 @@ export default async function CategoriaPage({
               tituloPrincipal={
                 partido.notaEspecial ? (
                   <>
-                    # {numeroFecha}. {partido.notaEspecial}
+                    <span style={{ fontSize: "0.75em" }}>#{numeroFecha}.</span> {partido.notaEspecial}
+                    {partido.fecha && (
+                      <span style={{ fontSize: "0.7em", fontWeight: 400, opacity: 0.6, marginLeft: 4 }}>
+                        {formatFechaCorta(partido.fecha)}
+                      </span>
+                    )}
                   </>
                 ) : (
                   <>
-                    # {numeroFecha}.{" "}
+                    <span style={{ fontSize: "0.75em" }}>#{numeroFecha}.</span>{" "}
                     <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                    {partido.fecha && (
+                      <span style={{ fontSize: "0.7em", fontWeight: 400, opacity: 0.6, marginLeft: 4 }}>
+                        {formatFechaCorta(partido.fecha)}
+                      </span>
+                    )}
                   </>
                 )
               }
