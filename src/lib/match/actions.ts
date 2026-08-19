@@ -255,15 +255,20 @@ export async function terminarPartido(partidoId: string): Promise<void> {
 
   if (liveState.periodo) {
     const minutoFin = Math.round(accumulated / 60);
-    const finIncidente: Incidente = {
-      tipo: liveState.periodo === "1T" ? "fin_1t" : "fin_2t",
-      periodo: liveState.periodo,
-      minuto: minutoFin,
-      segundoAbsoluto: Math.floor(accumulated),
-      publicadoPorCuentaId: session!.cuentaId,
-      createdAt: Timestamp.now(),
-    };
-    batch.set(partidoRef.collection("incidentes").doc(), finIncidente);
+    // Si se termina directo desde el entretiempo (sin arrancar el 2do tiempo), cortar1T() ya
+    // registro el "Final 1er tiempo" -- no duplicarlo, o queda pegado junto al entretiempo y
+    // "Final del partido" pierde su lugar como ultima incidencia.
+    if (partido.estado !== "entretiempo") {
+      const finIncidente: Incidente = {
+        tipo: liveState.periodo === "1T" ? "fin_1t" : "fin_2t",
+        periodo: liveState.periodo,
+        minuto: minutoFin,
+        segundoAbsoluto: Math.floor(accumulated),
+        publicadoPorCuentaId: session!.cuentaId,
+        createdAt: Timestamp.now(),
+      };
+      batch.set(partidoRef.collection("incidentes").doc(), finIncidente);
+    }
 
     const finPartidoIncidente: Incidente = {
       tipo: "fin_partido",
