@@ -21,7 +21,7 @@ const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
   walkover: "🚫",
 };
 
-const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t", "interrupcion_medica", "interrupcion_clima"];
+const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t", "fin_partido", "interrupcion_medica", "interrupcion_clima"];
 
 function familiaDe(tipo: Incidente["tipo"]): Incidente["tipo"][] | null {
   if (FAMILIA_PUNTOS.includes(tipo)) return FAMILIA_PUNTOS;
@@ -123,7 +123,12 @@ export default function IncidentesList({
   return (
     <div>
       {ordenadas.map((inc, i) => {
-        const cambioDePeriodo = i > 0 && ordenadas[i - 1].periodo !== inc.periodo;
+        // El entretiempo forma su propio grupo (aunque comparta periodo "1T" con las jugadas de
+        // antes del entretiempo) -- si no, la linea punteada solo aparece arriba del bloque de
+        // Entretiempo y no abajo, porque el periodo no cambia entre el ultimo cambio y "Final 1er
+        // tiempo".
+        const grupoDe = (x: Incidente) => (x.enEntretiempo ? "entretiempo" : x.periodo);
+        const cambioDePeriodo = i > 0 && grupoDe(ordenadas[i - 1]) !== grupoDe(inc);
         const esFinDeTiempo = SIN_EQUIPO.includes(inc.tipo);
         const familia = familiaDe(inc.tipo);
         const esCambio = inc.tipo === "cambio";

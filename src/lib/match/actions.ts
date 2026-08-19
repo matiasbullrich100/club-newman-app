@@ -254,15 +254,26 @@ export async function terminarPartido(partidoId: string): Promise<void> {
   });
 
   if (liveState.periodo) {
+    const minutoFin = Math.round(accumulated / 60);
     const finIncidente: Incidente = {
       tipo: liveState.periodo === "1T" ? "fin_1t" : "fin_2t",
       periodo: liveState.periodo,
-      minuto: Math.round(accumulated / 60),
+      minuto: minutoFin,
       segundoAbsoluto: Math.floor(accumulated),
       publicadoPorCuentaId: session!.cuentaId,
       createdAt: Timestamp.now(),
     };
     batch.set(partidoRef.collection("incidentes").doc(), finIncidente);
+
+    const finPartidoIncidente: Incidente = {
+      tipo: "fin_partido",
+      periodo: liveState.periodo,
+      minuto: minutoFin,
+      segundoAbsoluto: Math.floor(accumulated),
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    batch.set(partidoRef.collection("incidentes").doc(), finPartidoIncidente);
   }
 
   // Los partidos de prueba (whitelist mas abajo) nunca deben sumar minutos reales a jugadores/,

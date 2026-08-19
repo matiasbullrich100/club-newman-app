@@ -9,7 +9,7 @@ import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpcio
 import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t">; label: string }[] = [
+const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t" | "fin_partido">; label: string }[] = [
   { tipo: "try", label: "Try (+5)" },
   { tipo: "try_scrum", label: "Try Scrum (+5)" },
   { tipo: "conversion", label: "Conversión (+2)" },

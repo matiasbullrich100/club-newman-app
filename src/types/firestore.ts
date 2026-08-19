@@ -138,6 +138,7 @@ export type TipoIncidente =
   | "lesion"
   | "fin_1t"
   | "fin_2t"
+  | "fin_partido"
   | "interrupcion_medica"
   | "interrupcion_clima"
   | "walkover";
