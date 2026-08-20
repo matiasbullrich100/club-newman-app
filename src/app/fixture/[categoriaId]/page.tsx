@@ -29,7 +29,7 @@ export default async function FixturePickerPage({ params }: { params: Promise<{ 
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href={backHref} />
       <SessionBar session={session} />
-      <Header rightLabel={categoria.nombre} />
+      <Header rightLabel={categoria.nombre} logo={grupo.grupo === "juveniles" ? "urba" : "top14"} />
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase", textAlign: "center" }}>
         Fixture
