@@ -123,12 +123,12 @@ export default function LiveBanner({
         )}
         {fixtureNewmanHref && (
           <Link href={fixtureNewmanHref} style={botonChico}>
-            Fixture New.
+            Fixt. New.
           </Link>
         )}
         {fixtureDivisionHref && (
           <Link href={fixtureDivisionHref} style={botonChico}>
-            Fixture Divis.
+            Fixt Divis.
           </Link>
         )}
       </div>
