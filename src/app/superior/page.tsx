@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
-import { partidosEnVivoOUltimoTerminado, proximaFechaDe } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { esViernesOSabadoEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
@@ -33,7 +33,7 @@ export default async function PlantelSuperiorPage() {
   const terminados = resumen.filter((p) => p.estado === "terminado");
 
   const mostrarProximaFecha = enVivo.length === 0 && esViernesOSabadoEnArgentina();
-  const proximaFecha = mostrarProximaFecha ? await proximaFechaDe("primera") : null;
+  const proximasFechas = mostrarProximaFecha ? await proximasFechasDe("primera", 3) : [];
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -53,8 +53,8 @@ export default async function PlantelSuperiorPage() {
         />
       ))}
 
-      {proximaFecha ? (
-        <ProximaFechaBanner proxima={proximaFecha} />
+      {proximasFechas.length > 0 ? (
+        <ProximaFechaBanner proximas={proximasFechas} />
       ) : (
         terminados.map((p) => (
           <LiveBanner

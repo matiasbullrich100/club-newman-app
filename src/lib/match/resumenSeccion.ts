@@ -105,29 +105,28 @@ export interface ProximaFecha {
 }
 
 /**
- * El proximo partido "programado" de una categoria (menor numeroFecha) -- para el banner "Proxima
- * Fecha" de /superior los viernes/sabados (ver esViernesOSabadoEnArgentina en lib/fecha.ts), antes
- * de que la fecha de esta semana este en vivo o terminada. Trae los 26 partidos por id (mismo
- * patron que /categoria/[categoriaId]) en vez de un where() -- no hace falta indice compuesto.
+ * Las proximas `cantidad` fechas "programado" de una categoria (menor numeroFecha primero) -- para
+ * el banner "Proxima Fecha" de /superior los viernes/sabados (ver esViernesOSabadoEnArgentina en
+ * lib/fecha.ts), antes de que la fecha de esta semana este en vivo o terminada. Trae los 26
+ * partidos por id (mismo patron que /categoria/[categoriaId]) en vez de un where() -- no hace
+ * falta indice compuesto.
  */
-export async function proximaFechaDe(categoriaId: string): Promise<ProximaFecha | null> {
+export async function proximasFechasDe(categoriaId: string, cantidad: number): Promise<ProximaFecha[]> {
   const refs = Array.from({ length: NUMERO_FECHAS_SUPERIOR }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
   const snaps = await adminDb.getAll(...refs);
-  let proxima: (Partido & { numeroFecha: number }) | null = null;
-  for (const snap of snaps) {
-    if (!snap.exists) continue;
-    const p = snap.data() as Partido;
-    if (p.estado !== "programado") continue;
-    const n = comoNumero(p.numeroFecha);
-    if (!proxima || n < proxima.numeroFecha) proxima = { ...p, numeroFecha: n };
-  }
-  if (!proxima) return null;
-  return {
-    numeroFecha: proxima.numeroFecha,
-    fecha: proxima.fecha,
-    esLocal: proxima.esLocal,
-    rival: proxima.rival,
-    cancha: proxima.cancha,
-    notaEspecial: proxima.notaEspecial,
-  };
+  const programados = snaps
+    .filter((snap) => snap.exists)
+    .map((snap) => ({ ...(snap.data() as Partido), numeroFecha: comoNumero((snap.data() as Partido).numeroFecha) }))
+    .filter((p) => p.estado === "programado")
+    .sort((a, b) => a.numeroFecha - b.numeroFecha)
+    .slice(0, cantidad);
+
+  return programados.map((p) => ({
+    numeroFecha: p.numeroFecha,
+    fecha: p.fecha,
+    esLocal: p.esLocal,
+    rival: p.rival,
+    cancha: p.cancha,
+    notaEspecial: p.notaEspecial,
+  }));
 }
