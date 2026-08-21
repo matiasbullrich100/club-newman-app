@@ -115,6 +115,7 @@ export default function PartidoHistorico({
               <p style={{ opacity: 0.7, fontSize: "0.82rem", marginTop: 6 }}>
                 {partido.hora && `${partido.hora} hs`}
                 {partido.cancha && ` en ${partido.cancha}`}
+                {partido.numeroCancha && ` · Cancha ${partido.numeroCancha}`}
               </p>
             )}
           </div>
