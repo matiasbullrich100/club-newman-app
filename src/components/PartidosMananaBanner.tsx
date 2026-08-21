@@ -44,18 +44,18 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
             marginBottom: 8,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Link href={`/categoria/${categoriaId}`} style={{ display: "flex", flex: 1, minWidth: 0, alignItems: "center", gap: 8 }}>
-              <span style={{ flex: "0 0 auto", maxWidth: "22%", textTransform: "uppercase", letterSpacing: 0.3, fontSize: "0.62rem", color: DORADO_SUAVE }}>
-                {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
-              </span>
-              <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center" }}>
-                {partido.notaEspecial ?? <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} />}
-              </span>
-              <span style={{ flex: "0 0 auto", textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO, textAlign: "right" }}>
-                {partido.hora}
-              </span>
-            </Link>
+          <Link href={`/categoria/${categoriaId}`} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ flex: "0 0 auto", maxWidth: "22%", textTransform: "uppercase", letterSpacing: 0.3, fontSize: "0.62rem", color: DORADO_SUAVE, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+            </span>
+            <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {partido.notaEspecial ?? <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} />}
+            </span>
+            <span style={{ flex: "0 0 auto", textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO, textAlign: "right" }}>
+              {partido.hora}
+            </span>
+          </Link>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
             {posicionesHref && (
               <Link href={posicionesHref} style={botonChico}>
                 Tabla
