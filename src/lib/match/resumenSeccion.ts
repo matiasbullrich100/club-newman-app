@@ -176,6 +176,7 @@ export interface PartidoDeFecha {
   rival: string;
   hora?: string;
   cancha?: string;
+  numeroCancha?: string;
   notaEspecial?: string;
 }
 
@@ -202,6 +203,7 @@ export async function partidosDeFechaExacta(categoriaIds: string[], fechaIso: st
     rival: p.rival,
     hora: p.hora,
     cancha: p.cancha,
+    numeroCancha: p.numeroCancha,
     notaEspecial: p.notaEspecial,
   }));
 }

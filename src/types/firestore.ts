@@ -44,6 +44,10 @@ export interface Partido {
   rival: string;
   esLocal: boolean;
   cancha: string;
+  // Numero/nombre de cancha PUNTUAL dentro del predio (ej. "3") -- lo confirma el club rival
+  // (o el propio Newman si es local) recien el dia antes, distinto de `cancha` que es el predio/
+  // club entero (ej. "Champagnat"). Sin dato hasta que avisen.
+  numeroCancha?: string;
   hora?: string; // "HH:MM", solo si se conoce el horario (ej. juveniles)
   estado: EstadoPartido;
   resultado: Resultado;
