@@ -5,21 +5,38 @@ import type { PartidoDeFecha } from "@/lib/match/resumenSeccion";
 
 const NOMBRES_CORTOS: Record<string, string> = { Intermedia: "Inter" };
 
-// Resumen de los partidos de MAÑANA, uno por categoria -- mismo formato de tarjeta que
-// ProximaFechaRow/LiveBanner (el que ya se usa en /juveniles), pero mostrando el horario en vez
-// de la fecha (ya se sabe que es "mañana"). Cada tarjeta lleva a /categoria/[categoriaId] (mismo
-// destino que el boton de esa categoria mas abajo) donde ya se ve la formacion completa.
-export default function PartidosMananaBanner({ partidos }: { partidos: { categoriaId: string; categoriaNombre: string; partido: PartidoDeFecha }[] }) {
+const botonChico: React.CSSProperties = {
+  flex: "0 0 auto",
+  fontSize: "0.55rem",
+  fontWeight: 700,
+  textTransform: "uppercase",
+  letterSpacing: 0.3,
+  color: DORADO_SUAVE,
+  border: "1px solid rgba(226,197,120,.4)",
+  borderRadius: 6,
+  padding: "3px 5px",
+};
+
+interface PartidoManana {
+  categoriaId: string;
+  categoriaNombre: string;
+  partido: PartidoDeFecha;
+  posicionesHref?: string;
+  fixtureNewmanHref: string;
+  fixtureDivisionHref?: string;
+}
+
+// Resumen de los partidos de MAÑANA, uno por categoria -- mismo formato de tarjeta (y mismos
+// botones Tabla/Fixt. New./Fixt Divis.) que LiveBanner, ya usado en /juveniles y en el resto de
+// /superior. La fila principal lleva a /categoria/[categoriaId] (mismo destino que el boton de esa
+// categoria mas abajo) y muestra el horario en vez de la fecha (ya se sabe que es "mañana").
+export default function PartidosMananaBanner({ partidos }: { partidos: PartidoManana[] }) {
   return (
     <>
-      {partidos.map(({ categoriaId, categoriaNombre, partido }) => (
-        <Link
+      {partidos.map(({ categoriaId, categoriaNombre, partido, posicionesHref, fixtureNewmanHref, fixtureDivisionHref }) => (
+        <div
           key={categoriaId}
-          href={`/categoria/${categoriaId}`}
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
             background: "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
             border: "1px solid rgba(226,197,120,.35)",
             borderRadius: 10,
@@ -27,16 +44,33 @@ export default function PartidosMananaBanner({ partidos }: { partidos: { categor
             marginBottom: 8,
           }}
         >
-          <span style={{ flex: "0 0 auto", maxWidth: "22%", textTransform: "uppercase", letterSpacing: 0.3, fontSize: "0.62rem", color: DORADO_SUAVE }}>
-            {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
-          </span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center" }}>
-            {partido.notaEspecial ?? <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} />}
-          </span>
-          <span style={{ flex: "0 0 auto", textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO, textAlign: "right" }}>
-            {partido.hora}
-          </span>
-        </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Link href={`/categoria/${categoriaId}`} style={{ display: "flex", flex: 1, minWidth: 0, alignItems: "center", gap: 8 }}>
+              <span style={{ flex: "0 0 auto", maxWidth: "22%", textTransform: "uppercase", letterSpacing: 0.3, fontSize: "0.62rem", color: DORADO_SUAVE }}>
+                {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+              </span>
+              <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center" }}>
+                {partido.notaEspecial ?? <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} />}
+              </span>
+              <span style={{ flex: "0 0 auto", textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO, textAlign: "right" }}>
+                {partido.hora}
+              </span>
+            </Link>
+            {posicionesHref && (
+              <Link href={posicionesHref} style={botonChico}>
+                Tabla
+              </Link>
+            )}
+            <Link href={fixtureNewmanHref} style={botonChico}>
+              Fixt. New.
+            </Link>
+            {fixtureDivisionHref && (
+              <Link href={fixtureDivisionHref} style={botonChico}>
+                Fixt Divis.
+              </Link>
+            )}
+          </div>
+        </div>
       ))}
     </>
   );
