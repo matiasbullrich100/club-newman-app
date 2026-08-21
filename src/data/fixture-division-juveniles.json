@@ -1,0 +1,5138 @@
+{
+  "m15-a": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "La Plata A",
+          "Champagnat A"
+        ],
+        [
+          "SIC A",
+          "Olivos A"
+        ],
+        [
+          "Alumni A",
+          "A.D Francesa A"
+        ],
+        [
+          "Newman A",
+          "Regatas B. Vista A"
+        ],
+        [
+          "Liceo Naval A",
+          "CASI A"
+        ],
+        [
+          "Pucara A",
+          "CUBA A"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara A",
+          "La Plata A"
+        ],
+        [
+          "CUBA A",
+          "Liceo Naval A"
+        ],
+        [
+          "CASI A",
+          "Newman A"
+        ],
+        [
+          "Regatas B. Vista A",
+          "Alumni A"
+        ],
+        [
+          "A.D Francesa A",
+          "SIC A"
+        ],
+        [
+          "Olivos A",
+          "Champagnat A"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "La Plata A",
+          "Olivos A"
+        ],
+        [
+          "Champagnat A",
+          "A.D Francesa A"
+        ],
+        [
+          "SIC A",
+          "Regatas B. Vista A"
+        ],
+        [
+          "Alumni A",
+          "CASI A"
+        ],
+        [
+          "Newman A",
+          "CUBA A"
+        ],
+        [
+          "Liceo Naval A",
+          "Pucara A"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Liceo Naval A",
+          "La Plata A"
+        ],
+        [
+          "Pucara A",
+          "Newman A"
+        ],
+        [
+          "CUBA A",
+          "Alumni A"
+        ],
+        [
+          "CASI A",
+          "SIC A"
+        ],
+        [
+          "Regatas B. Vista A",
+          "Champagnat A"
+        ],
+        [
+          "A.D Francesa A",
+          "Olivos A"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "La Plata A",
+          "A.D Francesa A"
+        ],
+        [
+          "Olivos A",
+          "Regatas B. Vista A"
+        ],
+        [
+          "Champagnat A",
+          "CASI A"
+        ],
+        [
+          "SIC A",
+          "CUBA A"
+        ],
+        [
+          "Alumni A",
+          "Pucara A"
+        ],
+        [
+          "Newman A",
+          "Liceo Naval A"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Newman A",
+          "La Plata A"
+        ],
+        [
+          "Liceo Naval A",
+          "Alumni A"
+        ],
+        [
+          "Pucara A",
+          "SIC A"
+        ],
+        [
+          "CUBA A",
+          "Champagnat A"
+        ],
+        [
+          "CASI A",
+          "Olivos A"
+        ],
+        [
+          "Regatas B. Vista A",
+          "A.D Francesa A"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "La Plata A",
+          "Regatas B. Vista A"
+        ],
+        [
+          "A.D Francesa A",
+          "CASI A"
+        ],
+        [
+          "Olivos A",
+          "CUBA A"
+        ],
+        [
+          "Champagnat A",
+          "Pucara A"
+        ],
+        [
+          "SIC A",
+          "Liceo Naval A"
+        ],
+        [
+          "Alumni A",
+          "Newman A"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Alumni A",
+          "La Plata A"
+        ],
+        [
+          "Newman A",
+          "SIC A"
+        ],
+        [
+          "Liceo Naval A",
+          "Champagnat A"
+        ],
+        [
+          "Pucara A",
+          "Olivos A"
+        ],
+        [
+          "CUBA A",
+          "A.D Francesa A"
+        ],
+        [
+          "CASI A",
+          "Regatas B. Vista A"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "La Plata A",
+          "CASI A"
+        ],
+        [
+          "Regatas B. Vista A",
+          "CUBA A"
+        ],
+        [
+          "A.D Francesa A",
+          "Pucara A"
+        ],
+        [
+          "Olivos A",
+          "Liceo Naval A"
+        ],
+        [
+          "Champagnat A",
+          "Newman A"
+        ],
+        [
+          "SIC A",
+          "Alumni A"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC A",
+          "La Plata A"
+        ],
+        [
+          "Alumni A",
+          "Champagnat A"
+        ],
+        [
+          "Newman A",
+          "Olivos A"
+        ],
+        [
+          "Liceo Naval A",
+          "A.D Francesa A"
+        ],
+        [
+          "Pucara A",
+          "Regatas B. Vista A"
+        ],
+        [
+          "CUBA A",
+          "CASI A"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "La Plata A",
+          "CUBA A"
+        ],
+        [
+          "CASI A",
+          "Pucara A"
+        ],
+        [
+          "Regatas B. Vista A",
+          "Liceo Naval A"
+        ],
+        [
+          "A.D Francesa A",
+          "Newman A"
+        ],
+        [
+          "Olivos A",
+          "Alumni A"
+        ],
+        [
+          "Champagnat A",
+          "SIC A"
+        ]
+      ]
+    }
+  },
+  "m15-b": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "La Plata B",
+          "Champagnat B"
+        ],
+        [
+          "SIC B",
+          "Olivos B"
+        ],
+        [
+          "Alumni B",
+          "A.D Francesa B"
+        ],
+        [
+          "Newman B",
+          "Regatas B. Vista B"
+        ],
+        [
+          "Liceo Naval B",
+          "CASI B"
+        ],
+        [
+          "Pucara B",
+          "CUBA B"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara B",
+          "La Plata B"
+        ],
+        [
+          "CUBA B",
+          "Liceo Naval B"
+        ],
+        [
+          "CASI B",
+          "Newman B"
+        ],
+        [
+          "Regatas B. Vista B",
+          "Alumni B"
+        ],
+        [
+          "A.D Francesa B",
+          "SIC B"
+        ],
+        [
+          "Olivos B",
+          "Champagnat B"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "La Plata B",
+          "Olivos B"
+        ],
+        [
+          "Champagnat B",
+          "A.D Francesa B"
+        ],
+        [
+          "SIC B",
+          "Regatas B. Vista B"
+        ],
+        [
+          "Alumni B",
+          "CASI B"
+        ],
+        [
+          "Newman B",
+          "CUBA B"
+        ],
+        [
+          "Liceo Naval B",
+          "Pucara B"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Liceo Naval B",
+          "La Plata B"
+        ],
+        [
+          "Pucara B",
+          "Newman B"
+        ],
+        [
+          "CUBA B",
+          "Alumni B"
+        ],
+        [
+          "CASI B",
+          "SIC B"
+        ],
+        [
+          "Regatas B. Vista B",
+          "Champagnat B"
+        ],
+        [
+          "A.D Francesa B",
+          "Olivos B"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "La Plata B",
+          "A.D Francesa B"
+        ],
+        [
+          "Olivos B",
+          "Regatas B. Vista B"
+        ],
+        [
+          "Champagnat B",
+          "CASI B"
+        ],
+        [
+          "SIC B",
+          "CUBA B"
+        ],
+        [
+          "Alumni B",
+          "Pucara B"
+        ],
+        [
+          "Newman B",
+          "Liceo Naval B"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Newman B",
+          "La Plata B"
+        ],
+        [
+          "Liceo Naval B",
+          "Alumni B"
+        ],
+        [
+          "Pucara B",
+          "SIC B"
+        ],
+        [
+          "CUBA B",
+          "Champagnat B"
+        ],
+        [
+          "CASI B",
+          "Olivos B"
+        ],
+        [
+          "Regatas B. Vista B",
+          "A.D Francesa B"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "La Plata B",
+          "Regatas B. Vista B"
+        ],
+        [
+          "A.D Francesa B",
+          "CASI B"
+        ],
+        [
+          "Olivos B",
+          "CUBA B"
+        ],
+        [
+          "Champagnat B",
+          "Pucara B"
+        ],
+        [
+          "SIC B",
+          "Liceo Naval B"
+        ],
+        [
+          "Alumni B",
+          "Newman B"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Alumni B",
+          "La Plata B"
+        ],
+        [
+          "Newman B",
+          "SIC B"
+        ],
+        [
+          "Liceo Naval B",
+          "Champagnat B"
+        ],
+        [
+          "Pucara B",
+          "Olivos B"
+        ],
+        [
+          "CUBA B",
+          "A.D Francesa B"
+        ],
+        [
+          "CASI B",
+          "Regatas B. Vista B"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "La Plata B",
+          "CASI B"
+        ],
+        [
+          "Regatas B. Vista B",
+          "CUBA B"
+        ],
+        [
+          "A.D Francesa B",
+          "Pucara B"
+        ],
+        [
+          "Olivos B",
+          "Liceo Naval B"
+        ],
+        [
+          "Champagnat B",
+          "Newman B"
+        ],
+        [
+          "SIC B",
+          "Alumni B"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC B",
+          "La Plata B"
+        ],
+        [
+          "Alumni B",
+          "Champagnat B"
+        ],
+        [
+          "Newman B",
+          "Olivos B"
+        ],
+        [
+          "Liceo Naval B",
+          "A.D Francesa B"
+        ],
+        [
+          "Pucara B",
+          "Regatas B. Vista B"
+        ],
+        [
+          "CUBA B",
+          "CASI B"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "La Plata B",
+          "CUBA B"
+        ],
+        [
+          "CASI B",
+          "Pucara B"
+        ],
+        [
+          "Regatas B. Vista B",
+          "Liceo Naval B"
+        ],
+        [
+          "A.D Francesa B",
+          "Newman B"
+        ],
+        [
+          "Olivos B",
+          "Alumni B"
+        ],
+        [
+          "Champagnat B",
+          "SIC B"
+        ]
+      ]
+    }
+  },
+  "m15-c": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "La Plata C",
+          "Champagnat C"
+        ],
+        [
+          "SIC C",
+          "Olivos C"
+        ],
+        [
+          "Alumni C",
+          "Sin Info"
+        ],
+        [
+          "Newman C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Sin Info",
+          "CASI C"
+        ],
+        [
+          "Pucara C",
+          "CUBA C"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara C",
+          "La Plata C"
+        ],
+        [
+          "CUBA C",
+          "Sin Info"
+        ],
+        [
+          "CASI C",
+          "Newman C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Alumni C"
+        ],
+        [
+          "Sin Info",
+          "SIC C"
+        ],
+        [
+          "Olivos C",
+          "Champagnat C"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "La Plata C",
+          "Olivos C"
+        ],
+        [
+          "Champagnat C",
+          "Sin Info"
+        ],
+        [
+          "SIC C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Alumni C",
+          "CASI C"
+        ],
+        [
+          "Newman C",
+          "CUBA C"
+        ],
+        [
+          "Sin Info",
+          "Pucara C"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Sin Info",
+          "La Plata C"
+        ],
+        [
+          "Pucara C",
+          "Newman C"
+        ],
+        [
+          "CUBA C",
+          "Alumni C"
+        ],
+        [
+          "CASI C",
+          "SIC C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Champagnat C"
+        ],
+        [
+          "Sin Info",
+          "Olivos C"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "La Plata C",
+          "Sin Info"
+        ],
+        [
+          "Olivos C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Champagnat C",
+          "CASI C"
+        ],
+        [
+          "SIC C",
+          "CUBA C"
+        ],
+        [
+          "Alumni C",
+          "Pucara C"
+        ],
+        [
+          "Newman C",
+          "Sin Info"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Newman C",
+          "La Plata C"
+        ],
+        [
+          "Sin Info",
+          "Alumni C"
+        ],
+        [
+          "Pucara C",
+          "SIC C"
+        ],
+        [
+          "CUBA C",
+          "Champagnat C"
+        ],
+        [
+          "CASI C",
+          "Olivos C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Sin Info"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "La Plata C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Sin Info",
+          "CASI C"
+        ],
+        [
+          "Olivos C",
+          "CUBA C"
+        ],
+        [
+          "Champagnat C",
+          "Pucara C"
+        ],
+        [
+          "SIC C",
+          "Sin Info"
+        ],
+        [
+          "Alumni C",
+          "Newman C"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Alumni C",
+          "La Plata C"
+        ],
+        [
+          "Newman C",
+          "SIC C"
+        ],
+        [
+          "Sin Info",
+          "Champagnat C"
+        ],
+        [
+          "Pucara C",
+          "Olivos C"
+        ],
+        [
+          "CUBA C",
+          "Sin Info"
+        ],
+        [
+          "CASI C",
+          "Regatas B. Vista C"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "La Plata C",
+          "CASI C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "CUBA C"
+        ],
+        [
+          "Sin Info",
+          "Pucara C"
+        ],
+        [
+          "Olivos C",
+          "Sin Info"
+        ],
+        [
+          "Champagnat C",
+          "Newman C"
+        ],
+        [
+          "SIC C",
+          "Alumni C"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC C",
+          "La Plata C"
+        ],
+        [
+          "Alumni C",
+          "Champagnat C"
+        ],
+        [
+          "Newman C",
+          "Olivos C"
+        ],
+        [
+          "Sin Info",
+          "Sin Info"
+        ],
+        [
+          "Pucara C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "CUBA C",
+          "CASI C"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "La Plata C",
+          "CUBA C"
+        ],
+        [
+          "CASI C",
+          "Pucara C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Sin Info"
+        ],
+        [
+          "Sin Info",
+          "Newman C"
+        ],
+        [
+          "Olivos C",
+          "Alumni C"
+        ],
+        [
+          "Champagnat C",
+          "SIC C"
+        ]
+      ]
+    }
+  },
+  "m15-d": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "Los Pinos",
+          "Sin Info"
+        ],
+        [
+          "Sin Info",
+          "Sin Info"
+        ],
+        [
+          "Los Molinos C",
+          "Buenos Aires C"
+        ],
+        [
+          "Newman D",
+          "Regatas B. Vista D"
+        ],
+        [
+          "San Andres C",
+          "CASI D"
+        ],
+        [
+          "Pucara D",
+          "CUBA D"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara D",
+          "Los Pinos"
+        ],
+        [
+          "CUBA D",
+          "San Andres C"
+        ],
+        [
+          "CASI D",
+          "Newman D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Los Molinos C"
+        ],
+        [
+          "Buenos Aires C",
+          "Sin Info"
+        ],
+        [
+          "Sin Info",
+          "Sin Info"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "Los Pinos",
+          "Sin Info"
+        ],
+        [
+          "Sin Info",
+          "Buenos Aires C"
+        ],
+        [
+          "Sin Info",
+          "Regatas B. Vista D"
+        ],
+        [
+          "Los Molinos C",
+          "CASI D"
+        ],
+        [
+          "Newman D",
+          "CUBA D"
+        ],
+        [
+          "San Andres C",
+          "Pucara D"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "San Andres C",
+          "Los Pinos"
+        ],
+        [
+          "Pucara D",
+          "Newman D"
+        ],
+        [
+          "CUBA D",
+          "Los Molinos C"
+        ],
+        [
+          "CASI D",
+          "Sin Info"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Sin Info"
+        ],
+        [
+          "Buenos Aires C",
+          "Sin Info"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "Los Pinos",
+          "Buenos Aires C"
+        ],
+        [
+          "Sin Info",
+          "Regatas B. Vista D"
+        ],
+        [
+          "Sin Info",
+          "CASI D"
+        ],
+        [
+          "Sin Info",
+          "CUBA D"
+        ],
+        [
+          "Los Molinos C",
+          "Pucara D"
+        ],
+        [
+          "Newman D",
+          "San Andres C"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Newman D",
+          "Los Pinos"
+        ],
+        [
+          "San Andres C",
+          "Los Molinos C"
+        ],
+        [
+          "Pucara D",
+          "Sin Info"
+        ],
+        [
+          "CUBA D",
+          "Sin Info"
+        ],
+        [
+          "CASI D",
+          "Sin Info"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Buenos Aires C"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "Los Pinos",
+          "Regatas B. Vista D"
+        ],
+        [
+          "Buenos Aires C",
+          "CASI D"
+        ],
+        [
+          "Sin Info",
+          "CUBA D"
+        ],
+        [
+          "Sin Info",
+          "Pucara D"
+        ],
+        [
+          "Sin Info",
+          "San Andres C"
+        ],
+        [
+          "Los Molinos C",
+          "Newman D"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Los Molinos C",
+          "Los Pinos"
+        ],
+        [
+          "Newman D",
+          "Sin Info"
+        ],
+        [
+          "San Andres C",
+          "Sin Info"
+        ],
+        [
+          "Pucara D",
+          "Sin Info"
+        ],
+        [
+          "CUBA D",
+          "Buenos Aires C"
+        ],
+        [
+          "CASI D",
+          "Regatas B. Vista D"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "Los Pinos",
+          "CASI D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "CUBA D"
+        ],
+        [
+          "Buenos Aires C",
+          "Pucara D"
+        ],
+        [
+          "Sin Info",
+          "San Andres C"
+        ],
+        [
+          "Sin Info",
+          "Newman D"
+        ],
+        [
+          "Sin Info",
+          "Los Molinos C"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "Sin Info",
+          "Los Pinos"
+        ],
+        [
+          "Los Molinos C",
+          "Sin Info"
+        ],
+        [
+          "Newman D",
+          "Sin Info"
+        ],
+        [
+          "San Andres C",
+          "Buenos Aires C"
+        ],
+        [
+          "Pucara D",
+          "Regatas B. Vista D"
+        ],
+        [
+          "CUBA D",
+          "CASI D"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "Los Pinos",
+          "CUBA D"
+        ],
+        [
+          "CASI D",
+          "Pucara D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "San Andres C"
+        ],
+        [
+          "Buenos Aires C",
+          "Newman D"
+        ],
+        [
+          "Sin Info",
+          "Los Molinos C"
+        ],
+        [
+          "Sin Info",
+          "Sin Info"
+        ]
+      ]
+    }
+  },
+  "m16-a": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "CUBA A",
+          "Pucara A"
+        ],
+        [
+          "CASI A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "Hindu A",
+          "Newman A"
+        ],
+        [
+          "San Albano A",
+          "Alumni A"
+        ],
+        [
+          "Los Tilos A",
+          "SIC A"
+        ],
+        [
+          "Champagnat A",
+          "San Cirano A"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Champagnat A",
+          "CUBA A"
+        ],
+        [
+          "San Cirano A",
+          "Los Tilos A"
+        ],
+        [
+          "SIC A",
+          "San Albano A"
+        ],
+        [
+          "Alumni A",
+          "Hindu A"
+        ],
+        [
+          "Newman A",
+          "CASI A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Pucara A"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "CUBA A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "Pucara A",
+          "Newman A"
+        ],
+        [
+          "CASI A",
+          "Alumni A"
+        ],
+        [
+          "Hindu A",
+          "SIC A"
+        ],
+        [
+          "San Albano A",
+          "San Cirano A"
+        ],
+        [
+          "Los Tilos A",
+          "Champagnat A"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Los Tilos A",
+          "CUBA A"
+        ],
+        [
+          "Champagnat A",
+          "San Albano A"
+        ],
+        [
+          "San Cirano A",
+          "Hindu A"
+        ],
+        [
+          "SIC A",
+          "CASI A"
+        ],
+        [
+          "Alumni A",
+          "Pucara A"
+        ],
+        [
+          "Newman A",
+          "Belgrano Athl. A"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "CUBA A",
+          "Newman A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Alumni A"
+        ],
+        [
+          "Pucara A",
+          "SIC A"
+        ],
+        [
+          "CASI A",
+          "San Cirano A"
+        ],
+        [
+          "Hindu A",
+          "Champagnat A"
+        ],
+        [
+          "San Albano A",
+          "Los Tilos A"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "San Albano A",
+          "CUBA A"
+        ],
+        [
+          "Los Tilos A",
+          "Hindu A"
+        ],
+        [
+          "Champagnat A",
+          "CASI A"
+        ],
+        [
+          "San Cirano A",
+          "Pucara A"
+        ],
+        [
+          "SIC A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "Alumni A",
+          "Newman A"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "CUBA A",
+          "Alumni A"
+        ],
+        [
+          "Newman A",
+          "SIC A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "San Cirano A"
+        ],
+        [
+          "Pucara A",
+          "Champagnat A"
+        ],
+        [
+          "CASI A",
+          "Los Tilos A"
+        ],
+        [
+          "Hindu A",
+          "San Albano A"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Hindu A",
+          "CUBA A"
+        ],
+        [
+          "San Albano A",
+          "CASI A"
+        ],
+        [
+          "Los Tilos A",
+          "Pucara A"
+        ],
+        [
+          "Champagnat A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "San Cirano A",
+          "Newman A"
+        ],
+        [
+          "SIC A",
+          "Alumni A"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "CUBA A",
+          "SIC A"
+        ],
+        [
+          "Alumni A",
+          "San Cirano A"
+        ],
+        [
+          "Newman A",
+          "Champagnat A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Los Tilos A"
+        ],
+        [
+          "Pucara A",
+          "San Albano A"
+        ],
+        [
+          "CASI A",
+          "Hindu A"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "CASI A",
+          "CUBA A"
+        ],
+        [
+          "Hindu A",
+          "Pucara A"
+        ],
+        [
+          "San Albano A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "Los Tilos A",
+          "Newman A"
+        ],
+        [
+          "Champagnat A",
+          "Alumni A"
+        ],
+        [
+          "San Cirano A",
+          "SIC A"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "CUBA A",
+          "San Cirano A"
+        ],
+        [
+          "SIC A",
+          "Champagnat A"
+        ],
+        [
+          "Alumni A",
+          "Los Tilos A"
+        ],
+        [
+          "Newman A",
+          "San Albano A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Hindu A"
+        ],
+        [
+          "Pucara A",
+          "CASI A"
+        ]
+      ]
+    }
+  },
+  "m16-b": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "CUBA B",
+          "Pucara B"
+        ],
+        [
+          "CASI B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "Hindu B",
+          "Newman B"
+        ],
+        [
+          "San Albano B",
+          "Alumni B"
+        ],
+        [
+          "Los Tilos B",
+          "SIC B"
+        ],
+        [
+          "Champagnat B",
+          "San Cirano B"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Champagnat B",
+          "CUBA B"
+        ],
+        [
+          "San Cirano B",
+          "Los Tilos B"
+        ],
+        [
+          "SIC B",
+          "San Albano B"
+        ],
+        [
+          "Alumni B",
+          "Hindu B"
+        ],
+        [
+          "Newman B",
+          "CASI B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Pucara B"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "CUBA B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "Pucara B",
+          "Newman B"
+        ],
+        [
+          "CASI B",
+          "Alumni B"
+        ],
+        [
+          "Hindu B",
+          "SIC B"
+        ],
+        [
+          "San Albano B",
+          "San Cirano B"
+        ],
+        [
+          "Los Tilos B",
+          "Champagnat B"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Los Tilos B",
+          "CUBA B"
+        ],
+        [
+          "Champagnat B",
+          "San Albano B"
+        ],
+        [
+          "San Cirano B",
+          "Hindu B"
+        ],
+        [
+          "SIC B",
+          "CASI B"
+        ],
+        [
+          "Alumni B",
+          "Pucara B"
+        ],
+        [
+          "Newman B",
+          "Belgrano Athl. B"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "CUBA B",
+          "Newman B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Alumni B"
+        ],
+        [
+          "Pucara B",
+          "SIC B"
+        ],
+        [
+          "CASI B",
+          "San Cirano B"
+        ],
+        [
+          "Hindu B",
+          "Champagnat B"
+        ],
+        [
+          "San Albano B",
+          "Los Tilos B"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "San Albano B",
+          "CUBA B"
+        ],
+        [
+          "Los Tilos B",
+          "Hindu B"
+        ],
+        [
+          "Champagnat B",
+          "CASI B"
+        ],
+        [
+          "San Cirano B",
+          "Pucara B"
+        ],
+        [
+          "SIC B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "Alumni B",
+          "Newman B"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "CUBA B",
+          "Alumni B"
+        ],
+        [
+          "Newman B",
+          "SIC B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "San Cirano B"
+        ],
+        [
+          "Pucara B",
+          "Champagnat B"
+        ],
+        [
+          "CASI B",
+          "Los Tilos B"
+        ],
+        [
+          "Hindu B",
+          "San Albano B"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Hindu B",
+          "CUBA B"
+        ],
+        [
+          "San Albano B",
+          "CASI B"
+        ],
+        [
+          "Los Tilos B",
+          "Pucara B"
+        ],
+        [
+          "Champagnat B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "San Cirano B",
+          "Newman B"
+        ],
+        [
+          "SIC B",
+          "Alumni B"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "CUBA B",
+          "SIC B"
+        ],
+        [
+          "Alumni B",
+          "San Cirano B"
+        ],
+        [
+          "Newman B",
+          "Champagnat B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Los Tilos B"
+        ],
+        [
+          "Pucara B",
+          "San Albano B"
+        ],
+        [
+          "CASI B",
+          "Hindu B"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "CASI B",
+          "CUBA B"
+        ],
+        [
+          "Hindu B",
+          "Pucara B"
+        ],
+        [
+          "San Albano B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "Los Tilos B",
+          "Newman B"
+        ],
+        [
+          "Champagnat B",
+          "Alumni B"
+        ],
+        [
+          "San Cirano B",
+          "SIC B"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "CUBA B",
+          "San Cirano B"
+        ],
+        [
+          "SIC B",
+          "Champagnat B"
+        ],
+        [
+          "Alumni B",
+          "Los Tilos B"
+        ],
+        [
+          "Newman B",
+          "San Albano B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Hindu B"
+        ],
+        [
+          "Pucara B",
+          "CASI B"
+        ]
+      ]
+    }
+  },
+  "m16-c": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "CUBA C",
+          "Virreyes A"
+        ],
+        [
+          "CASI C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Regatas B Vista C",
+          "Newman C"
+        ],
+        [
+          "C.U De Quilmes A",
+          "Alumni C"
+        ],
+        [
+          "Sin Info",
+          "SIC C"
+        ],
+        [
+          "Champagnat C",
+          "El Retiro A"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Champagnat C",
+          "CUBA C"
+        ],
+        [
+          "El Retiro A",
+          "Sin Info"
+        ],
+        [
+          "SIC C",
+          "C.U De Quilmes A"
+        ],
+        [
+          "Alumni C",
+          "Regatas B Vista C"
+        ],
+        [
+          "Newman C",
+          "CASI C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Virreyes A"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "CUBA C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Virreyes A",
+          "Newman C"
+        ],
+        [
+          "CASI C",
+          "Alumni C"
+        ],
+        [
+          "Regatas B Vista C",
+          "SIC C"
+        ],
+        [
+          "C.U De Quilmes A",
+          "El Retiro A"
+        ],
+        [
+          "Sin Info",
+          "Champagnat C"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Sin Info",
+          "CUBA C"
+        ],
+        [
+          "Champagnat C",
+          "C.U De Quilmes A"
+        ],
+        [
+          "El Retiro A",
+          "Regatas B Vista C"
+        ],
+        [
+          "SIC C",
+          "CASI C"
+        ],
+        [
+          "Alumni C",
+          "Virreyes A"
+        ],
+        [
+          "Newman C",
+          "Belgrano Athl. C"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "CUBA C",
+          "Newman C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Alumni C"
+        ],
+        [
+          "Virreyes A",
+          "SIC C"
+        ],
+        [
+          "CASI C",
+          "El Retiro A"
+        ],
+        [
+          "Regatas B Vista C",
+          "Champagnat C"
+        ],
+        [
+          "C.U De Quilmes A",
+          "Sin Info"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "C.U De Quilmes A",
+          "CUBA C"
+        ],
+        [
+          "Sin Info",
+          "Regatas B Vista C"
+        ],
+        [
+          "Champagnat C",
+          "CASI C"
+        ],
+        [
+          "El Retiro A",
+          "Virreyes A"
+        ],
+        [
+          "SIC C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Alumni C",
+          "Newman C"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "CUBA C",
+          "Alumni C"
+        ],
+        [
+          "Newman C",
+          "SIC C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "El Retiro A"
+        ],
+        [
+          "Virreyes A",
+          "Champagnat C"
+        ],
+        [
+          "CASI C",
+          "Sin Info"
+        ],
+        [
+          "Regatas B Vista C",
+          "C.U De Quilmes A"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B Vista C",
+          "CUBA C"
+        ],
+        [
+          "C.U De Quilmes A",
+          "CASI C"
+        ],
+        [
+          "Sin Info",
+          "Virreyes A"
+        ],
+        [
+          "Champagnat C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "El Retiro A",
+          "Newman C"
+        ],
+        [
+          "SIC C",
+          "Alumni C"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "CUBA C",
+          "SIC C"
+        ],
+        [
+          "Alumni C",
+          "El Retiro A"
+        ],
+        [
+          "Newman C",
+          "Champagnat C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Sin Info"
+        ],
+        [
+          "Virreyes A",
+          "C.U De Quilmes A"
+        ],
+        [
+          "CASI C",
+          "Regatas B Vista C"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "CASI C",
+          "CUBA C"
+        ],
+        [
+          "Regatas B Vista C",
+          "Virreyes A"
+        ],
+        [
+          "C.U De Quilmes A",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Sin Info",
+          "Newman C"
+        ],
+        [
+          "Champagnat C",
+          "Alumni C"
+        ],
+        [
+          "El Retiro A",
+          "SIC C"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "CUBA C",
+          "El Retiro A"
+        ],
+        [
+          "SIC C",
+          "Champagnat C"
+        ],
+        [
+          "Alumni C",
+          "Sin Info"
+        ],
+        [
+          "Newman C",
+          "C.U De Quilmes A"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Regatas B Vista C"
+        ],
+        [
+          "Virreyes A",
+          "CASI C"
+        ]
+      ]
+    }
+  },
+  "m16-d": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "CUBA D",
+          "Virreyes B"
+        ],
+        [
+          "CASI D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "Regatas B Vista D",
+          "Newman D"
+        ],
+        [
+          "C.U De Quilmes B",
+          "Alumni D"
+        ],
+        [
+          "Sin Info",
+          "SIC D"
+        ],
+        [
+          "Champagnat D",
+          "El Retiro B"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Champagnat D",
+          "CUBA D"
+        ],
+        [
+          "El Retiro B",
+          "Sin Info"
+        ],
+        [
+          "SIC D",
+          "C.U De Quilmes B"
+        ],
+        [
+          "Alumni D",
+          "Regatas B Vista D"
+        ],
+        [
+          "Newman D",
+          "CASI D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "Virreyes B"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "CUBA D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "Virreyes B",
+          "Newman D"
+        ],
+        [
+          "CASI D",
+          "Alumni D"
+        ],
+        [
+          "Regatas B Vista D",
+          "SIC D"
+        ],
+        [
+          "C.U De Quilmes B",
+          "El Retiro B"
+        ],
+        [
+          "Sin Info",
+          "Champagnat D"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Sin Info",
+          "CUBA D"
+        ],
+        [
+          "Champagnat D",
+          "C.U De Quilmes B"
+        ],
+        [
+          "El Retiro B",
+          "Regatas B Vista D"
+        ],
+        [
+          "SIC D",
+          "CASI D"
+        ],
+        [
+          "Alumni D",
+          "Virreyes B"
+        ],
+        [
+          "Newman D",
+          "Belgrano Athl. D"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "CUBA D",
+          "Newman D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "Alumni D"
+        ],
+        [
+          "Virreyes B",
+          "SIC D"
+        ],
+        [
+          "CASI D",
+          "El Retiro B"
+        ],
+        [
+          "Regatas B Vista D",
+          "Champagnat D"
+        ],
+        [
+          "C.U De Quilmes B",
+          "Sin Info"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "C.U De Quilmes B",
+          "CUBA D"
+        ],
+        [
+          "Sin Info",
+          "Regatas B Vista D"
+        ],
+        [
+          "Champagnat D",
+          "CASI D"
+        ],
+        [
+          "El Retiro B",
+          "Virreyes B"
+        ],
+        [
+          "SIC D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "Alumni D",
+          "Newman D"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "CUBA D",
+          "Alumni D"
+        ],
+        [
+          "Newman D",
+          "SIC D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "El Retiro B"
+        ],
+        [
+          "Virreyes B",
+          "Champagnat D"
+        ],
+        [
+          "CASI D",
+          "Sin Info"
+        ],
+        [
+          "Regatas B Vista D",
+          "C.U De Quilmes B"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B Vista D",
+          "CUBA D"
+        ],
+        [
+          "C.U De Quilmes B",
+          "CASI D"
+        ],
+        [
+          "Sin Info",
+          "Virreyes B"
+        ],
+        [
+          "Champagnat D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "El Retiro B",
+          "Newman D"
+        ],
+        [
+          "SIC D",
+          "Alumni D"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "CUBA D",
+          "SIC D"
+        ],
+        [
+          "Alumni D",
+          "El Retiro B"
+        ],
+        [
+          "Newman D",
+          "Champagnat D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "Sin Info"
+        ],
+        [
+          "Virreyes B",
+          "C.U De Quilmes B"
+        ],
+        [
+          "CASI D",
+          "Regatas B Vista D"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "CASI D",
+          "CUBA D"
+        ],
+        [
+          "Regatas B Vista D",
+          "Virreyes B"
+        ],
+        [
+          "C.U De Quilmes B",
+          "Belgrano Athl. D"
+        ],
+        [
+          "Sin Info",
+          "Newman D"
+        ],
+        [
+          "Champagnat D",
+          "Alumni D"
+        ],
+        [
+          "El Retiro B",
+          "SIC D"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "CUBA D",
+          "El Retiro B"
+        ],
+        [
+          "SIC D",
+          "Champagnat D"
+        ],
+        [
+          "Alumni D",
+          "Sin Info"
+        ],
+        [
+          "Newman D",
+          "C.U De Quilmes B"
+        ],
+        [
+          "Belgrano Athl. D",
+          "Regatas B Vista D"
+        ],
+        [
+          "Virreyes B",
+          "CASI D"
+        ]
+      ]
+    }
+  },
+  "m17-a": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "SITAS A",
+          "Los Molinos A"
+        ],
+        [
+          "Liceo Naval A",
+          "Hindu A"
+        ],
+        [
+          "A.D. Francesa A",
+          "Lomas Athl. A"
+        ],
+        [
+          "Newman A",
+          "San Martin A"
+        ],
+        [
+          "Los Tilos A",
+          "Olivos A"
+        ],
+        [
+          "San Andres A",
+          "Los Matreros A"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "San Andres A",
+          "SITAS A"
+        ],
+        [
+          "Los Matreros A",
+          "Los Tilos A"
+        ],
+        [
+          "Olivos A",
+          "Newman A"
+        ],
+        [
+          "San Martin A",
+          "A.D. Francesa A"
+        ],
+        [
+          "Lomas Athl. A",
+          "Liceo Naval A"
+        ],
+        [
+          "Hindu A",
+          "Los Molinos A"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "SITAS A",
+          "Hindu A"
+        ],
+        [
+          "Los Molinos A",
+          "Lomas Athl. A"
+        ],
+        [
+          "Liceo Naval A",
+          "San Martin A"
+        ],
+        [
+          "A.D. Francesa A",
+          "Olivos A"
+        ],
+        [
+          "Newman A",
+          "Los Matreros A"
+        ],
+        [
+          "Los Tilos A",
+          "San Andres A"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Los Tilos A",
+          "SITAS A"
+        ],
+        [
+          "San Andres A",
+          "Newman A"
+        ],
+        [
+          "Los Matreros A",
+          "A.D. Francesa A"
+        ],
+        [
+          "Olivos A",
+          "Liceo Naval A"
+        ],
+        [
+          "San Martin A",
+          "Los Molinos A"
+        ],
+        [
+          "Lomas Athl. A",
+          "Hindu A"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "SITAS A",
+          "Lomas Athl. A"
+        ],
+        [
+          "Hindu A",
+          "San Martin A"
+        ],
+        [
+          "Los Molinos A",
+          "Olivos A"
+        ],
+        [
+          "Liceo Naval A",
+          "Los Matreros A"
+        ],
+        [
+          "A.D. Francesa A",
+          "San Andres A"
+        ],
+        [
+          "Newman A",
+          "Los Tilos A"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Newman A",
+          "SITAS A"
+        ],
+        [
+          "Los Tilos A",
+          "A.D. Francesa A"
+        ],
+        [
+          "San Andres A",
+          "Liceo Naval A"
+        ],
+        [
+          "Los Matreros A",
+          "Los Molinos A"
+        ],
+        [
+          "Olivos A",
+          "Hindu A"
+        ],
+        [
+          "San Martin A",
+          "Lomas Athl. A"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "SITAS A",
+          "San Martin A"
+        ],
+        [
+          "Lomas Athl. A",
+          "Olivos A"
+        ],
+        [
+          "Hindu A",
+          "Los Matreros A"
+        ],
+        [
+          "Los Molinos A",
+          "San Andres A"
+        ],
+        [
+          "Liceo Naval A",
+          "Los Tilos A"
+        ],
+        [
+          "A.D. Francesa A",
+          "Newman A"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "A.D. Francesa A",
+          "SITAS A"
+        ],
+        [
+          "Newman A",
+          "Liceo Naval A"
+        ],
+        [
+          "Los Tilos A",
+          "Los Molinos A"
+        ],
+        [
+          "San Andres A",
+          "Hindu A"
+        ],
+        [
+          "Los Matreros A",
+          "Lomas Athl. A"
+        ],
+        [
+          "Olivos A",
+          "San Martin A"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "SITAS A",
+          "Olivos A"
+        ],
+        [
+          "San Martin A",
+          "Los Matreros A"
+        ],
+        [
+          "Lomas Athl. A",
+          "San Andres A"
+        ],
+        [
+          "Hindu A",
+          "Los Tilos A"
+        ],
+        [
+          "Los Molinos A",
+          "Newman A"
+        ],
+        [
+          "Liceo Naval A",
+          "A.D. Francesa A"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "Liceo Naval A",
+          "SITAS A"
+        ],
+        [
+          "A.D. Francesa A",
+          "Los Molinos A"
+        ],
+        [
+          "Newman A",
+          "Hindu A"
+        ],
+        [
+          "Los Tilos A",
+          "Lomas Athl. A"
+        ],
+        [
+          "San Andres A",
+          "San Martin A"
+        ],
+        [
+          "Los Matreros A",
+          "Olivos A"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "SITAS A",
+          "Los Matreros A"
+        ],
+        [
+          "Olivos A",
+          "San Andres A"
+        ],
+        [
+          "San Martin A",
+          "Los Tilos A"
+        ],
+        [
+          "Lomas Athl. A",
+          "Newman A"
+        ],
+        [
+          "Hindu A",
+          "A.D. Francesa A"
+        ],
+        [
+          "Los Molinos A",
+          "Liceo Naval A"
+        ]
+      ]
+    }
+  },
+  "m17-b": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "SITAS B",
+          "Los Molinos B"
+        ],
+        [
+          "Liceo Naval B",
+          "Hindu B"
+        ],
+        [
+          "A.D. Francesa B",
+          "Lomas Athl. B"
+        ],
+        [
+          "Newman B",
+          "San Martin B"
+        ],
+        [
+          "Los Tilos B",
+          "Olivos B"
+        ],
+        [
+          "San Andres B",
+          "Los Matreros B"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "San Andres B",
+          "SITAS B"
+        ],
+        [
+          "Los Matreros B",
+          "Los Tilos B"
+        ],
+        [
+          "Olivos B",
+          "Newman B"
+        ],
+        [
+          "San Martin B",
+          "A.D. Francesa B"
+        ],
+        [
+          "Lomas Athl. B",
+          "Liceo Naval B"
+        ],
+        [
+          "Hindu B",
+          "Los Molinos B"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "SITAS B",
+          "Hindu B"
+        ],
+        [
+          "Los Molinos B",
+          "Lomas Athl. B"
+        ],
+        [
+          "Liceo Naval B",
+          "San Martin B"
+        ],
+        [
+          "A.D. Francesa B",
+          "Olivos B"
+        ],
+        [
+          "Newman B",
+          "Los Matreros B"
+        ],
+        [
+          "Los Tilos B",
+          "San Andres B"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Los Tilos B",
+          "SITAS B"
+        ],
+        [
+          "San Andres B",
+          "Newman B"
+        ],
+        [
+          "Los Matreros B",
+          "A.D. Francesa B"
+        ],
+        [
+          "Olivos B",
+          "Liceo Naval B"
+        ],
+        [
+          "San Martin B",
+          "Los Molinos B"
+        ],
+        [
+          "Lomas Athl. B",
+          "Hindu B"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "SITAS B",
+          "Lomas Athl. B"
+        ],
+        [
+          "Hindu B",
+          "San Martin B"
+        ],
+        [
+          "Los Molinos B",
+          "Olivos B"
+        ],
+        [
+          "Liceo Naval B",
+          "Los Matreros B"
+        ],
+        [
+          "A.D. Francesa B",
+          "San Andres B"
+        ],
+        [
+          "Newman B",
+          "Los Tilos B"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Newman B",
+          "SITAS B"
+        ],
+        [
+          "Los Tilos B",
+          "A.D. Francesa B"
+        ],
+        [
+          "San Andres B",
+          "Liceo Naval B"
+        ],
+        [
+          "Los Matreros B",
+          "Los Molinos B"
+        ],
+        [
+          "Olivos B",
+          "Hindu B"
+        ],
+        [
+          "San Martin B",
+          "Lomas Athl. B"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "SITAS B",
+          "San Martin B"
+        ],
+        [
+          "Lomas Athl. B",
+          "Olivos B"
+        ],
+        [
+          "Hindu B",
+          "Los Matreros B"
+        ],
+        [
+          "Los Molinos B",
+          "San Andres B"
+        ],
+        [
+          "Liceo Naval B",
+          "Los Tilos B"
+        ],
+        [
+          "A.D. Francesa B",
+          "Newman B"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "A.D. Francesa B",
+          "SITAS B"
+        ],
+        [
+          "Newman B",
+          "Liceo Naval B"
+        ],
+        [
+          "Los Tilos B",
+          "Los Molinos B"
+        ],
+        [
+          "San Andres B",
+          "Hindu B"
+        ],
+        [
+          "Los Matreros B",
+          "Lomas Athl. B"
+        ],
+        [
+          "Olivos B",
+          "San Martin B"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "SITAS B",
+          "Olivos B"
+        ],
+        [
+          "San Martin B",
+          "Los Matreros B"
+        ],
+        [
+          "Lomas Athl. B",
+          "San Andres B"
+        ],
+        [
+          "Hindu B",
+          "Los Tilos B"
+        ],
+        [
+          "Los Molinos B",
+          "Newman B"
+        ],
+        [
+          "Liceo Naval B",
+          "A.D. Francesa B"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "Liceo Naval B",
+          "SITAS B"
+        ],
+        [
+          "A.D. Francesa B",
+          "Los Molinos B"
+        ],
+        [
+          "Newman B",
+          "Hindu B"
+        ],
+        [
+          "Los Tilos B",
+          "Lomas Athl. B"
+        ],
+        [
+          "San Andres B",
+          "San Martin B"
+        ],
+        [
+          "Los Matreros B",
+          "Olivos B"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "SITAS B",
+          "Los Matreros B"
+        ],
+        [
+          "Olivos B",
+          "San Andres B"
+        ],
+        [
+          "San Martin B",
+          "Los Tilos B"
+        ],
+        [
+          "Lomas Athl. B",
+          "Newman B"
+        ],
+        [
+          "Hindu B",
+          "A.D. Francesa B"
+        ],
+        [
+          "Los Molinos B",
+          "Liceo Naval B"
+        ]
+      ]
+    }
+  },
+  "m17-c": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "CUBA C",
+          "Pucara D"
+        ],
+        [
+          "Buenos Aires C",
+          "Sin Info"
+        ],
+        [
+          "Alumni C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "CASI C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Champagnat C",
+          "SIC D"
+        ],
+        [
+          "La Plata C",
+          "Newman C"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "La Plata C",
+          "CUBA C"
+        ],
+        [
+          "Newman C",
+          "Champagnat C"
+        ],
+        [
+          "SIC D",
+          "CASI C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Alumni C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Buenos Aires C"
+        ],
+        [
+          "Sin Info",
+          "Pucara D"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-21",
+      "partidos": [
+        [
+          "CUBA C",
+          "Sin Info"
+        ],
+        [
+          "Pucara D",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Buenos Aires C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Alumni C",
+          "SIC D"
+        ],
+        [
+          "CASI C",
+          "Newman C"
+        ],
+        [
+          "Champagnat C",
+          "La Plata C"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Champagnat C",
+          "CUBA C"
+        ],
+        [
+          "La Plata C",
+          "CASI C"
+        ],
+        [
+          "Newman C",
+          "Alumni C"
+        ],
+        [
+          "SIC D",
+          "Buenos Aires C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Pucara D"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Sin Info"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "CUBA C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Sin Info",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Pucara D",
+          "SIC D"
+        ],
+        [
+          "Buenos Aires C",
+          "Newman C"
+        ],
+        [
+          "Alumni C",
+          "La Plata C"
+        ],
+        [
+          "CASI C",
+          "Champagnat C"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "CASI C",
+          "CUBA C"
+        ],
+        [
+          "Champagnat C",
+          "Alumni C"
+        ],
+        [
+          "La Plata C",
+          "Buenos Aires C"
+        ],
+        [
+          "Newman C",
+          "Pucara D"
+        ],
+        [
+          "SIC D",
+          "Sin Info"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Belgrano Athl. C"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "CUBA C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "SIC D"
+        ],
+        [
+          "Sin Info",
+          "Newman C"
+        ],
+        [
+          "Pucara D",
+          "La Plata C"
+        ],
+        [
+          "Buenos Aires C",
+          "Champagnat C"
+        ],
+        [
+          "Alumni C",
+          "CASI C"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Alumni C",
+          "CUBA C"
+        ],
+        [
+          "CASI C",
+          "Buenos Aires C"
+        ],
+        [
+          "Champagnat C",
+          "Pucara D"
+        ],
+        [
+          "La Plata C",
+          "Sin Info"
+        ],
+        [
+          "Newman C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "SIC D",
+          "Regatas B. Vista C"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "CUBA C",
+          "SIC D"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Newman C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "La Plata C"
+        ],
+        [
+          "Sin Info",
+          "Champagnat C"
+        ],
+        [
+          "Pucara D",
+          "CASI C"
+        ],
+        [
+          "Buenos Aires C",
+          "Alumni C"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "Buenos Aires C",
+          "CUBA C"
+        ],
+        [
+          "Alumni C",
+          "Pucara D"
+        ],
+        [
+          "CASI C",
+          "Sin Info"
+        ],
+        [
+          "Champagnat C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "La Plata C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Newman C",
+          "SIC D"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "CUBA C",
+          "Newman C"
+        ],
+        [
+          "SIC D",
+          "La Plata C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Champagnat C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "CASI C"
+        ],
+        [
+          "Sin Info",
+          "Alumni C"
+        ],
+        [
+          "Pucara D",
+          "Buenos Aires C"
+        ]
+      ]
+    }
+  },
+  "m19-a": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "San Luis A",
+          "La Plata A"
+        ],
+        [
+          "SIC A",
+          "Champagnat A"
+        ],
+        [
+          "Regatas B Vista A",
+          "Newman A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Alumni A"
+        ],
+        [
+          "Hindu A",
+          "Buenos Aires A"
+        ],
+        [
+          "Pucara A",
+          "CUBA A"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara A",
+          "San Luis A"
+        ],
+        [
+          "CUBA A",
+          "Hindu A"
+        ],
+        [
+          "Buenos Aires A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "Alumni A",
+          "Regatas B Vista A"
+        ],
+        [
+          "Newman A",
+          "SIC A"
+        ],
+        [
+          "Champagnat A",
+          "La Plata A"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "San Luis A",
+          "Champagnat A"
+        ],
+        [
+          "La Plata A",
+          "Newman A"
+        ],
+        [
+          "SIC A",
+          "Alumni A"
+        ],
+        [
+          "Regatas B Vista A",
+          "Buenos Aires A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "CUBA A"
+        ],
+        [
+          "Hindu A",
+          "Pucara A"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Hindu A",
+          "San Luis A"
+        ],
+        [
+          "Pucara A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "CUBA A",
+          "Regatas B Vista A"
+        ],
+        [
+          "Buenos Aires A",
+          "SIC A"
+        ],
+        [
+          "Alumni A",
+          "La Plata A"
+        ],
+        [
+          "Newman A",
+          "Champagnat A"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "San Luis A",
+          "Newman A"
+        ],
+        [
+          "Champagnat A",
+          "Alumni A"
+        ],
+        [
+          "La Plata A",
+          "Buenos Aires A"
+        ],
+        [
+          "SIC A",
+          "CUBA A"
+        ],
+        [
+          "Regatas B Vista A",
+          "Pucara A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Hindu A"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Belgrano Athl. A",
+          "San Luis A"
+        ],
+        [
+          "Hindu A",
+          "Regatas B Vista A"
+        ],
+        [
+          "Pucara A",
+          "SIC A"
+        ],
+        [
+          "CUBA A",
+          "La Plata A"
+        ],
+        [
+          "Buenos Aires A",
+          "Champagnat A"
+        ],
+        [
+          "Alumni A",
+          "Newman A"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "San Luis A",
+          "Alumni A"
+        ],
+        [
+          "Newman A",
+          "Buenos Aires A"
+        ],
+        [
+          "Champagnat A",
+          "CUBA A"
+        ],
+        [
+          "La Plata A",
+          "Pucara A"
+        ],
+        [
+          "SIC A",
+          "Hindu A"
+        ],
+        [
+          "Regatas B Vista A",
+          "Belgrano Athl. A"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B Vista A",
+          "San Luis A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "SIC A"
+        ],
+        [
+          "Hindu A",
+          "La Plata A"
+        ],
+        [
+          "Pucara A",
+          "Champagnat A"
+        ],
+        [
+          "CUBA A",
+          "Newman A"
+        ],
+        [
+          "Buenos Aires A",
+          "Alumni A"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "San Luis A",
+          "Buenos Aires A"
+        ],
+        [
+          "Alumni A",
+          "CUBA A"
+        ],
+        [
+          "Newman A",
+          "Pucara A"
+        ],
+        [
+          "Champagnat A",
+          "Hindu A"
+        ],
+        [
+          "La Plata A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "SIC A",
+          "Regatas B Vista A"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC A",
+          "San Luis A"
+        ],
+        [
+          "Regatas B Vista A",
+          "La Plata A"
+        ],
+        [
+          "Belgrano Athl. A",
+          "Champagnat A"
+        ],
+        [
+          "Hindu A",
+          "Newman A"
+        ],
+        [
+          "Pucara A",
+          "Alumni A"
+        ],
+        [
+          "CUBA A",
+          "Buenos Aires A"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "San Luis A",
+          "CUBA A"
+        ],
+        [
+          "Buenos Aires A",
+          "Pucara A"
+        ],
+        [
+          "Alumni A",
+          "Hindu A"
+        ],
+        [
+          "Newman A",
+          "Belgrano Athl. A"
+        ],
+        [
+          "Champagnat A",
+          "Regatas B Vista A"
+        ],
+        [
+          "La Plata A",
+          "SIC A"
+        ]
+      ]
+    }
+  },
+  "m19-b": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "San Luis B",
+          "La Plata B"
+        ],
+        [
+          "SIC B",
+          "Champagnat B"
+        ],
+        [
+          "Regatas B Vista B",
+          "Newman B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Alumni B"
+        ],
+        [
+          "Hindu B",
+          "Buenos Aires B"
+        ],
+        [
+          "Pucara B",
+          "CUBA B"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara B",
+          "San Luis B"
+        ],
+        [
+          "CUBA B",
+          "Hindu B"
+        ],
+        [
+          "Buenos Aires B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "Alumni B",
+          "Regatas B Vista B"
+        ],
+        [
+          "Newman B",
+          "SIC B"
+        ],
+        [
+          "Champagnat B",
+          "La Plata B"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "San Luis B",
+          "Champagnat B"
+        ],
+        [
+          "La Plata B",
+          "Newman B"
+        ],
+        [
+          "SIC B",
+          "Alumni B"
+        ],
+        [
+          "Regatas B Vista B",
+          "Buenos Aires B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "CUBA B"
+        ],
+        [
+          "Hindu B",
+          "Pucara B"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Hindu B",
+          "San Luis B"
+        ],
+        [
+          "Pucara B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "CUBA B",
+          "Regatas B Vista B"
+        ],
+        [
+          "Buenos Aires B",
+          "SIC B"
+        ],
+        [
+          "Alumni B",
+          "La Plata B"
+        ],
+        [
+          "Newman B",
+          "Champagnat B"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "San Luis B",
+          "Newman B"
+        ],
+        [
+          "Champagnat B",
+          "Alumni B"
+        ],
+        [
+          "La Plata B",
+          "Buenos Aires B"
+        ],
+        [
+          "SIC B",
+          "CUBA B"
+        ],
+        [
+          "Regatas B Vista B",
+          "Pucara B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Hindu B"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Belgrano Athl. B",
+          "San Luis B"
+        ],
+        [
+          "Hindu B",
+          "Regatas B Vista B"
+        ],
+        [
+          "Pucara B",
+          "SIC B"
+        ],
+        [
+          "CUBA B",
+          "La Plata B"
+        ],
+        [
+          "Buenos Aires B",
+          "Champagnat B"
+        ],
+        [
+          "Alumni B",
+          "Newman B"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "San Luis B",
+          "Alumni B"
+        ],
+        [
+          "Newman B",
+          "Buenos Aires B"
+        ],
+        [
+          "Champagnat B",
+          "CUBA B"
+        ],
+        [
+          "La Plata B",
+          "Pucara B"
+        ],
+        [
+          "SIC B",
+          "Hindu B"
+        ],
+        [
+          "Regatas B Vista B",
+          "Belgrano Athl. B"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B Vista B",
+          "San Luis B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "SIC B"
+        ],
+        [
+          "Hindu B",
+          "La Plata B"
+        ],
+        [
+          "Pucara B",
+          "Champagnat B"
+        ],
+        [
+          "CUBA B",
+          "Newman B"
+        ],
+        [
+          "Buenos Aires B",
+          "Alumni B"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "San Luis B",
+          "Buenos Aires B"
+        ],
+        [
+          "Alumni B",
+          "CUBA B"
+        ],
+        [
+          "Newman B",
+          "Pucara B"
+        ],
+        [
+          "Champagnat B",
+          "Hindu B"
+        ],
+        [
+          "La Plata B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "SIC B",
+          "Regatas B Vista B"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC B",
+          "San Luis B"
+        ],
+        [
+          "Regatas B Vista B",
+          "La Plata B"
+        ],
+        [
+          "Belgrano Athl. B",
+          "Champagnat B"
+        ],
+        [
+          "Hindu B",
+          "Newman B"
+        ],
+        [
+          "Pucara B",
+          "Alumni B"
+        ],
+        [
+          "CUBA B",
+          "Buenos Aires B"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "San Luis B",
+          "CUBA B"
+        ],
+        [
+          "Buenos Aires B",
+          "Pucara B"
+        ],
+        [
+          "Alumni B",
+          "Hindu B"
+        ],
+        [
+          "Newman B",
+          "Belgrano Athl. B"
+        ],
+        [
+          "Champagnat B",
+          "Regatas B Vista B"
+        ],
+        [
+          "La Plata B",
+          "SIC B"
+        ]
+      ]
+    }
+  },
+  "m19-c": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "San Martin C",
+          "La Plata C"
+        ],
+        [
+          "SIC C",
+          "Champagnat C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Newman C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "CASI C"
+        ],
+        [
+          "Hindu C",
+          "Buenos Aires C"
+        ],
+        [
+          "Pucara C",
+          "CUBA C"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara C",
+          "San Martin C"
+        ],
+        [
+          "CUBA C",
+          "Hindu C"
+        ],
+        [
+          "Buenos Aires C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "CASI C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Newman C",
+          "SIC C"
+        ],
+        [
+          "Champagnat C",
+          "La Plata C"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "San Martin C",
+          "Champagnat C"
+        ],
+        [
+          "La Plata C",
+          "Newman C"
+        ],
+        [
+          "SIC C",
+          "CASI C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Buenos Aires C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "CUBA C"
+        ],
+        [
+          "Hindu C",
+          "Pucara C"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Hindu C",
+          "San Martin C"
+        ],
+        [
+          "Pucara C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "CUBA C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Buenos Aires C",
+          "SIC C"
+        ],
+        [
+          "CASI C",
+          "La Plata C"
+        ],
+        [
+          "Newman C",
+          "Champagnat C"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "San Martin C",
+          "Newman C"
+        ],
+        [
+          "Champagnat C",
+          "CASI C"
+        ],
+        [
+          "La Plata C",
+          "Buenos Aires C"
+        ],
+        [
+          "SIC C",
+          "CUBA C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Pucara C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Hindu C"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Belgrano Athl. C",
+          "San Martin C"
+        ],
+        [
+          "Hindu C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "Pucara C",
+          "SIC C"
+        ],
+        [
+          "CUBA C",
+          "La Plata C"
+        ],
+        [
+          "Buenos Aires C",
+          "Champagnat C"
+        ],
+        [
+          "CASI C",
+          "Newman C"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "San Martin C",
+          "CASI C"
+        ],
+        [
+          "Newman C",
+          "Buenos Aires C"
+        ],
+        [
+          "Champagnat C",
+          "CUBA C"
+        ],
+        [
+          "La Plata C",
+          "Pucara C"
+        ],
+        [
+          "SIC C",
+          "Hindu C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "Belgrano Athl. C"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B. Vista C",
+          "San Martin C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "SIC C"
+        ],
+        [
+          "Hindu C",
+          "La Plata C"
+        ],
+        [
+          "Pucara C",
+          "Champagnat C"
+        ],
+        [
+          "CUBA C",
+          "Newman C"
+        ],
+        [
+          "Buenos Aires C",
+          "CASI C"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "San Martin C",
+          "Buenos Aires C"
+        ],
+        [
+          "CASI C",
+          "CUBA C"
+        ],
+        [
+          "Newman C",
+          "Pucara C"
+        ],
+        [
+          "Champagnat C",
+          "Hindu C"
+        ],
+        [
+          "La Plata C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "SIC C",
+          "Regatas B. Vista C"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC C",
+          "San Martin C"
+        ],
+        [
+          "Regatas B. Vista C",
+          "La Plata C"
+        ],
+        [
+          "Belgrano Athl. C",
+          "Champagnat C"
+        ],
+        [
+          "Hindu C",
+          "Newman C"
+        ],
+        [
+          "Pucara C",
+          "CASI C"
+        ],
+        [
+          "CUBA C",
+          "Buenos Aires C"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "San Martin C",
+          "CUBA C"
+        ],
+        [
+          "Buenos Aires C",
+          "Pucara C"
+        ],
+        [
+          "CASI C",
+          "Hindu C"
+        ],
+        [
+          "Newman C",
+          "Belgrano Athl. C"
+        ],
+        [
+          "Champagnat C",
+          "Regatas B. Vista C"
+        ],
+        [
+          "La Plata C",
+          "SIC C"
+        ]
+      ]
+    }
+  },
+  "m19-d": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "San Martin D",
+          "La Plata D"
+        ],
+        [
+          "SIC D",
+          "Champagnat D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Newman D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "CASI D"
+        ],
+        [
+          "Hindu D",
+          "Buenos Aires D"
+        ],
+        [
+          "Pucara D",
+          "CUBA D"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Pucara D",
+          "San Martin D"
+        ],
+        [
+          "CUBA D",
+          "Hindu D"
+        ],
+        [
+          "Buenos Aires D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "CASI D",
+          "Regatas B. Vista D"
+        ],
+        [
+          "Newman D",
+          "SIC D"
+        ],
+        [
+          "Champagnat D",
+          "La Plata D"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "San Martin D",
+          "Champagnat D"
+        ],
+        [
+          "La Plata D",
+          "Newman D"
+        ],
+        [
+          "SIC D",
+          "CASI D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Buenos Aires D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "CUBA D"
+        ],
+        [
+          "Hindu D",
+          "Pucara D"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Hindu D",
+          "San Martin D"
+        ],
+        [
+          "Pucara D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "CUBA D",
+          "Regatas B. Vista D"
+        ],
+        [
+          "Buenos Aires D",
+          "SIC D"
+        ],
+        [
+          "CASI D",
+          "La Plata D"
+        ],
+        [
+          "Newman D",
+          "Champagnat D"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "San Martin D",
+          "Newman D"
+        ],
+        [
+          "Champagnat D",
+          "CASI D"
+        ],
+        [
+          "La Plata D",
+          "Buenos Aires D"
+        ],
+        [
+          "SIC D",
+          "CUBA D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Pucara D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "Hindu D"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Belgrano Athl. D",
+          "San Martin D"
+        ],
+        [
+          "Hindu D",
+          "Regatas B. Vista D"
+        ],
+        [
+          "Pucara D",
+          "SIC D"
+        ],
+        [
+          "CUBA D",
+          "La Plata D"
+        ],
+        [
+          "Buenos Aires D",
+          "Champagnat D"
+        ],
+        [
+          "CASI D",
+          "Newman D"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "San Martin D",
+          "CASI D"
+        ],
+        [
+          "Newman D",
+          "Buenos Aires D"
+        ],
+        [
+          "Champagnat D",
+          "CUBA D"
+        ],
+        [
+          "La Plata D",
+          "Pucara D"
+        ],
+        [
+          "SIC D",
+          "Hindu D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "Belgrano Athl. D"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B. Vista D",
+          "San Martin D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "SIC D"
+        ],
+        [
+          "Hindu D",
+          "La Plata D"
+        ],
+        [
+          "Pucara D",
+          "Champagnat D"
+        ],
+        [
+          "CUBA D",
+          "Newman D"
+        ],
+        [
+          "Buenos Aires D",
+          "CASI D"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "San Martin D",
+          "Buenos Aires D"
+        ],
+        [
+          "CASI D",
+          "CUBA D"
+        ],
+        [
+          "Newman D",
+          "Pucara D"
+        ],
+        [
+          "Champagnat D",
+          "Hindu D"
+        ],
+        [
+          "La Plata D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "SIC D",
+          "Regatas B. Vista D"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC D",
+          "San Martin D"
+        ],
+        [
+          "Regatas B. Vista D",
+          "La Plata D"
+        ],
+        [
+          "Belgrano Athl. D",
+          "Champagnat D"
+        ],
+        [
+          "Hindu D",
+          "Newman D"
+        ],
+        [
+          "Pucara D",
+          "CASI D"
+        ],
+        [
+          "CUBA D",
+          "Buenos Aires D"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "San Martin D",
+          "CUBA D"
+        ],
+        [
+          "Buenos Aires D",
+          "Pucara D"
+        ],
+        [
+          "CASI D",
+          "Hindu D"
+        ],
+        [
+          "Newman D",
+          "Belgrano Athl. D"
+        ],
+        [
+          "Champagnat D",
+          "Regatas B. Vista D"
+        ],
+        [
+          "La Plata D",
+          "SIC D"
+        ]
+      ]
+    }
+  },
+  "m19-e": {
+    "1": {
+      "fecha": "2026-08-09",
+      "partidos": [
+        [
+          "San Luis C",
+          "G Y Esgrima C"
+        ],
+        [
+          "SIC E",
+          "Champagnat E"
+        ],
+        [
+          "Regatas B Vista E",
+          "Newman E"
+        ],
+        [
+          "Belgrano Athl. E",
+          "Alumni C"
+        ],
+        [
+          "Manuel Belgrano C",
+          "Buenos Aires E"
+        ],
+        [
+          "Los Molinos C",
+          "CUBA E"
+        ]
+      ]
+    },
+    "2": {
+      "fecha": "2026-08-16",
+      "partidos": [
+        [
+          "Los Molinos C",
+          "San Luis C"
+        ],
+        [
+          "CUBA E",
+          "Manuel Belgrano C"
+        ],
+        [
+          "Buenos Aires E",
+          "Belgrano Athl. E"
+        ],
+        [
+          "Alumni C",
+          "Regatas B Vista E"
+        ],
+        [
+          "Newman E",
+          "SIC E"
+        ],
+        [
+          "Champagnat E",
+          "G Y Esgrima C"
+        ]
+      ]
+    },
+    "3": {
+      "fecha": "2026-08-23",
+      "partidos": [
+        [
+          "San Luis C",
+          "Champagnat E"
+        ],
+        [
+          "G Y Esgrima C",
+          "Newman E"
+        ],
+        [
+          "SIC E",
+          "Alumni C"
+        ],
+        [
+          "Regatas B Vista E",
+          "Buenos Aires E"
+        ],
+        [
+          "Belgrano Athl. E",
+          "CUBA E"
+        ],
+        [
+          "Manuel Belgrano C",
+          "Los Molinos C"
+        ]
+      ]
+    },
+    "4": {
+      "fecha": "2026-08-30",
+      "partidos": [
+        [
+          "Manuel Belgrano C",
+          "San Luis C"
+        ],
+        [
+          "Los Molinos C",
+          "Belgrano Athl. E"
+        ],
+        [
+          "CUBA E",
+          "Regatas B Vista E"
+        ],
+        [
+          "Buenos Aires E",
+          "SIC E"
+        ],
+        [
+          "Alumni C",
+          "G Y Esgrima C"
+        ],
+        [
+          "Newman E",
+          "Champagnat E"
+        ]
+      ]
+    },
+    "5": {
+      "fecha": "2026-09-06",
+      "partidos": [
+        [
+          "San Luis C",
+          "Newman E"
+        ],
+        [
+          "Champagnat E",
+          "Alumni C"
+        ],
+        [
+          "G Y Esgrima C",
+          "Buenos Aires E"
+        ],
+        [
+          "SIC E",
+          "CUBA E"
+        ],
+        [
+          "Regatas B Vista E",
+          "Los Molinos C"
+        ],
+        [
+          "Belgrano Athl. E",
+          "Manuel Belgrano C"
+        ]
+      ]
+    },
+    "6": {
+      "fecha": "2026-09-13",
+      "partidos": [
+        [
+          "Belgrano Athl. E",
+          "San Luis C"
+        ],
+        [
+          "Manuel Belgrano C",
+          "Regatas B Vista E"
+        ],
+        [
+          "Los Molinos C",
+          "SIC E"
+        ],
+        [
+          "CUBA E",
+          "G Y Esgrima C"
+        ],
+        [
+          "Buenos Aires E",
+          "Champagnat E"
+        ],
+        [
+          "Alumni C",
+          "Newman E"
+        ]
+      ]
+    },
+    "7": {
+      "fecha": "2026-09-27",
+      "partidos": [
+        [
+          "San Luis C",
+          "Alumni C"
+        ],
+        [
+          "Newman E",
+          "Buenos Aires E"
+        ],
+        [
+          "Champagnat E",
+          "CUBA E"
+        ],
+        [
+          "G Y Esgrima C",
+          "Los Molinos C"
+        ],
+        [
+          "SIC E",
+          "Manuel Belgrano C"
+        ],
+        [
+          "Regatas B Vista E",
+          "Belgrano Athl. E"
+        ]
+      ]
+    },
+    "8": {
+      "fecha": "2026-10-04",
+      "partidos": [
+        [
+          "Regatas B Vista E",
+          "San Luis C"
+        ],
+        [
+          "Belgrano Athl. E",
+          "SIC E"
+        ],
+        [
+          "Manuel Belgrano C",
+          "G Y Esgrima C"
+        ],
+        [
+          "Los Molinos C",
+          "Champagnat E"
+        ],
+        [
+          "CUBA E",
+          "Newman E"
+        ],
+        [
+          "Buenos Aires E",
+          "Alumni C"
+        ]
+      ]
+    },
+    "9": {
+      "fecha": "2026-10-11",
+      "partidos": [
+        [
+          "San Luis C",
+          "Buenos Aires E"
+        ],
+        [
+          "Alumni C",
+          "CUBA E"
+        ],
+        [
+          "Newman E",
+          "Los Molinos C"
+        ],
+        [
+          "Champagnat E",
+          "Manuel Belgrano C"
+        ],
+        [
+          "G Y Esgrima C",
+          "Belgrano Athl. E"
+        ],
+        [
+          "SIC E",
+          "Regatas B Vista E"
+        ]
+      ]
+    },
+    "10": {
+      "fecha": "2026-10-25",
+      "partidos": [
+        [
+          "SIC E",
+          "San Luis C"
+        ],
+        [
+          "Regatas B Vista E",
+          "G Y Esgrima C"
+        ],
+        [
+          "Belgrano Athl. E",
+          "Champagnat E"
+        ],
+        [
+          "Manuel Belgrano C",
+          "Newman E"
+        ],
+        [
+          "Los Molinos C",
+          "Alumni C"
+        ],
+        [
+          "CUBA E",
+          "Buenos Aires E"
+        ]
+      ]
+    },
+    "11": {
+      "fecha": "2026-11-01",
+      "partidos": [
+        [
+          "San Luis C",
+          "CUBA E"
+        ],
+        [
+          "Buenos Aires E",
+          "Los Molinos C"
+        ],
+        [
+          "Alumni C",
+          "Manuel Belgrano C"
+        ],
+        [
+          "Newman E",
+          "Belgrano Athl. E"
+        ],
+        [
+          "Champagnat E",
+          "Regatas B Vista E"
+        ],
+        [
+          "G Y Esgrima C",
+          "SIC E"
+        ]
+      ]
+    }
+  }
+}

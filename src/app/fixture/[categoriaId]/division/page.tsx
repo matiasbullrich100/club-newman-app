@@ -2,16 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS } from "@/lib/categorias";
-import { NUMERO_FECHAS_SUPERIOR } from "@/lib/categorias";
-import { fixtureDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import { DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
-// Picker de fecha para el fixture completo de la division (las 26 fechas del TOP 14) -- de aca se
-// entra a /fixture/[categoriaId]/division/[numeroFecha], que muestra los 7 partidos de esa fecha.
+// Picker de fecha para el fixture completo de la division (26 fechas en Plantel Superior, 11 en
+// Juveniles -- ver numeroFechasDivisionDe) -- de aca se entra a
+// /fixture/[categoriaId]/division/[numeroFecha], que muestra los partidos de esa fecha.
 export default async function FixtureDivisionPickerPage({ params }: { params: Promise<{ categoriaId: string }> }) {
   const { categoriaId } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
@@ -21,7 +21,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   // "en_CA" da "YYYY-MM-DD", comparable como string contra el ISO de cada fecha del fixture --
   // mismo truco que esHoyEnArgentina() en lib/fecha.ts, sin importar el huso horario del server.
   const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
-  const fechas = Array.from({ length: NUMERO_FECHAS_SUPERIOR }, (_, i) => {
+  const fechas = Array.from({ length: numeroFechasDivisionDe(categoriaId) }, (_, i) => {
     const n = i + 1;
     const datos = fixtureDivisionDe(categoriaId, n);
     return { n, fecha: datos?.fecha, yaPaso: !!datos && datos.fecha < hoy };

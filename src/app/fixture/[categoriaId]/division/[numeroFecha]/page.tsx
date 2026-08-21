@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR } from "@/lib/categorias";
-import { fixtureDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { CATEGORIAS } from "@/lib/categorias";
+import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -22,14 +22,15 @@ export default async function FixtureDivisionFechaPage({
   if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
 
   const numeroFecha = Number(numeroFechaParam);
-  if (!Number.isInteger(numeroFecha) || numeroFecha < 1 || numeroFecha > NUMERO_FECHAS_SUPERIOR) notFound();
+  const numeroFechas = numeroFechasDivisionDe(categoriaId);
+  if (!Number.isInteger(numeroFecha) || numeroFecha < 1 || numeroFecha > numeroFechas) notFound();
 
   const fecha = fixtureDivisionDe(categoriaId, numeroFecha);
   if (!fecha) notFound();
 
   const session = await getSession();
   const hayAnterior = numeroFecha > 1;
-  const haySiguiente = numeroFecha < NUMERO_FECHAS_SUPERIOR;
+  const haySiguiente = numeroFecha < numeroFechas;
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>

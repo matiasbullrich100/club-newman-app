@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
 import type { Partido, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
@@ -55,8 +57,29 @@ export default async function EquipoJuvenilesPage({
         </>
       )}
 
+      {tieneFixtureDivision(equipoId) && (
+        <p style={{ textAlign: "center", margin: "12px 0 0" }}>
+          <Link
+            href={`/fixture/${equipoId}/division`}
+            style={{
+              display: "inline-block",
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              fontSize: "0.78rem",
+              fontWeight: 700,
+              padding: "10px 16px",
+              borderRadius: 8,
+              border: "1px solid rgba(226,197,120,.4)",
+              color: DORADO_SUAVE,
+            }}
+          >
+            Fixture División
+          </Link>
+        </p>
+      )}
+
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
-        Fixture
+        Fixture {nombreNewman}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>

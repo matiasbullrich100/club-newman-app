@@ -1,13 +1,20 @@
 import fixtureDatos from "@/data/fixture-division-superior.json";
 import resultadosDatos from "@/data/resultados-division-superior.json";
+import fixtureJuvenilesDatos from "@/data/fixture-division-juveniles.json";
+import resultadosJuvenilesDatos from "@/data/resultados-division-juveniles.json";
 import { normalizarNombreEquipo } from "./urba";
+import { grupoDeCategoria, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR } from "./categorias";
 
-// Fixture completo (las 26 fechas, los 7 partidos de cada fecha) de las 9 divisiones de Plantel
-// Superior que se juegan en formato "TOP 14" -- el calendario (quien juega con quien) esta cargado
-// a mano desde el PDF oficial de URBA que paso el club, y los resultados de las fechas ya jugadas
-// (1 a 18 a esta altura de la temporada) vienen de fixture.urba.org.ar (scrapeado a mano, no hay
+// Fixture completo (todas las fechas, los ~7 partidos de cada fecha) de la zona de URBA de cada
+// categoria -- calendario y resultados vienen de fixture.urba.org.ar (scrapeado a mano, no hay
 // endpoint publico de resultados/partidos -- ver src/lib/urba.ts, que solo cubre posiciones).
-// pre-g y pre-h no estan en este formato en el PDF, asi que no tienen datos aca.
+//
+// Plantel Superior: 9 divisiones en formato "TOP 14" (26 fechas) -- pre-g y pre-h no estan en ese
+// formato, asi que no tienen datos aca.
+//
+// Juveniles: cada letra (m15-a, m15-b, ...) juega en SU PROPIA zona de URBA (a diferencia de
+// Plantel Superior, las letras de una misma edad no comparten division) -- 11 fechas, un solo
+// round robin (Segunda Rueda). m19-f no tiene zona propia en URBA esta temporada.
 export const CATEGORIAS_CON_FIXTURE_DIVISION = [
   "primera",
   "intermedia",
@@ -18,12 +25,34 @@ export const CATEGORIAS_CON_FIXTURE_DIVISION = [
   "pre-e",
   "pre-f",
   "m-22",
+  "m15-a",
+  "m15-b",
+  "m15-c",
+  "m15-d",
+  "m16-a",
+  "m16-b",
+  "m16-c",
+  "m16-d",
+  "m17-a",
+  "m17-b",
+  "m17-c",
+  "m19-a",
+  "m19-b",
+  "m19-c",
+  "m19-d",
+  "m19-e",
 ] as const;
 
 export type CategoriaConFixtureDivision = (typeof CATEGORIAS_CON_FIXTURE_DIVISION)[number];
 
 export function tieneFixtureDivision(categoriaId: string): categoriaId is CategoriaConFixtureDivision {
   return (CATEGORIAS_CON_FIXTURE_DIVISION as readonly string[]).includes(categoriaId);
+}
+
+// Cuantas fechas tiene el picker/paginador de Fixture Division de esta categoria -- 26 en Plantel
+// Superior (TOP 14), 11 en Juveniles (un solo round robin de Segunda Rueda).
+export function numeroFechasDivisionDe(categoriaId: string): number {
+  return grupoDeCategoria(categoriaId).grupo === "juveniles" ? NUMERO_FECHAS_JUVENILES : NUMERO_FECHAS_SUPERIOR;
 }
 
 export interface PartidoDivision {
@@ -57,14 +86,22 @@ type PartidoResultadoRaw = {
 };
 type DatosResultadosCategoria = Record<string, { fecha: string | null; partidos: PartidoResultadoRaw[] }>;
 
-const FIXTURE = fixtureDatos as unknown as Record<CategoriaConFixtureDivision, DatosFixtureCategoria>;
-const RESULTADOS = resultadosDatos as unknown as Record<CategoriaConFixtureDivision, DatosResultadosCategoria>;
+const FIXTURE = {
+  ...(fixtureDatos as unknown as Record<CategoriaConFixtureDivision, DatosFixtureCategoria>),
+  ...(fixtureJuvenilesDatos as unknown as Record<CategoriaConFixtureDivision, DatosFixtureCategoria>),
+};
+const RESULTADOS = {
+  ...(resultadosDatos as unknown as Record<CategoriaConFixtureDivision, DatosResultadosCategoria>),
+  ...(resultadosJuvenilesDatos as unknown as Record<CategoriaConFixtureDivision, DatosResultadosCategoria>),
+};
 
-// El nombre EXACTO con el que aparece nuestro propio equipo en el PDF/sitio de URBA para cada
-// division -- no siempre es "Newman" a secas. En Preintermedia B a E, el propio equipo aparece
+// El nombre EXACTO con el que aparece nuestro propio equipo en el sitio de URBA para cada
+// categoria -- no siempre es "Newman" a secas. En Preintermedia B a E, el propio equipo aparece
 // como "Newman B"/"Newman C"/etc. Preintermedia F es un caso particular: el club mete 3 planteles
 // (Newman F, G y H) en la MISMA zona de 14 equipos -- el nuestro (categoria "pre-f") es "Newman
-// F"; G y H son otros planteles del club que juegan en esa misma zona, no nosotros.
+// F"; G y H son otros planteles del club que juegan en esa misma zona, no nosotros. En Juveniles
+// cada letra tiene su propia zona (no comparten con otras letras de Newman), asi que la letra de
+// la categoria coincide siempre con la del equipo propio en la zona.
 const NOMBRE_PROPIO: Record<CategoriaConFixtureDivision, string> = {
   primera: "Newman",
   intermedia: "Newman",
@@ -75,6 +112,22 @@ const NOMBRE_PROPIO: Record<CategoriaConFixtureDivision, string> = {
   "pre-e": "Newman E",
   "pre-f": "Newman F",
   "m-22": "Newman",
+  "m15-a": "Newman A",
+  "m15-b": "Newman B",
+  "m15-c": "Newman C",
+  "m15-d": "Newman D",
+  "m16-a": "Newman A",
+  "m16-b": "Newman B",
+  "m16-c": "Newman C",
+  "m16-d": "Newman D",
+  "m17-a": "Newman A",
+  "m17-b": "Newman B",
+  "m17-c": "Newman C",
+  "m19-a": "Newman A",
+  "m19-b": "Newman B",
+  "m19-c": "Newman C",
+  "m19-d": "Newman D",
+  "m19-e": "Newman E",
 };
 
 function nombreCorto(nombre: string, propio: string): string {
