@@ -2,17 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { puedeOperarCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { proximasFechasDe } from "@/lib/match/resumenSeccion";
-import type { JugadorPartido, Partido } from "@/types/firestore";
+import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
+import type { Partido } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
-import PartidoHistorico from "@/components/PartidoHistorico";
-import { ordenarPorDorsal } from "@/lib/players";
+import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
@@ -29,10 +28,12 @@ const botonEstilo: React.CSSProperties = {
 };
 
 // Landing de un equipo de Plantel Superior: los 3 botones (Tabla / Fixt. New. / Fixt Divis.) y,
-// debajo, la formacion del PROXIMO partido directo -- para que alguien que solo quiere ver quien
-// juega no tenga que ir a buscarlo en el fixture completo (eso vive en /categoria/[id]/fixture,
-// detras de "Fixt. New."). Si no hay proximo partido cargado (temporada terminada), no hay nada
-// que mostrar ahi abajo.
+// en la MISMA pantalla, la formacion del PROXIMO partido directo (mismo panel que /partido/[id],
+// via PartidoProgramadoPanel -- sin un link aparte a "ver partido completo"): un socio sin
+// loguearse ve formacion + incidencias, y si puede operar esta categoria ve ademas el panel para
+// publicar formacion/iniciar el partido/cargar cambios. El fixture completo (jugado y por jugar)
+// vive en /categoria/[id]/fixture, detras de "Fixt. New.". Si no hay proxima fecha cargada
+// (temporada terminada), no hay nada que mostrar ahi abajo.
 export default async function CategoriaPage({
   params,
 }: {
@@ -46,26 +47,14 @@ export default async function CategoriaPage({
 
   let proximoPartido: Partido | null = null;
   let proximoPartidoId: string | null = null;
-  let plantel: { jugadorId: string; nombre: string; dorsal: string; titular: boolean; capitan?: boolean; debut?: boolean }[] = [];
-  let ocultarFormacion = false;
+  let datos: Awaited<ReturnType<typeof datosPartidoProgramado>> | null = null;
 
   if (proxima) {
     proximoPartidoId = partidoId(categoriaId, proxima.numeroFecha);
-    const partidoRef = adminDb.collection("partidos").doc(proximoPartidoId);
-    const [partidoSnap, plantelSnap] = await Promise.all([partidoRef.get(), partidoRef.collection("plantel").get()]);
+    const partidoSnap = await adminDb.collection("partidos").doc(proximoPartidoId).get();
     if (partidoSnap.exists) {
       proximoPartido = partidoSnap.data() as Partido;
-      const puedeOperar = puedeOperarCategoria(session, categoriaId);
-      const formacionPublicada = proximoPartido.formacionPublicada !== false;
-      ocultarFormacion = !formacionPublicada && !puedeOperar;
-      plantel = ocultarFormacion
-        ? []
-        : ordenarPorDorsal(
-            plantelSnap.docs.map((d) => {
-              const data = d.data() as JugadorPartido;
-              return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular, capitan: data.capitan, debut: data.debut };
-            })
-          );
+      datos = await datosPartidoProgramado(proximoPartidoId, proximoPartido, session);
     }
   }
 
@@ -97,15 +86,8 @@ export default async function CategoriaPage({
         Próximo Partido
       </div>
 
-      {proximoPartido && proximoPartidoId ? (
-        <>
-          <PartidoHistorico partido={proximoPartido} plantel={plantel} incidentes={[]} formacionPendientePublicar={ocultarFormacion} />
-          <p style={{ textAlign: "center", marginTop: -6 }}>
-            <Link href={`/partido/${proximoPartidoId}`} style={{ fontSize: "0.78rem", color: DORADO_SUAVE, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              Ver partido completo →
-            </Link>
-          </p>
-        </>
+      {proximoPartido && proximoPartidoId && datos ? (
+        <PartidoProgramadoPanel partidoId={proximoPartidoId} partido={proximoPartido} datos={datos} />
       ) : (
         <p style={{ textAlign: "center", color: DORADO_SUAVE, fontStyle: "italic", opacity: 0.75 }}>No hay próximo partido programado.</p>
       )}

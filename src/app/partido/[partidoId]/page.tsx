@@ -12,15 +12,14 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
-import PanelDesignado from "@/components/panel-designado/PanelDesignado";
 import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
 import CargaCambio from "@/components/panel-designado/CargaCambio";
-import EditarFormacion from "@/components/panel-designado/EditarFormacion";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import ReiniciarPartidoButton from "@/components/ReiniciarPartidoButton";
-import PublicarFormacionButton from "@/components/PublicarFormacionButton";
+import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
+import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PartidoPage({
@@ -164,76 +163,17 @@ export default async function PartidoPage({
   // Partido todavia no arranco: vista estatica (resultado/formaciones aun no hay) + si quien
   // mira puede operar esta categoria, el boton "Iniciar partido" para arrancarlo cuando toque.
   if (partido.estado === "programado") {
-    const grupo = grupoDeCategoria(partido.categoriaId);
-    const jugadoresQuery =
-      grupo.grupo === "superior"
-        ? adminDb.collection("jugadores").where("grupo", "==", "superior")
-        : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
-    const [plantelSnap, jugadoresSnap] = await Promise.all([partidoRef.collection("plantel").get(), jugadoresQuery.get()]);
-    const plantelCompleto = jugadoresSnap.docs.map((d) => ({
-      jugadorId: d.id,
-      nombre: (d.data() as JugadorAgregado).nombre,
-    }));
-    const plantel = ordenarPorDorsal(
-      plantelSnap.docs.map((d) => {
-        const data = d.data() as JugadorPartido;
-        return {
-          jugadorId: d.id,
-          nombre: data.nombre,
-          dorsal: data.dorsal,
-          titular: data.titular,
-          capitan: data.capitan,
-          debut: data.debut,
-        };
-      })
-    );
-    // createdAt/updatedAt son Timestamps de Firestore -- no se pueden pasar a un Client Component.
-    const partidoParaCliente: Partido = {
-      categoriaId: partido.categoriaId,
-      numeroFecha: partido.numeroFecha,
-      rival: partido.rival,
-      esLocal: partido.esLocal,
-      cancha: partido.cancha,
-      estado: partido.estado,
-      resultado: partido.resultado,
-      enCanchaIds: partido.enCanchaIds,
-    };
-
-    // Formacion cargada como borrador (ver formacionPublicada en types/firestore.ts) -- quien no
-    // puede operar esta categoria no ve la formacion real hasta que se publique.
-    const formacionPublicada = partido.formacionPublicada !== false;
-    const ocultarFormacion = !formacionPublicada && !puedeOperar;
-    const plantelParaMostrar = ocultarFormacion ? [] : plantel;
-
+    const datos = await datosPartidoProgramado(partidoId, partido, session);
     return (
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
-        <PartidoHistorico
+        <PartidoProgramadoPanel
+          partidoId={partidoId}
           partido={partido}
-          plantel={plantelParaMostrar}
-          incidentes={[]}
+          datos={datos}
           posicionesHref={posicionesHref}
           posicionesActualizado={posicionesActualizado}
-          formacionPendientePublicar={ocultarFormacion}
         />
-        {puedeOperar && !formacionPublicada && plantel.length > 0 && <PublicarFormacionButton partidoId={partidoId} />}
-        {puedeOperar && (
-          <PanelDesignado
-            partidoId={partidoId}
-            partido={partidoParaCliente}
-            plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
-            periodo={null}
-          />
-        )}
-        {puedeOperar && plantel.length > 0 && (
-          <EditarFormacion
-            partidoId={partidoId}
-            plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
-            plantelCompleto={plantelCompleto}
-          />
-        )}
-        {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
-        {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );
