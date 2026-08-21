@@ -28,6 +28,14 @@ export function esHoyEnArgentina(fecha: Date): boolean {
   return diaDe(fecha) === diaDe(new Date());
 }
 
+// Plantel Superior juega los sabados -- desde el viernes (previa) hasta el sabado, el resumen de
+// /superior deja de mostrar el resultado de la fecha pasada (ya viejo) y muestra la Proxima Fecha
+// en su lugar, hasta que haya un partido en vivo o recien terminado que lo reemplace.
+export function esViernesOSabadoEnArgentina(): boolean {
+  const dia = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short" });
+  return dia === "Fri" || dia === "Sat";
+}
+
 // Para un ISO "YYYY-MM-DD" (la fecha calendario del partido, no de la ultima edicion) -- una
 // correccion cargada dias despues no debe hacer que el partido "reaparezca" como si fuera hoy.
 export function fechaIsoEsHoyEnArgentina(fechaIso: string): boolean {

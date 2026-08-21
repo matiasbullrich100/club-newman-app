@@ -1,7 +1,7 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina } from "@/lib/fecha";
-import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
+import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
@@ -93,4 +93,41 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
     estado: p.estado,
     resultado: p.resultado,
   }));
+}
+
+export interface ProximaFecha {
+  numeroFecha: number;
+  fecha?: string;
+  esLocal: boolean;
+  rival: string;
+  cancha?: string;
+  notaEspecial?: string;
+}
+
+/**
+ * El proximo partido "programado" de una categoria (menor numeroFecha) -- para el banner "Proxima
+ * Fecha" de /superior los viernes/sabados (ver esViernesOSabadoEnArgentina en lib/fecha.ts), antes
+ * de que la fecha de esta semana este en vivo o terminada. Trae los 26 partidos por id (mismo
+ * patron que /categoria/[categoriaId]) en vez de un where() -- no hace falta indice compuesto.
+ */
+export async function proximaFechaDe(categoriaId: string): Promise<ProximaFecha | null> {
+  const refs = Array.from({ length: NUMERO_FECHAS_SUPERIOR }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
+  const snaps = await adminDb.getAll(...refs);
+  let proxima: (Partido & { numeroFecha: number }) | null = null;
+  for (const snap of snaps) {
+    if (!snap.exists) continue;
+    const p = snap.data() as Partido;
+    if (p.estado !== "programado") continue;
+    const n = comoNumero(p.numeroFecha);
+    if (!proxima || n < proxima.numeroFecha) proxima = { ...p, numeroFecha: n };
+  }
+  if (!proxima) return null;
+  return {
+    numeroFecha: proxima.numeroFecha,
+    fecha: proxima.fecha,
+    esLocal: proxima.esLocal,
+    rival: proxima.rival,
+    cancha: proxima.cancha,
+    notaEspecial: proxima.notaEspecial,
+  };
 }
