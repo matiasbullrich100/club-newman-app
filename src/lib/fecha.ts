@@ -33,6 +33,13 @@ export function hoyIsoEnArgentina(): string {
   return new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 }
 
+// "YYYY-MM-DD" de mañana en Argentina -- para el resumen de "Partidos de Mañana" en /superior.
+export function mananaIsoEnArgentina(): string {
+  const hoy = new Date(`${hoyIsoEnArgentina()}T00:00:00Z`);
+  hoy.setUTCDate(hoy.getUTCDate() + 1);
+  return hoy.toISOString().slice(0, 10);
+}
+
 // Dias de calendario (no horas) entre una fecha ISO "YYYY-MM-DD" y hoy en Argentina -- para saber
 // si el ultimo resultado terminado todavia es "de esta semana" o ya quedo viejo (ver
 // debeMostrarProximaFechaEnArgentina, mas abajo, y su uso en /superior y /juveniles).

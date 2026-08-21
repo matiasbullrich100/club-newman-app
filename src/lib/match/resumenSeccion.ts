@@ -169,6 +169,43 @@ export async function proximaFechaPorCategoria(categoriaIds: string[]): Promise<
   return resultado;
 }
 
+export interface PartidoDeFecha {
+  id: string;
+  categoriaId: string;
+  esLocal: boolean;
+  rival: string;
+  hora?: string;
+  cancha?: string;
+  notaEspecial?: string;
+}
+
+/**
+ * El partido de cada categoria en `categoriaIds` que cae justo en `fechaIso` -- para el resumen
+ * "Partidos de Mañana" en /superior (ver mananaIsoEnArgentina en lib/fecha.ts). Un solo where()
+ * sobre el campo `fecha` (sin filtro compuesto, no hace falta indice) y se filtra/ordena en
+ * memoria por el orden canonico de categorias.ts.
+ */
+export async function partidosDeFechaExacta(categoriaIds: string[], fechaIso: string): Promise<PartidoDeFecha[]> {
+  const idsSet = new Set(categoriaIds);
+  const snap = await adminDb.collection("partidos").where("fecha", "==", fechaIso).get();
+  const partidos = snap.docs
+    .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
+    .filter((p) => idsSet.has(p.categoriaId));
+
+  const ordenPorCategoria = new Map<string, number>(CATEGORIAS.map((c) => [c.id, c.orden]));
+  partidos.sort((a, b) => (ordenPorCategoria.get(a.categoriaId) ?? 0) - (ordenPorCategoria.get(b.categoriaId) ?? 0));
+
+  return partidos.map((p) => ({
+    id: p.id,
+    categoriaId: p.categoriaId,
+    esLocal: p.esLocal,
+    rival: p.rival,
+    hora: p.hora,
+    cancha: p.cancha,
+    notaEspecial: p.notaEspecial,
+  }));
+}
+
 async function proximaFechaJuvenilDe(categoriaId: string): Promise<ProximaFecha | null> {
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
   const snaps = await adminDb.getAll(...refs);

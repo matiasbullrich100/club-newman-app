@@ -2,15 +2,16 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
-import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
+import PartidosMananaBanner from "@/components/PartidosMananaBanner";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
@@ -45,6 +46,15 @@ export default async function PlantelSuperiorPage() {
 
   const mostrarProximaFecha = enVivo.length === 0 && !primeraTerminadoFresco && debeMostrarProximaFechaEnArgentina();
   const proximasFechas = mostrarProximaFecha ? await proximasFechasDe("primera", 3) : [];
+
+  // Resumen "Partidos de Mañana" -- todas las categorias de Plantel Superior que juegan manana,
+  // con horario, para verlas de un vistazo sin entrar categoria por categoria.
+  const partidosManana = await partidosDeFechaExacta(CATEGORIAS_SUPERIOR.map((c) => c.id), mananaIsoEnArgentina());
+  const partidosMananaConNombre = partidosManana.map((p) => ({
+    categoriaId: p.categoriaId,
+    categoriaNombre: CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId,
+    partido: p,
+  }));
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -81,6 +91,8 @@ export default async function PlantelSuperiorPage() {
           />
         ))
       )}
+
+      <PartidosMananaBanner partidos={partidosMananaConNombre} />
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 16 }}>
         {CATEGORIAS_SUPERIOR.map((cat) => (
