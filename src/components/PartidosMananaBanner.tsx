@@ -55,6 +55,9 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
               {partido.hora}
             </span>
           </Link>
+          {partido.cancha && !partido.notaEspecial && (
+            <div style={{ textAlign: "right", fontSize: "0.6rem", color: DORADO_SUAVE, opacity: 0.75, marginTop: 2 }}>en {partido.cancha}</div>
+          )}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
             {posicionesHref && (
               <Link href={posicionesHref} style={botonChico}>
