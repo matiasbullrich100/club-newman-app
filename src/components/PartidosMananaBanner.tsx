@@ -61,7 +61,7 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
                 {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
               </span>
               {!partido.notaEspecial && (
-                <span style={{ display: "block", fontSize: "0.55rem", color: DORADO_SUAVE, opacity: 0.65, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <span style={{ display: "block", fontSize: "0.68rem", fontWeight: 600, color: DORADO_SUAVE, opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   Cancha{partido.numeroCancha ? ` ${partido.numeroCancha}` : ""}
                 </span>
               )}

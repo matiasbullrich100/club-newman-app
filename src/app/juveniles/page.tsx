@@ -51,39 +51,52 @@ export default async function JuvenilesPage() {
       <SessionBar session={session} />
       <Header rightLabel="Juveniles" logo="urba" />
 
-      {equiposOrdenados.map((equipo) => {
-        const p = resumen.find((r) => r.categoriaId === equipo.id);
-        const proxima = proximasPorCategoria.get(equipo.id);
-        // Si el resultado esta viejo Y hay una proxima fecha para mostrar en su lugar, esta gana --
-        // si no hay proxima (ej. temporada terminada), se sigue mostrando el ultimo resultado aunque
-        // este viejo, mejor eso que nada.
-        if (p && !(proxima && !fresco(p))) {
-          return (
-            <LiveBanner
-              key={p.id}
-              partidoId={p.id}
-              categoriaNombre={CATEGORIAS.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-              inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
-              nombreNewman={nombreNewmanDe(p.categoriaId)}
-              esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
-              posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-              fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
-            />
-          );
-        }
-        if (!proxima) return null;
-        return (
-          <ProximaFechaRow
-            key={equipo.id}
-            partidoId={partidoIdDe(equipo.id, proxima.numeroFecha)}
-            categoriaNombre={equipo.nombre}
-            proxima={proxima}
-            nombreNewman={nombreNewmanDe(equipo.id)}
-            posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
-            fixtureHref={`/fixture/${equipo.id}`}
-          />
-        );
-      })}
+      {equiposOrdenados
+        .map((equipo) => {
+          const p = resumen.find((r) => r.categoriaId === equipo.id);
+          const proxima = proximasPorCategoria.get(equipo.id);
+          // Si el resultado esta viejo Y hay una proxima fecha para mostrar en su lugar, esta gana --
+          // si no hay proxima (ej. temporada terminada), se sigue mostrando el ultimo resultado aunque
+          // este viejo, mejor eso que nada.
+          if (p && !(proxima && !fresco(p))) {
+            return {
+              esVivo: ESTADOS_EN_VIVO.has(p.estado),
+              node: (
+                <LiveBanner
+                  key={p.id}
+                  partidoId={p.id}
+                  categoriaNombre={CATEGORIAS.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
+                  inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
+                  nombreNewman={nombreNewmanDe(p.categoriaId)}
+                  esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+                  posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
+                  fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
+                />
+              ),
+            };
+          }
+          if (!proxima) return null;
+          return {
+            esVivo: false,
+            node: (
+              <ProximaFechaRow
+                key={equipo.id}
+                partidoId={partidoIdDe(equipo.id, proxima.numeroFecha)}
+                categoriaNombre={equipo.nombre}
+                proxima={proxima}
+                nombreNewman={nombreNewmanDe(equipo.id)}
+                posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
+                fixtureHref={`/fixture/${equipo.id}`}
+              />
+            ),
+          };
+        })
+        // Los partidos EN VIVO van primero (cualquier categoria), sin importar el orden de edad/letra
+        // -- lo que esta pasando ahora es lo mas importante de esta pantalla. Dentro de cada grupo
+        // (en vivo / resto) se mantiene el orden de mas arriba (ordenar es estable).
+        .filter((f): f is NonNullable<typeof f> => f !== null)
+        .sort((a, b) => Number(b.esVivo) - Number(a.esVivo))
+        .map((f) => f.node)}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 20 }}>
         {equiposOrdenados.map((equipo) => (

@@ -83,55 +83,60 @@ export default function LiveBanner({
         marginBottom: 8,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <Link href={`/partido/${partidoId}`} style={{ display: "flex", flex: 1, minWidth: 0, alignItems: "center", gap: 8 }}>
-          <span
-            style={{
-              flex: "0 0 auto",
-              maxWidth: "22%",
-              textTransform: "uppercase",
-              letterSpacing: 0.3,
-              fontSize: "0.62rem",
-              color: DORADO_SUAVE,
-            }}
-          >
-            {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
-          </span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center" }}>
-            {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
-            {partido.notaEspecial ?? (
-              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
-            )}
-          </span>
-          <span
-            style={{
-              flex: "0 0 auto",
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-              fontSize: "0.6rem",
-              color: DORADO,
-              textAlign: "right",
-            }}
-          >
-            {partido.notaEspecial ? "" : enVivo ? "● En juego" : "Final"}
-          </span>
-        </Link>
-        {posicionesHref && (
-          <Link href={posicionesHref} style={botonChico}>
-            Tabla
-          </Link>
-        )}
-        {fixtureNewmanHref && (
-          <Link href={fixtureNewmanHref} style={botonChico}>
-            Fixt. New.
-          </Link>
-        )}
-        {fixtureDivisionHref && (
-          <Link href={fixtureDivisionHref} style={botonChico}>
-            Fixt Divis.
-          </Link>
-        )}
-      </div>
+      <Link href={`/partido/${partidoId}`} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span
+          style={{
+            flex: "0 0 auto",
+            maxWidth: "22%",
+            textTransform: "uppercase",
+            letterSpacing: 0.3,
+            fontSize: "0.62rem",
+            color: DORADO_SUAVE,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+        </span>
+        <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
+          {partido.notaEspecial ?? (
+            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
+          )}
+        </span>
+        <span
+          style={{
+            flex: "0 0 auto",
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+            fontSize: "0.6rem",
+            color: DORADO,
+            textAlign: "right",
+          }}
+        >
+          {partido.notaEspecial ? "" : enVivo ? "● En juego" : "Final"}
+        </span>
+      </Link>
+      {(posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
+          {posicionesHref && (
+            <Link href={posicionesHref} style={botonChico}>
+              Tabla
+            </Link>
+          )}
+          {fixtureNewmanHref && (
+            <Link href={fixtureNewmanHref} style={botonChico}>
+              Fixt. New.
+            </Link>
+          )}
+          {fixtureDivisionHref && (
+            <Link href={fixtureDivisionHref} style={botonChico}>
+              Fixt Divis.
+            </Link>
+          )}
+        </div>
+      )}
       {enVivo && (
         <div style={{ marginTop: 4, textAlign: "center" }}>
           <Cronometro partidoId={partidoId} estado={partido.estado} />
