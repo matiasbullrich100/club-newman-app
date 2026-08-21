@@ -32,6 +32,7 @@ interface EstadoPartidoLive {
   rival: string;
   estado: EstadoPartido;
   resultado: Resultado;
+  notaEspecial?: string;
 }
 
 export default function LiveBanner({
@@ -93,7 +94,9 @@ export default function LiveBanner({
           </span>
           <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center" }}>
             {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
-            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
+            {partido.notaEspecial ?? (
+              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
+            )}
           </span>
           <span
             style={{
@@ -105,7 +108,7 @@ export default function LiveBanner({
               textAlign: "right",
             }}
           >
-            {enVivo ? "● En juego" : "Final"}
+            {partido.notaEspecial ? "" : enVivo ? "● En juego" : "Final"}
           </span>
         </Link>
         {posicionesHref && (

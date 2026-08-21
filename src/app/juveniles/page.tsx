@@ -36,7 +36,8 @@ export default async function JuvenilesPage() {
   // ya agrupaba las 17 categorias de entrada).
   const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
   const fresco = (p: (typeof resumen)[number]) =>
-    ESTADOS_EN_VIVO.has(p.estado) || (p.estado === "terminado" && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3);
+    ESTADOS_EN_VIVO.has(p.estado) ||
+    ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3);
   const idsSinResumenFresco = equiposOrdenados
     .map((e) => e.id)
     .filter((id) => !resumen.some((p) => p.categoriaId === id && fresco(p)));
@@ -62,7 +63,7 @@ export default async function JuvenilesPage() {
               key={p.id}
               partidoId={p.id}
               categoriaNombre={CATEGORIAS.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-              inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+              inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
               nombreNewman={nombreNewmanDe(p.categoriaId)}
               esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
               posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}

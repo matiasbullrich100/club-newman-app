@@ -17,6 +17,8 @@ export interface PartidoResumen {
   // /superior y /juveniles puedan distinguir un resultado "de esta semana" de uno ya viejo (ver
   // diasDesdeEnArgentina en lib/fecha.ts).
   fecha?: string;
+  // "Fecha libre" si esta fecha fue un bye -- LiveBanner muestra esto en vez del resultado.
+  notaEspecial?: string;
 }
 
 function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
@@ -25,18 +27,23 @@ function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
 }
 
 /**
- * Partidos en vivo (cualquier categoria dentro de `categoriaIds`) mas el ULTIMO terminado de cada
- * categoria (mayor `numeroFecha`, no "jugado hoy" literal) -- el club juega una fecha por semana
- * (Plantel Superior el sabado, Juveniles el domingo), asi que el resumen tiene que seguir
+ * Partidos en vivo (cualquier categoria dentro de `categoriaIds`) mas la ULTIMA fecha jugada de
+ * cada categoria (mayor `numeroFecha`, no "jugado hoy" literal) -- el club juega una fecha por
+ * semana (Plantel Superior el sabado, Juveniles el domingo), asi que el resumen tiene que seguir
  * mostrando los resultados del ultimo partido jugado toda la semana, hasta que haya uno mas nuevo
- * (la fecha siguiente). No hace falta indice compuesto: se trae "estado==terminado" entero (el
- * volumen de partidos de este club es chico) y se filtra/agrupa en memoria.
+ * (la fecha siguiente). "Jugada" incluye un bye (Fecha libre) que ya paso -- si no, una categoria
+ * con fecha libre esta semana desaparece del resumen en vez de decir "Fecha libre" (una Fecha
+ * libre queda "programado" para siempre, nunca pasa a "terminado"). No hace falta indice
+ * compuesto: se trae "estado==terminado" y "notaEspecial==Fecha libre" enteros (el volumen de
+ * partidos de este club es chico) y se filtra/agrupa en memoria.
  */
 export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Promise<PartidoResumen[]> {
   const idsSet = new Set(categoriaIds);
-  const [enVivoSnap, terminadosSnap] = await Promise.all([
+  const hoy = hoyIsoEnArgentina();
+  const [enVivoSnap, terminadosSnap, librePasadaSnap] = await Promise.all([
     adminDb.collection("partidos").where("estado", "in", ESTADOS_EN_VIVO).get(),
     adminDb.collection("partidos").where("estado", "==", "terminado").get(),
+    adminDb.collection("partidos").where("notaEspecial", "==", "Fecha libre").get(),
   ]);
 
   const enVivo = enVivoSnap.docs
@@ -47,9 +54,14 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
     .filter((p) => idsSet.has(p.categoriaId));
 
-  // Partidos reales (con fecha calendario): el de mayor numeroFecha por categoria.
+  const libresPasadas = librePasadaSnap.docs
+    .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
+    .filter((p) => idsSet.has(p.categoriaId) && !!p.fecha && p.fecha <= hoy);
+
+  // Partidos reales (con fecha calendario, terminados o Fecha libre ya pasada): el de mayor
+  // numeroFecha por categoria.
   const masRecientePorCategoria = new Map<string, (typeof terminados)[number]>();
-  for (const p of terminados) {
+  for (const p of [...terminados, ...libresPasadas]) {
     if (!p.fecha) continue;
     const actual = masRecientePorCategoria.get(p.categoriaId);
     if (!actual || comoNumero(p.numeroFecha) > comoNumero(actual.numeroFecha)) {
@@ -97,6 +109,7 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
     estado: p.estado,
     resultado: p.resultado,
     fecha: p.fecha,
+    notaEspecial: p.notaEspecial,
   }));
 }
 

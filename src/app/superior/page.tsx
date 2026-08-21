@@ -30,7 +30,9 @@ export default async function PlantelSuperiorPage() {
   const pruebasVisibles = pruebasVisiblesPara(session);
   const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
   const enVivo = resumen.filter((p) => ESTADOS_EN_VIVO.has(p.estado));
-  const terminados = resumen.filter((p) => p.estado === "terminado");
+  // "terminado" o Fecha libre (un bye nunca pasa a "terminado", pero cuenta como la ultima fecha
+  // jugada igual -- ver partidosEnVivoOUltimoTerminado).
+  const terminados = resumen.filter((p) => p.estado === "terminado" || p.notaEspecial);
   // "terminados" queda pegado toda la semana (ver partidosEnVivoOUltimoTerminado) -- sin chequear
   // la fecha, Primera SIEMPRE aparece como "recien terminada" (aunque haya jugado hace 5 dias) y
   // la Proxima Fecha nunca llegaria a mostrarse.
@@ -52,7 +54,7 @@ export default async function PlantelSuperiorPage() {
           key={p.id}
           partidoId={p.id}
           categoriaNombre={CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
           fixtureHref={`/fixture/${p.categoriaId}`}
@@ -67,7 +69,7 @@ export default async function PlantelSuperiorPage() {
             key={p.id}
             partidoId={p.id}
             categoriaNombre={CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-            inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+            inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
             esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
             posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
             fixtureHref={`/fixture/${p.categoriaId}`}

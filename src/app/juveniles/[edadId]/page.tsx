@@ -52,7 +52,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           key={p.id}
           partidoId={p.id}
           categoriaNombre={equipos.find((e) => e.id === p.categoriaId)?.nombre ?? p.categoriaId}
-          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado }}
+          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
           nombreNewman={nombreNewmanDe(p.categoriaId)}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
