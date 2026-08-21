@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
-import { esViernesOSabadoEnArgentina } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -16,9 +16,9 @@ const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
 // Primera pantalla de la division: solo lo que se esta jugando/se jugo hoy + el selector de
 // categoria -- el fixture completo (jugado y por jugar) vive en /categoria/[categoriaId], no aca.
-// De viernes a sabado (juega Plantel Superior), si todavia no hay nada en vivo, el resultado de la
-// fecha pasada ya esta viejo -- se muestra la Proxima Fecha (de Primera) en su lugar hasta que
-// arranque el partido.
+// De jueves a la noche a domingo (juega Plantel Superior), si Primera todavia no tiene nada en vivo
+// ni recien terminado, el resultado de la fecha pasada ya esta viejo -- se muestra la Proxima Fecha
+// (de Primera) en su lugar hasta que arranque el partido o haya resultado.
 export default async function PlantelSuperiorPage() {
   const [session, resumenCompleto] = await Promise.all([
     getSession(),
@@ -31,8 +31,14 @@ export default async function PlantelSuperiorPage() {
   const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
   const enVivo = resumen.filter((p) => ESTADOS_EN_VIVO.has(p.estado));
   const terminados = resumen.filter((p) => p.estado === "terminado");
+  // "terminados" queda pegado toda la semana (ver partidosEnVivoOUltimoTerminado) -- sin chequear
+  // la fecha, Primera SIEMPRE aparece como "recien terminada" (aunque haya jugado hace 5 dias) y
+  // la Proxima Fecha nunca llegaria a mostrarse.
+  const primeraTerminadoFresco = terminados.some(
+    (p) => p.categoriaId === "primera" && p.fecha && diasDesdeEnArgentina(p.fecha) <= 3
+  );
 
-  const mostrarProximaFecha = enVivo.length === 0 && esViernesOSabadoEnArgentina();
+  const mostrarProximaFecha = enVivo.length === 0 && !primeraTerminadoFresco && debeMostrarProximaFechaEnArgentina();
   const proximasFechas = mostrarProximaFecha ? await proximasFechasDe("primera", 3) : [];
 
   return (

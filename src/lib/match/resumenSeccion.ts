@@ -1,7 +1,7 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
-import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina } from "@/lib/fecha";
-import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria, partidoId } from "@/lib/categorias";
+import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina, hoyIsoEnArgentina } from "@/lib/fecha";
+import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR, NUMERO_FECHAS_JUVENILES, grupoDeCategoria, partidoId } from "@/lib/categorias";
 import type { Partido } from "@/types/firestore";
 
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
@@ -13,6 +13,10 @@ export interface PartidoResumen {
   rival: string;
   estado: Partido["estado"];
   resultado: Partido["resultado"];
+  // Fecha calendario (ISO) del partido, si la tiene (los partidos de prueba no) -- para que
+  // /superior y /juveniles puedan distinguir un resultado "de esta semana" de uno ya viejo (ver
+  // diasDesdeEnArgentina en lib/fecha.ts).
+  fecha?: string;
 }
 
 function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
@@ -92,6 +96,7 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
     rival: p.rival,
     estado: p.estado,
     resultado: p.resultado,
+    fecha: p.fecha,
   }));
 }
 
@@ -106,18 +111,22 @@ export interface ProximaFecha {
 
 /**
  * Las proximas `cantidad` fechas "programado" de una categoria (menor numeroFecha primero) -- para
- * el banner "Proxima Fecha" de /superior los viernes/sabados (ver esViernesOSabadoEnArgentina en
- * lib/fecha.ts), antes de que la fecha de esta semana este en vivo o terminada. Trae los 26
- * partidos por id (mismo patron que /categoria/[categoriaId]) en vez de un where() -- no hace
- * falta indice compuesto.
+ * el banner "Proxima Fecha" de /superior de jueves a la noche a domingo (ver
+ * debeMostrarProximaFechaEnArgentina en lib/fecha.ts), antes de que la fecha de esta semana este en
+ * vivo o terminada. Trae los 26 partidos por id (mismo patron que /categoria/[categoriaId]) en vez
+ * de un where() -- no hace falta indice compuesto.
  */
 export async function proximasFechasDe(categoriaId: string, cantidad: number): Promise<ProximaFecha[]> {
   const refs = Array.from({ length: NUMERO_FECHAS_SUPERIOR }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
   const snaps = await adminDb.getAll(...refs);
+  const hoy = hoyIsoEnArgentina();
   const programados = snaps
     .filter((snap) => snap.exists)
     .map((snap) => ({ ...(snap.data() as Partido), numeroFecha: comoNumero((snap.data() as Partido).numeroFecha) }))
-    .filter((p) => p.estado === "programado")
+    // "programado" no siempre es futuro -- una Fecha libre queda "programado" para siempre, nunca
+    // pasa a "terminado", asi que sin este filtro una fecha libre YA JUGADA (semanas atras) se
+    // sigue mostrando como "proxima" para siempre.
+    .filter((p) => p.estado === "programado" && (!p.fecha || p.fecha >= hoy))
     .sort((a, b) => a.numeroFecha - b.numeroFecha)
     .slice(0, cantidad);
 
@@ -129,4 +138,45 @@ export async function proximasFechasDe(categoriaId: string, cantidad: number): P
     cancha: p.cancha,
     notaEspecial: p.notaEspecial,
   }));
+}
+
+/**
+ * La proxima fecha "programado" de CADA categoria en `categoriaIds` -- para Juveniles, donde a
+ * diferencia de /superior (una sola fila, Primera) se sigue mostrando un resumen por equipo (hasta
+ * 17). Usa NUMERO_FECHAS_JUVENILES (11 fechas) en vez de las 26 de Plantel Superior.
+ */
+export async function proximaFechaPorCategoria(categoriaIds: string[]): Promise<Map<string, ProximaFecha>> {
+  const resultado = new Map<string, ProximaFecha>();
+  await Promise.all(
+    categoriaIds.map(async (categoriaId) => {
+      const proximas = await proximaFechaJuvenilDe(categoriaId);
+      if (proximas) resultado.set(categoriaId, proximas);
+    })
+  );
+  return resultado;
+}
+
+async function proximaFechaJuvenilDe(categoriaId: string): Promise<ProximaFecha | null> {
+  const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
+  const snaps = await adminDb.getAll(...refs);
+  const hoy = hoyIsoEnArgentina();
+  let proxima: (Partido & { numeroFecha: number }) | null = null;
+  for (const snap of snaps) {
+    if (!snap.exists) continue;
+    const p = snap.data() as Partido;
+    // "programado" no siempre es futuro -- una Fecha libre queda asi para siempre (ver el mismo
+    // comentario en proximasFechasDe).
+    if (p.estado !== "programado" || (p.fecha && p.fecha < hoy)) continue;
+    const n = comoNumero(p.numeroFecha);
+    if (!proxima || n < proxima.numeroFecha) proxima = { ...p, numeroFecha: n };
+  }
+  if (!proxima) return null;
+  return {
+    numeroFecha: proxima.numeroFecha,
+    fecha: proxima.fecha,
+    esLocal: proxima.esLocal,
+    rival: proxima.rival,
+    cancha: proxima.cancha,
+    notaEspecial: proxima.notaEspecial,
+  };
 }

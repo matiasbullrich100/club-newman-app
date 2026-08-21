@@ -28,12 +28,44 @@ export function esHoyEnArgentina(fecha: Date): boolean {
   return diaDe(fecha) === diaDe(new Date());
 }
 
-// Plantel Superior juega los sabados -- desde el viernes (previa) hasta el sabado, el resumen de
-// /superior deja de mostrar el resultado de la fecha pasada (ya viejo) y muestra la Proxima Fecha
-// en su lugar, hasta que haya un partido en vivo o recien terminado que lo reemplace.
-export function esViernesOSabadoEnArgentina(): boolean {
-  const dia = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short" });
-  return dia === "Fri" || dia === "Sat";
+// "YYYY-MM-DD" de hoy en Argentina, comparable como string contra el campo `fecha` de un partido.
+export function hoyIsoEnArgentina(): string {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+}
+
+// Dias de calendario (no horas) entre una fecha ISO "YYYY-MM-DD" y hoy en Argentina -- para saber
+// si el ultimo resultado terminado todavia es "de esta semana" o ya quedo viejo (ver
+// debeMostrarProximaFechaEnArgentina, mas abajo, y su uso en /superior y /juveniles).
+export function diasDesdeEnArgentina(fechaIso: string): number {
+  const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+  const msPorDia = 24 * 60 * 60 * 1000;
+  const diff = (new Date(`${hoy}T00:00:00Z`).getTime() - new Date(`${fechaIso}T00:00:00Z`).getTime()) / msPorDia;
+  return Math.round(diff);
+}
+
+// Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 20:30 (pedido
+// explicito, es cuando el club arma la previa del fin de semana) hasta el domingo, el resumen de
+// /superior y /juveniles deja de mostrar el resultado de la fecha pasada (ya viejo a esa altura) y
+// muestra la Proxima Fecha en su lugar, hasta que haya un partido en vivo o recien terminado que
+// lo reemplace (ver el chequeo de "terminados" en cada pagina, no solo esta funcion).
+export function debeMostrarProximaFechaEnArgentina(): boolean {
+  const partes = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date())
+      .map((p) => [p.type, p.value])
+  );
+  const dia = partes.weekday;
+  if (dia === "Fri" || dia === "Sat" || dia === "Sun") return true;
+  if (dia === "Thu") {
+    const horas = Number(partes.hour) % 24 + Number(partes.minute) / 60;
+    return horas >= 20.5;
+  }
+  return false;
 }
 
 // Para un ISO "YYYY-MM-DD" (la fecha calendario del partido, no de la ultima edicion) -- una
