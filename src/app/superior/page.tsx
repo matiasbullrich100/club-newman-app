@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
+import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
@@ -16,7 +16,9 @@ import { DORADO_SUAVE } from "@/lib/colors";
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
 // Primera pantalla de la division: solo lo que se esta jugando/se jugo hoy + el selector de
-// categoria -- el fixture completo (jugado y por jugar) vive en /categoria/[categoriaId], no aca.
+// categoria -- el fixture completo (jugado y por jugar) vive en /categoria/[categoriaId]/fixture,
+// no aca. El selector de categoria lleva a /categoria/[categoriaId], que ya muestra la formacion
+// del proximo partido directo.
 // De jueves a la noche a domingo (juega Plantel Superior), si Primera todavia no tiene nada en vivo
 // ni recien terminado, el resultado de la fecha pasada ya esta viejo -- se muestra la Proxima Fecha
 // (de Primera) en su lugar hasta que arranque el partido o haya resultado.
@@ -44,18 +46,6 @@ export default async function PlantelSuperiorPage() {
   const mostrarProximaFecha = enVivo.length === 0 && !primeraTerminadoFresco && debeMostrarProximaFechaEnArgentina();
   const proximasFechas = mostrarProximaFecha ? await proximasFechasDe("primera", 3) : [];
 
-  // Selector de equipo (grilla de abajo): entrar directo a la formacion del proximo partido de esa
-  // categoria en vez de a /categoria/[categoriaId] -- se ahorra el paso de buscar la fecha que
-  // viene en el fixture completo. Si no hay proxima fecha cargada (ej. temporada terminada), cae
-  // al fixture completo como antes.
-  const proximoPartidoPorCategoria = new Map<string, string>();
-  await Promise.all(
-    CATEGORIAS_SUPERIOR.map(async (cat) => {
-      const [proxima] = await proximasFechasDe(cat.id, 1);
-      if (proxima) proximoPartidoPorCategoria.set(cat.id, partidoId(cat.id, proxima.numeroFecha));
-    })
-  );
-
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
@@ -70,7 +60,7 @@ export default async function PlantelSuperiorPage() {
           inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-          fixtureNewmanHref={`/categoria/${p.categoriaId}`}
+          fixtureNewmanHref={`/categoria/${p.categoriaId}/fixture`}
           fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
         />
       ))}
@@ -86,7 +76,7 @@ export default async function PlantelSuperiorPage() {
             inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
             esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
             posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-            fixtureNewmanHref={`/categoria/${p.categoriaId}`}
+            fixtureNewmanHref={`/categoria/${p.categoriaId}/fixture`}
             fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
           />
         ))
@@ -96,7 +86,7 @@ export default async function PlantelSuperiorPage() {
         {CATEGORIAS_SUPERIOR.map((cat) => (
           <Link
             key={cat.id}
-            href={proximoPartidoPorCategoria.has(cat.id) ? `/partido/${proximoPartidoPorCategoria.get(cat.id)}` : `/categoria/${cat.id}`}
+            href={`/categoria/${cat.id}`}
             style={{
               background: "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
               border: "1px solid rgba(226,197,120,.25)",
