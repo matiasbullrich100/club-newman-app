@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
+import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
@@ -44,6 +44,18 @@ export default async function PlantelSuperiorPage() {
   const mostrarProximaFecha = enVivo.length === 0 && !primeraTerminadoFresco && debeMostrarProximaFechaEnArgentina();
   const proximasFechas = mostrarProximaFecha ? await proximasFechasDe("primera", 3) : [];
 
+  // Selector de equipo (grilla de abajo): entrar directo a la formacion del proximo partido de esa
+  // categoria en vez de a /categoria/[categoriaId] -- se ahorra el paso de buscar la fecha que
+  // viene en el fixture completo. Si no hay proxima fecha cargada (ej. temporada terminada), cae
+  // al fixture completo como antes.
+  const proximoPartidoPorCategoria = new Map<string, string>();
+  await Promise.all(
+    CATEGORIAS_SUPERIOR.map(async (cat) => {
+      const [proxima] = await proximasFechasDe(cat.id, 1);
+      if (proxima) proximoPartidoPorCategoria.set(cat.id, partidoId(cat.id, proxima.numeroFecha));
+    })
+  );
+
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/" />
@@ -84,7 +96,7 @@ export default async function PlantelSuperiorPage() {
         {CATEGORIAS_SUPERIOR.map((cat) => (
           <Link
             key={cat.id}
-            href={`/categoria/${cat.id}`}
+            href={proximoPartidoPorCategoria.has(cat.id) ? `/partido/${proximoPartidoPorCategoria.get(cat.id)}` : `/categoria/${cat.id}`}
             style={{
               background: "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
               border: "1px solid rgba(226,197,120,.25)",
