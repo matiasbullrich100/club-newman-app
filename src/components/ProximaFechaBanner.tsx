@@ -29,7 +29,9 @@ export default function ProximaFechaBanner({ proxima }: { proxima: ProximaFecha 
           </div>
           <div style={{ fontSize: "0.7rem", color: DORADO_SUAVE, opacity: 0.8, marginTop: 2 }}>
             {proxima.fecha && formatFechaCorta(proxima.fecha)}
-            {!proxima.esLocal && proxima.cancha && ` · en ${proxima.cancha}`}
+            {/* "en Champa", no "en Champagnat" -- el rival ya viene abreviado (ver normalizarNombreEquipo),
+                a diferencia de `cancha` que guarda el nombre completo del club. */}
+            {!proxima.esLocal && ` · en ${proxima.rival}`}
           </div>
         </>
       )}
