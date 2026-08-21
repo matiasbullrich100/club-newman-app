@@ -4,6 +4,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 import Header from "@/components/Header";
@@ -35,25 +36,62 @@ export default async function CategoriaPage({
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
 
-      {TORNEOS_URBA[categoriaId] !== undefined && (
-        <p style={{ textAlign: "center", margin: "10px 0 0" }}>
+      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+        {TORNEOS_URBA[categoriaId] !== undefined && (
           <Link
             href={`/posiciones/${categoriaId}`}
             style={{
-              display: "inline-block",
+              flex: 1,
+              textAlign: "center",
               textTransform: "uppercase",
-              letterSpacing: 1,
-              fontSize: "0.78rem",
-              padding: "10px 16px",
+              letterSpacing: 0.5,
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              padding: "9px 4px",
               borderRadius: 8,
               border: "1px solid rgba(226,197,120,.4)",
               color: DORADO_SUAVE,
             }}
           >
-            Tabla de posiciones
+            Tabla
           </Link>
-        </p>
-      )}
+        )}
+        <span
+          style={{
+            flex: 1,
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            padding: "9px 4px",
+            borderRadius: 8,
+            border: `1px solid ${DORADO}`,
+            color: DORADO_SUAVE,
+          }}
+        >
+          Fixture Newman
+        </span>
+        {tieneFixtureDivision(categoriaId) && (
+          <Link
+            href={`/fixture/${categoriaId}/division`}
+            style={{
+              flex: 1,
+              textAlign: "center",
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              padding: "9px 4px",
+              borderRadius: 8,
+              border: "1px solid rgba(226,197,120,.4)",
+              color: DORADO_SUAVE,
+            }}
+          >
+            Fixture División
+          </Link>
+        )}
+      </div>
 
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
         Fixture
