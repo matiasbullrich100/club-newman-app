@@ -94,12 +94,12 @@ export default function Header({
               {rightLabel}
             </span>
           )}
-          <span style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ width: logo === "urba" ? 58 : 48, height: logo === "urba" ? 58 : 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Image
               src={logo === "urba" ? "/logo-urba.png" : "/logo-top14.png"}
               alt={logo === "urba" ? "URBA" : "URBA Top 14"}
-              width={48}
-              height={48}
+              width={logo === "urba" ? 58 : 48}
+              height={logo === "urba" ? 58 : 48}
               style={{ width: "100%", height: "100%", objectFit: "contain" }}
             />
           </span>
