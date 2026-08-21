@@ -45,8 +45,26 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
           }}
         >
           <Link href={`/categoria/${categoriaId}`} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ flex: "0 0 auto", maxWidth: "22%", textTransform: "uppercase", letterSpacing: 0.3, fontSize: "0.62rem", color: DORADO_SUAVE, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+            <span style={{ flex: "0 0 auto", maxWidth: "22%" }}>
+              <span
+                style={{
+                  display: "block",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.3,
+                  fontSize: "0.62rem",
+                  color: DORADO_SUAVE,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+              </span>
+              {!partido.notaEspecial && (
+                <span style={{ display: "block", fontSize: "0.55rem", color: DORADO_SUAVE, opacity: 0.65, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  Cancha{partido.cancha ? `: ${partido.cancha}` : ""}
+                </span>
+              )}
             </span>
             <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {partido.notaEspecial ?? <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} />}
@@ -55,9 +73,6 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
               {partido.hora}
             </span>
           </Link>
-          {partido.cancha && !partido.notaEspecial && (
-            <div style={{ textAlign: "right", fontSize: "0.6rem", color: DORADO_SUAVE, opacity: 0.75, marginTop: 2 }}>en {partido.cancha}</div>
-          )}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
             {posicionesHref && (
               <Link href={posicionesHref} style={botonChico}>
