@@ -32,8 +32,9 @@ export default function PartidosMananaBanner({ partidos }: { partidos: { categor
             display: "flex",
             alignItems: "center",
             gap: 6,
-            marginTop: i === 0 ? 4 : 2,
-            paddingTop: i === 0 ? 0 : 2,
+            marginTop: i === 0 ? 4 : i % 3 === 0 ? 6 : 2,
+            paddingTop: i === 0 ? 0 : i % 3 === 0 ? 6 : 2,
+            borderTop: i > 0 && i % 3 === 0 ? "1px dashed rgba(226,197,120,.3)" : undefined,
           }}
         >
           <span style={{ flex: "0 0 auto", maxWidth: "20%", textTransform: "uppercase", letterSpacing: 0.3, fontSize: "0.6rem", color: DORADO_SUAVE }}>
