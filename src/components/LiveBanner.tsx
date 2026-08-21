@@ -42,7 +42,8 @@ export default function LiveBanner({
   nombreNewman,
   esPrueba,
   posicionesHref,
-  fixtureHref,
+  fixtureNewmanHref,
+  fixtureDivisionHref,
 }: {
   partidoId: string;
   categoriaNombre: string;
@@ -55,8 +56,12 @@ export default function LiveBanner({
   // Solo si la categoria tiene torneo de URBA asignado (ver TORNEOS_URBA) -- si no hay, no hay
   // tabla de posiciones para mostrar.
   posicionesHref?: string;
-  // Siempre presente -- lleva a /fixture/{categoriaId} (ver ese picker).
-  fixtureHref?: string;
+  // Siempre presente -- lleva directo al fixture del propio equipo (/categoria/{id} o
+  // /juveniles/.../equipo/{id}).
+  fixtureNewmanHref?: string;
+  // Solo si la categoria tiene Fixture Division cargado (ver tieneFixtureDivision en
+  // lib/fixtureDivision.ts) -- hoy solo Plantel Superior.
+  fixtureDivisionHref?: string;
 }) {
   const [partido, setPartido] = useState<EstadoPartidoLive>(inicial);
 
@@ -116,9 +121,14 @@ export default function LiveBanner({
             Tabla
           </Link>
         )}
-        {fixtureHref && (
-          <Link href={fixtureHref} style={botonChico}>
-            Fixture
+        {fixtureNewmanHref && (
+          <Link href={fixtureNewmanHref} style={botonChico}>
+            Fixture New.
+          </Link>
+        )}
+        {fixtureDivisionHref && (
+          <Link href={fixtureDivisionHref} style={botonChico}>
+            Fixture Divis.
           </Link>
         )}
       </div>

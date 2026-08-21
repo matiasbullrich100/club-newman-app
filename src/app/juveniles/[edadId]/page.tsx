@@ -56,7 +56,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           nombreNewman={nombreNewmanDe(p.categoriaId)}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-          fixtureHref={`/fixture/${p.categoriaId}`}
+          fixtureNewmanHref={`/juveniles/${edadId}/equipo/${p.categoriaId}`}
         />
       ))}
 

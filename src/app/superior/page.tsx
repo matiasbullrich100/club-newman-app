@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
@@ -57,7 +58,8 @@ export default async function PlantelSuperiorPage() {
           inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-          fixtureHref={`/fixture/${p.categoriaId}`}
+          fixtureNewmanHref={`/categoria/${p.categoriaId}`}
+          fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
         />
       ))}
 
@@ -72,7 +74,8 @@ export default async function PlantelSuperiorPage() {
             inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
             esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
             posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-            fixtureHref={`/fixture/${p.categoriaId}`}
+            fixtureNewmanHref={`/categoria/${p.categoriaId}`}
+            fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
           />
         ))
       )}
