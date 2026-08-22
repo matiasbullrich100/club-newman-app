@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 import { formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
@@ -36,11 +36,15 @@ export default function ProximaFechaRow({
   posicionesHref?: string;
   fixtureHref?: string;
 }) {
+  // Fecha libre (u otra nota especial) -- mismo fondo negro que un partido ya jugado, no hay nada
+  // que "esperar" en esa fila.
+  const jugada = !!proxima.notaEspecial;
+
   return (
     <div
       style={{
-        background: "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
-        border: "1px solid rgba(226,197,120,.35)",
+        background: jugada ? NEGRO_JUGADA : "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
+        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.35)"}`,
         borderRadius: 10,
         padding: "8px 12px",
         marginBottom: 8,

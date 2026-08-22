@@ -5,7 +5,7 @@ import Link from "next/link";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import type { EstadoPartido, Resultado } from "@/types/firestore";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 import { MatchupText } from "./FixtureRow";
 import Cronometro from "./Cronometro";
 
@@ -72,12 +72,15 @@ export default function LiveBanner({
   }, [partidoId]);
 
   const enVivo = ESTADOS_EN_VIVO.has(partido.estado);
+  // Mismo criterio que FixtureRow -- ya jugado (terminado) o Fecha libre van con fondo negro,
+  // igual que en el fixture completo, para distinguirlos de un vistazo del que esta en vivo.
+  const jugada = !enVivo && (partido.estado === "terminado" || !!partido.notaEspecial);
 
   return (
     <div
       style={{
-        background: "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
-        border: `1px solid ${DORADO}`,
+        background: jugada ? NEGRO_JUGADA : "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
+        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : DORADO}`,
         borderRadius: 10,
         padding: "8px 12px",
         marginBottom: 8,
