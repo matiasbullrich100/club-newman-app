@@ -2,17 +2,25 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS, partidoId } from "@/lib/categorias";
+import { CATEGORIAS, partidoId, grupoDeCategoria } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { proximasFechasDe } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
-import type { Partido } from "@/types/firestore";
+import { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
+import { diasDesdeEnArgentina } from "@/lib/fecha";
+import type { JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
+import PartidoTerminadoPanel from "@/components/PartidoTerminadoPanel";
+import PartidoLive from "@/components/PartidoLive";
+import type { RosterJugador } from "@/components/panel-designado/types";
+import { ordenarPorDorsal } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+
+const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -27,13 +35,13 @@ const botonEstilo: React.CSSProperties = {
   color: DORADO_SUAVE,
 };
 
-// Landing de un equipo de Plantel Superior: los 3 botones (Tabla / Fixt. New. / Fixt Divis.) y,
-// en la MISMA pantalla, la formacion del PROXIMO partido directo (mismo panel que /partido/[id],
-// via PartidoProgramadoPanel -- sin un link aparte a "ver partido completo"): un socio sin
-// loguearse ve formacion + incidencias, y si puede operar esta categoria ve ademas el panel para
-// publicar formacion/iniciar el partido/cargar cambios. El fixture completo (jugado y por jugar)
-// vive en /categoria/[id]/fixture, detras de "Fixt. New.". Si no hay proxima fecha cargada
-// (temporada terminada), no hay nada que mostrar ahi abajo.
+// Landing de un equipo de Plantel Superior: los 3 botones (Tabla / Fixt. New. / Fixt Divis.) y, en
+// la MISMA pantalla, el partido mas relevante ahora mismo -- si esta en vivo o se acaba de
+// resolver (terminado o walkover, "fresco" = dentro de los ultimos 3 dias, mismo criterio que
+// /superior), ese; si no, el proximo programado. Sin un link aparte a "ver partido completo": un
+// socio sin loguearse ve formacion + incidencias, y si puede operar esta categoria ve ademas el
+// panel para publicar formacion/iniciar el partido/cargar cambios. El fixture completo (jugado y
+// por jugar) vive en /categoria/[id]/fixture, detras de "Fixt. New.".
 export default async function CategoriaPage({
   params,
 }: {
@@ -43,18 +51,55 @@ export default async function CategoriaPage({
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId && c.grupo === "superior");
   if (!categoria) notFound();
 
-  const [session, [proxima]] = await Promise.all([getSession(), proximasFechasDe(categoriaId, 1)]);
+  const [session, [resumenPropio]] = await Promise.all([getSession(), partidosEnVivoOUltimoTerminado([categoriaId])]);
 
-  let proximoPartido: Partido | null = null;
-  let proximoPartidoId: string | null = null;
-  let datos: Awaited<ReturnType<typeof datosPartidoProgramado>> | null = null;
+  const esVivo = !!resumenPropio && ESTADOS_EN_VIVO.has(resumenPropio.estado);
+  const esFresco =
+    !!resumenPropio &&
+    (esVivo || ((resumenPropio.estado === "terminado" || resumenPropio.notaEspecial) && !!resumenPropio.fecha && diasDesdeEnArgentina(resumenPropio.fecha) <= 3));
 
-  if (proxima) {
-    proximoPartidoId = partidoId(categoriaId, proxima.numeroFecha);
-    const partidoSnap = await adminDb.collection("partidos").doc(proximoPartidoId).get();
+  let panel: React.ReactNode = null;
+  let titulo = "Próximo Partido";
+
+  if (esFresco && resumenPropio) {
+    const partidoRef = adminDb.collection("partidos").doc(resumenPropio.id);
+    const partidoSnap = await partidoRef.get();
     if (partidoSnap.exists) {
-      proximoPartido = partidoSnap.data() as Partido;
-      datos = await datosPartidoProgramado(proximoPartidoId, proximoPartido, session);
+      const partido = partidoSnap.data() as Partido;
+      if (esVivo) {
+        titulo = "Partido en Vivo";
+        const grupo = grupoDeCategoria(categoriaId);
+        const jugadoresQuery =
+          grupo.grupo === "superior"
+            ? adminDb.collection("jugadores").where("grupo", "==", "superior")
+            : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
+        const [plantelSnap, jugadoresSnap] = await Promise.all([partidoRef.collection("plantel").get(), jugadoresQuery.get()]);
+        const plantelCompleto = jugadoresSnap.docs.map((d) => ({ jugadorId: d.id, nombre: (d.data() as JugadorAgregado).nombre }));
+        const plantel: RosterJugador[] = ordenarPorDorsal(
+          plantelSnap.docs.map((d) => {
+            const data = d.data() as JugadorPartido;
+            return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular };
+          })
+        );
+        panel = <PartidoLive partidoId={resumenPropio.id} inicial={partido} session={session} plantel={plantel} plantelCompleto={plantelCompleto} />;
+      } else {
+        titulo = "Última Fecha Jugada";
+        const datos = await datosPartidoTerminado(resumenPropio.id, partido, session);
+        panel = <PartidoTerminadoPanel partidoId={resumenPropio.id} partido={partido} datos={datos} />;
+      }
+    }
+  }
+
+  if (!panel) {
+    const [proxima] = await proximasFechasDe(categoriaId, 1);
+    if (proxima) {
+      const proximoPartidoId = partidoId(categoriaId, proxima.numeroFecha);
+      const partidoSnap = await adminDb.collection("partidos").doc(proximoPartidoId).get();
+      if (partidoSnap.exists) {
+        const proximoPartido = partidoSnap.data() as Partido;
+        const datos = await datosPartidoProgramado(proximoPartidoId, proximoPartido, session);
+        panel = <PartidoProgramadoPanel partidoId={proximoPartidoId} partido={proximoPartido} datos={datos} />;
+      }
     }
   }
 
@@ -83,12 +128,10 @@ export default async function CategoriaPage({
       </div>
 
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "16px 0 6px" }}>
-        Próximo Partido
+        {titulo}
       </div>
 
-      {proximoPartido && proximoPartidoId && datos ? (
-        <PartidoProgramadoPanel partidoId={proximoPartidoId} partido={proximoPartido} datos={datos} />
-      ) : (
+      {panel ?? (
         <p style={{ textAlign: "center", color: DORADO_SUAVE, fontStyle: "italic", opacity: 0.75 }}>No hay próximo partido programado.</p>
       )}
     </main>

@@ -5,22 +5,20 @@ import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
-import type { Incidente, JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
+import type { JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
-import PartidoHistorico from "@/components/PartidoHistorico";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
-import CargaIncidencia from "@/components/panel-designado/CargaIncidencia";
-import CargaCambio from "@/components/panel-designado/CargaCambio";
 import ResetDemoButton from "@/components/ResetDemoButton";
-import ReiniciarPartidoButton from "@/components/ReiniciarPartidoButton";
 import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
+import PartidoTerminadoPanel from "@/components/PartidoTerminadoPanel";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
 import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
+import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PartidoPage({
   params,
@@ -75,86 +73,17 @@ export default async function PartidoPage({
 
   // Partido ya jugado: vista estática, para siempre (nunca vuelve a estar operable).
   if (partido.estado === "terminado") {
-    const grupoTerminado = grupoDeCategoria(partido.categoriaId);
-    const jugadoresQueryTerminado =
-      grupoTerminado.grupo === "superior"
-        ? adminDb.collection("jugadores").where("grupo", "==", "superior")
-        : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupoTerminado.edadId);
-    const [plantelSnap, incidentesSnap, jugadoresSnapTerminado] = await Promise.all([
-      partidoRef.collection("plantel").get(),
-      partidoRef.collection("incidentes").orderBy("createdAt").get(),
-      jugadoresQueryTerminado.get(),
-    ]);
-    const plantelCompletoTerminado = jugadoresSnapTerminado.docs.map((d) => ({
-      jugadorId: d.id,
-      nombre: (d.data() as JugadorAgregado).nombre,
-    }));
-    const plantel = ordenarPorDorsal(
-      plantelSnap.docs.map((d) => {
-        const data = d.data() as JugadorPartido;
-        return {
-          jugadorId: d.id,
-          nombre: data.nombre,
-          dorsal: data.dorsal,
-          titular: data.titular,
-          capitan: data.capitan,
-          debut: data.debut,
-        };
-      })
-    );
-    // IncidentesList es un Client Component (necesita interactividad para "Corregir") -- un
-    // Timestamp crudo del Admin SDK no cruza el limite servidor->cliente, hay que pasarlo a Date.
-    const incidentes = incidentesSnap.docs.map((d) => {
-      const data = d.data() as Incidente;
-      const createdAt = data.createdAt as unknown as FirebaseFirestore.Timestamp;
-      return { id: d.id, ...data, createdAt: createdAt?.toDate?.() ?? data.createdAt };
-    });
-
+    const datos = await datosPartidoTerminado(partidoId, partido, session);
     return (
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
         {cabecera}
-        <PartidoHistorico
-          partido={partido}
-          plantel={plantel}
-          incidentes={incidentes}
+        <PartidoTerminadoPanel
           partidoId={partidoId}
-          puedeEditar={puedeOperar}
+          partido={partido}
+          datos={datos}
           posicionesHref={posicionesHref}
           posicionesActualizado={posicionesActualizado}
         />
-        {puedeOperar && (
-          <div
-            style={{
-              background: "rgba(255,255,255,.045)",
-              border: "1px solid rgba(226,197,120,.2)",
-              borderRadius: 12,
-              padding: 16,
-              marginBottom: 14,
-            }}
-          >
-            <h2 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 4 }}>
-              Corregir el partido
-            </h2>
-            <p style={{ fontSize: "0.8rem", opacity: 0.75, marginTop: 0, marginBottom: 10 }}>
-              Para agregar una jugada o un cambio que faltó cargar. El minuto queda aproximado.
-            </p>
-            <CargaIncidencia
-              partidoId={partidoId}
-              plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
-              enCanchaIds={partido.enCanchaIds}
-              soloEnCancha={false}
-            />
-            <CargaCambio
-              partidoId={partidoId}
-              plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
-              plantelCompleto={plantelCompletoTerminado}
-              enCanchaIds={partido.enCanchaIds}
-              soloEnCancha={false}
-            />
-          </div>
-        )}
-        {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
-        {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
         <FooterChip />
       </main>
     );
