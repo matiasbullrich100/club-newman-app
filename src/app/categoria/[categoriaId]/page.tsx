@@ -81,7 +81,21 @@ export default async function CategoriaPage({
             return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular };
           })
         );
-        panel = <PartidoLive partidoId={resumenPropio.id} inicial={partido} session={session} plantel={plantel} plantelCompleto={plantelCompleto} />;
+        // createdAt/updatedAt son Timestamps de Firestore -- no se pueden pasar a un Client
+        // Component (rompe la serializacion del RSC payload en produccion).
+        const partidoParaCliente: Partido = {
+          categoriaId: partido.categoriaId,
+          numeroFecha: partido.numeroFecha,
+          rival: partido.rival,
+          esLocal: partido.esLocal,
+          cancha: partido.cancha,
+          estado: partido.estado,
+          resultado: partido.resultado,
+          enCanchaIds: partido.enCanchaIds,
+        };
+        panel = (
+          <PartidoLive partidoId={resumenPropio.id} inicial={partidoParaCliente} session={session} plantel={plantel} plantelCompleto={plantelCompleto} />
+        );
       } else {
         titulo = "Última Fecha Jugada";
         const datos = await datosPartidoTerminado(resumenPropio.id, partido, session);
