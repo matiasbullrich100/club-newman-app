@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
+import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
-import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe } from "@/lib/match/resumenSeccion";
+import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
+import ProximaFechaRow from "@/components/ProximaFechaRow";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
 import { DORADO_SUAVE } from "@/lib/colors";
@@ -20,9 +21,6 @@ const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 // categoria -- el fixture completo (jugado y por jugar) vive en /categoria/[categoriaId]/fixture,
 // no aca. El selector de categoria lleva a /categoria/[categoriaId], que ya muestra la formacion
 // del proximo partido directo.
-// De jueves a la noche a domingo (juega Plantel Superior), si Primera todavia no tiene nada en vivo
-// ni recien terminado, el resultado de la fecha pasada ya esta viejo -- se muestra la Proxima Fecha
-// (de Primera) en su lugar hasta que arranque el partido o haya resultado.
 export default async function PlantelSuperiorPage() {
   const [session, resumenCompleto] = await Promise.all([
     getSession(),
@@ -33,19 +31,72 @@ export default async function PlantelSuperiorPage() {
   // pasado el corte, se oculta para quien no sea el Administrador (ver partidosPrueba.ts).
   const pruebasVisibles = pruebasVisiblesPara(session);
   const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
-  const enVivo = resumen.filter((p) => ESTADOS_EN_VIVO.has(p.estado));
-  // "terminado" o Fecha libre (un bye nunca pasa a "terminado", pero cuenta como la ultima fecha
-  // jugada igual -- ver partidosEnVivoOUltimoTerminado).
-  const terminados = resumen.filter((p) => p.estado === "terminado" || p.notaEspecial);
-  // "terminados" queda pegado toda la semana (ver partidosEnVivoOUltimoTerminado) -- sin chequear
-  // la fecha, Primera SIEMPRE aparece como "recien terminada" (aunque haya jugado hace 5 dias) y
-  // la Proxima Fecha nunca llegaria a mostrarse.
-  const primeraTerminadoFresco = terminados.some(
-    (p) => p.categoriaId === "primera" && p.fecha && diasDesdeEnArgentina(p.fecha) <= 3
+
+  // "Fresco" = en vivo, o terminado/Fecha libre hace <=3 dias -- una categoria que TODAVIA no
+  // arranco su partido de esta semana no cuenta como fresca aunque otra categoria si este en vivo
+  // (antes, si CUALQUIER categoria arrancaba, las demas se quedaban pegadas mostrando el resultado
+  // de la semana pasada en vez de la proxima fecha).
+  const fresco = (p: (typeof resumen)[number] | undefined) =>
+    !!p && (ESTADOS_EN_VIVO.has(p.estado) || ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3));
+
+  const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
+  const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
+  const proximasFechasPrimera = mostrarProximaFechaPrimera ? await proximasFechasDe("primera", 3) : [];
+
+  // El resto de las categorias (Primera tambien, si no le toca el cartel de 3 fechas de arriba):
+  // fresca -> LiveBanner; si no, su propia proxima fecha -> ProximaFechaRow.
+  const categoriasEnFilas = CATEGORIAS_SUPERIOR.filter((cat) => !(cat.id === "primera" && mostrarProximaFechaPrimera));
+  const idsSinResumenFresco = categoriasEnFilas.map((c) => c.id).filter((id) => !fresco(resumen.find((p) => p.categoriaId === id)));
+  const proximasPorCategoria = new Map<string, ProximaFecha>();
+  await Promise.all(
+    idsSinResumenFresco.map(async (id) => {
+      const [proxima] = await proximasFechasDe(id, 1);
+      if (proxima) proximasPorCategoria.set(id, proxima);
+    })
   );
 
-  const mostrarProximaFecha = enVivo.length === 0 && !primeraTerminadoFresco && debeMostrarProximaFechaEnArgentina();
-  const proximasFechas = mostrarProximaFecha ? await proximasFechasDe("primera", 3) : [];
+  const filas = categoriasEnFilas
+    .map((cat) => {
+      const p = resumen.find((r) => r.categoriaId === cat.id);
+      if (p && fresco(p)) {
+        return {
+          esVivo: ESTADOS_EN_VIVO.has(p.estado),
+          node: (
+            <LiveBanner
+              key={p.id}
+              partidoId={p.id}
+              categoriaNombre={cat.nombre}
+              inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
+              esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+              posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
+              fixtureNewmanHref={`/categoria/${cat.id}/fixture`}
+              fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}
+            />
+          ),
+        };
+      }
+      const proxima = proximasPorCategoria.get(cat.id);
+      if (!proxima) return null;
+      return {
+        esVivo: false,
+        node: (
+          <ProximaFechaRow
+            key={cat.id}
+            partidoId={partidoId(cat.id, proxima.numeroFecha)}
+            categoriaNombre={cat.nombre}
+            proxima={proxima}
+            posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
+            fixtureHref={`/categoria/${cat.id}/fixture`}
+          />
+        ),
+      };
+    })
+    .filter((f): f is NonNullable<typeof f> => f !== null);
+
+  // Los partidos EN VIVO van siempre arriba del todo (cualquier categoria) -- el cartel de las 3
+  // proximas fechas de Primera y el resto de las filas van despues.
+  const filasVivo = filas.filter((f) => f.esVivo);
+  const filasResto = filas.filter((f) => !f.esVivo);
 
   // Resumen "Partidos de Mañana" -- todas las categorias de Plantel Superior que juegan manana,
   // con horario, para verlas de un vistazo sin entrar categoria por categoria.
@@ -65,35 +116,11 @@ export default async function PlantelSuperiorPage() {
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
 
-      {enVivo.map((p) => (
-        <LiveBanner
-          key={p.id}
-          partidoId={p.id}
-          categoriaNombre={CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
-          esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
-          posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-          fixtureNewmanHref={`/categoria/${p.categoriaId}/fixture`}
-          fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
-        />
-      ))}
+      {filasVivo.map((f) => f.node)}
 
-      {proximasFechas.length > 0 ? (
-        <ProximaFechaBanner proximas={proximasFechas} />
-      ) : (
-        terminados.map((p) => (
-          <LiveBanner
-            key={p.id}
-            partidoId={p.id}
-            categoriaNombre={CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-            inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
-            esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
-            posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-            fixtureNewmanHref={`/categoria/${p.categoriaId}/fixture`}
-            fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
-          />
-        ))
-      )}
+      {mostrarProximaFechaPrimera && proximasFechasPrimera.length > 0 && <ProximaFechaBanner proximas={proximasFechasPrimera} />}
+
+      {filasResto.map((f) => f.node)}
 
       <PartidosMananaBanner partidos={partidosMananaConNombre} />
 
