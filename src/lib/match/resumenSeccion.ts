@@ -2,7 +2,7 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina, hoyIsoEnArgentina } from "@/lib/fecha";
 import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR, NUMERO_FECHAS_JUVENILES, grupoDeCategoria, partidoId } from "@/lib/categorias";
-import type { Partido } from "@/types/firestore";
+import type { Partido, Resultado } from "@/types/firestore";
 
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
 
@@ -174,6 +174,11 @@ export interface PartidoDeFecha {
   categoriaId: string;
   esLocal: boolean;
   rival: string;
+  // "terminado" cuando el partido ya se resolvio antes de jugarse (ej. walkover) -- el resumen
+  // tiene que mostrar el resultado real en vez de solo los nombres, aunque la fecha calendario
+  // sea "mañana".
+  jugado: boolean;
+  resultado: Resultado;
   hora?: string;
   cancha?: string;
   numeroCancha?: string;
@@ -201,6 +206,8 @@ export async function partidosDeFechaExacta(categoriaIds: string[], fechaIso: st
     categoriaId: p.categoriaId,
     esLocal: p.esLocal,
     rival: p.rival,
+    jugado: p.estado === "terminado",
+    resultado: p.resultado,
     hora: p.hora,
     cancha: p.cancha,
     numeroCancha: p.numeroCancha,
