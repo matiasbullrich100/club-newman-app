@@ -86,40 +86,51 @@ export default function LiveBanner({
         marginBottom: 8,
       }}
     >
-      <Link href={`/partido/${partidoId}`} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span
-          style={{
-            flex: "0 0 auto",
-            maxWidth: "22%",
-            textTransform: "uppercase",
-            letterSpacing: 0.3,
-            fontSize: "0.62rem",
-            color: DORADO_SUAVE,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
-        </span>
-        <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
-          {partido.notaEspecial ?? (
-            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
-          )}
-        </span>
-        <span
-          style={{
-            flex: "0 0 auto",
-            textTransform: "uppercase",
-            letterSpacing: 0.5,
-            fontSize: "0.6rem",
-            color: DORADO,
-            textAlign: "right",
-          }}
-        >
-          {partido.notaEspecial ? "" : enVivo ? "● En juego" : "Final"}
-        </span>
+      {/* Todo el bloque (fila de texto + cronometro) es UN solo Link -- si el cronometro quedara
+          afuera, en un partido en vivo esa es la parte mas grande y mas tentadora para tocar, y
+          antes no llevaba a ningun lado (un designado real no podia entrar al partido desde el
+          resumen por esto). */}
+      <Link href={`/partido/${partidoId}`} style={{ display: "block" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              flex: "0 0 auto",
+              maxWidth: "22%",
+              textTransform: "uppercase",
+              letterSpacing: 0.3,
+              fontSize: "0.62rem",
+              color: DORADO_SUAVE,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+          </span>
+          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
+            {partido.notaEspecial ?? (
+              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
+            )}
+          </span>
+          <span
+            style={{
+              flex: "0 0 auto",
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              fontSize: "0.6rem",
+              color: DORADO,
+              textAlign: "right",
+            }}
+          >
+            {partido.notaEspecial ? "" : enVivo ? "● En juego" : "Final"}
+          </span>
+        </div>
+        {enVivo && (
+          <div style={{ marginTop: 4, textAlign: "center" }}>
+            <Cronometro partidoId={partidoId} estado={partido.estado} />
+          </div>
+        )}
       </Link>
       {(posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
@@ -138,11 +149,6 @@ export default function LiveBanner({
               Fixt Divis.
             </Link>
           )}
-        </div>
-      )}
-      {enVivo && (
-        <div style={{ marginTop: 4, textAlign: "center" }}>
-          <Cronometro partidoId={partidoId} estado={partido.estado} />
         </div>
       )}
     </div>
