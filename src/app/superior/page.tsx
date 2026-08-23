@@ -44,7 +44,6 @@ export default async function PlantelSuperiorPage() {
   // de mas arriba), asi que rota solo a la fecha nueva cuando esa categoria termina su partido.
   const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
   const ganadosSemana = jugadosSemana.filter((p) => p.resultado.newman > p.resultado.rival).length;
-  const empatadosSemana = jugadosSemana.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidosSemana = jugadosSemana.filter((p) => p.resultado.newman < p.resultado.rival).length;
   const fullHouseSemana = jugadosSemana.length > 0 && ganadosSemana === jugadosSemana.length;
 
@@ -139,7 +138,7 @@ export default async function PlantelSuperiorPage() {
           }}
         >
           <span>
-            Partidos Ganados: {ganadosSemana} · Partidos Empatados: {empatadosSemana} · Partidos Perdidos: {perdidosSemana}
+            P. Gan. {ganadosSemana} · P. Perd. {perdidosSemana}
           </span>
           {fullHouseSemana && <span style={{ color: DORADO, fontWeight: 700, letterSpacing: 1 }}>FULL HOUSE</span>}
         </div>
