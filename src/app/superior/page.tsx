@@ -13,7 +13,7 @@ import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
-import { DORADO_SUAVE } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
@@ -38,6 +38,15 @@ export default async function PlantelSuperiorPage() {
   // de la semana pasada en vez de la proxima fecha).
   const fresco = (p: (typeof resumen)[number] | undefined) =>
     !!p && (ESTADOS_EN_VIVO.has(p.estado) || ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3));
+
+  // Mismo resumen "Ganados/Empatados/Perdidos" + "Full House" que ya existe en /fecha/[n], pero
+  // arriba de todo en /superior -- usa el ultimo resultado de cada categoria (el mismo `resumen`
+  // de mas arriba), asi que rota solo a la fecha nueva cuando esa categoria termina su partido.
+  const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
+  const ganadosSemana = jugadosSemana.filter((p) => p.resultado.newman > p.resultado.rival).length;
+  const empatadosSemana = jugadosSemana.filter((p) => p.resultado.newman === p.resultado.rival).length;
+  const perdidosSemana = jugadosSemana.filter((p) => p.resultado.newman < p.resultado.rival).length;
+  const fullHouseSemana = jugadosSemana.length > 0 && ganadosSemana === jugadosSemana.length;
 
   const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
   const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
@@ -115,6 +124,26 @@ export default async function PlantelSuperiorPage() {
       <BackLink href="/" />
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
+
+      {jugadosSemana.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 6,
+            fontSize: "0.78rem",
+            color: DORADO_SUAVE,
+            marginBottom: 10,
+          }}
+        >
+          <span>
+            Partidos Ganados: {ganadosSemana} · Partidos Empatados: {empatadosSemana} · Partidos Perdidos: {perdidosSemana}
+          </span>
+          {fullHouseSemana && <span style={{ color: DORADO, fontWeight: 700, letterSpacing: 1 }}>FULL HOUSE</span>}
+        </div>
+      )}
 
       {filasVivo.map((f) => f.node)}
 
