@@ -128,19 +128,25 @@ export default async function PlantelSuperiorPage() {
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: 6,
-            fontSize: "0.78rem",
+            gap: 10,
+            fontSize: "0.95rem",
+            fontWeight: 700,
             color: DORADO_SUAVE,
-            marginBottom: 10,
+            background: "linear-gradient(160deg, rgba(226,197,120,.14), rgba(0,0,0,.15))",
+            border: `1px solid ${DORADO}`,
+            borderRadius: 10,
+            padding: "10px 14px",
+            marginBottom: 12,
+            textAlign: "center",
           }}
         >
           <span>
             P. Gan. {ganadosSemana} · P. Perd. {perdidosSemana}
           </span>
-          {fullHouseSemana && <span style={{ color: DORADO, fontWeight: 700, letterSpacing: 1 }}>FULL HOUSE</span>}
+          {fullHouseSemana && <span style={{ color: DORADO, fontWeight: 800, letterSpacing: 1.5 }}>FULL HOUSE</span>}
         </div>
       )}
 
