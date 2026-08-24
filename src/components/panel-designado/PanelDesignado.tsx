@@ -218,7 +218,13 @@ export default function PanelDesignado({
           {partido.estado === "en_juego" && (
             <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
           )}
-          <SancionesActivas partidoId={partidoId} enCanchaIds={partido.enCanchaIds} plantel={plantel} plantelCompleto={plantelCompleto} />
+          <SancionesActivas
+            partidoId={partidoId}
+            enCanchaIds={partido.enCanchaIds}
+            plantel={plantel}
+            plantelCompleto={plantelCompleto}
+            rivalNombre={partido.rival}
+          />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
           <IncidentesFeed

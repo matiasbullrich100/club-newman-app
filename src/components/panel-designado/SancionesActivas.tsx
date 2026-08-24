@@ -5,7 +5,7 @@ import { collection, doc, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import { reingresarSancion } from "@/lib/match/actions";
 import { elapsedSeconds, formatMMSS } from "@/lib/match/clock";
-import { DURACION_SANCION_SEGUNDOS } from "@/lib/incidentes";
+import { DURACION_SANCION_SEGUNDOS, ETIQUETAS_INCIDENTE } from "@/lib/incidentes";
 import { norm } from "@/lib/players";
 import type { Incidente, LiveState } from "@/types/firestore";
 import type { JugadorBusqueda, RosterJugador } from "./types";
@@ -23,11 +23,13 @@ export default function SancionesActivas({
   enCanchaIds,
   plantel,
   plantelCompleto,
+  rivalNombre,
 }: {
   partidoId: string;
   enCanchaIds: string[];
   plantel: RosterJugador[];
   plantelCompleto: JugadorBusqueda[];
+  rivalNombre?: string;
 }) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
   const [liveState, setLiveState] = useState<LiveState | null>(null);
@@ -64,7 +66,18 @@ export default function SancionesActivas({
       !enCanchaIds.includes(inc.jugadorId)
   );
 
-  if (sanciones.length === 0 || !liveState) return null;
+  // Del rival no sabemos quien entra/sale (no llevamos su plantel) -- solo referencia de cuenta
+  // regresiva, sin boton de reingreso. Se cuenta con la duracion, no con enCanchaIds: una vez
+  // cumplida, deja de mostrarse sola (nadie tiene que confirmar nada del lado del rival).
+  const ahoraParaRival = liveState ? elapsedSeconds(liveState) : 0;
+  const sancionesRival = liveState
+    ? incidentes.filter((inc) => {
+        const duracion = DURACION_SANCION_SEGUNDOS[inc.tipo];
+        return duracion !== undefined && inc.equipo === "rival" && duracion - (ahoraParaRival - inc.segundoAbsoluto) > 0;
+      })
+    : [];
+
+  if ((sanciones.length === 0 && sancionesRival.length === 0) || !liveState) return null;
 
   const ahora = elapsedSeconds(liveState);
   const sancionadosIds = new Set(sanciones.map((s) => s.jugadorId));
@@ -99,6 +112,7 @@ export default function SancionesActivas({
       <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
         Sanción en curso
       </h3>
+      {sanciones.length > 0 && (
       <div style={{ display: "grid", gap: 10 }}>
         {sanciones.map((s) => {
           const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
@@ -190,6 +204,31 @@ export default function SancionesActivas({
           );
         })}
       </div>
+      )}
+
+      {sancionesRival.length > 0 && (
+        <div style={{ display: "grid", gap: 10, marginTop: sanciones.length > 0 ? 10 : 0 }}>
+          {sancionesRival.map((s) => {
+            const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
+            const restante = Math.max(0, duracion - (ahora - s.segundoAbsoluto));
+            return (
+              <div
+                key={s.id}
+                style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(226,197,120,.25)", borderRadius: 10, padding: 12 }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>
+                    {ETIQUETAS_INCIDENTE[s.tipo]} — {rivalNombre ?? "Rival"}
+                  </span>
+                  <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700, color: DORADO_SUAVE }}>
+                    {formatMMSS(restante)}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
