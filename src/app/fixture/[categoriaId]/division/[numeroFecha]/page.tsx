@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS } from "@/lib/categorias";
+import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFecha } from "@/lib/fecha";
 import Header from "@/components/Header";
@@ -48,51 +48,63 @@ export default async function FixtureDivisionFechaPage({
       </div>
 
       <div style={{ display: "grid", gap: 8, marginTop: 20 }}>
-        {fecha.partidos.map((p, i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              padding: "10px 12px",
-              borderRadius: 10,
-              border: `1px solid ${p.esNewman ? DORADO : p.jugado ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.2)"}`,
-              background: p.jugado ? NEGRO_JUGADA : p.esNewman ? "rgba(226,197,120,.08)" : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
-              fontSize: "0.85rem",
-              fontWeight: p.esNewman ? 700 : 400,
-              color: p.esNewman ? DORADO_SUAVE : "#f7f1e4",
-              textAlign: "center",
-            }}
-          >
-            {p.jugado && p.especial ? (
-              <span style={{ fontSize: "0.85em", opacity: 0.75, fontStyle: "italic" }}>
-                {p.local} - {p.visitante} · {p.especial === "postergado" ? "Postergado" : "Sin información"}
-              </span>
-            ) : p.jugado ? (
-              <>
-                <span>{p.local}</span>
-                <b style={{ margin: "0 2px" }}>
-                  {p.golesLocal}
-                  {p.bonusLocal && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
-                </b>
-                <em style={{ fontSize: "0.72em", fontWeight: 400, opacity: 0.6, fontStyle: "normal" }}>-</em>
-                <b style={{ margin: "0 2px" }}>
-                  {p.golesVisitante}
-                  {p.bonusVisitante && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
-                </b>
-                <span>{p.visitante}</span>
-              </>
-            ) : (
-              <>
-                <span>{p.local}</span>
-                <em style={{ fontSize: "0.72em", fontWeight: 400, opacity: 0.6, fontStyle: "normal" }}>-</em>
-                <span>{p.visitante}</span>
-              </>
-            )}
-          </div>
-        ))}
+        {fecha.partidos.map((p, i) => {
+          const estiloFila: React.CSSProperties = {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            padding: "10px 12px",
+            borderRadius: 10,
+            border: `1px solid ${p.esNewman ? DORADO : p.jugado ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.2)"}`,
+            background: p.jugado ? NEGRO_JUGADA : p.esNewman ? "rgba(226,197,120,.08)" : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
+            fontSize: "0.85rem",
+            fontWeight: p.esNewman ? 700 : 400,
+            color: p.esNewman ? DORADO_SUAVE : "#f7f1e4",
+            textAlign: "center",
+          };
+          const contenido = (
+            <>
+              {p.jugado && p.especial ? (
+                <span style={{ fontSize: "0.85em", opacity: 0.75, fontStyle: "italic" }}>
+                  {p.local} - {p.visitante} · {p.especial === "postergado" ? "Postergado" : "Sin información"}
+                </span>
+              ) : p.jugado ? (
+                <>
+                  <span>{p.local}</span>
+                  <b style={{ margin: "0 2px" }}>
+                    {p.golesLocal}
+                    {p.bonusLocal && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
+                  </b>
+                  <em style={{ fontSize: "0.72em", fontWeight: 400, opacity: 0.6, fontStyle: "normal" }}>-</em>
+                  <b style={{ margin: "0 2px" }}>
+                    {p.golesVisitante}
+                    {p.bonusVisitante && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
+                  </b>
+                  <span>{p.visitante}</span>
+                </>
+              ) : (
+                <>
+                  <span>{p.local}</span>
+                  <em style={{ fontSize: "0.72em", fontWeight: 400, opacity: 0.6, fontStyle: "normal" }}>-</em>
+                  <span>{p.visitante}</span>
+                </>
+              )}
+            </>
+          );
+          // Solo la fila de Newman lleva a /partido/[id] -- las otras 6 son de otros clubes, no
+          // tenemos esa pagina para ellas. Mismo categoriaId/numeroFecha que esta pantalla: el
+          // fixture de la division usa la misma numeracion de fecha que nuestros propios partidos.
+          return p.esNewman ? (
+            <Link key={i} href={`/partido/${partidoId(categoriaId, numeroFecha)}`} style={estiloFila}>
+              {contenido}
+            </Link>
+          ) : (
+            <div key={i} style={estiloFila}>
+              {contenido}
+            </div>
+          );
+        })}
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
