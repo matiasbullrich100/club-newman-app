@@ -66,13 +66,14 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
         {categoria.nombre} - Fixture División
       </div>
 
+      {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         {tienePosiciones && (
-          <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
+          <Link href={`/posiciones/${categoriaId}`} replace style={botonEstilo}>
             Tabla
           </Link>
         )}
-        <Link href={fixtureNewmanHref} style={botonEstilo}>
+        <Link href={fixtureNewmanHref} replace style={botonEstilo}>
           Fixt. New.
         </Link>
       </div>

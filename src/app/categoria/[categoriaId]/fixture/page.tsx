@@ -63,14 +63,15 @@ export default async function CategoriaFixturePage({
         {categoria.nombre} - Fixture Newman
       </div>
 
+      {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         {tienePosiciones && (
-          <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
+          <Link href={`/posiciones/${categoriaId}`} replace style={botonEstilo}>
             Tabla
           </Link>
         )}
         {tieneFixtureDivision(categoriaId) && (
-          <Link href={`/fixture/${categoriaId}/division`} style={botonEstilo}>
+          <Link href={`/fixture/${categoriaId}/division`} replace style={botonEstilo}>
             Fixt Divis.
           </Link>
         )}

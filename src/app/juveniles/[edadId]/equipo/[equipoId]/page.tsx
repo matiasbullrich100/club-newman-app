@@ -60,14 +60,15 @@ export default async function EquipoJuvenilesPage({
         {equipo.nombre} - Fixture {nombreNewman}
       </div>
 
+      {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         {tienePosiciones && (
-          <Link href={`/posiciones/${equipoId}`} style={botonEstilo}>
+          <Link href={`/posiciones/${equipoId}`} replace style={botonEstilo}>
             Tabla
           </Link>
         )}
         {tieneFixtureDivision(equipoId) && (
-          <Link href={`/fixture/${equipoId}/division`} style={botonEstilo}>
+          <Link href={`/fixture/${equipoId}/division`} replace style={botonEstilo}>
             Fixt Divis.
           </Link>
         )}
