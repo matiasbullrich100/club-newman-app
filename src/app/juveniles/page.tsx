@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, CATEGORIAS_JUVENILES, nombreNewmanDe, partidoId as partidoIdDe } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria } from "@/lib/match/resumenSeccion";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
@@ -71,6 +72,7 @@ export default async function JuvenilesPage() {
                   esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
                   posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
                   fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
+                  fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
                 />
               ),
             };
@@ -86,7 +88,8 @@ export default async function JuvenilesPage() {
                 proxima={proxima}
                 nombreNewman={nombreNewmanDe(equipo.id)}
                 posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
-                fixtureHref={`/fixture/${equipo.id}`}
+                fixtureHref={`/juveniles/${equipo.edadId}/equipo/${equipo.id}`}
+                fixtureDivisionHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/division` : undefined}
               />
             ),
           };

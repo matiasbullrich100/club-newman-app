@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
@@ -57,6 +58,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
           posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
           fixtureNewmanHref={`/juveniles/${edadId}/equipo/${p.categoriaId}`}
+          fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
         />
       ))}
 

@@ -28,6 +28,7 @@ export default function ProximaFechaRow({
   nombreNewman,
   posicionesHref,
   fixtureHref,
+  fixtureDivisionHref,
 }: {
   partidoId: string;
   categoriaNombre: string;
@@ -35,6 +36,9 @@ export default function ProximaFechaRow({
   nombreNewman?: string;
   posicionesHref?: string;
   fixtureHref?: string;
+  // Solo si la categoria tiene Fixture Division cargado (ver tieneFixtureDivision en
+  // lib/fixtureDivision.ts) -- mismo botón que ya tiene LiveBanner.
+  fixtureDivisionHref?: string;
 }) {
   // Fecha libre (u otra nota especial) -- mismo fondo negro que un partido ya jugado, no hay nada
   // que "esperar" en esa fila.
@@ -89,7 +93,12 @@ export default function ProximaFechaRow({
         )}
         {fixtureHref && (
           <Link href={fixtureHref} style={botonChico}>
-            Fixture
+            Fixt. New.
+          </Link>
+        )}
+        {fixtureDivisionHref && (
+          <Link href={fixtureDivisionHref} style={botonChico}>
+            Fixt Divis.
           </Link>
         )}
       </div>

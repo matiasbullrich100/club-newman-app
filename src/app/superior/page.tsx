@@ -95,6 +95,7 @@ export default async function PlantelSuperiorPage() {
             proxima={proxima}
             posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
             fixtureHref={`/categoria/${cat.id}/fixture`}
+            fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}
           />
         ),
       };
