@@ -52,7 +52,7 @@ export default async function EquipoJuvenilesPage({
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href={`/juveniles/${edadId}/equipos`} />
+      <BackLink href={`/juveniles/${edadId}`} />
       <SessionBar session={session} />
       <Header logo="urba" />
 

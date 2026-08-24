@@ -119,7 +119,7 @@ export default async function CategoriaPage({
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href="/categorias" />
+      <BackLink href="/superior" />
       <SessionBar session={session} />
       <Header />
 

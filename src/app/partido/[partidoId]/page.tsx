@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
-import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
+import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
@@ -36,18 +36,16 @@ export default async function PartidoPage({
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
-  // numeroFecha "demo" (partidos de prueba, fuera de cualquier esquema real) no tiene vista de
-  // fecha propia -- /fecha o /juveniles/.../fecha devuelven 404 para un numero fuera de rango.
-  const numero = Number(partido.numeroFecha);
-  const maxFechas = categoria?.grupo === "juveniles" ? NUMERO_FECHAS_JUVENILES : NUMERO_FECHAS_SUPERIOR;
-  const numeroFechaValido = Number.isInteger(numero) && numero >= 1 && numero <= maxFechas;
+  // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. New."
+  // o tocando la fila en LiveBanner/ProximaFechaRow), no la vieja vista /fecha/[n] (huerfana --
+  // nada mas en la app linkeaba ahi).
   const backHref = PARTIDOS_DEMO_IDS.includes(partidoId)
     ? "/pruebas"
-    : !numeroFechaValido
+    : !categoria
       ? "/"
-      : categoria?.grupo === "juveniles"
-        ? `/juveniles/${categoria.edadId}/fecha/${numero}`
-        : `/fecha/${numero}`;
+      : categoria.grupo === "juveniles"
+        ? `/juveniles/${categoria.edadId}`
+        : "/superior";
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
 

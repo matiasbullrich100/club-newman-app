@@ -43,7 +43,10 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
     ? ((posiciones.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (posiciones.updatedAt as Date))
     : null;
   const grupo = grupoDeCategoria(categoriaId);
-  const fixtureNewmanHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
+  // "Resumen del partido" -- mismo hub con los 3 botones (Tabla/Fixt. New./Fixt Divis.) del que se
+  // llega aca, tanto de vuelta (BackLink) como para el boton de "Fixt. New." en si.
+  const hubHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
+  const fixtureNewmanHref = grupo.grupo === "juveniles" ? hubHref : `/categoria/${categoriaId}/fixture`;
   // "en_CA" da "YYYY-MM-DD", comparable como string contra el ISO de cada fecha del fixture --
   // mismo truco que esHoyEnArgentina() en lib/fecha.ts, sin importar el huso horario del server.
   const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
@@ -55,7 +58,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href={`/fixture/${categoriaId}`} />
+      <BackLink href={hubHref} />
       <SessionBar session={session} />
       <Header />
 
