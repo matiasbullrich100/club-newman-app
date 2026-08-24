@@ -1,1417 +1,2066 @@
 {
-  "m15-a": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "La Plata A",
-          "visitante": "Champagnat A",
-          "golesLocal": 27,
-          "golesVisitante": 38
-        },
-        {
-          "local": "SIC A",
-          "visitante": "Olivos A",
-          "golesLocal": 31,
-          "golesVisitante": 20
-        },
-        {
-          "local": "Alumni A",
-          "visitante": "A.D Francesa A",
-          "golesLocal": 27,
-          "golesVisitante": 19
-        },
-        {
-          "local": "Newman A",
-          "visitante": "Regatas B. Vista A",
-          "golesLocal": 33,
-          "golesVisitante": 19
-        },
-        {
-          "local": "Liceo Naval A",
-          "visitante": "CASI A",
-          "golesLocal": 14,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Pucara A",
-          "visitante": "CUBA A",
-          "golesLocal": 22,
-          "golesVisitante": 26
-        }
-      ]
+ "m15-a": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "La Plata A",
+     "visitante": "Champagnat A",
+     "golesLocal": 27,
+     "golesVisitante": 38
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara A",
-          "visitante": "La Plata A",
-          "bonusLocal": true,
-          "golesLocal": 26,
-          "golesVisitante": 7
-        },
-        {
-          "local": "CUBA A",
-          "visitante": "Liceo Naval A",
-          "bonusLocal": true,
-          "golesLocal": 36,
-          "golesVisitante": 14
-        },
-        {
-          "local": "CASI A",
-          "visitante": "Newman A",
-          "golesLocal": 17,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Regatas B. Vista A",
-          "visitante": "Alumni A",
-          "golesLocal": 14,
-          "golesVisitante": 20
-        },
-        {
-          "local": "A.D Francesa A",
-          "visitante": "SIC A",
-          "golesLocal": 5,
-          "golesVisitante": 36,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Olivos A",
-          "visitante": "Champagnat A",
-          "golesLocal": 40,
-          "golesVisitante": 43
-        }
-      ]
+    {
+     "local": "SIC A",
+     "visitante": "Olivos A",
+     "golesLocal": 31,
+     "golesVisitante": 20
+    },
+    {
+     "local": "Alumni A",
+     "visitante": "A.D Francesa A",
+     "golesLocal": 27,
+     "golesVisitante": 19
+    },
+    {
+     "local": "Newman A",
+     "visitante": "Regatas B. Vista A",
+     "golesLocal": 33,
+     "golesVisitante": 19
+    },
+    {
+     "local": "Liceo Naval A",
+     "visitante": "CASI A",
+     "golesLocal": 14,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Pucara A",
+     "visitante": "CUBA A",
+     "golesLocal": 22,
+     "golesVisitante": 26
     }
+   ]
   },
-  "m15-b": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "La Plata B",
-          "visitante": "Champagnat B",
-          "bonusLocal": true,
-          "golesLocal": 45,
-          "golesVisitante": 0
-        },
-        {
-          "local": "SIC B",
-          "visitante": "Olivos B",
-          "bonusLocal": true,
-          "golesLocal": 31,
-          "golesVisitante": 0
-        },
-        {
-          "local": "Alumni B",
-          "visitante": "A.D Francesa B",
-          "golesLocal": 22,
-          "golesVisitante": 17
-        },
-        {
-          "local": "Newman B",
-          "visitante": "Regatas B. Vista B",
-          "golesLocal": 19,
-          "golesVisitante": 19
-        },
-        {
-          "local": "Liceo Naval B",
-          "visitante": "CASI B",
-          "golesLocal": 5,
-          "golesVisitante": 53,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Pucara B",
-          "visitante": "CUBA B",
-          "golesLocal": 19,
-          "golesVisitante": 28
-        }
-      ]
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara A",
+     "visitante": "La Plata A",
+     "bonusLocal": true,
+     "golesLocal": 26,
+     "golesVisitante": 7
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara B",
-          "visitante": "La Plata B",
-          "golesLocal": 19,
-          "golesVisitante": 33
-        },
-        {
-          "local": "CUBA B",
-          "visitante": "Liceo Naval B",
-          "bonusLocal": true,
-          "golesLocal": 79,
-          "golesVisitante": 0
-        },
-        {
-          "local": "CASI B",
-          "visitante": "Newman B",
-          "golesLocal": 14,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Regatas B. Vista B",
-          "visitante": "Alumni B",
-          "golesLocal": 17,
-          "golesVisitante": 19
-        },
-        {
-          "local": "A.D Francesa B",
-          "visitante": "SIC B",
-          "golesLocal": 7,
-          "golesVisitante": 36,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Olivos B",
-          "visitante": "Champagnat B",
-          "bonusLocal": true,
-          "golesLocal": 47,
-          "golesVisitante": 14
-        }
-      ]
+    {
+     "local": "CUBA A",
+     "visitante": "Liceo Naval A",
+     "bonusLocal": true,
+     "golesLocal": 36,
+     "golesVisitante": 14
+    },
+    {
+     "local": "CASI A",
+     "visitante": "Newman A",
+     "golesLocal": 17,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Regatas B. Vista A",
+     "visitante": "Alumni A",
+     "golesLocal": 14,
+     "golesVisitante": 20
+    },
+    {
+     "local": "A.D Francesa A",
+     "visitante": "SIC A",
+     "golesLocal": 5,
+     "golesVisitante": 36,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Olivos A",
+     "visitante": "Champagnat A",
+     "golesLocal": 40,
+     "golesVisitante": 43
     }
+   ]
   },
-  "m15-c": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "La Plata C",
-          "visitante": "Champagnat C",
-          "golesLocal": 51,
-          "golesVisitante": 33
-        },
-        {
-          "local": "SIC C",
-          "visitante": "Olivos C",
-          "bonusLocal": true,
-          "golesLocal": 39,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Alumni C",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Newman C",
-          "visitante": "Regatas B. Vista C",
-          "golesLocal": 36,
-          "golesVisitante": 47
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "CASI C",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Pucara C",
-          "visitante": "CUBA C",
-          "golesLocal": 7,
-          "golesVisitante": 29,
-          "bonusVisitante": true
-        }
-      ]
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "La Plata A",
+     "visitante": "Olivos A",
+     "golesLocal": 29,
+     "golesVisitante": 14,
+     "bonusLocal": true,
+     "bonusVisitante": false
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara C",
-          "visitante": "La Plata C",
-          "golesLocal": 10,
-          "golesVisitante": 29,
-          "bonusVisitante": true
-        },
-        {
-          "local": "CUBA C",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "CASI C",
-          "visitante": "Newman C",
-          "golesLocal": 26,
-          "golesVisitante": 21
-        },
-        {
-          "local": "Regatas B. Vista C",
-          "visitante": "Alumni C",
-          "bonusLocal": true,
-          "golesLocal": 57,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "SIC C",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Olivos C",
-          "visitante": "Champagnat C",
-          "golesLocal": 5,
-          "golesVisitante": 60,
-          "bonusVisitante": true
-        }
-      ]
-    }
-  },
-  "m15-d": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "Los Pinos",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Los Molinos C",
-          "visitante": "Buenos Aires C",
-          "golesLocal": 17,
-          "golesVisitante": 67,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Newman D",
-          "visitante": "Regatas B. Vista D",
-          "golesLocal": 34,
-          "golesVisitante": 51,
-          "bonusVisitante": true
-        },
-        {
-          "local": "San Andres C",
-          "visitante": "CASI D",
-          "golesLocal": 17,
-          "golesVisitante": 69,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Pucara D",
-          "visitante": "CUBA D",
-          "golesLocal": 26,
-          "golesVisitante": 22
-        }
-      ]
+    {
+     "local": "Champagnat A",
+     "visitante": "A.D Francesa A",
+     "golesLocal": 26,
+     "golesVisitante": 7,
+     "bonusLocal": true,
+     "bonusVisitante": false
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara D",
-          "visitante": "Los Pinos",
-          "golesLocal": 19,
-          "golesVisitante": 40,
-          "bonusVisitante": true
-        },
-        {
-          "local": "CUBA D",
-          "visitante": "San Andres C",
-          "golesLocal": 14,
-          "golesVisitante": 69,
-          "bonusVisitante": true
-        },
-        {
-          "local": "CASI D",
-          "visitante": "Newman D",
-          "bonusLocal": true,
-          "golesLocal": 68,
-          "golesVisitante": 10
-        },
-        {
-          "local": "Regatas B. Vista D",
-          "visitante": "Los Molinos C",
-          "golesLocal": 33,
-          "golesVisitante": 31
-        },
-        {
-          "local": "Buenos Aires C",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        }
-      ]
-    }
-  },
-  "m16-a": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "CUBA A",
-          "visitante": "Pucara A",
-          "golesLocal": 26,
-          "golesVisitante": 24
-        },
-        {
-          "local": "CASI A",
-          "visitante": "Belgrano Athl. A",
-          "golesLocal": 17,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Hindu A",
-          "visitante": "Newman A",
-          "golesLocal": 12,
-          "golesVisitante": 71,
-          "bonusVisitante": true
-        },
-        {
-          "local": "San Albano A",
-          "visitante": "Alumni A",
-          "golesLocal": 30,
-          "golesVisitante": 28
-        },
-        {
-          "local": "Los Tilos A",
-          "visitante": "SIC A",
-          "golesLocal": 12,
-          "golesVisitante": 48,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Champagnat A",
-          "visitante": "San Cirano A",
-          "golesLocal": 20,
-          "golesVisitante": 24
-        }
-      ]
+    {
+     "local": "SIC A",
+     "visitante": "Regatas B. Vista A",
+     "golesLocal": 59,
+     "golesVisitante": 19,
+     "bonusLocal": true,
+     "bonusVisitante": false
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Champagnat A",
-          "visitante": "CUBA A",
-          "golesLocal": 19,
-          "golesVisitante": 46,
-          "bonusVisitante": true
-        },
-        {
-          "local": "San Cirano A",
-          "visitante": "Los Tilos A",
-          "golesLocal": 20,
-          "golesVisitante": 14
-        },
-        {
-          "local": "SIC A",
-          "visitante": "San Albano A",
-          "bonusLocal": true,
-          "golesLocal": 34,
-          "golesVisitante": 12
-        },
-        {
-          "local": "Alumni A",
-          "visitante": "Hindu A",
-          "bonusLocal": true,
-          "golesLocal": 59,
-          "golesVisitante": 28
-        },
-        {
-          "local": "Newman A",
-          "visitante": "CASI A",
-          "bonusLocal": true,
-          "golesLocal": 31,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Belgrano Athl. A",
-          "visitante": "Pucara A",
-          "bonusLocal": true,
-          "golesLocal": 31,
-          "golesVisitante": 16
-        }
-      ]
-    }
-  },
-  "m16-b": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "CUBA B",
-          "visitante": "Pucara B",
-          "golesLocal": 19,
-          "golesVisitante": 33
-        },
-        {
-          "local": "CASI B",
-          "visitante": "Belgrano Athl. B",
-          "golesLocal": 35,
-          "golesVisitante": 19
-        },
-        {
-          "local": "Hindu B",
-          "visitante": "Newman B",
-          "golesLocal": 17,
-          "golesVisitante": 62,
-          "bonusVisitante": true
-        },
-        {
-          "local": "San Albano B",
-          "visitante": "Alumni B",
-          "golesLocal": 12,
-          "golesVisitante": 29,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Los Tilos B",
-          "visitante": "SIC B",
-          "golesLocal": 7,
-          "golesVisitante": 52,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Champagnat B",
-          "visitante": "San Cirano B",
-          "bonusLocal": true,
-          "golesLocal": 48,
-          "golesVisitante": 0
-        }
-      ]
+    {
+     "local": "Alumni A",
+     "visitante": "CASI A",
+     "golesLocal": 31,
+     "golesVisitante": 31,
+     "bonusLocal": false,
+     "bonusVisitante": false
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Champagnat B",
-          "visitante": "CUBA B",
-          "golesLocal": 5,
-          "golesVisitante": 17
-        },
-        {
-          "local": "San Cirano B",
-          "visitante": "Los Tilos B",
-          "golesLocal": 14,
-          "golesVisitante": 19
-        },
-        {
-          "local": "SIC B",
-          "visitante": "San Albano B",
-          "bonusLocal": true,
-          "golesLocal": 47,
-          "golesVisitante": 9
-        },
-        {
-          "local": "Alumni B",
-          "visitante": "Hindu B",
-          "golesLocal": 22,
-          "golesVisitante": 32
-        },
-        {
-          "local": "Newman B",
-          "visitante": "CASI B",
-          "bonusLocal": true,
-          "golesLocal": 41,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Belgrano Athl. B",
-          "visitante": "Pucara B",
-          "golesLocal": 17,
-          "golesVisitante": 22
-        }
-      ]
-    }
-  },
-  "m16-c": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "CUBA C",
-          "visitante": "Virreyes A",
-          "golesLocal": 24,
-          "golesVisitante": 19
-        },
-        {
-          "local": "CASI C",
-          "visitante": "Belgrano Athl. C",
-          "bonusLocal": true,
-          "golesLocal": 68,
-          "golesVisitante": 7
-        },
-        {
-          "local": "Regatas B Vista C",
-          "visitante": "Newman C",
-          "golesLocal": 31,
-          "golesVisitante": 57,
-          "bonusVisitante": true
-        },
-        {
-          "local": "C.U De Quilmes A",
-          "visitante": "Alumni C",
-          "bonusLocal": true,
-          "golesLocal": 71,
-          "golesVisitante": 7
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "SIC C",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Champagnat C",
-          "visitante": "El Retiro A",
-          "golesLocal": 0,
-          "golesVisitante": 73,
-          "bonusVisitante": true
-        }
-      ]
+    {
+     "local": "Newman A",
+     "visitante": "CUBA A",
+     "golesLocal": 19,
+     "golesVisitante": 52,
+     "bonusLocal": false,
+     "bonusVisitante": true
     },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Champagnat C",
-          "visitante": "CUBA C",
-          "golesLocal": 28,
-          "golesVisitante": 10
-        },
-        {
-          "local": "El Retiro A",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "SIC C",
-          "visitante": "C.U De Quilmes A",
-          "golesLocal": 17,
-          "golesVisitante": 21
-        },
-        {
-          "local": "Alumni C",
-          "visitante": "Regatas B Vista C",
-          "golesLocal": 22,
-          "golesVisitante": 78,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Newman C",
-          "visitante": "CASI C",
-          "golesLocal": 17,
-          "golesVisitante": 36
-        },
-        {
-          "local": "Belgrano Athl. C",
-          "visitante": "Virreyes A",
-          "golesLocal": 36,
-          "golesVisitante": 29
-        }
-      ]
+    {
+     "local": "Liceo Naval A",
+     "visitante": "Pucara A",
+     "golesLocal": 5,
+     "golesVisitante": 38,
+     "bonusLocal": false,
+     "bonusVisitante": true
     }
-  },
-  "m16-d": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "CUBA D",
-          "visitante": "Virreyes B",
-          "bonusLocal": true,
-          "golesLocal": 51,
-          "golesVisitante": 7
-        },
-        {
-          "local": "CASI D",
-          "visitante": "Belgrano Athl. D",
-          "bonusLocal": true,
-          "golesLocal": 55,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Regatas B Vista D",
-          "visitante": "Newman D",
-          "golesLocal": 19,
-          "golesVisitante": 14
-        },
-        {
-          "local": "C.U De Quilmes B",
-          "visitante": "Alumni D",
-          "golesLocal": 33,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "SIC D",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Champagnat D",
-          "visitante": "El Retiro B",
-          "golesLocal": 0,
-          "golesVisitante": 8
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Champagnat D",
-          "visitante": "CUBA D",
-          "bonusLocal": true,
-          "golesLocal": 45,
-          "golesVisitante": 19
-        },
-        {
-          "local": "El Retiro B",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "SIC D",
-          "visitante": "C.U De Quilmes B",
-          "bonusLocal": true,
-          "golesLocal": 54,
-          "golesVisitante": 17
-        },
-        {
-          "local": "Alumni D",
-          "visitante": "Regatas B Vista D",
-          "bonusLocal": true,
-          "golesLocal": 29,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Newman D",
-          "visitante": "CASI D",
-          "golesLocal": 21,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Belgrano Athl. D",
-          "visitante": "Virreyes B",
-          "golesLocal": 24,
-          "golesVisitante": 28
-        }
-      ]
-    }
-  },
-  "m17-a": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "SITAS A",
-          "visitante": "Los Molinos A",
-          "golesLocal": 15,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Liceo Naval A",
-          "visitante": "Hindu A",
-          "golesLocal": 28,
-          "golesVisitante": 36
-        },
-        {
-          "local": "A.D. Francesa A",
-          "visitante": "Lomas Athl. A",
-          "bonusLocal": true,
-          "golesLocal": 45,
-          "golesVisitante": 27
-        },
-        {
-          "local": "Newman A",
-          "visitante": "San Martin A",
-          "bonusLocal": true,
-          "golesLocal": 62,
-          "golesVisitante": 17
-        },
-        {
-          "local": "Los Tilos A",
-          "visitante": "Olivos A",
-          "golesLocal": 24,
-          "golesVisitante": 53,
-          "bonusVisitante": true
-        },
-        {
-          "local": "San Andres A",
-          "visitante": "Los Matreros A",
-          "golesLocal": 48,
-          "golesVisitante": 42
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "San Andres A",
-          "visitante": "SITAS A",
-          "bonusLocal": true,
-          "golesLocal": 64,
-          "golesVisitante": 0
-        },
-        {
-          "local": "Los Matreros A",
-          "visitante": "Los Tilos A",
-          "golesLocal": 21,
-          "golesVisitante": 17
-        },
-        {
-          "local": "Olivos A",
-          "visitante": "Newman A",
-          "golesLocal": 28,
-          "golesVisitante": 36
-        },
-        {
-          "local": "San Martin A",
-          "visitante": "A.D. Francesa A",
-          "golesLocal": 24,
-          "golesVisitante": 19
-        },
-        {
-          "local": "Lomas Athl. A",
-          "visitante": "Liceo Naval A",
-          "golesLocal": 31,
-          "golesVisitante": 26
-        },
-        {
-          "local": "Hindu A",
-          "visitante": "Los Molinos A",
-          "golesLocal": 5,
-          "golesVisitante": 30
-        }
-      ]
-    }
-  },
-  "m17-b": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "SITAS B",
-          "visitante": "Los Molinos B",
-          "golesLocal": 7,
-          "golesVisitante": 59,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Liceo Naval B",
-          "visitante": "Hindu B",
-          "golesLocal": 22,
-          "golesVisitante": 14
-        },
-        {
-          "local": "A.D. Francesa B",
-          "visitante": "Lomas Athl. B",
-          "bonusLocal": true,
-          "golesLocal": 59,
-          "golesVisitante": 7
-        },
-        {
-          "local": "Newman B",
-          "visitante": "San Martin B",
-          "bonusLocal": true,
-          "golesLocal": 45,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Los Tilos B",
-          "visitante": "Olivos B",
-          "golesLocal": 31,
-          "golesVisitante": 22
-        },
-        {
-          "local": "San Andres B",
-          "visitante": "Los Matreros B",
-          "golesLocal": 17,
-          "golesVisitante": 24
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "San Andres B",
-          "visitante": "SITAS B",
-          "golesLocal": 8,
-          "golesVisitante": 0
-        },
-        {
-          "local": "Los Matreros B",
-          "visitante": "Los Tilos B",
-          "golesLocal": 7,
-          "golesVisitante": 22,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Olivos B",
-          "visitante": "Newman B",
-          "golesLocal": 19,
-          "golesVisitante": 58,
-          "bonusVisitante": true
-        },
-        {
-          "local": "San Martin B",
-          "visitante": "A.D. Francesa B",
-          "golesLocal": 24,
-          "golesVisitante": 36
-        },
-        {
-          "local": "Lomas Athl. B",
-          "visitante": "Liceo Naval B",
-          "golesLocal": 17,
-          "golesVisitante": 31,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Hindu B",
-          "visitante": "Los Molinos B",
-          "bonusLocal": true,
-          "golesLocal": 43,
-          "golesVisitante": 17
-        }
-      ]
-    }
-  },
-  "m17-c": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "CUBA C",
-          "visitante": "Pucara D",
-          "bonusLocal": true,
-          "golesLocal": 71,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Buenos Aires C",
-          "visitante": "Sin Info",
-          "especial": "sin_info"
-        },
-        {
-          "local": "Alumni C",
-          "visitante": "Belgrano Athl. C",
-          "golesLocal": 40,
-          "golesVisitante": 19
-        },
-        {
-          "local": "CASI C",
-          "visitante": "Regatas B. Vista C",
-          "golesLocal": 26,
-          "golesVisitante": 12
-        },
-        {
-          "local": "Champagnat C",
-          "visitante": "SIC D",
-          "golesLocal": 19,
-          "golesVisitante": 12
-        },
-        {
-          "local": "La Plata C",
-          "visitante": "Newman C",
-          "bonusLocal": true,
-          "golesLocal": 64,
-          "golesVisitante": 33
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "La Plata C",
-          "visitante": "CUBA C",
-          "golesLocal": 26,
-          "golesVisitante": 78,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Newman C",
-          "visitante": "Champagnat C",
-          "bonusLocal": true,
-          "golesLocal": 25,
-          "golesVisitante": 12
-        },
-        {
-          "local": "SIC D",
-          "visitante": "CASI C",
-          "golesLocal": 14,
-          "golesVisitante": 10
-        },
-        {
-          "local": "Regatas B. Vista C",
-          "visitante": "Alumni C",
-          "golesLocal": 8,
-          "golesVisitante": 0
-        },
-        {
-          "local": "Belgrano Athl. C",
-          "visitante": "Buenos Aires C",
-          "bonusLocal": true,
-          "golesLocal": 31,
-          "golesVisitante": 12
-        },
-        {
-          "local": "Sin Info",
-          "visitante": "Pucara D",
-          "especial": "sin_info"
-        }
-      ]
-    }
-  },
-  "m19-a": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "San Luis A",
-          "visitante": "La Plata A",
-          "golesLocal": 16,
-          "golesVisitante": 17
-        },
-        {
-          "local": "SIC A",
-          "visitante": "Champagnat A",
-          "bonusLocal": true,
-          "golesLocal": 39,
-          "golesVisitante": 11
-        },
-        {
-          "local": "Regatas B Vista A",
-          "visitante": "Newman A",
-          "golesLocal": 24,
-          "golesVisitante": 47,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Belgrano Athl. A",
-          "visitante": "Alumni A",
-          "golesLocal": 37,
-          "golesVisitante": 38
-        },
-        {
-          "local": "Hindu A",
-          "visitante": "Buenos Aires A",
-          "bonusLocal": true,
-          "golesLocal": 59,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Pucara A",
-          "visitante": "CUBA A",
-          "golesLocal": 12,
-          "golesVisitante": 15
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara A",
-          "visitante": "San Luis A",
-          "golesLocal": 21,
-          "golesVisitante": 13
-        },
-        {
-          "local": "CUBA A",
-          "visitante": "Hindu A",
-          "golesLocal": 24,
-          "golesVisitante": 21
-        },
-        {
-          "local": "Buenos Aires A",
-          "visitante": "Belgrano Athl. A",
-          "golesLocal": 17,
-          "golesVisitante": 45,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Alumni A",
-          "visitante": "Regatas B Vista A",
-          "golesLocal": 14,
-          "golesVisitante": 20
-        },
-        {
-          "local": "Newman A",
-          "visitante": "SIC A",
-          "golesLocal": 18,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Champagnat A",
-          "visitante": "La Plata A",
-          "bonusLocal": true,
-          "golesLocal": 34,
-          "golesVisitante": 17
-        }
-      ]
-    }
-  },
-  "m19-b": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "San Luis B",
-          "visitante": "La Plata B",
-          "golesLocal": 14,
-          "golesVisitante": 17
-        },
-        {
-          "local": "SIC B",
-          "visitante": "Champagnat B",
-          "bonusLocal": true,
-          "golesLocal": 41,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Regatas B Vista B",
-          "visitante": "Newman B",
-          "golesLocal": 24,
-          "golesVisitante": 28
-        },
-        {
-          "local": "Belgrano Athl. B",
-          "visitante": "Alumni B",
-          "bonusLocal": true,
-          "golesLocal": 34,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Hindu B",
-          "visitante": "Buenos Aires B",
-          "golesLocal": 21,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Pucara B",
-          "visitante": "CUBA B",
-          "golesLocal": 17,
-          "golesVisitante": 38,
-          "bonusVisitante": true
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara B",
-          "visitante": "San Luis B",
-          "golesLocal": 17,
-          "golesVisitante": 27
-        },
-        {
-          "local": "CUBA B",
-          "visitante": "Hindu B",
-          "golesLocal": 35,
-          "golesVisitante": 31
-        },
-        {
-          "local": "Buenos Aires B",
-          "visitante": "Belgrano Athl. B",
-          "golesLocal": 20,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Alumni B",
-          "visitante": "Regatas B Vista B",
-          "golesLocal": 33,
-          "golesVisitante": 21
-        },
-        {
-          "local": "Newman B",
-          "visitante": "SIC B",
-          "golesLocal": 20,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Champagnat B",
-          "visitante": "La Plata B",
-          "golesLocal": 24,
-          "golesVisitante": 27
-        }
-      ]
-    }
-  },
-  "m19-c": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "San Martin C",
-          "visitante": "La Plata C",
-          "golesLocal": 8,
-          "golesVisitante": 0
-        },
-        {
-          "local": "SIC C",
-          "visitante": "Champagnat C",
-          "golesLocal": 26,
-          "golesVisitante": 28
-        },
-        {
-          "local": "Regatas B. Vista C",
-          "visitante": "Newman C",
-          "golesLocal": 5,
-          "golesVisitante": 40,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Belgrano Athl. C",
-          "visitante": "CASI C",
-          "bonusLocal": true,
-          "golesLocal": 38,
-          "golesVisitante": 5
-        },
-        {
-          "local": "Hindu C",
-          "visitante": "Buenos Aires C",
-          "golesLocal": 8,
-          "golesVisitante": 5
-        },
-        {
-          "local": "Pucara C",
-          "visitante": "CUBA C",
-          "golesLocal": 26,
-          "golesVisitante": 72,
-          "bonusVisitante": true
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara C",
-          "visitante": "San Martin C",
-          "golesLocal": 14,
-          "golesVisitante": 26
-        },
-        {
-          "local": "CUBA C",
-          "visitante": "Hindu C",
-          "bonusLocal": true,
-          "golesLocal": 50,
-          "golesVisitante": 24
-        },
-        {
-          "local": "Buenos Aires C",
-          "visitante": "Belgrano Athl. C",
-          "golesLocal": 26,
-          "golesVisitante": 36
-        },
-        {
-          "local": "CASI C",
-          "visitante": "Regatas B. Vista C",
-          "bonusLocal": true,
-          "golesLocal": 54,
-          "golesVisitante": 21
-        },
-        {
-          "local": "Newman C",
-          "visitante": "SIC C",
-          "golesLocal": 12,
-          "golesVisitante": 17
-        },
-        {
-          "local": "Champagnat C",
-          "visitante": "La Plata C",
-          "golesLocal": 26,
-          "golesVisitante": 17
-        }
-      ]
-    }
-  },
-  "m19-d": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "San Martin D",
-          "visitante": "La Plata D",
-          "golesLocal": 8,
-          "golesVisitante": 0
-        },
-        {
-          "local": "SIC D",
-          "visitante": "Champagnat D",
-          "bonusLocal": true,
-          "golesLocal": 60,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Regatas B. Vista D",
-          "visitante": "Newman D",
-          "golesLocal": 12,
-          "golesVisitante": 71,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Belgrano Athl. D",
-          "visitante": "CASI D",
-          "bonusLocal": true,
-          "golesLocal": 57,
-          "golesVisitante": 28
-        },
-        {
-          "local": "Hindu D",
-          "visitante": "Buenos Aires D",
-          "golesLocal": 36,
-          "golesVisitante": 34
-        },
-        {
-          "local": "Pucara D",
-          "visitante": "CUBA D",
-          "golesLocal": 19,
-          "golesVisitante": 79,
-          "bonusVisitante": true
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Pucara D",
-          "visitante": "San Martin D",
-          "golesLocal": 0,
-          "golesVisitante": 8
-        },
-        {
-          "local": "CUBA D",
-          "visitante": "Hindu D",
-          "bonusLocal": true,
-          "golesLocal": 31,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Buenos Aires D",
-          "visitante": "Belgrano Athl. D",
-          "golesLocal": 7,
-          "golesVisitante": 43,
-          "bonusVisitante": true
-        },
-        {
-          "local": "CASI D",
-          "visitante": "Regatas B. Vista D",
-          "bonusLocal": true,
-          "golesLocal": 47,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Newman D",
-          "visitante": "SIC D",
-          "golesLocal": 24,
-          "golesVisitante": 33
-        },
-        {
-          "local": "Champagnat D",
-          "visitante": "La Plata D",
-          "bonusLocal": true,
-          "golesLocal": 70,
-          "golesVisitante": 17
-        }
-      ]
-    }
-  },
-  "m19-e": {
-    "1": {
-      "fecha": "2026-08-09",
-      "partidos": [
-        {
-          "local": "San Luis C",
-          "visitante": "G Y Esgrima C",
-          "especial": "postergado"
-        },
-        {
-          "local": "SIC E",
-          "visitante": "Champagnat E",
-          "bonusLocal": true,
-          "golesLocal": 48,
-          "golesVisitante": 29
-        },
-        {
-          "local": "Regatas B Vista E",
-          "visitante": "Newman E",
-          "golesLocal": 26,
-          "golesVisitante": 33
-        },
-        {
-          "local": "Belgrano Athl. E",
-          "visitante": "Alumni C",
-          "bonusLocal": true,
-          "golesLocal": 36,
-          "golesVisitante": 14
-        },
-        {
-          "local": "Manuel Belgrano C",
-          "visitante": "Buenos Aires E",
-          "golesLocal": 8,
-          "golesVisitante": 0
-        },
-        {
-          "local": "Los Molinos C",
-          "visitante": "CUBA E",
-          "golesLocal": 14,
-          "golesVisitante": 43,
-          "bonusVisitante": true
-        }
-      ]
-    },
-    "2": {
-      "fecha": "2026-08-16",
-      "partidos": [
-        {
-          "local": "Los Molinos C",
-          "visitante": "San Luis C",
-          "golesLocal": 21,
-          "golesVisitante": 12
-        },
-        {
-          "local": "CUBA E",
-          "visitante": "Manuel Belgrano C",
-          "bonusLocal": true,
-          "golesLocal": 62,
-          "golesVisitante": 7
-        },
-        {
-          "local": "Buenos Aires E",
-          "visitante": "Belgrano Athl. E",
-          "golesLocal": 19,
-          "golesVisitante": 38,
-          "bonusVisitante": true
-        },
-        {
-          "local": "Alumni C",
-          "visitante": "Regatas B Vista E",
-          "golesLocal": 0,
-          "golesVisitante": 8
-        },
-        {
-          "local": "Newman E",
-          "visitante": "SIC E",
-          "golesLocal": 36,
-          "golesVisitante": 22
-        },
-        {
-          "local": "Champagnat E",
-          "visitante": "G Y Esgrima C",
-          "golesLocal": 24,
-          "golesVisitante": 61,
-          "bonusVisitante": true
-        }
-      ]
-    }
+   ]
   }
+ },
+ "m15-b": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "La Plata B",
+     "visitante": "Champagnat B",
+     "bonusLocal": true,
+     "golesLocal": 45,
+     "golesVisitante": 0
+    },
+    {
+     "local": "SIC B",
+     "visitante": "Olivos B",
+     "bonusLocal": true,
+     "golesLocal": 31,
+     "golesVisitante": 0
+    },
+    {
+     "local": "Alumni B",
+     "visitante": "A.D Francesa B",
+     "golesLocal": 22,
+     "golesVisitante": 17
+    },
+    {
+     "local": "Newman B",
+     "visitante": "Regatas B. Vista B",
+     "golesLocal": 19,
+     "golesVisitante": 19
+    },
+    {
+     "local": "Liceo Naval B",
+     "visitante": "CASI B",
+     "golesLocal": 5,
+     "golesVisitante": 53,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Pucara B",
+     "visitante": "CUBA B",
+     "golesLocal": 19,
+     "golesVisitante": 28
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara B",
+     "visitante": "La Plata B",
+     "golesLocal": 19,
+     "golesVisitante": 33
+    },
+    {
+     "local": "CUBA B",
+     "visitante": "Liceo Naval B",
+     "bonusLocal": true,
+     "golesLocal": 79,
+     "golesVisitante": 0
+    },
+    {
+     "local": "CASI B",
+     "visitante": "Newman B",
+     "golesLocal": 14,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Regatas B. Vista B",
+     "visitante": "Alumni B",
+     "golesLocal": 17,
+     "golesVisitante": 19
+    },
+    {
+     "local": "A.D Francesa B",
+     "visitante": "SIC B",
+     "golesLocal": 7,
+     "golesVisitante": 36,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Olivos B",
+     "visitante": "Champagnat B",
+     "bonusLocal": true,
+     "golesLocal": 47,
+     "golesVisitante": 14
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "La Plata B",
+     "visitante": "Olivos B",
+     "golesLocal": 35,
+     "golesVisitante": 19,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Champagnat B",
+     "visitante": "A.D Francesa B",
+     "golesLocal": 68,
+     "golesVisitante": 12,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "SIC B",
+     "visitante": "Regatas B. Vista B",
+     "golesLocal": 29,
+     "golesVisitante": 7,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Alumni B",
+     "visitante": "CASI B",
+     "golesLocal": 21,
+     "golesVisitante": 61,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Newman B",
+     "visitante": "CUBA B",
+     "golesLocal": 35,
+     "golesVisitante": 38,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Liceo Naval B",
+     "visitante": "Pucara B",
+     "golesLocal": 17,
+     "golesVisitante": 29,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m15-c": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "La Plata C",
+     "visitante": "Champagnat C",
+     "golesLocal": 51,
+     "golesVisitante": 33
+    },
+    {
+     "local": "SIC C",
+     "visitante": "Olivos C",
+     "bonusLocal": true,
+     "golesLocal": 39,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Alumni C",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Newman C",
+     "visitante": "Regatas B. Vista C",
+     "golesLocal": 36,
+     "golesVisitante": 47
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "CASI C",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Pucara C",
+     "visitante": "CUBA C",
+     "golesLocal": 7,
+     "golesVisitante": 29,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara C",
+     "visitante": "La Plata C",
+     "golesLocal": 10,
+     "golesVisitante": 29,
+     "bonusVisitante": true
+    },
+    {
+     "local": "CUBA C",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "CASI C",
+     "visitante": "Newman C",
+     "golesLocal": 26,
+     "golesVisitante": 21
+    },
+    {
+     "local": "Regatas B. Vista C",
+     "visitante": "Alumni C",
+     "bonusLocal": true,
+     "golesLocal": 57,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "SIC C",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Olivos C",
+     "visitante": "Champagnat C",
+     "golesLocal": 5,
+     "golesVisitante": 60,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "La Plata C",
+     "visitante": "Olivos C",
+     "golesLocal": 67,
+     "golesVisitante": 7,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Champagnat C",
+     "visitante": "SIC C",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Alumni C",
+     "visitante": "CASI C",
+     "golesLocal": 28,
+     "golesVisitante": 62,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Newman C",
+     "visitante": "CUBA C",
+     "golesLocal": 5,
+     "golesVisitante": 54,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Bye",
+     "visitante": "Pucara C",
+     "especial": "sin_info"
+    }
+   ]
+  }
+ },
+ "m15-d": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "Los Pinos",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Los Molinos C",
+     "visitante": "Buenos Aires C",
+     "golesLocal": 17,
+     "golesVisitante": 67,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Newman D",
+     "visitante": "Regatas B. Vista D",
+     "golesLocal": 34,
+     "golesVisitante": 51,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Andres C",
+     "visitante": "CASI D",
+     "golesLocal": 17,
+     "golesVisitante": 69,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Pucara D",
+     "visitante": "CUBA D",
+     "golesLocal": 26,
+     "golesVisitante": 22
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara D",
+     "visitante": "Los Pinos",
+     "golesLocal": 19,
+     "golesVisitante": 40,
+     "bonusVisitante": true
+    },
+    {
+     "local": "CUBA D",
+     "visitante": "San Andres C",
+     "golesLocal": 14,
+     "golesVisitante": 69,
+     "bonusVisitante": true
+    },
+    {
+     "local": "CASI D",
+     "visitante": "Newman D",
+     "bonusLocal": true,
+     "golesLocal": 68,
+     "golesVisitante": 10
+    },
+    {
+     "local": "Regatas B. Vista D",
+     "visitante": "Los Molinos C",
+     "golesLocal": 33,
+     "golesVisitante": 31
+    },
+    {
+     "local": "Buenos Aires C",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "Los Pinos",
+     "visitante": "Bye",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Bye",
+     "visitante": "Buenos Aires C",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Bye",
+     "visitante": "Regatas B. Vista D",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Newman D",
+     "visitante": "CUBA D",
+     "golesLocal": 17,
+     "golesVisitante": 38,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Andres C",
+     "visitante": "Pucara D",
+     "golesLocal": 15,
+     "golesVisitante": 50,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    }
+   ]
+  }
+ },
+ "m16-a": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "CUBA A",
+     "visitante": "Pucara A",
+     "golesLocal": 26,
+     "golesVisitante": 24
+    },
+    {
+     "local": "CASI A",
+     "visitante": "Belgrano Athl. A",
+     "golesLocal": 17,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Hindu A",
+     "visitante": "Newman A",
+     "golesLocal": 12,
+     "golesVisitante": 71,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Albano A",
+     "visitante": "Alumni A",
+     "golesLocal": 30,
+     "golesVisitante": 28
+    },
+    {
+     "local": "Los Tilos A",
+     "visitante": "SIC A",
+     "golesLocal": 12,
+     "golesVisitante": 48,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Champagnat A",
+     "visitante": "San Cirano A",
+     "golesLocal": 20,
+     "golesVisitante": 24
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Champagnat A",
+     "visitante": "CUBA A",
+     "golesLocal": 19,
+     "golesVisitante": 46,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Cirano A",
+     "visitante": "Los Tilos A",
+     "golesLocal": 20,
+     "golesVisitante": 14
+    },
+    {
+     "local": "SIC A",
+     "visitante": "San Albano A",
+     "bonusLocal": true,
+     "golesLocal": 34,
+     "golesVisitante": 12
+    },
+    {
+     "local": "Alumni A",
+     "visitante": "Hindu A",
+     "bonusLocal": true,
+     "golesLocal": 59,
+     "golesVisitante": 28
+    },
+    {
+     "local": "Newman A",
+     "visitante": "CASI A",
+     "bonusLocal": true,
+     "golesLocal": 31,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Belgrano Athl. A",
+     "visitante": "Pucara A",
+     "bonusLocal": true,
+     "golesLocal": 31,
+     "golesVisitante": 16
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "CUBA A",
+     "visitante": "Belgrano Athl. A",
+     "golesLocal": 15,
+     "golesVisitante": 40,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Pucara A",
+     "visitante": "Newman A",
+     "golesLocal": 5,
+     "golesVisitante": 24,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "CASI A",
+     "visitante": "Alumni A",
+     "golesLocal": 36,
+     "golesVisitante": 19,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Hindu A",
+     "visitante": "SIC A",
+     "golesLocal": 17,
+     "golesVisitante": 52,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Albano A",
+     "visitante": "San Cirano A",
+     "golesLocal": 46,
+     "golesVisitante": 12,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Los Tilos A",
+     "visitante": "Champagnat A",
+     "golesLocal": 22,
+     "golesVisitante": 20,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m16-b": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "CUBA B",
+     "visitante": "Pucara B",
+     "golesLocal": 19,
+     "golesVisitante": 33
+    },
+    {
+     "local": "CASI B",
+     "visitante": "Belgrano Athl. B",
+     "golesLocal": 35,
+     "golesVisitante": 19
+    },
+    {
+     "local": "Hindu B",
+     "visitante": "Newman B",
+     "golesLocal": 17,
+     "golesVisitante": 62,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Albano B",
+     "visitante": "Alumni B",
+     "golesLocal": 12,
+     "golesVisitante": 29,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Los Tilos B",
+     "visitante": "SIC B",
+     "golesLocal": 7,
+     "golesVisitante": 52,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Champagnat B",
+     "visitante": "San Cirano B",
+     "bonusLocal": true,
+     "golesLocal": 48,
+     "golesVisitante": 0
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Champagnat B",
+     "visitante": "CUBA B",
+     "golesLocal": 5,
+     "golesVisitante": 17
+    },
+    {
+     "local": "San Cirano B",
+     "visitante": "Los Tilos B",
+     "golesLocal": 14,
+     "golesVisitante": 19
+    },
+    {
+     "local": "SIC B",
+     "visitante": "San Albano B",
+     "bonusLocal": true,
+     "golesLocal": 47,
+     "golesVisitante": 9
+    },
+    {
+     "local": "Alumni B",
+     "visitante": "Hindu B",
+     "golesLocal": 22,
+     "golesVisitante": 32
+    },
+    {
+     "local": "Newman B",
+     "visitante": "CASI B",
+     "bonusLocal": true,
+     "golesLocal": 41,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Belgrano Athl. B",
+     "visitante": "Pucara B",
+     "golesLocal": 17,
+     "golesVisitante": 22
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "CUBA B",
+     "visitante": "Belgrano Athl. B",
+     "golesLocal": 5,
+     "golesVisitante": 20,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Pucara B",
+     "visitante": "Newman B",
+     "golesLocal": 39,
+     "golesVisitante": 14,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "CASI B",
+     "visitante": "Alumni B",
+     "golesLocal": 48,
+     "golesVisitante": 28,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Hindu B",
+     "visitante": "SIC B",
+     "golesLocal": 19,
+     "golesVisitante": 29,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "San Albano B",
+     "visitante": "San Cirano B",
+     "golesLocal": 38,
+     "golesVisitante": 12,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Los Tilos B",
+     "visitante": "Champagnat B",
+     "golesLocal": 15,
+     "golesVisitante": 24,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m16-c": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "CUBA C",
+     "visitante": "Virreyes A",
+     "golesLocal": 24,
+     "golesVisitante": 19
+    },
+    {
+     "local": "CASI C",
+     "visitante": "Belgrano Athl. C",
+     "bonusLocal": true,
+     "golesLocal": 68,
+     "golesVisitante": 7
+    },
+    {
+     "local": "Regatas B Vista C",
+     "visitante": "Newman C",
+     "golesLocal": 31,
+     "golesVisitante": 57,
+     "bonusVisitante": true
+    },
+    {
+     "local": "C.U De Quilmes A",
+     "visitante": "Alumni C",
+     "bonusLocal": true,
+     "golesLocal": 71,
+     "golesVisitante": 7
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "SIC C",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Champagnat C",
+     "visitante": "El Retiro A",
+     "golesLocal": 0,
+     "golesVisitante": 73,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Champagnat C",
+     "visitante": "CUBA C",
+     "golesLocal": 28,
+     "golesVisitante": 10
+    },
+    {
+     "local": "El Retiro A",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "SIC C",
+     "visitante": "C.U De Quilmes A",
+     "golesLocal": 17,
+     "golesVisitante": 21
+    },
+    {
+     "local": "Alumni C",
+     "visitante": "Regatas B Vista C",
+     "golesLocal": 22,
+     "golesVisitante": 78,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Newman C",
+     "visitante": "CASI C",
+     "golesLocal": 17,
+     "golesVisitante": 36
+    },
+    {
+     "local": "Belgrano Athl. C",
+     "visitante": "Virreyes A",
+     "golesLocal": 36,
+     "golesVisitante": 29
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "CUBA C",
+     "visitante": "Belgrano Athl. C",
+     "golesLocal": 38,
+     "golesVisitante": 28,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Virreyes A",
+     "visitante": "Newman C",
+     "golesLocal": 36,
+     "golesVisitante": 17,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "CASI C",
+     "visitante": "Alumni C",
+     "golesLocal": 43,
+     "golesVisitante": 5,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Regatas B Vista C",
+     "visitante": "SIC C",
+     "golesLocal": 31,
+     "golesVisitante": 26,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "C.U De Quilmes A",
+     "visitante": "El Retiro A",
+     "golesLocal": 17,
+     "golesVisitante": 41,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Bye",
+     "visitante": "Champagnat C",
+     "especial": "sin_info"
+    }
+   ]
+  }
+ },
+ "m16-d": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "CUBA D",
+     "visitante": "Virreyes B",
+     "bonusLocal": true,
+     "golesLocal": 51,
+     "golesVisitante": 7
+    },
+    {
+     "local": "CASI D",
+     "visitante": "Belgrano Athl. D",
+     "bonusLocal": true,
+     "golesLocal": 55,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Regatas B Vista D",
+     "visitante": "Newman D",
+     "golesLocal": 19,
+     "golesVisitante": 14
+    },
+    {
+     "local": "C.U De Quilmes B",
+     "visitante": "Alumni D",
+     "golesLocal": 33,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "SIC D",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Champagnat D",
+     "visitante": "El Retiro B",
+     "golesLocal": 0,
+     "golesVisitante": 8
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Champagnat D",
+     "visitante": "CUBA D",
+     "bonusLocal": true,
+     "golesLocal": 45,
+     "golesVisitante": 19
+    },
+    {
+     "local": "El Retiro B",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "SIC D",
+     "visitante": "C.U De Quilmes B",
+     "bonusLocal": true,
+     "golesLocal": 54,
+     "golesVisitante": 17
+    },
+    {
+     "local": "Alumni D",
+     "visitante": "Regatas B Vista D",
+     "bonusLocal": true,
+     "golesLocal": 29,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Newman D",
+     "visitante": "CASI D",
+     "golesLocal": 21,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Belgrano Athl. D",
+     "visitante": "Virreyes B",
+     "golesLocal": 24,
+     "golesVisitante": 28
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "CUBA D",
+     "visitante": "Belgrano Athl. D",
+     "golesLocal": 10,
+     "golesVisitante": 19,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Virreyes B",
+     "visitante": "Newman D",
+     "golesLocal": 26,
+     "golesVisitante": 50,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "CASI D",
+     "visitante": "Alumni D",
+     "golesLocal": 8,
+     "golesVisitante": 0,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Regatas B Vista D",
+     "visitante": "SIC D",
+     "golesLocal": 7,
+     "golesVisitante": 36,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "C.U De Quilmes B",
+     "visitante": "El Retiro B",
+     "golesLocal": 77,
+     "golesVisitante": 7,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Bye",
+     "visitante": "Champagnat D",
+     "especial": "sin_info"
+    }
+   ]
+  }
+ },
+ "m17-a": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "SITAS A",
+     "visitante": "Los Molinos A",
+     "golesLocal": 15,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Liceo Naval A",
+     "visitante": "Hindu A",
+     "golesLocal": 28,
+     "golesVisitante": 36
+    },
+    {
+     "local": "A.D. Francesa A",
+     "visitante": "Lomas Athl. A",
+     "bonusLocal": true,
+     "golesLocal": 45,
+     "golesVisitante": 27
+    },
+    {
+     "local": "Newman A",
+     "visitante": "San Martin A",
+     "bonusLocal": true,
+     "golesLocal": 62,
+     "golesVisitante": 17
+    },
+    {
+     "local": "Los Tilos A",
+     "visitante": "Olivos A",
+     "golesLocal": 24,
+     "golesVisitante": 53,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Andres A",
+     "visitante": "Los Matreros A",
+     "golesLocal": 48,
+     "golesVisitante": 42
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "San Andres A",
+     "visitante": "SITAS A",
+     "bonusLocal": true,
+     "golesLocal": 64,
+     "golesVisitante": 0
+    },
+    {
+     "local": "Los Matreros A",
+     "visitante": "Los Tilos A",
+     "golesLocal": 21,
+     "golesVisitante": 17
+    },
+    {
+     "local": "Olivos A",
+     "visitante": "Newman A",
+     "golesLocal": 28,
+     "golesVisitante": 36
+    },
+    {
+     "local": "San Martin A",
+     "visitante": "A.D. Francesa A",
+     "golesLocal": 24,
+     "golesVisitante": 19
+    },
+    {
+     "local": "Lomas Athl. A",
+     "visitante": "Liceo Naval A",
+     "golesLocal": 31,
+     "golesVisitante": 26
+    },
+    {
+     "local": "Hindu A",
+     "visitante": "Los Molinos A",
+     "golesLocal": 5,
+     "golesVisitante": 30
+    }
+   ]
+  }
+ },
+ "m17-b": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "SITAS B",
+     "visitante": "Los Molinos B",
+     "golesLocal": 7,
+     "golesVisitante": 59,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Liceo Naval B",
+     "visitante": "Hindu B",
+     "golesLocal": 22,
+     "golesVisitante": 14
+    },
+    {
+     "local": "A.D. Francesa B",
+     "visitante": "Lomas Athl. B",
+     "bonusLocal": true,
+     "golesLocal": 59,
+     "golesVisitante": 7
+    },
+    {
+     "local": "Newman B",
+     "visitante": "San Martin B",
+     "bonusLocal": true,
+     "golesLocal": 45,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Los Tilos B",
+     "visitante": "Olivos B",
+     "golesLocal": 31,
+     "golesVisitante": 22
+    },
+    {
+     "local": "San Andres B",
+     "visitante": "Los Matreros B",
+     "golesLocal": 17,
+     "golesVisitante": 24
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "San Andres B",
+     "visitante": "SITAS B",
+     "golesLocal": 8,
+     "golesVisitante": 0
+    },
+    {
+     "local": "Los Matreros B",
+     "visitante": "Los Tilos B",
+     "golesLocal": 7,
+     "golesVisitante": 22,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Olivos B",
+     "visitante": "Newman B",
+     "golesLocal": 19,
+     "golesVisitante": 58,
+     "bonusVisitante": true
+    },
+    {
+     "local": "San Martin B",
+     "visitante": "A.D. Francesa B",
+     "golesLocal": 24,
+     "golesVisitante": 36
+    },
+    {
+     "local": "Lomas Athl. B",
+     "visitante": "Liceo Naval B",
+     "golesLocal": 17,
+     "golesVisitante": 31,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Hindu B",
+     "visitante": "Los Molinos B",
+     "bonusLocal": true,
+     "golesLocal": 43,
+     "golesVisitante": 17
+    }
+   ]
+  }
+ },
+ "m17-c": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "CUBA C",
+     "visitante": "Pucara D",
+     "bonusLocal": true,
+     "golesLocal": 71,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Buenos Aires C",
+     "visitante": "Sin Info",
+     "especial": "sin_info"
+    },
+    {
+     "local": "Alumni C",
+     "visitante": "Belgrano Athl. C",
+     "golesLocal": 40,
+     "golesVisitante": 19
+    },
+    {
+     "local": "CASI C",
+     "visitante": "Regatas B. Vista C",
+     "golesLocal": 26,
+     "golesVisitante": 12
+    },
+    {
+     "local": "Champagnat C",
+     "visitante": "SIC D",
+     "golesLocal": 19,
+     "golesVisitante": 12
+    },
+    {
+     "local": "La Plata C",
+     "visitante": "Newman C",
+     "bonusLocal": true,
+     "golesLocal": 64,
+     "golesVisitante": 33
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "La Plata C",
+     "visitante": "CUBA C",
+     "golesLocal": 26,
+     "golesVisitante": 78,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Newman C",
+     "visitante": "Champagnat C",
+     "bonusLocal": true,
+     "golesLocal": 25,
+     "golesVisitante": 12
+    },
+    {
+     "local": "SIC D",
+     "visitante": "CASI C",
+     "golesLocal": 14,
+     "golesVisitante": 10
+    },
+    {
+     "local": "Regatas B. Vista C",
+     "visitante": "Alumni C",
+     "golesLocal": 8,
+     "golesVisitante": 0
+    },
+    {
+     "local": "Belgrano Athl. C",
+     "visitante": "Buenos Aires C",
+     "bonusLocal": true,
+     "golesLocal": 31,
+     "golesVisitante": 12
+    },
+    {
+     "local": "Sin Info",
+     "visitante": "Pucara D",
+     "especial": "sin_info"
+    }
+   ]
+  }
+ },
+ "m19-a": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "San Luis A",
+     "visitante": "La Plata A",
+     "golesLocal": 16,
+     "golesVisitante": 17
+    },
+    {
+     "local": "SIC A",
+     "visitante": "Champagnat A",
+     "bonusLocal": true,
+     "golesLocal": 39,
+     "golesVisitante": 11
+    },
+    {
+     "local": "Regatas B Vista A",
+     "visitante": "Newman A",
+     "golesLocal": 24,
+     "golesVisitante": 47,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Belgrano Athl. A",
+     "visitante": "Alumni A",
+     "golesLocal": 37,
+     "golesVisitante": 38
+    },
+    {
+     "local": "Hindu A",
+     "visitante": "Buenos Aires A",
+     "bonusLocal": true,
+     "golesLocal": 59,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Pucara A",
+     "visitante": "CUBA A",
+     "golesLocal": 12,
+     "golesVisitante": 15
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara A",
+     "visitante": "San Luis A",
+     "golesLocal": 21,
+     "golesVisitante": 13
+    },
+    {
+     "local": "CUBA A",
+     "visitante": "Hindu A",
+     "golesLocal": 24,
+     "golesVisitante": 21
+    },
+    {
+     "local": "Buenos Aires A",
+     "visitante": "Belgrano Athl. A",
+     "golesLocal": 17,
+     "golesVisitante": 45,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Alumni A",
+     "visitante": "Regatas B Vista A",
+     "golesLocal": 14,
+     "golesVisitante": 20
+    },
+    {
+     "local": "Newman A",
+     "visitante": "SIC A",
+     "golesLocal": 18,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Champagnat A",
+     "visitante": "La Plata A",
+     "bonusLocal": true,
+     "golesLocal": 34,
+     "golesVisitante": 17
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "San Luis A",
+     "visitante": "Champagnat A",
+     "golesLocal": 33,
+     "golesVisitante": 28,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "La Plata A",
+     "visitante": "Newman A",
+     "golesLocal": 19,
+     "golesVisitante": 52,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "SIC A",
+     "visitante": "Alumni A",
+     "golesLocal": 24,
+     "golesVisitante": 19,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Regatas B Vista A",
+     "visitante": "Buenos Aires A",
+     "golesLocal": 15,
+     "golesVisitante": 19,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Belgrano Athl. A",
+     "visitante": "CUBA A",
+     "golesLocal": 35,
+     "golesVisitante": 29,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Hindu A",
+     "visitante": "Pucara A",
+     "golesLocal": 38,
+     "golesVisitante": 41,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m19-b": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "San Luis B",
+     "visitante": "La Plata B",
+     "golesLocal": 14,
+     "golesVisitante": 17
+    },
+    {
+     "local": "SIC B",
+     "visitante": "Champagnat B",
+     "bonusLocal": true,
+     "golesLocal": 41,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Regatas B Vista B",
+     "visitante": "Newman B",
+     "golesLocal": 24,
+     "golesVisitante": 28
+    },
+    {
+     "local": "Belgrano Athl. B",
+     "visitante": "Alumni B",
+     "bonusLocal": true,
+     "golesLocal": 34,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Hindu B",
+     "visitante": "Buenos Aires B",
+     "golesLocal": 21,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Pucara B",
+     "visitante": "CUBA B",
+     "golesLocal": 17,
+     "golesVisitante": 38,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara B",
+     "visitante": "San Luis B",
+     "golesLocal": 17,
+     "golesVisitante": 27
+    },
+    {
+     "local": "CUBA B",
+     "visitante": "Hindu B",
+     "golesLocal": 35,
+     "golesVisitante": 31
+    },
+    {
+     "local": "Buenos Aires B",
+     "visitante": "Belgrano Athl. B",
+     "golesLocal": 20,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Alumni B",
+     "visitante": "Regatas B Vista B",
+     "golesLocal": 33,
+     "golesVisitante": 21
+    },
+    {
+     "local": "Newman B",
+     "visitante": "SIC B",
+     "golesLocal": 20,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Champagnat B",
+     "visitante": "La Plata B",
+     "golesLocal": 24,
+     "golesVisitante": 27
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "San Luis B",
+     "visitante": "Champagnat B",
+     "golesLocal": 12,
+     "golesVisitante": 31,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "La Plata B",
+     "visitante": "Newman B",
+     "golesLocal": 5,
+     "golesVisitante": 28,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "SIC B",
+     "visitante": "Alumni B",
+     "golesLocal": 62,
+     "golesVisitante": 7,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Regatas B Vista B",
+     "visitante": "Buenos Aires B",
+     "golesLocal": 40,
+     "golesVisitante": 28,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Belgrano Athl. B",
+     "visitante": "CUBA B",
+     "golesLocal": 59,
+     "golesVisitante": 24,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Hindu B",
+     "visitante": "Pucara B",
+     "golesLocal": 21,
+     "golesVisitante": 20,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m19-c": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "San Martin C",
+     "visitante": "La Plata C",
+     "golesLocal": 8,
+     "golesVisitante": 0
+    },
+    {
+     "local": "SIC C",
+     "visitante": "Champagnat C",
+     "golesLocal": 26,
+     "golesVisitante": 28
+    },
+    {
+     "local": "Regatas B. Vista C",
+     "visitante": "Newman C",
+     "golesLocal": 5,
+     "golesVisitante": 40,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Belgrano Athl. C",
+     "visitante": "CASI C",
+     "bonusLocal": true,
+     "golesLocal": 38,
+     "golesVisitante": 5
+    },
+    {
+     "local": "Hindu C",
+     "visitante": "Buenos Aires C",
+     "golesLocal": 8,
+     "golesVisitante": 5
+    },
+    {
+     "local": "Pucara C",
+     "visitante": "CUBA C",
+     "golesLocal": 26,
+     "golesVisitante": 72,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara C",
+     "visitante": "San Martin C",
+     "golesLocal": 14,
+     "golesVisitante": 26
+    },
+    {
+     "local": "CUBA C",
+     "visitante": "Hindu C",
+     "bonusLocal": true,
+     "golesLocal": 50,
+     "golesVisitante": 24
+    },
+    {
+     "local": "Buenos Aires C",
+     "visitante": "Belgrano Athl. C",
+     "golesLocal": 26,
+     "golesVisitante": 36
+    },
+    {
+     "local": "CASI C",
+     "visitante": "Regatas B. Vista C",
+     "bonusLocal": true,
+     "golesLocal": 54,
+     "golesVisitante": 21
+    },
+    {
+     "local": "Newman C",
+     "visitante": "SIC C",
+     "golesLocal": 12,
+     "golesVisitante": 17
+    },
+    {
+     "local": "Champagnat C",
+     "visitante": "La Plata C",
+     "golesLocal": 26,
+     "golesVisitante": 17
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "San Martin C",
+     "visitante": "Champagnat C",
+     "golesLocal": 21,
+     "golesVisitante": 47,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "La Plata C",
+     "visitante": "Newman C",
+     "golesLocal": 17,
+     "golesVisitante": 43,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "SIC C",
+     "visitante": "CASI C",
+     "golesLocal": 24,
+     "golesVisitante": 25,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Regatas B. Vista C",
+     "visitante": "Buenos Aires C",
+     "golesLocal": 28,
+     "golesVisitante": 24,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Belgrano Athl. C",
+     "visitante": "CUBA C",
+     "golesLocal": 44,
+     "golesVisitante": 26,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Hindu C",
+     "visitante": "Pucara C",
+     "golesLocal": 8,
+     "golesVisitante": 0,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m19-d": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "San Martin D",
+     "visitante": "La Plata D",
+     "golesLocal": 8,
+     "golesVisitante": 0
+    },
+    {
+     "local": "SIC D",
+     "visitante": "Champagnat D",
+     "bonusLocal": true,
+     "golesLocal": 60,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Regatas B. Vista D",
+     "visitante": "Newman D",
+     "golesLocal": 12,
+     "golesVisitante": 71,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Belgrano Athl. D",
+     "visitante": "CASI D",
+     "bonusLocal": true,
+     "golesLocal": 57,
+     "golesVisitante": 28
+    },
+    {
+     "local": "Hindu D",
+     "visitante": "Buenos Aires D",
+     "golesLocal": 36,
+     "golesVisitante": 34
+    },
+    {
+     "local": "Pucara D",
+     "visitante": "CUBA D",
+     "golesLocal": 19,
+     "golesVisitante": 79,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Pucara D",
+     "visitante": "San Martin D",
+     "golesLocal": 0,
+     "golesVisitante": 8
+    },
+    {
+     "local": "CUBA D",
+     "visitante": "Hindu D",
+     "bonusLocal": true,
+     "golesLocal": 31,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Buenos Aires D",
+     "visitante": "Belgrano Athl. D",
+     "golesLocal": 7,
+     "golesVisitante": 43,
+     "bonusVisitante": true
+    },
+    {
+     "local": "CASI D",
+     "visitante": "Regatas B. Vista D",
+     "bonusLocal": true,
+     "golesLocal": 47,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Newman D",
+     "visitante": "SIC D",
+     "golesLocal": 24,
+     "golesVisitante": 33
+    },
+    {
+     "local": "Champagnat D",
+     "visitante": "La Plata D",
+     "bonusLocal": true,
+     "golesLocal": 70,
+     "golesVisitante": 17
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "San Martin D",
+     "visitante": "Champagnat D",
+     "golesLocal": 5,
+     "golesVisitante": 45,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "La Plata D",
+     "visitante": "Newman D",
+     "golesLocal": 19,
+     "golesVisitante": 94,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "SIC D",
+     "visitante": "CASI D",
+     "golesLocal": 26,
+     "golesVisitante": 14,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Regatas B. Vista D",
+     "visitante": "Buenos Aires D",
+     "golesLocal": 19,
+     "golesVisitante": 28,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Belgrano Athl. D",
+     "visitante": "CUBA D",
+     "golesLocal": 28,
+     "golesVisitante": 35,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Hindu D",
+     "visitante": "Pucara D",
+     "golesLocal": 8,
+     "golesVisitante": 0,
+     "bonusLocal": false,
+     "bonusVisitante": false
+    }
+   ]
+  }
+ },
+ "m19-e": {
+  "1": {
+   "fecha": "2026-08-09",
+   "partidos": [
+    {
+     "local": "San Luis C",
+     "visitante": "G Y Esgrima C",
+     "especial": "postergado"
+    },
+    {
+     "local": "SIC E",
+     "visitante": "Champagnat E",
+     "bonusLocal": true,
+     "golesLocal": 48,
+     "golesVisitante": 29
+    },
+    {
+     "local": "Regatas B Vista E",
+     "visitante": "Newman E",
+     "golesLocal": 26,
+     "golesVisitante": 33
+    },
+    {
+     "local": "Belgrano Athl. E",
+     "visitante": "Alumni C",
+     "bonusLocal": true,
+     "golesLocal": 36,
+     "golesVisitante": 14
+    },
+    {
+     "local": "Manuel Belgrano C",
+     "visitante": "Buenos Aires E",
+     "golesLocal": 8,
+     "golesVisitante": 0
+    },
+    {
+     "local": "Los Molinos C",
+     "visitante": "CUBA E",
+     "golesLocal": 14,
+     "golesVisitante": 43,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "2": {
+   "fecha": "2026-08-16",
+   "partidos": [
+    {
+     "local": "Los Molinos C",
+     "visitante": "San Luis C",
+     "golesLocal": 21,
+     "golesVisitante": 12
+    },
+    {
+     "local": "CUBA E",
+     "visitante": "Manuel Belgrano C",
+     "bonusLocal": true,
+     "golesLocal": 62,
+     "golesVisitante": 7
+    },
+    {
+     "local": "Buenos Aires E",
+     "visitante": "Belgrano Athl. E",
+     "golesLocal": 19,
+     "golesVisitante": 38,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Alumni C",
+     "visitante": "Regatas B Vista E",
+     "golesLocal": 0,
+     "golesVisitante": 8
+    },
+    {
+     "local": "Newman E",
+     "visitante": "SIC E",
+     "golesLocal": 36,
+     "golesVisitante": 22
+    },
+    {
+     "local": "Champagnat E",
+     "visitante": "G Y Esgrima C",
+     "golesLocal": 24,
+     "golesVisitante": 61,
+     "bonusVisitante": true
+    }
+   ]
+  },
+  "3": {
+   "fecha": "2026-08-23",
+   "partidos": [
+    {
+     "local": "San Luis C",
+     "visitante": "Champagnat E",
+     "golesLocal": 47,
+     "golesVisitante": 24,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "G Y Esgrima C",
+     "visitante": "Newman E",
+     "golesLocal": 43,
+     "golesVisitante": 20,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "SIC E",
+     "visitante": "Alumni C",
+     "golesLocal": 33,
+     "golesVisitante": 64,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    },
+    {
+     "local": "Regatas B Vista E",
+     "visitante": "Buenos Aires E",
+     "especial": "postergado"
+    },
+    {
+     "local": "Belgrano Athl. E",
+     "visitante": "CUBA E",
+     "golesLocal": 49,
+     "golesVisitante": 12,
+     "bonusLocal": true,
+     "bonusVisitante": false
+    },
+    {
+     "local": "Manuel Belgrano C",
+     "visitante": "Los Molinos C",
+     "golesLocal": 12,
+     "golesVisitante": 62,
+     "bonusLocal": false,
+     "bonusVisitante": true
+    }
+   ]
+  }
+ }
 }
