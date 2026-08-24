@@ -4,7 +4,7 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 function LineaDorada() {
   return (
     <span
-      style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, #f2a900, transparent)" }}
+      style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${DORADO}, transparent)` }}
     />
   );
 }
