@@ -36,7 +36,9 @@ export default async function FixtureDivisionFechaPage({
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href={`/fixture/${categoriaId}/division`} />
       <SessionBar session={session} />
-      <Header rightLabel={categoria.nombre} />
+      <Header />
+
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
 
       <div style={{ textAlign: "center", marginTop: 8 }}>
         <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, textTransform: "uppercase" }}>

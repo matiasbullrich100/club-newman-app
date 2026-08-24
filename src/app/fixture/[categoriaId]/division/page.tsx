@@ -8,7 +8,7 @@ import { formatFechaCorta } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
-import { DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -47,11 +47,9 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href={`/fixture/${categoriaId}`} />
       <SessionBar session={session} />
-      <Header rightLabel={categoria.nombre} />
+      <Header />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase", textAlign: "center" }}>
-        Fixture División
-      </div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
 
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         {TORNEOS_URBA[categoriaId] !== undefined && (
@@ -62,6 +60,10 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
         <Link href={fixtureNewmanHref} style={botonEstilo}>
           Fixt. New.
         </Link>
+      </div>
+
+      <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
+        Fixture División
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginTop: 20 }}>
