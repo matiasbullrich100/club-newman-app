@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
+import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 import Header from "@/components/Header";
@@ -11,6 +14,19 @@ import FixtureRow, { MatchupText } from "@/components/FixtureRow";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const NUMERO_FECHAS = 26;
+
+const botonEstilo: React.CSSProperties = {
+  flex: 1,
+  textAlign: "center",
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  padding: "9px 4px",
+  borderRadius: 8,
+  border: "1px solid rgba(226,197,120,.4)",
+  color: DORADO_SUAVE,
+};
 
 // El fixture completo (jugado y por jugar) de un equipo de Plantel Superior -- vive en su propia
 // pagina, aparte de /categoria/[categoriaId] (que ahora muestra la formacion del proximo partido
@@ -35,6 +51,20 @@ export default async function CategoriaFixturePage({
       <Header />
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+
+      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+        {TORNEOS_URBA[categoriaId] !== undefined && (
+          <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
+            Tabla
+          </Link>
+        )}
+        {tieneFixtureDivision(categoriaId) && (
+          <Link href={`/fixture/${categoriaId}/division`} style={botonEstilo}>
+            Fixt Divis.
+          </Link>
+        )}
+      </div>
+
       <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
         Fixture
       </div>

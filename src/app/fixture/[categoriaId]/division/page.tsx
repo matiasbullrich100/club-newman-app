@@ -1,13 +1,27 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS } from "@/lib/categorias";
+import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
+import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import { DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
+
+const botonEstilo: React.CSSProperties = {
+  flex: 1,
+  textAlign: "center",
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  padding: "9px 4px",
+  borderRadius: 8,
+  border: "1px solid rgba(226,197,120,.4)",
+  color: DORADO_SUAVE,
+};
 
 // Picker de fecha para el fixture completo de la division (26 fechas en Plantel Superior, 11 en
 // Juveniles -- ver numeroFechasDivisionDe) -- de aca se entra a
@@ -18,6 +32,8 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
 
   const session = await getSession();
+  const grupo = grupoDeCategoria(categoriaId);
+  const fixtureNewmanHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
   // "en_CA" da "YYYY-MM-DD", comparable como string contra el ISO de cada fecha del fixture --
   // mismo truco que esHoyEnArgentina() en lib/fecha.ts, sin importar el huso horario del server.
   const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
@@ -35,6 +51,17 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase", textAlign: "center" }}>
         Fixture División
+      </div>
+
+      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+        {TORNEOS_URBA[categoriaId] !== undefined && (
+          <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
+            Tabla
+          </Link>
+        )}
+        <Link href={fixtureNewmanHref} style={botonEstilo}>
+          Fixt. New.
+        </Link>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginTop: 20 }}>

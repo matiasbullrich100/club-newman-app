@@ -1,13 +1,28 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS } from "@/lib/categorias";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TablaPosiciones from "@/components/TablaPosiciones";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+
+const botonEstilo: React.CSSProperties = {
+  flex: 1,
+  textAlign: "center",
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  padding: "9px 4px",
+  borderRadius: 8,
+  border: "1px solid rgba(226,197,120,.4)",
+  color: DORADO_SUAVE,
+};
 
 export default async function PosicionesPage({
   params,
@@ -18,8 +33,10 @@ export default async function PosicionesPage({
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
   if (!categoria) notFound();
 
-  const backHref =
-    categoria.grupo === "juveniles" ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
+  const esJuveniles = categoria.grupo === "juveniles";
+  const backHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
+  const fixtureNewmanHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
+  const fixtureDivisionHref = tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/division` : undefined;
 
   const [snap, session] = await Promise.all([adminDb.collection("posiciones").doc(categoriaId).get(), getSession()]);
 
@@ -30,6 +47,18 @@ export default async function PosicionesPage({
       <Header rightLabel="Posiciones" logo={categoria.grupo === "juveniles" ? "urba" : "top14"} />
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+
+      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+        <Link href={fixtureNewmanHref} style={botonEstilo}>
+          Fixt. New.
+        </Link>
+        {fixtureDivisionHref && (
+          <Link href={fixtureDivisionHref} style={botonEstilo}>
+            Fixt Divis.
+          </Link>
+        )}
+      </div>
+
       <div
         style={{
           textAlign: "center",
