@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TablaPosiciones from "@/components/TablaPosiciones";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -44,9 +44,11 @@ export default async function PosicionesPage({
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href={backHref} />
       <SessionBar session={session} />
-      <Header rightLabel="Posiciones" logo={categoria.grupo === "juveniles" ? "urba" : "top14"} />
+      <Header logo={categoria.grupo === "juveniles" ? "urba" : "top14"} />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
+        {categoria.nombre} - Tabla de Posiciones
+      </div>
 
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         <Link href={fixtureNewmanHref} style={botonEstilo}>
@@ -59,27 +61,15 @@ export default async function PosicionesPage({
         )}
       </div>
 
-      <div
-        style={{
-          textAlign: "center",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          fontSize: "0.78rem",
-          color: DORADO,
-          margin: "12px 0 6px",
-        }}
-      >
-        Tabla de posiciones
+      <div style={{ marginTop: 16 }}>
+        {!snap.exists ? (
+          <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem", textAlign: "center" }}>
+            Todavía no hay tabla de posiciones cargada para esta categoría.
+          </p>
+        ) : (
+          <TablaPosiciones data={snap.data() as PosicionesTorneo} />
+        )}
       </div>
-
-      {!snap.exists ? (
-        <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem", textAlign: "center", marginTop: 16 }}>
-          Todavía no hay tabla de posiciones cargada para esta categoría.
-        </p>
-      ) : (
-        <TablaPosiciones data={snap.data() as PosicionesTorneo} />
-      )}
     </main>
   );
 }
