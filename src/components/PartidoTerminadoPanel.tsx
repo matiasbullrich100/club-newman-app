@@ -17,12 +17,19 @@ export default function PartidoTerminadoPanel({
   datos,
   posicionesHref,
   posicionesActualizado,
+  fixtureNewmanHref,
+  fixtureDivisionHref,
 }: {
   partidoId: string;
   partido: Partido;
   datos: Awaited<ReturnType<typeof datosPartidoTerminado>>;
   posicionesHref?: string;
   posicionesActualizado?: Date | null;
+  // Solo se pasan en /partido/[id] (que no tiene otro lugar con estos botones) -- en
+  // /categoria/[id] quedan sin definir a proposito, porque esa pagina ya los muestra aparte,
+  // arriba del panel.
+  fixtureNewmanHref?: string;
+  fixtureDivisionHref?: string;
 }) {
   const { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset } = datos;
 
@@ -36,6 +43,8 @@ export default function PartidoTerminadoPanel({
         puedeEditar={puedeOperar}
         posicionesHref={posicionesHref}
         posicionesActualizado={posicionesActualizado}
+        fixtureNewmanHref={fixtureNewmanHref}
+        fixtureDivisionHref={fixtureDivisionHref}
       />
       {puedeOperar && (
         <div

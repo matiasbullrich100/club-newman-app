@@ -5,6 +5,7 @@ import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, NUMERO_FECHAS_JUVENILES, NUMERO_FECHAS_SUPERIOR, grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import type { JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
 import PartidoLive from "@/components/PartidoLive";
 import Header from "@/components/Header";
@@ -60,6 +61,14 @@ export default async function PartidoPage({
     : null;
   const posicionesHref = tienePosiciones ? `/posiciones/${partido.categoriaId}` : undefined;
 
+  // Mismos "Fixt. New." / "Fixt Divis." que ya aparecen en el resumen (LiveBanner/ProximaFechaRow)
+  // y en /categoria/[id] -- aca tambien hacen falta porque esta pagina (formacion + incidencias)
+  // es a la que se llega tocando un partido puntual, y antes solo tenia el boton de Tabla.
+  const grupo = grupoDeCategoria(partido.categoriaId);
+  const fixtureNewmanHref =
+    grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${partido.categoriaId}` : `/categoria/${partido.categoriaId}/fixture`;
+  const fixtureDivisionHref = tieneFixtureDivision(partido.categoriaId) ? `/fixture/${partido.categoriaId}/division` : undefined;
+
   const cabecera = (
     <>
       <BackLink href={backHref} />
@@ -83,6 +92,8 @@ export default async function PartidoPage({
           datos={datos}
           posicionesHref={posicionesHref}
           posicionesActualizado={posicionesActualizado}
+          fixtureNewmanHref={fixtureNewmanHref}
+          fixtureDivisionHref={fixtureDivisionHref}
         />
         <FooterChip />
       </main>
@@ -102,6 +113,8 @@ export default async function PartidoPage({
           datos={datos}
           posicionesHref={posicionesHref}
           posicionesActualizado={posicionesActualizado}
+          fixtureNewmanHref={fixtureNewmanHref}
+          fixtureDivisionHref={fixtureDivisionHref}
         />
         <FooterChip />
       </main>
@@ -109,7 +122,6 @@ export default async function PartidoPage({
   }
 
   // en_juego | entretiempo | suspendido: motor en vivo (Fase 1, sin cambios).
-  const grupo = grupoDeCategoria(partido.categoriaId);
   const jugadoresQuery =
     grupo.grupo === "superior"
       ? adminDb.collection("jugadores").where("grupo", "==", "superior")

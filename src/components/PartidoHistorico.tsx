@@ -32,6 +32,19 @@ const cardTituloStyle: React.CSSProperties = {
   marginBottom: 10,
 };
 
+const botonEstilo: React.CSSProperties = {
+  flex: 1,
+  textAlign: "center",
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  padding: "9px 4px",
+  borderRadius: 8,
+  border: "1px solid rgba(226,197,120,.4)",
+  color: DORADO_SUAVE,
+};
+
 export default function PartidoHistorico({
   partido,
   plantel,
@@ -40,6 +53,8 @@ export default function PartidoHistorico({
   puedeEditar,
   posicionesHref,
   posicionesActualizado,
+  fixtureNewmanHref,
+  fixtureDivisionHref,
   formacionPendientePublicar,
 }: {
   partido: Partido;
@@ -52,6 +67,11 @@ export default function PartidoHistorico({
   // claro que no es "la tabla como estaba ese dia".
   posicionesHref?: string;
   posicionesActualizado?: Date | null;
+  // Mismos "Fixt. New." / "Fixt Divis." que ya aparecen en el resumen -- solo se pasan desde
+  // /partido/[id] (que no tenia otro lugar con estos botones); en /categoria/[id] quedan sin
+  // definir a proposito porque esa pagina ya los muestra aparte, arriba del panel.
+  fixtureNewmanHref?: string;
+  fixtureDivisionHref?: string;
   // true cuando `plantel` viene vacio A PROPOSITO porque hay una formacion cargada pero todavia
   // sin publicar (ver formacionPublicada en types/firestore.ts) y quien mira esta pagina no
   // puede operar esta categoria -- distingue ese caso de "todavia no se cargo nada".
@@ -62,30 +82,30 @@ export default function PartidoHistorico({
 
   return (
     <div>
-      {posicionesHref && (
-        <p style={{ textAlign: "center", margin: "0 0 10px" }}>
-          <Link
-            href={posicionesHref}
-            style={{
-              display: "inline-block",
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              fontSize: "0.78rem",
-              padding: "10px 16px",
-              borderRadius: 8,
-              border: "1px solid rgba(226,197,120,.4)",
-              color: DORADO_SUAVE,
-            }}
-          >
-            Tabla de posiciones
-            {posicionesActualizado &&
-              ` al ${posicionesActualizado.toLocaleDateString("es-AR", {
-                timeZone: "America/Argentina/Buenos_Aires",
-                day: "2-digit",
-                month: "2-digit",
-              })}`}
-          </Link>
-        </p>
+      {(posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
+        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          {posicionesHref && (
+            <Link href={posicionesHref} style={botonEstilo}>
+              Tabla
+              {posicionesActualizado &&
+                ` al ${posicionesActualizado.toLocaleDateString("es-AR", {
+                  timeZone: "America/Argentina/Buenos_Aires",
+                  day: "2-digit",
+                  month: "2-digit",
+                })}`}
+            </Link>
+          )}
+          {fixtureNewmanHref && (
+            <Link href={fixtureNewmanHref} style={botonEstilo}>
+              Fixt. New.
+            </Link>
+          )}
+          {fixtureDivisionHref && (
+            <Link href={fixtureDivisionHref} style={botonEstilo}>
+              Fixt Divis.
+            </Link>
+          )}
+        </div>
       )}
       <div style={cardStyle}>
         {partido.fecha && (

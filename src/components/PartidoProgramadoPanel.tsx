@@ -18,12 +18,17 @@ export default function PartidoProgramadoPanel({
   datos,
   posicionesHref,
   posicionesActualizado,
+  fixtureNewmanHref,
+  fixtureDivisionHref,
 }: {
   partidoId: string;
   partido: Partido;
   datos: Awaited<ReturnType<typeof datosPartidoProgramado>>;
   posicionesHref?: string;
   posicionesActualizado?: Date | null;
+  // Solo se pasan en /partido/[id] -- ver mismo comentario en PartidoTerminadoPanel.
+  fixtureNewmanHref?: string;
+  fixtureDivisionHref?: string;
 }) {
   const { plantel, plantelCompleto, partidoParaCliente, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, formacionPublicada, ocultarFormacion } =
     datos;
@@ -36,6 +41,8 @@ export default function PartidoProgramadoPanel({
         incidentes={[]}
         posicionesHref={posicionesHref}
         posicionesActualizado={posicionesActualizado}
+        fixtureNewmanHref={fixtureNewmanHref}
+        fixtureDivisionHref={fixtureDivisionHref}
         formacionPendientePublicar={ocultarFormacion}
       />
       {puedeOperar && !formacionPublicada && plantel.length > 0 && <PublicarFormacionButton partidoId={partidoId} />}
