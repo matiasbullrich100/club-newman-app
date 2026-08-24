@@ -33,7 +33,7 @@ export default function Cronometro({ partidoId, estado }: { partidoId: string; e
   // del estado del partido, el entretiempo se mostraba como "1T · Detenido", igual que un partido
   // interrumpido sin motivo.
   const subLabel =
-    estado === "entretiempo" ? "1er Tiempo — Terminado" : motivoLabel ? `Partido interrumpido · ${motivoLabel}` : liveState.periodo;
+    estado === "entretiempo" ? "FINAL 1 T. - R. Parcial" : motivoLabel ? `Partido interrumpido · ${motivoLabel}` : liveState.periodo;
 
   return (
     <div style={{ fontVariantNumeric: "tabular-nums", fontSize: "1.15rem", letterSpacing: 1, color: DORADO }}>
