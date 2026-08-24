@@ -5,10 +5,12 @@ import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
+import { adminDb } from "@/lib/firebase-admin";
+import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
-import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
+import { DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -31,7 +33,15 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
   if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
 
-  const session = await getSession();
+  const tienePosiciones = TORNEOS_URBA[categoriaId] !== undefined;
+  const [session, posicionesSnap] = await Promise.all([
+    getSession(),
+    tienePosiciones ? adminDb.collection("posiciones").doc(categoriaId).get() : Promise.resolve(null),
+  ]);
+  const posiciones = posicionesSnap?.exists ? (posicionesSnap.data() as PosicionesTorneo) : null;
+  const actualizado = posiciones
+    ? ((posiciones.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (posiciones.updatedAt as Date))
+    : null;
   const grupo = grupoDeCategoria(categoriaId);
   const fixtureNewmanHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
   // "en_CA" da "YYYY-MM-DD", comparable como string contra el ISO de cada fecha del fixture --
@@ -49,10 +59,12 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
       <SessionBar session={session} />
       <Header />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
+        {categoria.nombre} - Fixture División
+      </div>
 
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-        {TORNEOS_URBA[categoriaId] !== undefined && (
+        {tienePosiciones && (
           <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
             Tabla
           </Link>
@@ -62,9 +74,17 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
         </Link>
       </div>
 
-      <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
-        Fixture División
-      </div>
+      {posiciones && (
+        <p style={{ fontSize: "0.78rem", opacity: 0.7, textAlign: "center", margin: "12px 0 6px" }}>
+          {posiciones.championshipName}
+          {actualizado && (
+            <>
+              {" · actualizado "}
+              {actualizado.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit" })}
+            </>
+          )}
+        </p>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginTop: 20 }}>
         {fechas.map(({ n, fecha, yaPaso }) => (

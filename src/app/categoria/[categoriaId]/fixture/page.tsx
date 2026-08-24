@@ -6,12 +6,12 @@ import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
-import type { Partido } from "@/types/firestore";
+import type { Partido, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO_SUAVE } from "@/lib/colors";
 
 const NUMERO_FECHAS = 26;
 
@@ -41,8 +41,17 @@ export default async function CategoriaFixturePage({
   if (!categoria) notFound();
 
   const refs = Array.from({ length: NUMERO_FECHAS }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
-  const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
+  const tienePosiciones = TORNEOS_URBA[categoriaId] !== undefined;
+  const [snaps, posicionesSnap, session] = await Promise.all([
+    adminDb.getAll(...refs),
+    tienePosiciones ? adminDb.collection("posiciones").doc(categoriaId).get() : Promise.resolve(null),
+    getSession(),
+  ]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
+  const posiciones = posicionesSnap?.exists ? (posicionesSnap.data() as PosicionesTorneo) : null;
+  const actualizado = posiciones
+    ? ((posiciones.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (posiciones.updatedAt as Date))
+    : null;
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -50,10 +59,12 @@ export default async function CategoriaFixturePage({
       <SessionBar session={session} />
       <Header />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
+        {categoria.nombre} - Fixture Newman
+      </div>
 
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-        {TORNEOS_URBA[categoriaId] !== undefined && (
+        {tienePosiciones && (
           <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
             Tabla
           </Link>
@@ -65,9 +76,17 @@ export default async function CategoriaFixturePage({
         )}
       </div>
 
-      <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
-        Fixture
-      </div>
+      {posiciones && (
+        <p style={{ fontSize: "0.78rem", opacity: 0.7, textAlign: "center", margin: "12px 0 6px" }}>
+          {posiciones.championshipName}
+          {actualizado && (
+            <>
+              {" · actualizado "}
+              {actualizado.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit" })}
+            </>
+          )}
+        </p>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {fechas.map(({ numeroFecha, partido }) =>

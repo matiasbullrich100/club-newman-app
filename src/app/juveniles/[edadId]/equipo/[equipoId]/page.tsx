@@ -6,12 +6,12 @@ import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partido
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { formatFechaCorta } from "@/lib/fecha";
-import type { Partido } from "@/types/firestore";
+import type { Partido, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -38,8 +38,17 @@ export default async function EquipoJuvenilesPage({
 
   const nombreNewman = nombreNewmanDe(equipoId);
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(equipoId, i + 1)));
-  const [snaps, session] = await Promise.all([adminDb.getAll(...refs), getSession()]);
+  const tienePosiciones = TORNEOS_URBA[equipoId] !== undefined;
+  const [snaps, posicionesSnap, session] = await Promise.all([
+    adminDb.getAll(...refs),
+    tienePosiciones ? adminDb.collection("posiciones").doc(equipoId).get() : Promise.resolve(null),
+    getSession(),
+  ]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
+  const posiciones = posicionesSnap?.exists ? (posicionesSnap.data() as PosicionesTorneo) : null;
+  const actualizado = posiciones
+    ? ((posiciones.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (posiciones.updatedAt as Date))
+    : null;
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -47,10 +56,12 @@ export default async function EquipoJuvenilesPage({
       <SessionBar session={session} />
       <Header rightLabel={edad.nombre} logo="urba" />
 
-      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{equipo.nombre}</div>
+      <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
+        {equipo.nombre} - Fixture {nombreNewman}
+      </div>
 
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-        {TORNEOS_URBA[equipoId] !== undefined && (
+        {tienePosiciones && (
           <Link href={`/posiciones/${equipoId}`} style={botonEstilo}>
             Tabla
           </Link>
@@ -62,9 +73,17 @@ export default async function EquipoJuvenilesPage({
         )}
       </div>
 
-      <div style={{ textAlign: "center", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, fontSize: "0.78rem", color: DORADO, margin: "12px 0 6px" }}>
-        Fixture {nombreNewman}
-      </div>
+      {posiciones && (
+        <p style={{ fontSize: "0.78rem", opacity: 0.7, textAlign: "center", margin: "12px 0 6px" }}>
+          {posiciones.championshipName}
+          {actualizado && (
+            <>
+              {" · actualizado "}
+              {actualizado.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit" })}
+            </>
+          )}
+        </p>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {fechas.map(({ numeroFecha, partido }) =>
