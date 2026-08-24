@@ -14,7 +14,7 @@ export const ETIQUETAS_INCIDENTE: Record<Incidente["tipo"], string> = {
   tarjeta_azul: "Tarjeta azul",
   cambio: "Cambio",
   lesion: "Lesión",
-  fin_1t: "Final 1er tiempo",
+  fin_1t: "Final 1 T.",
   fin_2t: "Final 2do tiempo",
   fin_partido: "Final del partido",
   interrupcion_medica: "Partido interrumpido — Médico",
@@ -51,10 +51,44 @@ export function requierePlayerSelection(tipo: Incidente["tipo"]): boolean {
 }
 
 /**
+ * Resultado acumulado DESPUES de cada incidencia de la lista, en el mismo orden (ver
+ * ordenarIncidentes) -- se lee directo de inc.puntos/inc.equipo, ya guardados en cada jugada, asi
+ * que sirve tanto para un partido en vivo como para uno ya terminado (no hace falta guardar una
+ * "foto" del resultado en el momento de cortar el primer tiempo).
+ */
+export function resultadosAcumulados(incidentesAscendente: Incidente[]): { newman: number; rival: number }[] {
+  let newman = 0;
+  let rival = 0;
+  return incidentesAscendente.map((inc) => {
+    if (FAMILIA_PUNTOS.includes(inc.tipo) && inc.puntos) {
+      if (inc.equipo === "newman") newman += inc.puntos;
+      else if (inc.equipo === "rival") rival += inc.puntos;
+    }
+    return { newman, rival };
+  });
+}
+
+/**
  * rivalNombre: nombre real del rival (ej. "SIC") para mostrar en vez del generico "Rival".
  * nombreNewman: "Newman" salvo en Juveniles, donde se pide aclarar el equipo (ej. "Newman A").
+ * finDePrimerTiempo: solo para inc.tipo === "fin_1t" -- esLocal del partido + el resultado
+ * acumulado (ver resultadosAcumulados) al llegar a esa incidencia, para mostrar "Final 1 T. Rival
+ * X - Y Newman" respetando la localia, igual que el resto de la app (ver MatchupText).
  */
-export function describirIncidente(inc: Incidente, rivalNombre?: string, nombreNewman = "Newman"): string {
+export function describirIncidente(
+  inc: Incidente,
+  rivalNombre?: string,
+  nombreNewman = "Newman",
+  finDePrimerTiempo?: { esLocal: boolean; resultadoParcial: { newman: number; rival: number } }
+): string {
+  if (inc.tipo === "fin_1t" && finDePrimerTiempo) {
+    const { esLocal, resultadoParcial } = finDePrimerTiempo;
+    const local = esLocal ? nombreNewman : (rivalNombre ?? "Rival");
+    const visitante = esLocal ? (rivalNombre ?? "Rival") : nombreNewman;
+    const golesLocal = esLocal ? resultadoParcial.newman : resultadoParcial.rival;
+    const golesVisitante = esLocal ? resultadoParcial.rival : resultadoParcial.newman;
+    return `${ETIQUETAS_INCIDENTE.fin_1t} ${local} ${golesLocal} - ${golesVisitante} ${visitante}`;
+  }
   if (inc.tipo === "cambio") {
     // Salida/reingreso por sancion (amarilla/roja de 20): un solo lado, sin par (ver
     // DURACION_SANCION_SEGUNDOS en match/actions.ts) -- no tiene sentido mostrar el otro como "?".

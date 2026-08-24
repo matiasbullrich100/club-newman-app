@@ -221,7 +221,14 @@ export default function PanelDesignado({
           <SancionesActivas partidoId={partidoId} enCanchaIds={partido.enCanchaIds} plantel={plantel} plantelCompleto={plantelCompleto} />
           {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
               pasando el bloque de cambios (que se usa menos) para verlo. */}
-          <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} puedeEditar nombreNewman={nombreNewman} plantel={plantel} />
+          <IncidentesFeed
+            partidoId={partidoId}
+            rivalNombre={partido.rival}
+            puedeEditar
+            nombreNewman={nombreNewman}
+            esLocal={partido.esLocal}
+            plantel={plantel}
+          />
           <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
         </div>
       )}

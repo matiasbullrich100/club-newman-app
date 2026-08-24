@@ -127,7 +127,12 @@ export default function PartidoLive({
         // El feed para el Designado va adentro del panel (entre jugadas y cambios).
         <PanelDesignado partidoId={partidoId} partido={partido} plantel={plantel} plantelCompleto={plantelCompleto} periodo={periodo} />
       ) : (
-        <IncidentesFeed partidoId={partidoId} rivalNombre={partido.rival} nombreNewman={nombreNewmanDe(partido.categoriaId)} />
+        <IncidentesFeed
+          partidoId={partidoId}
+          rivalNombre={partido.rival}
+          nombreNewman={nombreNewmanDe(partido.categoriaId)}
+          esLocal={partido.esLocal}
+        />
       )}
     </div>
   );

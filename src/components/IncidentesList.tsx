@@ -3,7 +3,15 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Incidente } from "@/types/firestore";
-import { describirIncidente, ETIQUETAS_INCIDENTE, FAMILIA_PUNTOS, FAMILIA_TARJETA, ordenarIncidentes, requierePlayerSelection } from "@/lib/incidentes";
+import {
+  describirIncidente,
+  ETIQUETAS_INCIDENTE,
+  FAMILIA_PUNTOS,
+  FAMILIA_TARJETA,
+  ordenarIncidentes,
+  requierePlayerSelection,
+  resultadosAcumulados,
+} from "@/lib/incidentes";
 import { corregirJugadorCambio, corregirJugadorIncidente, corregirTipoIncidente, eliminarIncidente } from "@/lib/match/actions";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
@@ -35,6 +43,7 @@ export default function IncidentesList({
   partidoId,
   puedeEditar,
   nombreNewman,
+  esLocal,
   plantel = [],
 }: {
   incidentes: (Incidente & { id: string })[];
@@ -42,6 +51,10 @@ export default function IncidentesList({
   partidoId?: string;
   puedeEditar?: boolean;
   nombreNewman?: string;
+  // Para mostrar el resultado parcial en "Final 1 T." respetando la localia -- ver
+  // describirIncidente. Sin esto, esa incidencia se muestra sin resultado (misma etiqueta de
+  // siempre).
+  esLocal?: boolean;
   // Para "Cambiar jugador" -- solo hace falta jugadorId/nombre/dorsal, asi sirve tanto el roster
   // de un partido en vivo como el historico (formas ligeramente distintas, mismos 3 campos).
   plantel?: { jugadorId: string; nombre: string; dorsal: string }[];
@@ -58,8 +71,11 @@ export default function IncidentesList({
     return <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Sin incidencias todavía.</p>;
   }
 
-  // Lo mas reciente arriba del todo.
-  const ordenadas = ordenarIncidentes(incidentes).reverse();
+  // Cronologico ascendente, para poder ir acumulando el resultado incidencia por incidencia (ver
+  // resultadosAcumulados) -- despues se muestra al reves, lo mas reciente arriba del todo.
+  const cronologico = ordenarIncidentes(incidentes);
+  const acumulados = resultadosAcumulados(cronologico);
+  const ordenadas = [...cronologico].reverse();
 
   function corregir(incidenteId: string, nuevoTipo: Incidente["tipo"]) {
     if (!partidoId) return;
@@ -137,6 +153,10 @@ export default function IncidentesList({
         const puedeCambiarJugador = editable && !esCambio && inc.equipo === "newman" && requierePlayerSelection(inc.tipo) && plantel.length > 0;
         const cambiandoJugador = cambiandoJugadorId === inc.id;
         const corrigiendoEsteCambio = esCambio && corrigiendoCambio?.id === inc.id ? corrigiendoCambio.lado : null;
+        const finDePrimerTiempo =
+          inc.tipo === "fin_1t" && esLocal !== undefined
+            ? { esLocal, resultadoParcial: acumulados[cronologico.length - 1 - i] }
+            : undefined;
         return (
           <div key={inc.id}>
             {cambioDePeriodo && (
@@ -173,7 +193,7 @@ export default function IncidentesList({
                   fontWeight: esFinDeTiempo ? 700 : 400,
                 }}
               >
-                {describirIncidente(inc, rivalNombre, nombreNewman)}
+                {describirIncidente(inc, rivalNombre, nombreNewman, finDePrimerTiempo)}
               </div>
               {editable && !editando && (
                 <button
