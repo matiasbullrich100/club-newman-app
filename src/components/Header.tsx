@@ -57,8 +57,26 @@ export default function Header({
           margin: "0 auto",
         }}
       >
+        {/* Linea recta, pero DETRAS del escudo (menor z-index) -- el escudo mismo se angosta y
+            hace punta abajo, asi que la linea queda tapada donde el escudo es solido y aparece a
+            los costados donde no, sin tener que calcar la curva a mano. El "top" es una
+            estimacion de a que altura del escudo (98px de alto) esta ese angostamiento -- ajustar
+            si no coincide. */}
         <div
           style={{
+            position: "absolute",
+            top: 58,
+            left: 0,
+            right: 0,
+            height: 1,
+            background: DORADO,
+            zIndex: 0,
+          }}
+        />
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
             fontWeight: 700,
             fontSize: "1.15rem",
             letterSpacing: 1.5,
@@ -71,7 +89,7 @@ export default function Header({
         >
           Rugby
         </div>
-        <div style={{ width: 92, height: 98, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <div style={{ position: "relative", zIndex: 1, width: 92, height: 98, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Image
             src="/escudo-newman.png"
             alt="Escudo Club Newman"
@@ -83,6 +101,8 @@ export default function Header({
         </div>
         <div
           style={{
+            position: "relative",
+            zIndex: 1,
             textAlign: "right",
             display: "flex",
             justifyContent: "flex-end",
@@ -123,16 +143,6 @@ export default function Header({
         </div>
       </div>
 
-      {/* Linea curva de lado a lado, colgando del escudo -- antes era una linea recta plana, sin
-          relacion con la forma del escudo (que termina en punta abajo). */}
-      <svg
-        viewBox="0 0 400 18"
-        preserveAspectRatio="none"
-        style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 400, height: 14, marginTop: 6, display: "block" }}
-      >
-        <path d="M 0,3 Q 200,18 400,3" stroke={DORADO} strokeWidth="1" fill="none" />
-      </svg>
-
       <div
         style={{
           position: "relative",
@@ -142,7 +152,7 @@ export default function Header({
           gap: 10,
           width: "100%",
           maxWidth: 400,
-          margin: "2px auto 0",
+          margin: "8px auto 0",
           fontSize: "0.62rem",
           letterSpacing: 1.2,
           textTransform: "uppercase",
