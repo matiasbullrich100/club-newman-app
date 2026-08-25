@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
+import { BORDO, BORDO_OSC, DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 import { formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
@@ -47,8 +47,8 @@ export default function ProximaFechaRow({
   return (
     <div
       style={{
-        background: jugada ? NEGRO_JUGADA : "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
-        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.35)"}`,
+        background: jugada ? NEGRO_JUGADA : `linear-gradient(135deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
+        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : DORADO}`,
         borderRadius: 10,
         padding: "8px 12px",
         marginBottom: 8,

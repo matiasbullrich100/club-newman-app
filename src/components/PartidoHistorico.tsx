@@ -32,10 +32,11 @@ const cardTituloStyle: React.CSSProperties = {
   marginBottom: 10,
 };
 
-// Banner del titulo del partido (fecha + resultado/rival) -- degrade bordo en vez del fondo
-// generico de las otras cards, mismo tratamiento que usa el club en sus graficas de Instagram.
+// Banner del titulo del partido (fecha + resultado/rival) -- degrade bordo bien visible (no
+// bordo-a-bordo, que se perdia contra el fondo oscuro de toda la app) en vez del fondo generico
+// de las otras cards, mismo tratamiento que usa el club en sus graficas de Instagram.
 const cardTituloPartidoStyle: React.CSSProperties = {
-  background: `linear-gradient(135deg, ${BORDO}, ${BORDO_OSC})`,
+  background: `linear-gradient(135deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
   border: `1px solid ${DORADO}`,
   borderRadius: 12,
   padding: 16,
