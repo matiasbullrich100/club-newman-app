@@ -12,7 +12,7 @@ import type { SessionPayload } from "@/lib/auth/session";
 import type { JugadorBusqueda, RosterJugador } from "./panel-designado/types";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { puedeOperarCategoria } from "@/lib/auth/scope";
-import { BORDO, BORDO_OSC, CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADO_BADGE: Record<EstadoPartido, { label: string; bg: string; color: string }> = {
   programado: { label: "No iniciado", bg: "rgba(255,255,255,.1)", color: "#ccc" },
@@ -69,9 +69,7 @@ export default function PartidoLive({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          // Mismo degrade bordo bien visible que el titulo del partido en PartidoHistorico --
-          // tratamiento consistente en toda la app, en vivo o no.
-          background: `linear-gradient(180deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
+          background: "linear-gradient(160deg, rgba(0,0,0,.3), rgba(0,0,0,.15))",
           border: `1px solid ${DORADO}`,
           borderRadius: 14,
           padding: "16px 14px",
