@@ -23,27 +23,31 @@ export default function Header({
         padding: tituloHome ? "16px 6px 10px" : "6px 6px 10px",
       }}
     >
-      {/* "2026" de fondo, detras del escudo -- igual que en las graficas de Instagram del club. */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: tituloHome ? 6 : -4,
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontSize: "3.4rem",
-          fontWeight: 800,
-          letterSpacing: 6,
-          color: DORADO,
-          opacity: 0.16,
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          userSelect: "none",
-          zIndex: 0,
-        }}
-      >
-        2026
-      </div>
+      {/* "20" y "26" de fondo, uno a cada lado del escudo (no "2026" entero atras, que quedaba
+          tapado por el) -- igual que en las graficas de Instagram del club. */}
+      {["20", "26"].map((mitad, i) => (
+        <div
+          key={mitad}
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: tituloHome ? 6 : -4,
+            left: i === 0 ? "25%" : "75%",
+            transform: "translateX(-50%)",
+            fontSize: "3.4rem",
+            fontWeight: 800,
+            letterSpacing: 6,
+            color: DORADO,
+            opacity: 0.16,
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+            userSelect: "none",
+            zIndex: 0,
+          }}
+        >
+          {mitad}
+        </div>
+      ))}
 
       <div
         style={{
