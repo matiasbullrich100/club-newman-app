@@ -99,9 +99,8 @@ export function describirIncidente(
         return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} — ${rivalNombre ?? "Rival"}`;
       }
       if (inc.cierreSancionMismoJugador) {
-        return inc.jugadorEntraNombre
-          ? `Reingresó ${inc.jugadorEntraNombre} — ${nombreNewman} (sancionado)`
-          : `Reingresó el sancionado — ${nombreNewman}`;
+        const reingresa = inc.jugadorEntraNombre ?? "el sancionado";
+        return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} — ${nombreNewman}: reingresa ${reingresa}`;
       }
       const sale = inc.jugadorSaleNombre ?? "el sancionado";
       const entra = inc.jugadorEntraNombre ?? "otro jugador";
