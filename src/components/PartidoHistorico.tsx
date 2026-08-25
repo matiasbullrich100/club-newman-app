@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Incidente, Partido } from "@/types/firestore";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { BORDO, BORDO_OSC, DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { formatFechaCorta } from "@/lib/fecha";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { MatchupText } from "./FixtureRow";
@@ -30,6 +30,16 @@ const cardTituloStyle: React.CSSProperties = {
   fontSize: "0.85rem",
   color: DORADO,
   marginBottom: 10,
+};
+
+// Banner del titulo del partido (fecha + resultado/rival) -- degrade bordo en vez del fondo
+// generico de las otras cards, mismo tratamiento que usa el club en sus graficas de Instagram.
+const cardTituloPartidoStyle: React.CSSProperties = {
+  background: `linear-gradient(135deg, ${BORDO}, ${BORDO_OSC})`,
+  border: `1px solid ${DORADO}`,
+  borderRadius: 12,
+  padding: 16,
+  marginBottom: 14,
 };
 
 const botonEstilo: React.CSSProperties = {
@@ -107,7 +117,7 @@ export default function PartidoHistorico({
           )}
         </div>
       )}
-      <div style={cardStyle}>
+      <div style={cardTituloPartidoStyle}>
         {partido.fecha && (
           <p style={{ textAlign: "center", margin: "0 0 4px", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, color: DORADO_SUAVE }}>
             Fecha #{partido.numeroFecha} · {formatFechaCorta(partido.fecha)}
