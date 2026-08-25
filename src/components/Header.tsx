@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { BORDO_OSC, DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default function Header({
   rightLabel,
@@ -15,6 +15,7 @@ export default function Header({
   return (
     <div
       style={{
+        position: "relative",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -22,8 +23,32 @@ export default function Header({
         padding: tituloHome ? "16px 6px 10px" : "6px 6px 10px",
       }}
     >
+      {/* "2026" de fondo, detras del escudo -- igual que en las graficas de Instagram del club. */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: tituloHome ? 6 : -4,
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontSize: "3.4rem",
+          fontWeight: 800,
+          letterSpacing: 6,
+          color: DORADO,
+          opacity: 0.16,
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          userSelect: "none",
+          zIndex: 0,
+        }}
+      >
+        2026
+      </div>
+
       <div
         style={{
+          position: "relative",
+          zIndex: 1,
           display: "grid",
           gridTemplateColumns: "1fr auto 1fr",
           alignItems: "center",
@@ -98,18 +123,26 @@ export default function Header({
         </div>
       </div>
 
-      {/* Linea continua de lado a lado, uniendo el escudo con el copete de abajo -- antes eran 3
-          tramos cortos flanqueando el texto, sin conectar con nada. */}
-      <div style={{ width: "100%", maxWidth: 400, height: 1, background: DORADO, margin: "8px auto 0" }} />
+      {/* Linea curva de lado a lado, colgando del escudo -- antes era una linea recta plana, sin
+          relacion con la forma del escudo (que termina en punta abajo). */}
+      <svg
+        viewBox="0 0 400 18"
+        preserveAspectRatio="none"
+        style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 400, height: 14, marginTop: 6, display: "block" }}
+      >
+        <path d="M 0,3 Q 200,18 400,3" stroke={DORADO} strokeWidth="1" fill="none" />
+      </svg>
 
       <div
         style={{
+          position: "relative",
+          zIndex: 1,
           display: "flex",
           justifyContent: "center",
           gap: 10,
           width: "100%",
           maxWidth: 400,
-          margin: "6px auto 0",
+          margin: "2px auto 0",
           fontSize: "0.62rem",
           letterSpacing: 1.2,
           textTransform: "uppercase",
@@ -122,26 +155,20 @@ export default function Header({
       </div>
 
       {tituloHome && (
-        <>
-          <div style={{ fontWeight: 700, fontSize: "1.35rem", letterSpacing: 1.5, textTransform: "uppercase", color: DORADO, marginTop: 14 }}>
-            Club Newman
-          </div>
-          <div
-            style={{
-              display: "inline-block",
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              letterSpacing: 3,
-              color: DORADO_SUAVE,
-              background: BORDO_OSC,
-              padding: "3px 14px",
-              borderRadius: 20,
-              marginTop: 8,
-            }}
-          >
-            2026
-          </div>
-        </>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            fontWeight: 700,
+            fontSize: "1.35rem",
+            letterSpacing: 1.5,
+            textTransform: "uppercase",
+            color: DORADO,
+            marginTop: 14,
+          }}
+        >
+          Club Newman
+        </div>
       )}
     </div>
   );

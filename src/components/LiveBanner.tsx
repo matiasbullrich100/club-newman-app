@@ -80,7 +80,7 @@ export default function LiveBanner({
   return (
     <div
       style={{
-        background: esBye ? NEGRO_JUGADA : `linear-gradient(135deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
+        background: esBye ? NEGRO_JUGADA : `linear-gradient(180deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
         border: `1px solid ${esBye ? "rgba(255,255,255,.06)" : DORADO}`,
         borderRadius: 10,
         padding: "8px 12px",

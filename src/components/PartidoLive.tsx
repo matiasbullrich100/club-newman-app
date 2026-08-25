@@ -71,7 +71,7 @@ export default function PartidoLive({
           justifyContent: "space-between",
           // Mismo degrade bordo bien visible que el titulo del partido en PartidoHistorico --
           // tratamiento consistente en toda la app, en vivo o no.
-          background: `linear-gradient(135deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
+          background: `linear-gradient(180deg, rgba(245,168,0,.4), ${BORDO} 50%, ${BORDO_OSC})`,
           border: `1px solid ${DORADO}`,
           borderRadius: 14,
           padding: "16px 14px",
