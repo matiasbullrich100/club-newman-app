@@ -12,10 +12,11 @@ export const PARTIDOS_DEMO_IDS = [
   "m15-c-test-cambio",
 ];
 
-// Los partidos de prueba son para que managers/administrador simulen formaciones antes de
-// publicarlas -- no son para designados ni para el publico general, asi que no aparecen en la
-// navegacion ni se pueden abrir por URL directa para nadie mas (ver el chequeo en
-// /partido/[partidoId]/page.tsx).
-export function pruebasVisiblesPara(session: Pick<SessionPayload, "rol"> | null): boolean {
-  return session?.rol === "manager";
+// Los partidos de prueba son solo para el administrador (manager sin alcance, acceso total) --
+// ni los designados, ni el publico general, ni los managers acotados a una division (manager/pelu
+// con alcance "superior", managerm15/16/17/19 con su edad) los ven en la navegacion ni pueden
+// abrirlos por URL directa (ver el chequeo en /partido/[partidoId]/page.tsx). Pedido explicito del
+// club: solo el admin simula formaciones ahi, no cada manager de division.
+export function pruebasVisiblesPara(session: Pick<SessionPayload, "rol" | "alcance"> | null): boolean {
+  return session?.rol === "manager" && !session.alcance;
 }
