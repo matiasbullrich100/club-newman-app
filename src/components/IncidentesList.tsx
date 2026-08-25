@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Incidente } from "@/types/firestore";
 import {
@@ -13,6 +13,7 @@ import {
   resultadosAcumulados,
 } from "@/lib/incidentes";
 import { corregirJugadorCambio, corregirJugadorIncidente, corregirTipoIncidente, eliminarIncidente } from "@/lib/match/actions";
+import { crearNombreCorto } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
@@ -66,6 +67,10 @@ export default function IncidentesList({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  // Solo apellido en el feed, salvo que el plantel de este partido tenga mas de uno con el mismo
+  // apellido -- ver crearNombreCorto en lib/players.ts.
+  const nombreCorto = useMemo(() => crearNombreCorto(plantel), [plantel]);
 
   // El "cambio" automatico que saca al jugador de la cancha al cargar una amarilla/roja de 20 no
   // se muestra -- la tarjeta ya dice "sale X" (ver ocultoEnFeed en actions.ts), sigue existiendo
@@ -198,7 +203,7 @@ export default function IncidentesList({
                   fontWeight: esFinDeTiempo ? 700 : 400,
                 }}
               >
-                {describirIncidente(inc, rivalNombre, nombreNewman, finDePrimerTiempo)}
+                {describirIncidente(inc, rivalNombre, nombreNewman, finDePrimerTiempo, nombreCorto)}
               </div>
               {editable && !editando && (
                 <button

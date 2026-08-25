@@ -89,12 +89,15 @@ export function resultadosAcumulados(incidentesAscendente: Incidente[]): { newma
  * finDePrimerTiempo: solo para inc.tipo === "fin_1t" -- esLocal del partido + el resultado
  * acumulado (ver resultadosAcumulados) al llegar a esa incidencia, para mostrar "Final 1 T. Rival
  * X - Y Newman" respetando la localia, igual que el resto de la app (ver MatchupText).
+ * nombreCorto: acorta un nombre completo (ej. "Bullrich Simón" -> "Bullrich") para el feed -- ver
+ * crearNombreCorto() en lib/players.ts. Sin este parametro se muestra el nombre tal cual vino.
  */
 export function describirIncidente(
   inc: Incidente,
   rivalNombre?: string,
   nombreNewman = "Newman",
-  finDePrimerTiempo?: { esLocal: boolean; resultadoParcial: { newman: number; rival: number } }
+  finDePrimerTiempo?: { esLocal: boolean; resultadoParcial: { newman: number; rival: number } },
+  nombreCorto: (nombre: string) => string = (n) => n
 ): string {
   if (inc.tipo === "fin_1t" && finDePrimerTiempo) {
     const { esLocal, resultadoParcial } = finDePrimerTiempo;
@@ -109,33 +112,34 @@ export function describirIncidente(
     // match/actions.ts.
     if (inc.cierreSancionTipo) {
       // Del rival no llevamos plantel, asi que no importa si volvio el mismo sancionado u otro --
-      // solo queda asentado que el rival ya vuelve a jugar con ese puesto cubierto.
+      // solo queda asentado que el rival ya vuelve a jugar con ese puesto cubierto. Sin guion --
+      // "Fin Amarilla Beromama", nada mas.
       if (inc.equipo === "rival") {
-        return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} — ${rivalNombre ?? "Rival"}`;
+        return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} ${rivalNombre ?? "Rival"}`;
       }
       if (inc.cierreSancionMismoJugador) {
-        const reingresa = inc.jugadorEntraNombre ?? "el sancionado";
-        return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} — ${nombreNewman}: reingresa ${reingresa}`;
+        const reingresa = inc.jugadorEntraNombre ? nombreCorto(inc.jugadorEntraNombre) : "el sancionado";
+        return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} ${nombreNewman} - reingresa ${reingresa}`;
       }
-      const sale = inc.jugadorSaleNombre ?? "el sancionado";
-      const entra = inc.jugadorEntraNombre ?? "otro jugador";
-      return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} — ${nombreNewman}: sale ${sale}, entra ${entra}`;
+      const sale = inc.jugadorSaleNombre ? nombreCorto(inc.jugadorSaleNombre) : "el sancionado";
+      const entra = inc.jugadorEntraNombre ? nombreCorto(inc.jugadorEntraNombre) : "otro jugador";
+      return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} ${nombreNewman} - sale ${sale} entra ${entra}`;
     }
     // Salida por sancion sin cierre todavia (un solo lado, sin par -- ver
     // DURACION_SANCION_SEGUNDOS en match/actions.ts) -- no tiene sentido mostrar el otro como "?".
     if (inc.jugadorSaleNombre && !inc.jugadorEntraNombre) {
-      return `Sale ${inc.jugadorSaleNombre} — ${nombreNewman} (sanción)`;
+      return `Sale ${nombreCorto(inc.jugadorSaleNombre)} — ${nombreNewman} (sanción)`;
     }
     if (inc.jugadorEntraNombre && !inc.jugadorSaleNombre) {
-      return `Entra ${inc.jugadorEntraNombre} — ${nombreNewman} (reingreso)`;
+      return `Entra ${nombreCorto(inc.jugadorEntraNombre)} — ${nombreNewman} (reingreso)`;
     }
-    return `Cambio ${nombreNewman} — Sale ${inc.jugadorSaleNombre ?? "?"}, entra ${inc.jugadorEntraNombre ?? "?"}`;
+    return `Cambio ${nombreNewman} — Sale ${inc.jugadorSaleNombre ? nombreCorto(inc.jugadorSaleNombre) : "?"}, entra ${inc.jugadorEntraNombre ? nombreCorto(inc.jugadorEntraNombre) : "?"}`;
   }
   if (SIN_EQUIPO.includes(inc.tipo)) {
     return ETIQUETAS_INCIDENTE[inc.tipo];
   }
   if (inc.equipo === "newman") {
-    const quien = inc.jugadorNombre ? `${nombreNewman} — ${inc.jugadorNombre}` : nombreNewman;
+    const quien = inc.jugadorNombre ? `${nombreNewman} — ${nombreCorto(inc.jugadorNombre)}` : nombreNewman;
     return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${quien}`;
   }
   return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${rivalNombre ?? "Rival"}`;

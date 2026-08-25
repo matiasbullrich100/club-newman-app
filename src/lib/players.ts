@@ -45,3 +45,22 @@ export function splitNombre(nombreCompleto: string): { apellido: string; nombre:
   if (partes.length <= 1) return { apellido: raw, nombre: "" };
   return { apellido: partes.slice(0, -1).join(" "), nombre: partes[partes.length - 1] };
 }
+
+/**
+ * Nombre corto para el feed de incidencias: solo el apellido, salvo que haya mas de un jugador
+ * con ese mismo apellido en el plantel -- ej. "Bullrich" puede ser Simón, Marcos o José, ahi se
+ * muestra el nombre completo para no generar ambiguedad. `plantel` es el roster de ESE partido
+ * puntual (titulares + suplentes), no todo el club -- alcanza para desambiguar en el contexto en
+ * que se lee la incidencia.
+ */
+export function crearNombreCorto(plantel: { nombre: string }[]): (nombreCompleto: string) => string {
+  const conteo = new Map<string, number>();
+  for (const j of plantel) {
+    const { apellido } = splitNombre(j.nombre);
+    conteo.set(apellido, (conteo.get(apellido) ?? 0) + 1);
+  }
+  return (nombreCompleto: string) => {
+    const { apellido } = splitNombre(nombreCompleto);
+    return (conteo.get(apellido) ?? 0) > 1 ? nombreCompleto : apellido;
+  };
+}
