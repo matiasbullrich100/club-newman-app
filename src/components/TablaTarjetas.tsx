@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { DORADO, DORADO_SUAVE, CREMA } from "@/lib/colors";
+import { BORDO_OSC, DORADO, DORADO_SUAVE, CREMA } from "@/lib/colors";
 import { etiquetaFecha, type FechaTarjeta } from "@/lib/tarjetasFormato";
 
 export interface JugadorTarjetasRow {
@@ -30,6 +30,13 @@ const thStyle: React.CSSProperties = {
   color: DORADO,
   padding: "4px 6px",
   borderBottom: "1px solid rgba(226,197,120,.3)",
+  // Fijo arriba al scrollear -- con la lista larga, al llegar a los ultimos jugadores se pierde
+  // de vista que columna es cada una. Necesita un fondo opaco (no el semitransparente de la
+  // tarjeta) para que las filas no se transparenten atras.
+  position: "sticky",
+  top: 0,
+  background: BORDO_OSC,
+  zIndex: 1,
 };
 
 const tdStyle: React.CSSProperties = {
@@ -88,7 +95,12 @@ export default function TablaTarjetas({ jugadores }: { jugadores: JugadorTarjeta
   const [expandidoId, setExpandidoId] = useState<string | null>(null);
 
   return (
-    <div style={{ overflowX: "auto" }}>
+    // maxHeight + overflowY propios (no solo overflowX) -- position:sticky necesita que ESTE div
+    // sea el que scrollea de verdad. Con overflowX:auto solo (sin alto acotado), el navegador ya
+    // lo trata como contenedor de scroll para el eje Y tambien (mismo comportamiento raro que con
+    // overflow-x a secas), pero como el div nunca scrollea internamente (crece con el contenido),
+    // "top: 0" nunca engancha con nada -- el header se va con el resto de la pagina.
+    <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "70vh" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>

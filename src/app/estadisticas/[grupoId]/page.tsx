@@ -10,7 +10,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TablaTarjetas, { type JugadorTarjetasRow } from "@/components/TablaTarjetas";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { BORDO_OSC, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const cardStyle: React.CSSProperties = {
   background: "rgba(255,255,255,.045)",
@@ -36,6 +36,12 @@ const thStyle: React.CSSProperties = {
   color: DORADO,
   padding: "4px 6px",
   borderBottom: "1px solid rgba(226,197,120,.3)",
+  // Fijo arriba al scrollear -- con la lista larga, al llegar a los ultimos jugadores se pierde
+  // de vista que columna es cada una.
+  position: "sticky",
+  top: 0,
+  background: BORDO_OSC,
+  zIndex: 1,
 };
 
 const tdStyle: React.CSSProperties = {
@@ -164,7 +170,9 @@ async function Tablas({ grupoId }: { grupoId: string }) {
               cargados en vivo. Los partidos históricos no tienen ese detalle todavía, por eso figuran en 0
               (orden alfabético mientras tanto).
             </p>
-            <div style={{ overflowX: "auto" }}>
+            {/* maxHeight + overflowY propios -- ver el comentario en TablaTarjetas.tsx sobre por
+                que position:sticky necesita que este div sea el que scrollea de verdad. */}
+            <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "70vh" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr>
