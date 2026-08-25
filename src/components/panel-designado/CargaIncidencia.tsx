@@ -52,6 +52,7 @@ export default function CargaIncidencia({
   const [isPending, startTransition] = useTransition();
   const [errorReloj, setErrorReloj] = useState<string | null>(null);
   const [isPendingReloj, startTransitionReloj] = useTransition();
+  const [confirmandoReloj, setConfirmandoReloj] = useState<30 | 60 | null>(null);
 
   // En correcciones post-partido el reloj ya esta congelado -- hay que preguntar en que
   // momento paso la jugada para que quede ordenada cronologicamente entre las demas.
@@ -83,12 +84,16 @@ export default function CargaIncidencia({
 
   // Correccion silenciosa del reloj (ej. el designado arranco el partido tarde) -- no pasa por el
   // flujo tipo/equipo/jugador, no queda en incidencias, y no aplica en correcciones post-partido
-  // (ahi no hay reloj corriendo).
+  // (ahi no hay reloj corriendo). Los segundos que suma a accumulatedSeconds se reflejan solos en
+  // la cuenta regresiva de las tarjetas activas (Newman y rival) -- esa cuenta se calcula siempre
+  // en base al reloj del partido (ver segundosDesdeIncidente en clock.ts), no guarda un valor
+  // propio que haya que actualizar aparte.
   function adelantar(segundos: 30 | 60) {
     setErrorReloj(null);
     startTransitionReloj(async () => {
       try {
         await adelantarReloj(partidoId, segundos);
+        setConfirmandoReloj(null);
       } catch (e) {
         setErrorReloj(e instanceof Error ? e.message : "No se pudo adelantar el reloj");
       }
@@ -163,17 +168,33 @@ export default function CargaIncidencia({
           {/* Correccion de reloj -- no hay reloj corriendo en una correccion post-partido. */}
           {!esCorreccion && (
             <>
-              <button style={{ ...botonOpcion, textAlign: "center" }} disabled={isPendingReloj} onClick={() => adelantar(30)}>
+              <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(30)}>
                 +30&quot;
               </button>
-              <button style={{ ...botonOpcion, textAlign: "center" }} disabled={isPendingReloj} onClick={() => adelantar(60)}>
+              <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(60)}>
                 +60&quot;
               </button>
             </>
           )}
         </div>
       )}
-      {paso === "tipo" && errorReloj && <p style={{ color: "crimson", marginTop: 8 }}>{errorReloj}</p>}
+
+      {paso === "tipo" && confirmandoReloj !== null && (
+        <div style={{ ...listaOpciones, marginTop: 10 }}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>
+            ¿Adelantar el reloj {confirmandoReloj} segundos? También corre para las tarjetas activas.
+          </p>
+          {errorReloj && <p style={{ color: "crimson", margin: 0 }}>{errorReloj}</p>}
+          <BarraAccionFija>
+            <button style={botonPrimario} disabled={isPendingReloj} onClick={() => adelantar(confirmandoReloj)}>
+              {isPendingReloj ? "Adelantando…" : "Confirmar"}
+            </button>
+            <button style={botonSecundario} disabled={isPendingReloj} onClick={() => { setConfirmandoReloj(null); setErrorReloj(null); }}>
+              Cancelar
+            </button>
+          </BarraAccionFija>
+        </div>
+      )}
 
       {paso === "equipo" && (
         <div style={listaOpciones}>
