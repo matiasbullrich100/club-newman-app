@@ -85,6 +85,30 @@ export async function iniciarPartido(partidoId: string): Promise<void> {
   revalidatePath(`/partido/${partidoId}`);
 }
 
+/**
+ * Corrige el reloj cuando el designado arranca el partido mas tarde de lo que en realidad
+ * arranco (ej. se demoro en apretar "Iniciar partido" y ya habian pasado 30-60 segundos desde el
+ * pie inicial) -- suma los segundos directo a `accumulatedSeconds`, sin dejar rastro en
+ * incidencias (es una correccion de reloj, no una jugada).
+ */
+export async function adelantarReloj(partidoId: string, segundos: 30 | 60): Promise<void> {
+  const session = await getSession();
+  const { partidoRef, liveStateRef } = refs(partidoId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
+    if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Datos del partido incompletos");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "en_juego" && partido.estado !== "entretiempo") {
+      throw new Error("El partido no está en juego");
+    }
+    tx.update(liveStateRef, { accumulatedSeconds: FieldValue.increment(segundos) });
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
 export async function cortar1T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
+import { adelantarReloj, publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
 import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
 import { requierePlayerSelection } from "@/lib/incidentes";
 import type { RosterJugador } from "./types";
@@ -21,7 +21,6 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t" | "fi
   { tipo: "tarjeta_roja", label: "Roja Definitiva" },
   { tipo: "tarjeta_roja_20", label: "Roja de 20" },
   { tipo: "tarjeta_azul", label: "Tarjeta azul" },
-  { tipo: "lesion", label: "Lesión" },
 ];
 
 type Paso = "tipo" | "equipo" | "jugador" | "cuando" | "confirmar" | "convirtio";
@@ -51,6 +50,8 @@ export default function CargaIncidencia({
   const [minutoManual, setMinutoManual] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [errorReloj, setErrorReloj] = useState<string | null>(null);
+  const [isPendingReloj, startTransitionReloj] = useTransition();
 
   // En correcciones post-partido el reloj ya esta congelado -- hay que preguntar en que
   // momento paso la jugada para que quede ordenada cronologicamente entre las demas.
@@ -77,12 +78,21 @@ export default function CargaIncidencia({
 
   function elegirTipo(t: (typeof TIPOS)[number]["tipo"]) {
     setTipo(t);
-    if (t === "lesion") {
-      setEquipo("newman");
-      setPaso("jugador");
-    } else {
-      setPaso("equipo");
-    }
+    setPaso("equipo");
+  }
+
+  // Correccion silenciosa del reloj (ej. el designado arranco el partido tarde) -- no pasa por el
+  // flujo tipo/equipo/jugador, no queda en incidencias, y no aplica en correcciones post-partido
+  // (ahi no hay reloj corriendo).
+  function adelantar(segundos: 30 | 60) {
+    setErrorReloj(null);
+    startTransitionReloj(async () => {
+      try {
+        await adelantarReloj(partidoId, segundos);
+      } catch (e) {
+        setErrorReloj(e instanceof Error ? e.message : "No se pudo adelantar el reloj");
+      }
+    });
   }
 
   function elegirEquipo(e: Equipo) {
@@ -150,8 +160,20 @@ export default function CargaIncidencia({
               {label}
             </button>
           ))}
+          {/* Correccion de reloj -- no hay reloj corriendo en una correccion post-partido. */}
+          {!esCorreccion && (
+            <>
+              <button style={{ ...botonOpcion, textAlign: "center" }} disabled={isPendingReloj} onClick={() => adelantar(30)}>
+                +30&quot;
+              </button>
+              <button style={{ ...botonOpcion, textAlign: "center" }} disabled={isPendingReloj} onClick={() => adelantar(60)}>
+                +60&quot;
+              </button>
+            </>
+          )}
         </div>
       )}
+      {paso === "tipo" && errorReloj && <p style={{ color: "crimson", marginTop: 8 }}>{errorReloj}</p>}
 
       {paso === "equipo" && (
         <div style={listaOpciones}>
