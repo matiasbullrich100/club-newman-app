@@ -56,6 +56,7 @@ export default function PartidoHistorico({
   fixtureNewmanHref,
   fixtureDivisionHref,
   formacionPendientePublicar,
+  apellidosAmbiguos,
 }: {
   partido: Partido;
   plantel: RosterJugadorHistorico[];
@@ -76,6 +77,8 @@ export default function PartidoHistorico({
   // sin publicar (ver formacionPublicada en types/firestore.ts) y quien mira esta pagina no
   // puede operar esta categoria -- distingue ese caso de "todavia no se cargo nada".
   formacionPendientePublicar?: boolean;
+  // Apellidos que se repiten en TODO el club -- ver apellidosAmbiguos() en lib/players.ts.
+  apellidosAmbiguos?: string[];
 }) {
   const jugado = partido.estado === "terminado";
   const nombreNewman = nombreNewmanDe(partido.categoriaId);
@@ -166,6 +169,7 @@ export default function PartidoHistorico({
             nombreNewman={nombreNewman}
             esLocal={partido.esLocal}
             plantel={plantel}
+            apellidosAmbiguos={apellidosAmbiguos}
           />
         </div>
       )}

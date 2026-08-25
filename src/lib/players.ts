@@ -47,20 +47,31 @@ export function splitNombre(nombreCompleto: string): { apellido: string; nombre:
 }
 
 /**
- * Nombre corto para el feed de incidencias: solo el apellido, salvo que haya mas de un jugador
- * con ese mismo apellido en el plantel -- ej. "Bullrich" puede ser Simón, Marcos o José, ahi se
- * muestra el nombre completo para no generar ambiguedad. `plantel` es el roster de ESE partido
- * puntual (titulares + suplentes), no todo el club -- alcanza para desambiguar en el contexto en
- * que se lee la incidencia.
+ * Que apellidos se repiten en una lista de nombres -- ej. "Bullrich" puede ser Simón (Plantel
+ * Superior), Marcos o José (Juveniles). Pensado para calcularse UNA vez server-side sobre todo el
+ * club (Plantel + las 4 edades de Juveniles, no solo el plantel de un partido puntual -- dos
+ * jugadores con el mismo apellido en divisiones distintas siguen siendo ambiguos para quien lee
+ * el feed) y pasarse como prop liviana (array de apellidos, no la lista entera de jugadores) a
+ * crearNombreCorto().
  */
-export function crearNombreCorto(plantel: { nombre: string }[]): (nombreCompleto: string) => string {
+export function apellidosAmbiguos(nombres: string[]): string[] {
   const conteo = new Map<string, number>();
-  for (const j of plantel) {
-    const { apellido } = splitNombre(j.nombre);
+  for (const n of nombres) {
+    const { apellido } = splitNombre(n);
     conteo.set(apellido, (conteo.get(apellido) ?? 0) + 1);
   }
+  return [...conteo.entries()].filter(([, c]) => c > 1).map(([apellido]) => apellido);
+}
+
+/**
+ * Nombre corto para el feed de incidencias: solo el apellido, salvo que ese apellido este en
+ * `ambiguos` (ver apellidosAmbiguos), en cuyo caso se muestra el nombre completo para no generar
+ * ambiguedad.
+ */
+export function crearNombreCorto(ambiguos: string[]): (nombreCompleto: string) => string {
+  const set = new Set(ambiguos);
   return (nombreCompleto: string) => {
     const { apellido } = splitNombre(nombreCompleto);
-    return (conteo.get(apellido) ?? 0) > 1 ? nombreCompleto : apellido;
+    return set.has(apellido) ? nombreCompleto : apellido;
   };
 }

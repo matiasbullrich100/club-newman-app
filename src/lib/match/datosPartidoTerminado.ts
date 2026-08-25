@@ -3,7 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
-import { ordenarPorDorsal } from "@/lib/players";
+import { apellidosAmbiguos, ordenarPorDorsal } from "@/lib/players";
 import type { Incidente, JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 
@@ -18,10 +18,14 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     grupo.grupo === "superior"
       ? adminDb.collection("jugadores").where("grupo", "==", "superior")
       : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
-  const [plantelSnap, incidentesSnap, jugadoresSnap] = await Promise.all([
+  const [plantelSnap, incidentesSnap, jugadoresSnap, jugadoresClubSnap] = await Promise.all([
     partidoRef.collection("plantel").get(),
     partidoRef.collection("incidentes").orderBy("createdAt").get(),
     jugadoresQuery.get(),
+    // Sin scope de grupo/edad -- dos jugadores con el mismo apellido en divisiones distintas (ej.
+    // uno en Plantel, otro en Juveniles) siguen siendo ambiguos para quien lee el feed. Ver
+    // apellidosAmbiguos() en lib/players.ts.
+    adminDb.collection("jugadores").get(),
   ]);
 
   const plantelCompleto = jugadoresSnap.docs.map((d) => ({
@@ -46,6 +50,7 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
+  const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
 
-  return { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset };
+  return { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos: ambiguos };
 }

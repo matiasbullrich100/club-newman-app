@@ -14,6 +14,7 @@ export default function IncidentesFeed({
   nombreNewman,
   esLocal,
   plantel,
+  apellidosAmbiguos,
 }: {
   partidoId: string;
   rivalNombre?: string;
@@ -21,6 +22,7 @@ export default function IncidentesFeed({
   nombreNewman?: string;
   esLocal?: boolean;
   plantel?: { jugadorId: string; nombre: string; dorsal: string }[];
+  apellidosAmbiguos?: string[];
 }) {
   const [incidentes, setIncidentes] = useState<(Incidente & { id: string })[]>([]);
 
@@ -54,6 +56,7 @@ export default function IncidentesFeed({
         nombreNewman={nombreNewman}
         esLocal={esLocal}
         plantel={plantel}
+        apellidosAmbiguos={apellidosAmbiguos}
       />
     </div>
   );

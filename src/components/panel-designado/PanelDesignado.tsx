@@ -54,12 +54,14 @@ export default function PanelDesignado({
   plantel,
   plantelCompleto = [],
   periodo,
+  apellidosAmbiguos,
 }: {
   partidoId: string;
   partido: Partido;
   plantel: RosterJugador[];
   plantelCompleto?: JugadorBusqueda[];
   periodo: LiveState["periodo"];
+  apellidosAmbiguos?: string[];
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
@@ -234,6 +236,7 @@ export default function PanelDesignado({
             nombreNewman={nombreNewman}
             esLocal={partido.esLocal}
             plantel={plantel}
+            apellidosAmbiguos={apellidosAmbiguos}
           />
           <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
         </div>

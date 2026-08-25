@@ -46,6 +46,7 @@ export default function IncidentesList({
   nombreNewman,
   esLocal,
   plantel = [],
+  apellidosAmbiguos = [],
 }: {
   incidentes: (Incidente & { id: string })[];
   rivalNombre?: string;
@@ -59,6 +60,10 @@ export default function IncidentesList({
   // Para "Cambiar jugador" -- solo hace falta jugadorId/nombre/dorsal, asi sirve tanto el roster
   // de un partido en vivo como el historico (formas ligeramente distintas, mismos 3 campos).
   plantel?: { jugadorId: string; nombre: string; dorsal: string }[];
+  // Apellidos que se repiten en TODO el club (Plantel + las 4 edades de Juveniles), no solo en el
+  // plantel de este partido -- ver apellidosAmbiguos() en lib/players.ts. Sin esto se muestra
+  // siempre el apellido solo.
+  apellidosAmbiguos?: string[];
 }) {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [confirmandoEliminarId, setConfirmandoEliminarId] = useState<string | null>(null);
@@ -68,9 +73,9 @@ export default function IncidentesList({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  // Solo apellido en el feed, salvo que el plantel de este partido tenga mas de uno con el mismo
-  // apellido -- ver crearNombreCorto en lib/players.ts.
-  const nombreCorto = useMemo(() => crearNombreCorto(plantel), [plantel]);
+  // Solo apellido en el feed, salvo que sea ambiguo en todo el club -- ver crearNombreCorto en
+  // lib/players.ts.
+  const nombreCorto = useMemo(() => crearNombreCorto(apellidosAmbiguos), [apellidosAmbiguos]);
 
   // El "cambio" automatico que saca al jugador de la cancha al cargar una amarilla/roja de 20 no
   // se muestra -- la tarjeta ya dice "sale X" (ver ocultoEnFeed en actions.ts), sigue existiendo

@@ -16,7 +16,7 @@ import ResetDemoButton from "@/components/ResetDemoButton";
 import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
 import PartidoTerminadoPanel from "@/components/PartidoTerminadoPanel";
 import type { RosterJugador } from "@/components/panel-designado/types";
-import { ordenarPorDorsal } from "@/lib/players";
+import { apellidosAmbiguos, ordenarPorDorsal } from "@/lib/players";
 import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
 import { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
 import { DORADO_SUAVE } from "@/lib/colors";
@@ -127,11 +127,19 @@ export default async function PartidoPage({
     grupo.grupo === "superior"
       ? adminDb.collection("jugadores").where("grupo", "==", "superior")
       : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
-  const [plantelSnap, jugadoresSnap] = await Promise.all([partidoRef.collection("plantel").get(), jugadoresQuery.get()]);
+  const [plantelSnap, jugadoresSnap, jugadoresClubSnap] = await Promise.all([
+    partidoRef.collection("plantel").get(),
+    jugadoresQuery.get(),
+    // Sin scope de grupo/edad -- dos jugadores con el mismo apellido en divisiones distintas (ej.
+    // uno en Plantel, otro en Juveniles) siguen siendo ambiguos para quien lee el feed. Ver
+    // apellidosAmbiguos() en lib/players.ts.
+    adminDb.collection("jugadores").get(),
+  ]);
   const plantelCompleto = jugadoresSnap.docs.map((d) => ({
     jugadorId: d.id,
     nombre: (d.data() as JugadorAgregado).nombre,
   }));
+  const apellidosAmbiguosClub = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
   const partidoParaCliente: Partido = {
     categoriaId: partido.categoriaId,
     numeroFecha: partido.numeroFecha,
@@ -164,6 +172,7 @@ export default async function PartidoPage({
         session={session}
         plantel={plantel}
         plantelCompleto={plantelCompleto}
+        apellidosAmbiguos={apellidosAmbiguosClub}
       />
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
       <FooterChip />

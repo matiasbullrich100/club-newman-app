@@ -28,12 +28,14 @@ export default function PartidoLive({
   session,
   plantel,
   plantelCompleto,
+  apellidosAmbiguos,
 }: {
   partidoId: string;
   inicial: Partido;
   session: SessionPayload | null;
   plantel: RosterJugador[];
   plantelCompleto: JugadorBusqueda[];
+  apellidosAmbiguos?: string[];
 }) {
   const [partido, setPartido] = useState<Partido>(inicial);
   const [periodo, setPeriodo] = useState<LiveState["periodo"]>(null);
@@ -125,13 +127,22 @@ export default function PartidoLive({
 
       {puedeOperar ? (
         // El feed para el Designado va adentro del panel (entre jugadas y cambios).
-        <PanelDesignado partidoId={partidoId} partido={partido} plantel={plantel} plantelCompleto={plantelCompleto} periodo={periodo} />
+        <PanelDesignado
+          partidoId={partidoId}
+          partido={partido}
+          plantel={plantel}
+          plantelCompleto={plantelCompleto}
+          periodo={periodo}
+          apellidosAmbiguos={apellidosAmbiguos}
+        />
       ) : (
         <IncidentesFeed
           partidoId={partidoId}
           rivalNombre={partido.rival}
           nombreNewman={nombreNewmanDe(partido.categoriaId)}
           esLocal={partido.esLocal}
+          plantel={plantel}
+          apellidosAmbiguos={apellidosAmbiguos}
         />
       )}
     </div>
