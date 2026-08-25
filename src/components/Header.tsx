@@ -65,7 +65,7 @@ export default function Header({
         <div
           style={{
             position: "absolute",
-            top: 77,
+            top: 82,
             left: 0,
             right: 0,
             height: 1,
