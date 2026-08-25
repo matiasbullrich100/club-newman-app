@@ -77,6 +77,28 @@ export default function Header({
             zIndex: 0,
           }}
         />
+        {/* "Certa Bonum Certamen" / "Viriliter Age" -- una a cada lado del escudo, chicas, justo
+            arriba de la linea (no una fila centrada debajo de todo el escudo). */}
+        {["Certa Bonum Certamen", "Viriliter Age"].map((lema, i) => (
+          <div
+            key={lema}
+            style={{
+              position: "absolute",
+              zIndex: 1,
+              top: 66,
+              left: i === 0 ? "22%" : "78%",
+              transform: "translateX(-50%)",
+              fontSize: "0.5rem",
+              letterSpacing: 0.8,
+              textTransform: "uppercase",
+              color: DORADO_SUAVE,
+              opacity: 0.9,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {lema}
+          </div>
+        ))}
         <div
           style={{
             position: "relative",
@@ -145,27 +167,6 @@ export default function Header({
             />
           </span>
         </div>
-      </div>
-
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          display: "flex",
-          justifyContent: "center",
-          gap: 10,
-          width: "100%",
-          maxWidth: 400,
-          margin: "8px auto 0",
-          fontSize: "0.62rem",
-          letterSpacing: 1.2,
-          textTransform: "uppercase",
-          color: DORADO_SUAVE,
-          opacity: 0.85,
-        }}
-      >
-        <span>Certa Bonum Certamen</span>
-        <span>Viriliter Age</span>
       </div>
 
       {tituloHome && (
