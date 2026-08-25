@@ -3,7 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
+import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import type { JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
@@ -35,6 +35,9 @@ export default async function PartidoPage({
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  // Solo managers/administrador pueden ver un partido de prueba -- ni el designado de esa
+  // categoria ni el publico general, aunque conozcan la URL directa (ver partidosPrueba.ts).
+  if (esPartidoDePrueba && !pruebasVisiblesPara(session)) notFound();
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
   // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. New."
   // o tocando la fila en LiveBanner/ProximaFechaRow), no la vieja vista /fecha/[n] (huerfana --

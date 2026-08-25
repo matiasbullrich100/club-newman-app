@@ -12,13 +12,10 @@ export const PARTIDOS_DEMO_IDS = [
   "m15-c-test-cambio",
 ];
 
-// Pedido puntual del club: los partidos de prueba dejan de aparecer en la navegacion principal a
-// partir del sabado 15/8/2026 8:00 (hora Argentina), salvo para el Administrador -- que los sigue
-// usando para simular formaciones antes de publicarlas. Argentina es UTC-3 todo el año (sin
-// horario de verano), asi que 08:00 ART = 11:00 UTC.
-const CORTE_PRUEBAS_VISIBLES = new Date("2026-08-15T11:00:00Z");
-
-export function pruebasVisiblesPara(session: Pick<SessionPayload, "username"> | null): boolean {
-  if (session?.username === "administrador") return true;
-  return new Date() < CORTE_PRUEBAS_VISIBLES;
+// Los partidos de prueba son para que managers/administrador simulen formaciones antes de
+// publicarlas -- no son para designados ni para el publico general, asi que no aparecen en la
+// navegacion ni se pueden abrir por URL directa para nadie mas (ver el chequeo en
+// /partido/[partidoId]/page.tsx).
+export function pruebasVisiblesPara(session: Pick<SessionPayload, "rol"> | null): boolean {
+  return session?.rol === "manager";
 }
