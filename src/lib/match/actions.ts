@@ -459,6 +459,9 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
         periodo,
         minuto,
         segundoAbsoluto,
+        // La tarjeta de arriba ya dice "sale X" -- este cambio es solo para calcularMinutos() y
+        // para que el jugador reaparezca en el banco, no para el feed (ver ocultoEnFeed).
+        ocultoEnFeed: true,
         publicadoPorCuentaId: session!.cuentaId,
         createdAt: Timestamp.now(),
       };

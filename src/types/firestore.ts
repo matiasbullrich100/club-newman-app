@@ -181,6 +181,12 @@ export interface Incidente {
   // texto generico de un cambio tactico comun.
   cierreSancionTipo?: TipoIncidente;
   cierreSancionMismoJugador?: boolean;
+  // true solo en el "cambio" automatico que publicarIncidente genera al cargar una amarilla/roja
+  // de 20 (saca al jugador de la cancha ahi mismo) -- existe para que calcularMinutos() le corte
+  // los minutos en ese momento y para que reingresarSancion lo encuentre en el banco, pero NO se
+  // muestra en el feed: la tarjeta ya dice "sale X" con la misma info, mostrar las dos juntas
+  // duplica el mensaje.
+  ocultoEnFeed?: boolean;
   publicadoPorCuentaId: string;
   createdAt: Timestamp | Date;
 }

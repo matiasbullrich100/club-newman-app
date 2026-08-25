@@ -67,13 +67,18 @@ export default function IncidentesList({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  if (incidentes.length === 0) {
+  // El "cambio" automatico que saca al jugador de la cancha al cargar una amarilla/roja de 20 no
+  // se muestra -- la tarjeta ya dice "sale X" (ver ocultoEnFeed en actions.ts), sigue existiendo
+  // solo para calcularMinutos() y el banco de reingresarSancion.
+  const visibles = incidentes.filter((inc) => !inc.ocultoEnFeed);
+
+  if (visibles.length === 0) {
     return <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.85rem" }}>Sin incidencias todavía.</p>;
   }
 
   // Cronologico ascendente, para poder ir acumulando el resultado incidencia por incidencia (ver
   // resultadosAcumulados) -- despues se muestra al reves, lo mas reciente arriba del todo.
-  const cronologico = ordenarIncidentes(incidentes);
+  const cronologico = ordenarIncidentes(visibles);
   const acumulados = resultadosAcumulados(cronologico);
   const ordenadas = [...cronologico].reverse();
 
