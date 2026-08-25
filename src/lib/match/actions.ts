@@ -1039,30 +1039,48 @@ export interface ReingresarSancionInput {
 
 /**
  * Llena el puesto que dejo vacante una amarilla/roja de 20 -- a diferencia de un cambio comun no
- * hay "sale" (ya salio con la tarjeta, ver DURACION_SANCION_SEGUNDOS en publicarIncidente): puede
+ * hay "sale" (ya salio con la tarjeta, ver DURACION_SANCION_SEGUNDOS en publicarIncidente). Puede
  * reingresar el mismo jugador sancionado o cualquier otro (banco, alguien que ya salio antes, o
- * del plantel completo via el buscador).
+ * del plantel completo via el buscador) -- EXCEPTO en una roja de 20: por reglamento el jugador
+ * expulsado no vuelve mas, solo se repone el puesto con otro (a diferencia de la amarilla, que es
+ * un sin-bin temporal). `incidenteId` identifica la sancion puntual que se esta resolviendo -- se
+ * marca `sancionResuelta` en ese mismo doc para que la tarjeta deje de mostrarse en el panel aunque
+ * haya entrado un jugador DISTINTO del sancionado (antes solo se ocultaba comparando
+ * `enCanchaIds` contra el jugadorId original, que nunca vuelve a aparecer si entro otro en su
+ * lugar).
  */
-export async function reingresarSancion(partidoId: string, input: ReingresarSancionInput): Promise<void> {
+export async function reingresarSancion(partidoId: string, incidenteId: string, input: ReingresarSancionInput): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const entraRef = partidoRef.collection("plantel").doc(input.jugadorEntraId);
-  const incidenteRef = partidoRef.collection("incidentes").doc();
+  const sancionRef = partidoRef.collection("incidentes").doc(incidenteId);
+  const cambioRef = partidoRef.collection("incidentes").doc();
 
   await adminDb.runTransaction(async (tx) => {
-    const [partidoSnap, liveSnap, entraSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef), tx.get(entraRef)]);
+    const [partidoSnap, liveSnap, entraSnap, sancionSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(liveStateRef),
+      tx.get(entraRef),
+      tx.get(sancionRef),
+    ]);
     if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Datos del partido incompletos");
+    if (!sancionSnap.exists) throw new Error("Sanción no encontrada");
     const entraEsNuevo = !entraSnap.exists;
     if (entraEsNuevo && !input.jugadorEntraNombre) throw new Error("Jugador no encontrado en el plantel");
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
+    const sancion = sancionSnap.data() as Incidente;
     const entra: JugadorPartido = entraEsNuevo
       ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false, agregadoEnVivo: true }
       : (entraSnap.data() as JugadorPartido);
 
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (sancion.equipo !== "newman") throw new Error("Esta acción es solo para sanciones de Newman");
     if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
       throw new Error("El partido no está en juego");
+    }
+    if (sancion.tipo === "tarjeta_roja_20" && input.jugadorEntraId === sancion.jugadorId) {
+      throw new Error("Con roja de 20 el jugador expulsado no puede volver -- elegí a otro");
     }
     if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
     if (partido.enCanchaIds.length >= 15) throw new Error("Ya hay 15 jugadores en cancha");
@@ -1075,6 +1093,7 @@ export async function reingresarSancion(partidoId: string, input: ReingresarSanc
       enCanchaIds: [...partido.enCanchaIds, input.jugadorEntraId],
       updatedAt: FieldValue.serverTimestamp(),
     });
+    tx.update(sancionRef, { sancionResuelta: true });
 
     const incidente: Incidente = {
       tipo: "cambio",
@@ -1088,7 +1107,7 @@ export async function reingresarSancion(partidoId: string, input: ReingresarSanc
       publicadoPorCuentaId: session!.cuentaId,
       createdAt: Timestamp.now(),
     };
-    tx.set(incidenteRef, incidente);
+    tx.set(cambioRef, incidente);
   });
 
   revalidatePath(`/partido/${partidoId}`);

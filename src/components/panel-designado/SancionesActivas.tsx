@@ -69,15 +69,16 @@ export default function SancionesActivas({
     return liveState ? segundosDesdeIncidente(s.periodo, s.segundoAbsoluto, liveState) : 0;
   }
 
-  // Sigue "activa" mientras el jugador no vuelva a estar en cancha -- no importa si fue el mismo
-  // u otro quien cubrio el puesto, en ambos casos enCanchaIds vuelve a incluirlo/completarse y
-  // deja de aparecer aca.
+  // Sigue "activa" hasta que el jugador vuelve a estar en cancha (mismo jugador, ej. via el Cambio
+  // general) o hasta que reingresarSancion marca `sancionResuelta` (entro un jugador DISTINTO --
+  // el propio jugadorId original nunca vuelve a aparecer en enCanchaIds en ese caso).
   const sanciones = incidentes.filter(
     (inc) =>
       DURACION_SANCION_SEGUNDOS[inc.tipo] !== undefined &&
       inc.equipo === "newman" &&
       inc.jugadorId &&
-      !enCanchaIds.includes(inc.jugadorId)
+      !enCanchaIds.includes(inc.jugadorId) &&
+      !inc.sancionResuelta
   );
 
   // Del rival no llevamos plantel (no hay "quien entra" que elegir) -- sigue "activa" hasta que el
@@ -119,11 +120,11 @@ export default function SancionesActivas({
     setError(null);
   }
 
-  function elegirEntra(jugadorId: string, nombre: string, esNuevo: boolean) {
+  function elegirEntra(incidenteId: string, jugadorId: string, nombre: string, esNuevo: boolean) {
     setError(null);
     startTransition(async () => {
       try {
-        await reingresarSancion(partidoId, { jugadorEntraId: jugadorId, ...(esNuevo ? { jugadorEntraNombre: nombre } : {}) });
+        await reingresarSancion(partidoId, incidenteId, { jugadorEntraId: jugadorId, ...(esNuevo ? { jugadorEntraNombre: nombre } : {}) });
         cerrarEleccion();
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo reingresar");
@@ -189,11 +190,15 @@ export default function SancionesActivas({
                 </button>
               ) : (
                 <div style={{ ...listaOpciones, marginTop: 8 }}>
-                  <button style={botonPrimario} disabled={isPending} onClick={() => elegirEntra(s.jugadorId!, s.jugadorNombre!, false)}>
-                    Vuelve {s.jugadorNombre}
-                  </button>
+                  {/* Con roja de 20 el expulsado no puede volver -- solo con amarilla (sin-bin
+                      temporal) tiene sentido ofrecer que vuelva el mismo jugador. */}
+                  {s.tipo !== "tarjeta_roja_20" && (
+                    <button style={botonPrimario} disabled={isPending} onClick={() => elegirEntra(s.id, s.jugadorId!, s.jugadorNombre!, false)}>
+                      Vuelve {s.jugadorNombre}
+                    </button>
+                  )}
                   {banco.map((j) => (
-                    <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirEntra(j.jugadorId, j.nombre, false)}>
+                    <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirEntra(s.id, j.jugadorId, j.nombre, false)}>
                       {j.dorsal} — {j.nombre}
                     </button>
                   ))}
@@ -223,7 +228,7 @@ export default function SancionesActivas({
                         <p style={{ margin: 0, fontSize: "0.82rem", color: DORADO_SUAVE, opacity: 0.75 }}>Sin resultados.</p>
                       )}
                       {resultadosBusqueda.map((j) => (
-                        <button key={j.jugadorId} style={botonOpcion} onClick={() => elegirEntra(j.jugadorId, j.nombre, true)}>
+                        <button key={j.jugadorId} style={botonOpcion} onClick={() => elegirEntra(s.id, j.jugadorId, j.nombre, true)}>
                           {j.nombre}
                         </button>
                       ))}
