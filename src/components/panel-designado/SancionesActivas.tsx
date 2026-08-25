@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { collection, doc, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import { reingresarSancion, resolverSancionRival } from "@/lib/match/actions";
-import { elapsedSeconds, formatMMSS } from "@/lib/match/clock";
+import { elapsedSeconds, formatMMSS, segundosDesdeIncidente } from "@/lib/match/clock";
 import { DURACION_SANCION_SEGUNDOS, ETIQUETAS_INCIDENTE } from "@/lib/incidentes";
 import { norm } from "@/lib/players";
 import type { Incidente, LiveState } from "@/types/firestore";
@@ -62,6 +62,13 @@ export default function SancionesActivas({
 
   const ahora = liveState ? elapsedSeconds(liveState) : 0;
 
+  // Segundos reales transcurridos desde que se cargo la sancion -- no una resta directa contra
+  // `ahora`, porque `segundoAbsoluto` es relativo al periodo en el que se cargo (se resetea en
+  // iniciar2T) y una tarjeta cargada en el 1T sigue corriendo durante el 2T (ver clock.ts).
+  function transcurridosDesde(s: { periodo: Incidente["periodo"]; segundoAbsoluto: number }): number {
+    return liveState ? segundosDesdeIncidente(s.periodo, s.segundoAbsoluto, liveState) : 0;
+  }
+
   // Sigue "activa" mientras el jugador no vuelva a estar en cancha -- no importa si fue el mismo
   // u otro quien cubrio el puesto, en ambos casos enCanchaIds vuelve a incluirlo/completarse y
   // deja de aparecer aca.
@@ -86,7 +93,7 @@ export default function SancionesActivas({
   useEffect(() => {
     for (const s of sanciones) {
       const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
-      const cumplida = duracion - (ahora - s.segundoAbsoluto) <= 0;
+      const cumplida = duracion - transcurridosDesde(s) <= 0;
       if (cumplida && !avisadasRef.current.has(s.id)) {
         avisadasRef.current.add(s.id);
         setEligiendoPara(s.id);
@@ -145,7 +152,7 @@ export default function SancionesActivas({
       <div style={{ display: "grid", gap: 10 }}>
         {sanciones.map((s) => {
           const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
-          const restante = Math.max(0, duracion - (ahora - s.segundoAbsoluto));
+          const restante = Math.max(0, duracion - transcurridosDesde(s));
           const cumplida = restante <= 0;
           const eligiendo = eligiendoPara === s.id;
           return (
@@ -239,7 +246,7 @@ export default function SancionesActivas({
         <div style={{ display: "grid", gap: 10, marginTop: sanciones.length > 0 ? 10 : 0 }}>
           {sancionesRival.map((s) => {
             const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
-            const restante = Math.max(0, duracion - (ahora - s.segundoAbsoluto));
+            const restante = Math.max(0, duracion - transcurridosDesde(s));
             const cumplida = restante <= 0;
             return (
               <div
