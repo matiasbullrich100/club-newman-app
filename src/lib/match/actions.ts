@@ -1087,6 +1087,7 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
 
     const minuto = minutoActual(liveState);
     const segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+    const mismoJugador = input.jugadorEntraId === sancion.jugadorId;
 
     tx.set(entraRef, { ...entra, enCancha: true }, { merge: true });
     tx.update(partidoRef, {
@@ -1100,6 +1101,9 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
       equipo: "newman",
       jugadorEntraId: input.jugadorEntraId,
       jugadorEntraNombre: entra.nombre,
+      ...(!mismoJugador ? { jugadorSaleId: sancion.jugadorId, jugadorSaleNombre: sancion.jugadorNombre } : {}),
+      cierreSancionTipo: sancion.tipo,
+      cierreSancionMismoJugador: mismoJugador,
       periodo: liveState.periodo,
       minuto,
       segundoAbsoluto,
@@ -1115,25 +1119,51 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
 
 /**
  * Cierra a mano una sancion del RIVAL (amarilla/roja de 20) -- del rival no llevamos plantel, asi
- * que no hay "quien entra" que elegir (a diferencia de reingresarSancion): el designado solo
- * marca que el equipo rival ya volvio a jugar con el sancionado adentro, sea el mismo jugador u
- * otro. Disponible en cualquier momento, no solo cuando se cumple la cuenta regresiva -- el
- * arbitro decide en la cancha, no el reloj de este panel (mismo criterio que reingresarSancion).
+ * que no hay "quien entra" que elegir por nombre (a diferencia de reingresarSancion): el
+ * designado solo confirma si volvio a jugar el mismo sancionado o entro otro jugador distinto
+ * (`mismoJugador`), y eso se refleja en el texto de la incidencia que se publica (ver
+ * describirIncidente en lib/incidentes.ts). Disponible en cualquier momento, no solo cuando se
+ * cumple la cuenta regresiva -- el arbitro decide en la cancha, no el reloj de este panel (mismo
+ * criterio que reingresarSancion).
  */
-export async function resolverSancionRival(partidoId: string, incidenteId: string): Promise<void> {
+export async function resolverSancionRival(partidoId: string, incidenteId: string, mismoJugador: boolean): Promise<void> {
   const session = await getSession();
-  const { partidoRef } = refs(partidoId);
-  const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
+  const { partidoRef, liveStateRef } = refs(partidoId);
+  const sancionRef = partidoRef.collection("incidentes").doc(incidenteId);
+  const cambioRef = partidoRef.collection("incidentes").doc();
 
   await adminDb.runTransaction(async (tx) => {
-    const [partidoSnap, incSnap] = await Promise.all([tx.get(partidoRef), tx.get(incidenteRef)]);
-    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
-    if (!incSnap.exists) throw new Error("Incidencia no encontrada");
+    const [partidoSnap, liveSnap, sancionSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef), tx.get(sancionRef)]);
+    if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Datos del partido incompletos");
+    if (!sancionSnap.exists) throw new Error("Sanción no encontrada");
     const partido = partidoSnap.data() as Partido;
+    const liveState = liveSnap.data() as LiveState;
+    const sancion = sancionSnap.data() as Incidente;
+
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    const inc = incSnap.data() as Incidente;
-    if (inc.equipo !== "rival") throw new Error("Esta accion es solo para sanciones del rival");
-    tx.update(incidenteRef, { sancionResuelta: true });
+    if (sancion.equipo !== "rival") throw new Error("Esta acción es solo para sanciones del rival");
+    if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
+      throw new Error("El partido no está en juego");
+    }
+
+    const minuto = minutoActual(liveState);
+    const segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
+
+    tx.update(sancionRef, { sancionResuelta: true });
+
+    const incidente: Incidente = {
+      tipo: "cambio",
+      equipo: "rival",
+      cierreSancionTipo: sancion.tipo,
+      cierreSancionMismoJugador: mismoJugador,
+      periodo: liveState.periodo,
+      minuto,
+      segundoAbsoluto,
+      ...(partido.estado === "entretiempo" ? { enEntretiempo: true } : {}),
+      publicadoPorCuentaId: session!.cuentaId,
+      createdAt: Timestamp.now(),
+    };
+    tx.set(cambioRef, incidente);
   });
 
   revalidatePath(`/partido/${partidoId}`);

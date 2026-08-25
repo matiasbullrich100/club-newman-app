@@ -89,10 +89,10 @@ export default function SancionesActivas({
   );
 
   // Avisa solo -- no bloquea nada, el arbitro decide en la cancha. Se abre el picker de reingreso
-  // automaticamente apenas se cumple la cuenta regresiva de Newman, en vez de esperar a que el
-  // designado se acuerde de tocar "Reingresar".
+  // automaticamente apenas se cumple la cuenta regresiva (Newman o rival), en vez de esperar a que
+  // el designado se acuerde de tocar "Reingresar".
   useEffect(() => {
-    for (const s of sanciones) {
+    for (const s of [...sanciones, ...sancionesRival]) {
       const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
       const cumplida = duracion - transcurridosDesde(s) <= 0;
       if (cumplida && !avisadasRef.current.has(s.id)) {
@@ -101,7 +101,7 @@ export default function SancionesActivas({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ahora, sanciones.map((s) => s.id).join(",")]);
+  }, [ahora, sanciones.map((s) => s.id).join(","), sancionesRival.map((s) => s.id).join(",")]);
 
   if ((sanciones.length === 0 && sancionesRival.length === 0) || !liveState) return null;
 
@@ -132,11 +132,12 @@ export default function SancionesActivas({
     });
   }
 
-  function resolverRival(incidenteId: string) {
+  function resolverRival(incidenteId: string, mismoJugador: boolean) {
     setErrorRivalId(null);
     startTransitionRival(async () => {
       try {
-        await resolverSancionRival(partidoId, incidenteId);
+        await resolverSancionRival(partidoId, incidenteId, mismoJugador);
+        cerrarEleccion();
       } catch (e) {
         setErrorRivalId(incidenteId);
         setError(e instanceof Error ? e.message : "No se pudo marcar el reingreso");
@@ -253,6 +254,7 @@ export default function SancionesActivas({
             const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
             const restante = Math.max(0, duracion - transcurridosDesde(s));
             const cumplida = restante <= 0;
+            const eligiendo = eligiendoPara === s.id;
             return (
               <div
                 key={s.id}
@@ -266,14 +268,33 @@ export default function SancionesActivas({
                     {cumplida ? "Cumplida" : formatMMSS(restante)}
                   </span>
                 </div>
-                <button
-                  style={{ ...botonSecundario, marginTop: 8 }}
-                  disabled={isPendingRival}
-                  onClick={() => resolverRival(s.id)}
-                >
-                  Reingresó
-                </button>
-                {errorRivalId === s.id && error && <p style={{ color: "crimson", margin: "6px 0 0" }}>{error}</p>}
+
+                {!eligiendo ? (
+                  <button
+                    style={{ ...botonSecundario, marginTop: 8 }}
+                    disabled={isPendingRival}
+                    onClick={() => {
+                      setError(null);
+                      setErrorRivalId(null);
+                      setEligiendoPara(s.id);
+                    }}
+                  >
+                    Reingresar
+                  </button>
+                ) : (
+                  <div style={{ ...listaOpciones, marginTop: 8 }}>
+                    <button style={botonPrimario} disabled={isPendingRival} onClick={() => resolverRival(s.id, true)}>
+                      Reingresó el sancionado
+                    </button>
+                    <button style={botonOpcion} disabled={isPendingRival} onClick={() => resolverRival(s.id, false)}>
+                      Entró otro jugador
+                    </button>
+                    <button style={botonSecundario} disabled={isPendingRival} onClick={cerrarEleccion}>
+                      Cancelar
+                    </button>
+                    {errorRivalId === s.id && error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
+                  </div>
+                )}
               </div>
             );
           })}

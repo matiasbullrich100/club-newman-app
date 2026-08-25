@@ -174,6 +174,13 @@ export interface Incidente {
   // sola cuando enCanchaIds vuelve a incluir a alguien en ese puesto). El designado marca a mano
   // que el rival ya volvio a jugar con el sancionado adentro -- ver resolverSancionRival().
   sancionResuelta?: boolean;
+  // Solo en el incidente tipo "cambio" que CIERRA una sancion (ver reingresarSancion y
+  // resolverSancionRival) -- que tipo de tarjeta se esta cerrando, y si volvio el mismo jugador
+  // sancionado o entro otro distinto. describirIncidente usa estos dos campos para mostrar "Fin
+  // {tarjeta}: sale X, entra Y" (jugador distinto) o "Reingresó X" (mismo jugador) en vez del
+  // texto generico de un cambio tactico comun.
+  cierreSancionTipo?: TipoIncidente;
+  cierreSancionMismoJugador?: boolean;
   publicadoPorCuentaId: string;
   createdAt: Timestamp | Date;
 }

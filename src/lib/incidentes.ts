@@ -90,7 +90,21 @@ export function describirIncidente(
     return `${ETIQUETAS_INCIDENTE.fin_1t} ${local} ${golesLocal} - ${golesVisitante} ${visitante}`;
   }
   if (inc.tipo === "cambio") {
-    // Salida/reingreso por sancion (amarilla/roja de 20): un solo lado, sin par (ver
+    // Cierre de una sancion (amarilla/roja de 20) -- ver reingresarSancion/resolverSancionRival en
+    // match/actions.ts. Del rival no hay nombres (no llevamos su plantel), asi que cae al texto
+    // generico "el sancionado"/"otro jugador".
+    if (inc.cierreSancionTipo) {
+      const equipoLabel = inc.equipo === "newman" ? nombreNewman : (rivalNombre ?? "Rival");
+      if (inc.cierreSancionMismoJugador) {
+        return inc.jugadorEntraNombre
+          ? `Reingresó ${inc.jugadorEntraNombre} — ${equipoLabel} (sancionado)`
+          : `Reingresó el sancionado — ${equipoLabel}`;
+      }
+      const sale = inc.jugadorSaleNombre ?? "el sancionado";
+      const entra = inc.jugadorEntraNombre ?? "otro jugador";
+      return `Fin ${ETIQUETAS_INCIDENTE[inc.cierreSancionTipo]} — ${equipoLabel}: sale ${sale}, entra ${entra}`;
+    }
+    // Salida por sancion sin cierre todavia (un solo lado, sin par -- ver
     // DURACION_SANCION_SEGUNDOS en match/actions.ts) -- no tiene sentido mostrar el otro como "?".
     if (inc.jugadorSaleNombre && !inc.jugadorEntraNombre) {
       return `Sale ${inc.jugadorSaleNombre} — ${nombreNewman} (sanción)`;
