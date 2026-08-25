@@ -32,7 +32,7 @@ export default function Header({
           style={{
             position: "absolute",
             top: tituloHome ? 3 : -7,
-            left: i === 0 ? "30%" : "70%",
+            left: i === 0 ? "23%" : "77%",
             transform: "translateX(-50%)",
             fontSize: "3.4rem",
             fontWeight: 800,
