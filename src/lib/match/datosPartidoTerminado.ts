@@ -2,6 +2,7 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
+import { FAMILIA_TARJETA } from "@/lib/incidentes";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { apellidosAmbiguos, ordenarPorDorsal } from "@/lib/players";
 import type { Incidente, JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
@@ -38,16 +39,28 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
       return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular, capitan: data.capitan, debut: data.debut };
     })
   );
+  const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
+  const esManager = puedeReiniciar; // mismo chequeo, ver el filtro de tarjetas mas abajo
+
   // IncidentesList es un Client Component -- un Timestamp crudo del Admin SDK no cruza el limite
   // servidor->cliente, hay que pasarlo a Date.
-  const incidentes = incidentesSnap.docs.map((d) => {
+  const todasLasIncidencias = incidentesSnap.docs.map((d) => {
     const data = d.data() as Incidente;
     const createdAt = data.createdAt as unknown as FirebaseFirestore.Timestamp;
     return { id: d.id, ...data, createdAt: createdAt?.toDate?.() ?? data.createdAt };
   });
+  // Terminado el partido, las tarjetas (y el "Fin {tarjeta}: sale/entra" que las cierra) se ocultan
+  // del feed para todos menos el manager de esta categoria -- se siguen viendo durante el partido
+  // (en_juego/entretiempo, ver /partido/[id]/page.tsx) y siguen sumando al stock de jugadores/ vía
+  // publicarIncidente. Pensado para que el manager pueda reconciliar contra lo que URBA denuncia
+  // antes de que la tarjeta quede visible para todos -- si el arbitro no la denuncio, el manager la
+  // borra (Corregir → Eliminar jugada, ya resta del stock) sin que haya llegado a mostrarse en
+  // público.
+  const incidentes = esManager
+    ? todasLasIncidencias
+    : todasLasIncidencias.filter((inc) => !FAMILIA_TARJETA.includes(inc.tipo) && !(inc.tipo === "cambio" && inc.cierreSancionTipo));
 
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
-  const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
   const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
