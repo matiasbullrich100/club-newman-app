@@ -1,13 +1,5 @@
 import Image from "next/image";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
-
-function LineaDorada() {
-  return (
-    <span
-      style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${DORADO}, transparent)` }}
-    />
-  );
-}
+import { BORDO_OSC, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default function Header({
   rightLabel,
@@ -106,14 +98,18 @@ export default function Header({
         </div>
       </div>
 
+      {/* Linea continua de lado a lado, uniendo el escudo con el copete de abajo -- antes eran 3
+          tramos cortos flanqueando el texto, sin conectar con nada. */}
+      <div style={{ width: "100%", maxWidth: 400, height: 1, background: DORADO, margin: "8px auto 0" }} />
+
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          gap: 6,
+          justifyContent: "center",
+          gap: 10,
           width: "100%",
           maxWidth: 400,
-          margin: "7px auto 0",
+          margin: "6px auto 0",
           fontSize: "0.62rem",
           letterSpacing: 1.2,
           textTransform: "uppercase",
@@ -121,11 +117,8 @@ export default function Header({
           opacity: 0.85,
         }}
       >
-        <LineaDorada />
-        Certa Bonum Certamen
-        <LineaDorada />
-        Viriliter Age
-        <LineaDorada />
+        <span>Certa Bonum Certamen</span>
+        <span>Viriliter Age</span>
       </div>
 
       {tituloHome && (
@@ -133,7 +126,21 @@ export default function Header({
           <div style={{ fontWeight: 700, fontSize: "1.35rem", letterSpacing: 1.5, textTransform: "uppercase", color: DORADO, marginTop: 14 }}>
             Club Newman
           </div>
-          <div style={{ fontSize: "0.8rem", letterSpacing: 3, color: "#f7f1e4", opacity: 0.75, marginTop: 4 }}>2026</div>
+          <div
+            style={{
+              display: "inline-block",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              letterSpacing: 3,
+              color: DORADO_SUAVE,
+              background: BORDO_OSC,
+              padding: "3px 14px",
+              borderRadius: 20,
+              marginTop: 8,
+            }}
+          >
+            2026
+          </div>
         </>
       )}
     </div>
