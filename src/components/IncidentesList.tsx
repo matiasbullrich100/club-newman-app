@@ -18,7 +18,7 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
   tarjeta_amarilla: "🟨",
-  tarjeta_doble_amarilla: "🟨🟨",
+  tarjeta_doble_amarilla: "🟨🟨🟥",
   tarjeta_roja: "🟥",
   tarjeta_roja_20: "🟥20",
   tarjeta_azul: "🟦",

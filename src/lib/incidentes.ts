@@ -140,6 +140,11 @@ export function describirIncidente(
   }
   if (inc.equipo === "newman") {
     const quien = inc.jugadorNombre ? `${nombreNewman} — ${nombreCorto(inc.jugadorNombre)}` : nombreNewman;
+    // La doble amarilla siempre es roja por reglamento (se detecta sola, ver publicarIncidente) --
+    // el feed lo deja explicito en vez de solo decir "Doble amarilla".
+    if (inc.tipo === "tarjeta_doble_amarilla") {
+      return `Roja Definitiva por Doble amarilla ${quien}`;
+    }
     return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${quien}`;
   }
   return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${rivalNombre ?? "Rival"}`;
