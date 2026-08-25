@@ -31,7 +31,7 @@ export default function Header({
           aria-hidden
           style={{
             position: "absolute",
-            top: tituloHome ? 3 : -7,
+            top: tituloHome ? -1 : -11,
             left: i === 0 ? "23%" : "77%",
             transform: "translateX(-50%)",
             fontSize: "3.4rem",
