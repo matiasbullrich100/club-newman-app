@@ -1122,14 +1122,14 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
 
 /**
  * Cierra a mano una sancion del RIVAL (amarilla/roja de 20) -- del rival no llevamos plantel, asi
- * que no hay "quien entra" que elegir por nombre (a diferencia de reingresarSancion): el
- * designado solo confirma si volvio a jugar el mismo sancionado o entro otro jugador distinto
- * (`mismoJugador`), y eso se refleja en el texto de la incidencia que se publica (ver
+ * que no hay "quien entra" que elegir, y tampoco importa si volvio el mismo sancionado o entro
+ * otro (a diferencia de reingresarSancion): el designado solo confirma que el rival ya vuelve a
+ * jugar con ese puesto cubierto, para que quede asentado en las incidencias (ver
  * describirIncidente en lib/incidentes.ts). Disponible en cualquier momento, no solo cuando se
  * cumple la cuenta regresiva -- el arbitro decide en la cancha, no el reloj de este panel (mismo
  * criterio que reingresarSancion).
  */
-export async function resolverSancionRival(partidoId: string, incidenteId: string, mismoJugador: boolean): Promise<void> {
+export async function resolverSancionRival(partidoId: string, incidenteId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const sancionRef = partidoRef.collection("incidentes").doc(incidenteId);
@@ -1158,7 +1158,6 @@ export async function resolverSancionRival(partidoId: string, incidenteId: strin
       tipo: "cambio",
       equipo: "rival",
       cierreSancionTipo: sancion.tipo,
-      cierreSancionMismoJugador: mismoJugador,
       periodo: liveState.periodo,
       minuto,
       segundoAbsoluto,
