@@ -46,6 +46,21 @@ export const DURACION_SANCION_SEGUNDOS: Partial<Record<Incidente["tipo"], number
   tarjeta_roja_20: 20 * 60,
 };
 
+// Tarjetas que sacan al jugador de la cancha en el momento -- superset de DURACION_SANCION_SEGUNDOS
+// (amarilla/roja de 20, temporales con reingreso) mas roja y doble amarilla (expulsion definitiva:
+// no vuelve mas, y nadie entra en su lugar -- ver expulsadoDefinitivo en types/firestore.ts). La
+// azul (HIA/sangre) queda afuera a proposito, se resuelve con su propio mecanismo aparte.
+export const TARJETAS_SACAN_DE_CANCHA: Incidente["tipo"][] = [
+  "tarjeta_amarilla",
+  "tarjeta_roja_20",
+  "tarjeta_roja",
+  "tarjeta_doble_amarilla",
+];
+
+// De estas dos, cuales son expulsion DEFINITIVA (nadie entra en su lugar por el resto del
+// partido) -- a diferencia de amarilla/roja de 20, que son temporales con reingreso.
+export const TARJETAS_EXPULSION_DEFINITIVA: Incidente["tipo"][] = ["tarjeta_roja", "tarjeta_doble_amarilla"];
+
 export function requierePlayerSelection(tipo: Incidente["tipo"]): boolean {
   return !SIN_JUGADOR_PUNTUAL.includes(tipo);
 }

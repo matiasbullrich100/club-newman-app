@@ -16,8 +16,10 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t" | "fi
   { tipo: "penal", label: "Penal (+3)" },
   { tipo: "drop", label: "Drop (+3)" },
   { tipo: "try_penal", label: "Try Penal (+7)" },
+  // "Doble amarilla" no se elige a mano -- si el jugador ya tiene una amarilla en este partido,
+  // publicarIncidente detecta la segunda sola y la guarda como tarjeta_doble_amarilla (es roja por
+  // reglamento, ver docs/live-match-engine.md).
   { tipo: "tarjeta_amarilla", label: "Tarjeta amarilla" },
-  { tipo: "tarjeta_doble_amarilla", label: "Doble amarilla" },
   { tipo: "tarjeta_roja", label: "Roja Definitiva" },
   { tipo: "tarjeta_roja_20", label: "Roja de 20" },
   { tipo: "tarjeta_azul", label: "Tarjeta azul" },

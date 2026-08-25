@@ -124,6 +124,12 @@ export interface JugadorPartido {
   // arrancar) -- resetearPartidoDemo lo usa para saber a quien borrar del todo al resetear un
   // partido de prueba, en vez de solo reiniciarle las banderas.
   agregadoEnVivo?: boolean;
+  // true si a este jugador le sacaron roja (directa o por doble amarilla) -- a diferencia de una
+  // amarilla/roja de 20 (sin-bin temporal, ver DURACION_SANCION_SEGUNDOS), no vuelve mas a jugar
+  // este partido. Se usa para sacarlo de cualquier "banco" de reingreso/cambio (CargaCambio,
+  // SancionesActivas), no solo de enCanchaIds -- si no, alguien podria seleccionarlo por error
+  // como "quien entra" en un cambio de otro jugador.
+  expulsadoDefinitivo?: boolean;
 }
 
 export type TipoIncidente =

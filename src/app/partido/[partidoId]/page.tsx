@@ -145,7 +145,13 @@ export default async function PartidoPage({
   const plantel: RosterJugador[] = ordenarPorDorsal(
     plantelSnap.docs.map((d) => {
       const data = d.data() as JugadorPartido;
-      return { jugadorId: d.id, nombre: data.nombre, dorsal: data.dorsal, titular: data.titular };
+      return {
+        jugadorId: d.id,
+        nombre: data.nombre,
+        dorsal: data.dorsal,
+        titular: data.titular,
+        expulsadoDefinitivo: data.expulsadoDefinitivo,
+      };
     })
   );
 

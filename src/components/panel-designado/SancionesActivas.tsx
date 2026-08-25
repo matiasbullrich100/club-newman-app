@@ -107,7 +107,9 @@ export default function SancionesActivas({
   if ((sanciones.length === 0 && sancionesRival.length === 0) || !liveState) return null;
 
   const sancionadosIds = new Set(sanciones.map((s) => s.jugadorId));
-  const banco = plantel.filter((j) => !enCanchaIds.includes(j.jugadorId) && !sancionadosIds.has(j.jugadorId));
+  // Quien ya recibio roja (directa o por doble amarilla) no puede volver a entrar -- ver
+  // expulsadoDefinitivo en types/firestore.ts.
+  const banco = plantel.filter((j) => !enCanchaIds.includes(j.jugadorId) && !sancionadosIds.has(j.jugadorId) && !j.expulsadoDefinitivo);
   const idsPlantel = new Set(plantel.map((j) => j.jugadorId));
   const resultadosBusqueda =
     busqueda.trim().length >= 2

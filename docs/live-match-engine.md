@@ -42,6 +42,21 @@ el plantel y los cambios de cada período por separado, y se llama solo desde
 Cambios, doc creado on-the-fly en `plantel/`), igual se le calculan minutos normalmente — no
 necesita tratamiento especial.
 
+## Tarjetas: sin-bin temporal vs. expulsión definitiva
+
+`TARJETAS_SACAN_DE_CANCHA` (`src/lib/incidentes.ts`) saca al jugador de la cancha en el momento
+(amarilla, roja de 20, roja, doble amarilla — la azul queda afuera, es HIA/sangre con su propio
+mecanismo). De esas cuatro, solo amarilla/roja de 20 tienen reingreso (`DURACION_SANCION_SEGUNDOS`
++ `reingresarSancion`); roja y doble amarilla (`TARJETAS_EXPULSION_DEFINITIVA`) marcan
+`expulsadoDefinitivo: true` en su `plantel/{id}` — no vuelven a aparecer en ningún banco de
+reingreso/cambio por el resto del partido, y `CargaCambio`/`reingresarSancion` los rechazan aunque
+alguien intente seleccionarlos de todas formas.
+
+Una **segunda amarilla del mismo jugador en el mismo partido es roja por reglamento** —
+`publicarIncidente` la detecta sola (busca si ya tiene una `tarjeta_amarilla` este partido) y la
+guarda como `tarjeta_doble_amarilla`, sin que el Designado tenga que elegirla a mano (ni existe esa
+opción en el picker).
+
 ## Corrección de incidencias
 
 `corregirTipoIncidente` / `eliminarIncidente` solo permiten moverse **dentro de la misma familia**

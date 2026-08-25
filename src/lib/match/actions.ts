@@ -7,7 +7,14 @@ import { getSession, puedeOperarCategoria, esManagerDeCategoria } from "@/lib/au
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
 import { calcularBonus } from "./bonus";
-import { DURACION_SANCION_SEGUNDOS, FAMILIA_PUNTOS, FAMILIA_TARJETA, requierePlayerSelection } from "@/lib/incidentes";
+import {
+  DURACION_SANCION_SEGUNDOS,
+  FAMILIA_PUNTOS,
+  FAMILIA_TARJETA,
+  requierePlayerSelection,
+  TARJETAS_EXPULSION_DEFINITIVA,
+  TARJETAS_SACAN_DE_CANCHA,
+} from "@/lib/incidentes";
 import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import {
@@ -405,6 +412,10 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
 
     let jugadorNombre: string | undefined;
     let dorsal: string | undefined;
+    // Segunda amarilla del mismo jugador en el mismo partido = roja por reglamento -- se detecta
+    // sola, no hace falta que el designado elija "Doble amarilla" a mano (ni se ofrece esa opcion
+    // en el picker, ver CargaIncidencia.tsx).
+    let tipoReal: TipoIncidente = input.tipo;
     if (input.equipo === "newman" && requierePlayerSelection(input.tipo)) {
       if (!input.jugadorId) throw new Error("Falta el jugador");
       if (!esCorreccionPostPartido && !partido.enCanchaIds.includes(input.jugadorId)) {
@@ -415,6 +426,17 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       const jugador = jugadorSnap.data() as JugadorPartido;
       jugadorNombre = jugador.nombre;
       dorsal = jugador.dorsal;
+
+      if (input.tipo === "tarjeta_amarilla") {
+        const previasSnap = await tx.get(
+          partidoRef
+            .collection("incidentes")
+            .where("equipo", "==", "newman")
+            .where("jugadorId", "==", input.jugadorId)
+            .where("tipo", "==", "tarjeta_amarilla")
+        );
+        if (!previasSnap.empty) tipoReal = "tarjeta_doble_amarilla";
+      }
     }
 
     let periodo: Periodo;
@@ -436,10 +458,10 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       minuto = minutoActual(liveState);
       segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
     }
-    const puntos = (PUNTOS_POR_TIPO as Record<string, number>)[input.tipo];
+    const puntos = (PUNTOS_POR_TIPO as Record<string, number>)[tipoReal];
 
     const incidente: Incidente = {
-      tipo: input.tipo,
+      tipo: tipoReal,
       equipo: input.equipo,
       periodo,
       minuto,
@@ -458,18 +480,22 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       tx.update(partidoRef, { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() });
     }
 
-    // Amarilla/roja de 20 sacan al jugador de la cancha en el momento (10'/20' de sancion) -- se
-    // registra como un "cambio" sin entra (solo jugadorSaleId) para que calcularMinutos() le corte
-    // los minutos ahi mismo, y para que vuelva a aparecer en el banco de Cambios/reingresarSancion.
+    // Toda tarjeta que saca al jugador de la cancha (amarilla, roja de 20, roja, doble amarilla --
+    // ver TARJETAS_SACAN_DE_CANCHA) se registra ademas como un "cambio" sin entra (solo
+    // jugadorSaleId) para que calcularMinutos() le corte los minutos ahi mismo. Con roja/doble
+    // amarilla (expulsion definitiva) tambien se marca expulsadoDefinitivo en su plantel/ -- no
+    // vuelve a aparecer en ningun banco de reingreso/cambio, ni siquiera para que otro designado
+    // lo elija por error como "quien entra" de un cambio ajeno.
     if (
-      DURACION_SANCION_SEGUNDOS[input.tipo] !== undefined &&
+      TARJETAS_SACAN_DE_CANCHA.includes(tipoReal) &&
       input.equipo === "newman" &&
       input.jugadorId &&
       !esCorreccionPostPartido &&
       partido.enCanchaIds.includes(input.jugadorId)
     ) {
+      const esDefinitiva = TARJETAS_EXPULSION_DEFINITIVA.includes(tipoReal);
       const jugadorRef = partidoRef.collection("plantel").doc(input.jugadorId);
-      tx.update(jugadorRef, { enCancha: false });
+      tx.update(jugadorRef, { enCancha: false, ...(esDefinitiva ? { expulsadoDefinitivo: true } : {}) });
       tx.update(partidoRef, {
         enCanchaIds: partido.enCanchaIds.filter((id) => id !== input.jugadorId),
         updatedAt: FieldValue.serverTimestamp(),
@@ -484,7 +510,8 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
         minuto,
         segundoAbsoluto,
         // La tarjeta de arriba ya dice "sale X" -- este cambio es solo para calcularMinutos() y
-        // para que el jugador reaparezca en el banco, no para el feed (ver ocultoEnFeed).
+        // para que el jugador reaparezca en el banco (si no es expulsion definitiva), no para el
+        // feed (ver ocultoEnFeed).
         ocultoEnFeed: true,
         publicadoPorCuentaId: session!.cuentaId,
         createdAt: Timestamp.now(),
@@ -495,14 +522,14 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     // Las tarjetas de partidos de prueba no se contabilizan en las estadisticas reales, aunque
     // se hayan cargado con nombres de jugadores reales para simular una formacion realista.
     const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
-    if (CAMPO_TARJETA[input.tipo] && input.equipo === "newman" && input.jugadorId && !esPartidoDePrueba) {
-      const campoHistorial = CAMPO_HISTORIAL_TARJETA[input.tipo];
+    if (CAMPO_TARJETA[tipoReal] && input.equipo === "newman" && input.jugadorId && !esPartidoDePrueba) {
+      const campoHistorial = CAMPO_HISTORIAL_TARJETA[tipoReal];
       tx.set(
         adminDb.collection("jugadores").doc(input.jugadorId),
         {
           nombre: jugadorNombre,
           ...grupoDeCategoria(partido.categoriaId),
-          [CAMPO_TARJETA[input.tipo]!]: FieldValue.increment(1),
+          [CAMPO_TARJETA[tipoReal]!]: FieldValue.increment(1),
           ...(campoHistorial
             ? {
                 [campoHistorial]: FieldValue.arrayUnion({
@@ -985,6 +1012,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       }
       if (!sale.enCancha) throw new Error("Ese jugador no está en cancha");
       if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
+      if (entra.expulsadoDefinitivo) throw new Error("Ese jugador ya no puede jugar este partido");
       periodo = liveState.periodo;
       minuto = minutoActual(liveState);
       segundoAbsoluto = Math.floor(elapsedSeconds(liveState));
@@ -1103,12 +1131,16 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
 
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
     if (sancion.equipo !== "newman") throw new Error("Esta acción es solo para sanciones de Newman");
+    if (DURACION_SANCION_SEGUNDOS[sancion.tipo] === undefined) {
+      throw new Error("Esta tarjeta es expulsión definitiva -- no hay reingreso");
+    }
     if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
       throw new Error("El partido no está en juego");
     }
     if (sancion.tipo === "tarjeta_roja_20" && input.jugadorEntraId === sancion.jugadorId) {
       throw new Error("Con roja de 20 el jugador expulsado no puede volver -- elegí a otro");
     }
+    if (entra.expulsadoDefinitivo) throw new Error("Ese jugador ya no puede jugar este partido");
     if (entra.enCancha) throw new Error("Ese jugador ya está en cancha");
     if (partido.enCanchaIds.length >= 15) throw new Error("Ya hay 15 jugadores en cancha");
 

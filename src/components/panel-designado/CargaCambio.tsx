@@ -44,7 +44,9 @@ export default function CargaCambio({
 
   const esCorreccion = !soloEnCancha;
   const enCancha = soloEnCancha ? plantel.filter((j) => enCanchaIds.includes(j.jugadorId)) : plantel;
-  const banco = soloEnCancha ? plantel.filter((j) => !enCanchaIds.includes(j.jugadorId)) : plantel;
+  // Quien ya recibio roja (directa o por doble amarilla) no puede volver a entrar -- ver
+  // expulsadoDefinitivo en types/firestore.ts.
+  const banco = soloEnCancha ? plantel.filter((j) => !enCanchaIds.includes(j.jugadorId) && !j.expulsadoDefinitivo) : plantel;
   const sale = plantel.find((j) => j.jugadorId === saleId);
 
   // No repetir en el buscador a quien ya se ve arriba (banco de esta formacion).
