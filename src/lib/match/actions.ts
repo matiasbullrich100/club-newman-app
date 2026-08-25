@@ -1095,6 +1095,32 @@ export async function reingresarSancion(partidoId: string, input: ReingresarSanc
 }
 
 /**
+ * Cierra a mano una sancion del RIVAL (amarilla/roja de 20) -- del rival no llevamos plantel, asi
+ * que no hay "quien entra" que elegir (a diferencia de reingresarSancion): el designado solo
+ * marca que el equipo rival ya volvio a jugar con el sancionado adentro, sea el mismo jugador u
+ * otro. Disponible en cualquier momento, no solo cuando se cumple la cuenta regresiva -- el
+ * arbitro decide en la cancha, no el reloj de este panel (mismo criterio que reingresarSancion).
+ */
+export async function resolverSancionRival(partidoId: string, incidenteId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, incSnap] = await Promise.all([tx.get(partidoRef), tx.get(incidenteRef)]);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    if (!incSnap.exists) throw new Error("Incidencia no encontrada");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    const inc = incSnap.data() as Incidente;
+    if (inc.equipo !== "rival") throw new Error("Esta accion es solo para sanciones del rival");
+    tx.update(incidenteRef, { sancionResuelta: true });
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
  * Reemplaza a un jugador de la formacion oficial ANTES de que arranque el partido (ej. se
  * enfermo un titular la mañana del partido) -- el que entra hereda el dorsal y el puesto
  * (titular/suplente) del que sale, no arma una jugada nueva ni pasa por el reloj (el partido

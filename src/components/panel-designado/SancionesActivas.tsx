@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { collection, doc, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
-import { reingresarSancion } from "@/lib/match/actions";
+import { reingresarSancion, resolverSancionRival } from "@/lib/match/actions";
 import { elapsedSeconds, formatMMSS } from "@/lib/match/clock";
 import { DURACION_SANCION_SEGUNDOS, ETIQUETAS_INCIDENTE } from "@/lib/incidentes";
 import { norm } from "@/lib/players";
@@ -38,7 +38,12 @@ export default function SancionesActivas({
   const [buscando, setBuscando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [errorRivalId, setErrorRivalId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isPendingRival, startTransitionRival] = useTransition();
+  // Sanciones ya avisadas automaticamente (ver mas abajo) -- para no forzar el picker de nuevo si
+  // el designado lo cancela a mano despues de que se cumplio el tiempo.
+  const avisadasRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const q = query(collection(db, "partidos", partidoId, "incidentes"));
@@ -55,6 +60,8 @@ export default function SancionesActivas({
     return () => clearInterval(interval);
   }, []);
 
+  const ahora = liveState ? elapsedSeconds(liveState) : 0;
+
   // Sigue "activa" mientras el jugador no vuelva a estar en cancha -- no importa si fue el mismo
   // u otro quien cubrio el puesto, en ambos casos enCanchaIds vuelve a incluirlo/completarse y
   // deja de aparecer aca.
@@ -66,20 +73,30 @@ export default function SancionesActivas({
       !enCanchaIds.includes(inc.jugadorId)
   );
 
-  // Del rival no sabemos quien entra/sale (no llevamos su plantel) -- solo referencia de cuenta
-  // regresiva, sin boton de reingreso. Se cuenta con la duracion, no con enCanchaIds: una vez
-  // cumplida, deja de mostrarse sola (nadie tiene que confirmar nada del lado del rival).
-  const ahoraParaRival = liveState ? elapsedSeconds(liveState) : 0;
-  const sancionesRival = liveState
-    ? incidentes.filter((inc) => {
-        const duracion = DURACION_SANCION_SEGUNDOS[inc.tipo];
-        return duracion !== undefined && inc.equipo === "rival" && duracion - (ahoraParaRival - inc.segundoAbsoluto) > 0;
-      })
-    : [];
+  // Del rival no llevamos plantel (no hay "quien entra" que elegir) -- sigue "activa" hasta que el
+  // designado la marca resuelta a mano con el boton "Reingresó" (ver resolverSancionRival), sea
+  // antes o despues de que se cumpla la cuenta regresiva.
+  const sancionesRival = incidentes.filter(
+    (inc) => DURACION_SANCION_SEGUNDOS[inc.tipo] !== undefined && inc.equipo === "rival" && !inc.sancionResuelta
+  );
+
+  // Avisa solo -- no bloquea nada, el arbitro decide en la cancha. Se abre el picker de reingreso
+  // automaticamente apenas se cumple la cuenta regresiva de Newman, en vez de esperar a que el
+  // designado se acuerde de tocar "Reingresar".
+  useEffect(() => {
+    for (const s of sanciones) {
+      const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
+      const cumplida = duracion - (ahora - s.segundoAbsoluto) <= 0;
+      if (cumplida && !avisadasRef.current.has(s.id)) {
+        avisadasRef.current.add(s.id);
+        setEligiendoPara(s.id);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ahora, sanciones.map((s) => s.id).join(",")]);
 
   if ((sanciones.length === 0 && sancionesRival.length === 0) || !liveState) return null;
 
-  const ahora = elapsedSeconds(liveState);
   const sancionadosIds = new Set(sanciones.map((s) => s.jugadorId));
   const banco = plantel.filter((j) => !enCanchaIds.includes(j.jugadorId) && !sancionadosIds.has(j.jugadorId));
   const idsPlantel = new Set(plantel.map((j) => j.jugadorId));
@@ -103,6 +120,18 @@ export default function SancionesActivas({
         cerrarEleccion();
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo reingresar");
+      }
+    });
+  }
+
+  function resolverRival(incidenteId: string) {
+    setErrorRivalId(null);
+    startTransitionRival(async () => {
+      try {
+        await resolverSancionRival(partidoId, incidenteId);
+      } catch (e) {
+        setErrorRivalId(incidenteId);
+        setError(e instanceof Error ? e.message : "No se pudo marcar el reingreso");
       }
     });
   }
@@ -211,6 +240,7 @@ export default function SancionesActivas({
           {sancionesRival.map((s) => {
             const duracion = DURACION_SANCION_SEGUNDOS[s.tipo]!;
             const restante = Math.max(0, duracion - (ahora - s.segundoAbsoluto));
+            const cumplida = restante <= 0;
             return (
               <div
                 key={s.id}
@@ -220,10 +250,18 @@ export default function SancionesActivas({
                   <span>
                     {ETIQUETAS_INCIDENTE[s.tipo]} — {rivalNombre ?? "Rival"}
                   </span>
-                  <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700, color: DORADO_SUAVE }}>
-                    {formatMMSS(restante)}
+                  <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700, color: cumplida ? DORADO : DORADO_SUAVE }}>
+                    {cumplida ? "Cumplida" : formatMMSS(restante)}
                   </span>
                 </div>
+                <button
+                  style={{ ...botonSecundario, marginTop: 8 }}
+                  disabled={isPendingRival}
+                  onClick={() => resolverRival(s.id)}
+                >
+                  Reingresó
+                </button>
+                {errorRivalId === s.id && error && <p style={{ color: "crimson", margin: "6px 0 0" }}>{error}</p>}
               </div>
             );
           })}

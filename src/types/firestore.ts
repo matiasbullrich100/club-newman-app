@@ -169,6 +169,11 @@ export interface Incidente {
   // periodo/minuto igual quedan con el valor del cierre del 1T (para el orden cronológico), pero
   // el feed tiene que mostrar "Entretiempo" en vez de "1T X'", que sería engañoso.
   enEntretiempo?: boolean;
+  // Solo para tarjeta_amarilla/tarjeta_roja_20 del RIVAL -- del rival no llevamos plantel, asi que
+  // no hay "quien entra" que registrar (a diferencia de una sancion de Newman, que se resuelve
+  // sola cuando enCanchaIds vuelve a incluir a alguien en ese puesto). El designado marca a mano
+  // que el rival ya volvio a jugar con el sancionado adentro -- ver resolverSancionRival().
+  sancionResuelta?: boolean;
   publicadoPorCuentaId: string;
   createdAt: Timestamp | Date;
 }
