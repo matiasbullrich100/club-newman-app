@@ -143,7 +143,7 @@ export function describirIncidente(
     // La doble amarilla siempre es roja por reglamento (se detecta sola, ver publicarIncidente) --
     // el feed lo deja explicito en vez de solo decir "Doble amarilla".
     if (inc.tipo === "tarjeta_doble_amarilla") {
-      return `Roja Definitiva por Doble amarilla ${quien}`;
+      return `Roja Definitiva x 2 Amarilla ${quien}`;
     }
     return `${ETIQUETAS_INCIDENTE[inc.tipo]} ${quien}`;
   }

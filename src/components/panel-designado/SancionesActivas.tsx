@@ -35,6 +35,7 @@ export default function SancionesActivas({
   const [liveState, setLiveState] = useState<LiveState | null>(null);
   const [, tick] = useState(0);
   const [eligiendoPara, setEligiendoPara] = useState<string | null>(null);
+  const [confirmandoEntra, setConfirmandoEntra] = useState<{ jugadorId: string; nombre: string; esNuevo: boolean } | null>(null);
   const [buscando, setBuscando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -118,12 +119,22 @@ export default function SancionesActivas({
 
   function cerrarEleccion() {
     setEligiendoPara(null);
+    setConfirmandoEntra(null);
     setBuscando(false);
     setBusqueda("");
     setError(null);
   }
 
-  function elegirEntra(incidenteId: string, jugadorId: string, nombre: string, esNuevo: boolean) {
+  // No publica todavia -- solo pide confirmar (ver confirmarEntra), para no reingresar a alguien
+  // por un toque de mas en la lista.
+  function pedirConfirmacion(jugadorId: string, nombre: string, esNuevo: boolean) {
+    setError(null);
+    setConfirmandoEntra({ jugadorId, nombre, esNuevo });
+  }
+
+  function confirmarEntra(incidenteId: string) {
+    if (!confirmandoEntra) return;
+    const { jugadorId, nombre, esNuevo } = confirmandoEntra;
     setError(null);
     startTransition(async () => {
       try {
@@ -191,17 +202,30 @@ export default function SancionesActivas({
                 >
                   Reingresar
                 </button>
+              ) : confirmandoEntra ? (
+                <div style={{ ...listaOpciones, marginTop: 8 }}>
+                  <p style={{ margin: 0, fontSize: "0.92rem" }}>
+                    ¿Confirmar? Entra <strong>{confirmandoEntra.nombre}</strong>
+                  </p>
+                  {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
+                  <button style={botonPrimario} disabled={isPending} onClick={() => confirmarEntra(s.id)}>
+                    {isPending ? "Confirmando…" : "Confirmar"}
+                  </button>
+                  <button style={botonSecundario} disabled={isPending} onClick={() => setConfirmandoEntra(null)}>
+                    Cancelar
+                  </button>
+                </div>
               ) : (
                 <div style={{ ...listaOpciones, marginTop: 8 }}>
                   {/* Con roja de 20 el expulsado no puede volver -- solo con amarilla (sin-bin
                       temporal) tiene sentido ofrecer que vuelva el mismo jugador. */}
                   {s.tipo !== "tarjeta_roja_20" && (
-                    <button style={botonPrimario} disabled={isPending} onClick={() => elegirEntra(s.id, s.jugadorId!, s.jugadorNombre!, false)}>
+                    <button style={botonPrimario} disabled={isPending} onClick={() => pedirConfirmacion(s.jugadorId!, s.jugadorNombre!, false)}>
                       Vuelve {s.jugadorNombre}
                     </button>
                   )}
                   {banco.map((j) => (
-                    <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirEntra(s.id, j.jugadorId, j.nombre, false)}>
+                    <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => pedirConfirmacion(j.jugadorId, j.nombre, false)}>
                       {j.dorsal} — {j.nombre}
                     </button>
                   ))}
@@ -231,7 +255,7 @@ export default function SancionesActivas({
                         <p style={{ margin: 0, fontSize: "0.82rem", color: DORADO_SUAVE, opacity: 0.75 }}>Sin resultados.</p>
                       )}
                       {resultadosBusqueda.map((j) => (
-                        <button key={j.jugadorId} style={botonOpcion} onClick={() => elegirEntra(s.id, j.jugadorId, j.nombre, true)}>
+                        <button key={j.jugadorId} style={botonOpcion} onClick={() => pedirConfirmacion(j.jugadorId, j.nombre, true)}>
                           {j.nombre}
                         </button>
                       ))}
