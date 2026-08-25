@@ -163,7 +163,7 @@ export default function SancionesActivas({
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>
-                  {s.dorsal ? `${s.dorsal} — ` : ""}
+                  {ETIQUETAS_INCIDENTE[s.tipo]} — {s.dorsal ? `${s.dorsal} — ` : ""}
                   {s.jugadorNombre}
                 </span>
                 <span
