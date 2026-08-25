@@ -31,7 +31,7 @@ export default function Header({
           aria-hidden
           style={{
             position: "absolute",
-            top: tituloHome ? 6 : -4,
+            top: tituloHome ? 3 : -7,
             left: i === 0 ? "30%" : "70%",
             transform: "translateX(-50%)",
             fontSize: "3.4rem",
@@ -88,8 +88,8 @@ export default function Header({
               top: 66,
               left: i === 0 ? "22%" : "78%",
               transform: "translateX(-50%)",
-              fontSize: "0.38rem",
-              letterSpacing: 0.6,
+              fontSize: "0.34rem",
+              letterSpacing: 0.5,
               textTransform: "uppercase",
               color: DORADO_SUAVE,
               opacity: 0.9,
