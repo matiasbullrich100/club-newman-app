@@ -25,7 +25,7 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t" | "fi
   { tipo: "tarjeta_azul", label: "Tarjeta azul" },
 ];
 
-type Paso = "tipo" | "equipo" | "jugador" | "cuando" | "confirmar" | "convirtio";
+type Paso = "tipo" | "equipo" | "jugador" | "convirtio" | "jugadorConversion" | "cuando" | "confirmar";
 
 // Try y Try Scrum pueden convertirse -- Try Penal ya suma los 7 puntos (try+conversion
 // automatica), no se le vuelve a preguntar.
@@ -48,6 +48,8 @@ export default function CargaIncidencia({
   const [tipo, setTipo] = useState<(typeof TIPOS)[number]["tipo"] | null>(null);
   const [equipo, setEquipo] = useState<Equipo | null>(null);
   const [jugadorId, setJugadorId] = useState<string | null>(null);
+  const [convirtio, setConvirtio] = useState<boolean | null>(null);
+  const [jugadorConversionId, setJugadorConversionId] = useState<string | null>(null);
   const [periodoManual, setPeriodoManual] = useState<Periodo | null>(null);
   const [minutoManual, setMinutoManual] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -70,13 +72,25 @@ export default function CargaIncidencia({
     setTipo(null);
     setEquipo(null);
     setJugadorId(null);
+    setConvirtio(null);
+    setJugadorConversionId(null);
     setPeriodoManual(null);
     setMinutoManual("");
     setError(null);
   }
 
+  // Try/Try Scrum: antes de publicar nada, preguntar si convirtio y quien pateo -- asi el try y
+  // su conversion salen en un solo "Publicar", sin una pantalla de "¿Convirtió?" en el medio con
+  // tiempo de reaccion humano de por medio (eso fue lo que dejaba conversiones sin cargar: si el
+  // designado tardaba en responder y mientras tanto cortaba el tiempo o terminaba el partido,
+  // CargaIncidencia se desmontaba -- ver el render condicional en PanelDesignado -- y la pregunta
+  // se perdia, aunque el try ya hubiera quedado guardado).
   function siguientePasoTrasJugador() {
-    setPaso(esCorreccion ? "cuando" : "confirmar");
+    if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
+      setPaso("convirtio");
+    } else {
+      setPaso(esCorreccion ? "cuando" : "confirmar");
+    }
   }
 
   function elegirTipo(t: (typeof TIPOS)[number]["tipo"]) {
@@ -107,51 +121,49 @@ export default function CargaIncidencia({
     const necesitaJugador = e === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
     if (necesitaJugador) {
       setPaso("jugador");
+    } else if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
+      setPaso("convirtio");
     } else {
       setPaso(esCorreccion ? "cuando" : "confirmar");
     }
   }
 
+  function elegirConvirtio(convirtioAhora: boolean) {
+    setConvirtio(convirtioAhora);
+    if (convirtioAhora && equipo === "newman") {
+      setPaso("jugadorConversion");
+    } else {
+      setPaso(esCorreccion ? "cuando" : "confirmar");
+    }
+  }
+
+  function elegirJugadorConversion(id: string) {
+    setJugadorConversionId(id);
+    setPaso(esCorreccion ? "cuando" : "confirmar");
+  }
+
+  // Publica el try y, si convirtio, la conversion asociada en el mismo tap de "Publicar" -- sin
+  // pausa entre ambas donde el componente pueda desmontarse a mitad de camino.
   function confirmar() {
     if (!tipo || !equipo) return;
     setError(null);
-    const tipoPublicado = tipo;
-    const input: PublicarIncidenteInput = {
-      tipo,
-      equipo,
-      jugadorId: jugadorId ?? undefined,
-      ...(esCorreccion ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) } : {}),
-    };
+    const cuando = esCorreccion
+      ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) }
+      : {};
+    const inputTry: PublicarIncidenteInput = { tipo, equipo, jugadorId: jugadorId ?? undefined, ...cuando };
+    const necesitaConversion = TIPOS_CON_CONVERSION.includes(tipo) && convirtio === true;
+    const inputConversion: PublicarIncidenteInput | null = necesitaConversion
+      ? { tipo: "conversion", equipo, jugadorId: equipo === "newman" ? (jugadorConversionId ?? undefined) : undefined, ...cuando }
+      : null;
     startTransition(async () => {
       try {
-        await publicarIncidente(partidoId, input);
-        if (TIPOS_CON_CONVERSION.includes(tipoPublicado)) {
-          // Encadenar la pregunta de conversion en vez de forzar a buscarla despues como jugada
-          // aparte -- se mantiene el equipo (y periodoManual/minutoManual si es correccion), se
-          // limpia tipo/jugador para la proxima eleccion.
-          setTipo(null);
-          setJugadorId(null);
-          setPaso("convirtio");
-        } else {
-          reset();
-        }
+        await publicarIncidente(partidoId, inputTry);
+        if (inputConversion) await publicarIncidente(partidoId, inputConversion);
+        reset();
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo publicar");
       }
     });
-  }
-
-  function elegirConvirtio(convirtio: boolean) {
-    if (!convirtio) {
-      reset();
-      return;
-    }
-    setTipo("conversion");
-    if (equipo === "newman") {
-      setPaso("jugador");
-    } else {
-      setPaso(esCorreccion ? "cuando" : "confirmar");
-    }
   }
 
   return (
@@ -292,11 +304,35 @@ export default function CargaIncidencia({
         </div>
       )}
 
+      {paso === "jugadorConversion" && (
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién pateó la conversión?</p>
+          {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
+          {enCancha.map((j) => (
+            <button key={j.jugadorId} style={botonOpcion} onClick={() => elegirJugadorConversion(j.jugadorId)}>
+              {j.dorsal} — {j.nombre}
+            </button>
+          ))}
+          <button style={botonSecundario} onClick={reset}>
+            Cancelar
+          </button>
+        </div>
+      )}
+
       {paso === "confirmar" && tipo && equipo && (
         <div>
           <p style={{ fontSize: "1.02rem" }}>
             Confirmar: <strong>{TIPOS.find((t) => t.tipo === tipo)?.label}</strong> —{" "}
             {equipo === "newman" ? (requiereJugador ? jugador?.nombre ?? "" : "Newman") : "Rival"}
+            {convirtio === true && (
+              <>
+                {" "}
+                + Conversión
+                {equipo === "newman" && jugadorConversionId
+                  ? ` — ${plantel.find((j) => j.jugadorId === jugadorConversionId)?.nombre ?? ""}`
+                  : ""}
+              </>
+            )}
             {esCorreccion && periodoManual && minutoManual && (
               <>
                 {" "}
