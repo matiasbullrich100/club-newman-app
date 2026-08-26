@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { adelantarReloj, publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
 import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
-import { requierePlayerSelection } from "@/lib/incidentes";
+import { FAMILIA_PUNTOS, requierePlayerSelection } from "@/lib/incidentes";
 import type { RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
 import BarraAccionFija from "./BarraAccionFija";
@@ -95,17 +95,73 @@ export default function CargaIncidencia({
     setError(null);
   }
 
-  // Try/Try Scrum: antes de publicar nada, preguntar si convirtio y quien pateo -- asi el try y
-  // su conversion salen en un solo "Publicar", sin una pantalla de "¿Convirtió?" en el medio con
-  // tiempo de reaccion humano de por medio (eso fue lo que dejaba conversiones sin cargar: si el
-  // designado tardaba en responder y mientras tanto cortaba el tiempo o terminaba el partido,
-  // CargaIncidencia se desmontaba -- ver el render condicional en PanelDesignado -- y la pregunta
-  // se perdia, aunque el try ya hubiera quedado guardado).
-  function siguientePasoTrasJugador() {
+  type Overrides = {
+    equipo?: Equipo;
+    jugadorId?: string | null;
+    convirtio?: boolean | null;
+    jugadorConversionId?: string | null;
+  };
+
+  // Publica directo, sin pasar por la pantalla "Confirmar / Publicar" -- solo para jugadas de
+  // puntos en vivo (try, conversion, penal, drop, try penal). Las tarjetas siguen pidiendo
+  // confirmacion a mano (terminarJugada mas abajo), son mas delicadas. Recibe el ultimo valor
+  // elegido por parametro en vez de leerlo del estado -- el setX() de un ratito antes todavia no
+  // se aplico cuando esta funcion corre en el mismo evento.
+  function publicarDirecto(overrides: Overrides = {}) {
+    const equipoUsar = overrides.equipo ?? equipo;
+    if (!tipo || !equipoUsar) return;
+    setError(null);
+    const jugadorIdUsar = overrides.jugadorId !== undefined ? overrides.jugadorId : jugadorId;
+    const convirtioUsar = overrides.convirtio !== undefined ? overrides.convirtio : convirtio;
+    const jugadorConversionIdUsar =
+      overrides.jugadorConversionId !== undefined ? overrides.jugadorConversionId : jugadorConversionId;
+    const cuando = esCorreccion
+      ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) }
+      : {};
+    const inputTry: PublicarIncidenteInput = { tipo, equipo: equipoUsar, jugadorId: jugadorIdUsar ?? undefined, ...cuando };
+    const necesitaConversion = TIPOS_CON_CONVERSION.includes(tipo) && convirtioUsar === true;
+    const inputConversion: PublicarIncidenteInput | null = necesitaConversion
+      ? {
+          tipo: "conversion",
+          equipo: equipoUsar,
+          jugadorId: equipoUsar === "newman" ? (jugadorConversionIdUsar ?? undefined) : undefined,
+          ...cuando,
+        }
+      : null;
+    startTransition(async () => {
+      try {
+        await publicarIncidente(partidoId, inputTry);
+        if (inputConversion) await publicarIncidente(partidoId, inputConversion);
+        reset();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo publicar");
+      }
+    });
+  }
+
+  // Punto de llegada de cualquier camino que ya tiene todo lo necesario para esa jugada. En
+  // correccion post-partido siempre pasa por "cuando" (pedir periodo/minuto) y termina con un
+  // "Publicar" a mano. En vivo: las jugadas de puntos se publican solas (pedido del club -- no
+  // hace falta un tap mas despues de contestar la ultima pregunta); las tarjetas siguen yendo a
+  // la pantalla de confirmar, son mas delicadas como para publicarlas sin volver a mirarlas.
+  function terminarJugada(overrides: Overrides = {}) {
+    if (esCorreccion) {
+      setPaso("cuando");
+      return;
+    }
+    if (tipo && FAMILIA_PUNTOS.includes(tipo)) {
+      publicarDirecto(overrides);
+    } else {
+      setPaso("confirmar");
+    }
+  }
+
+  function elegirJugador(id: string) {
+    setJugadorId(id);
     if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
       setPaso("convirtio");
     } else {
-      setPaso(esCorreccion ? "cuando" : "confirmar");
+      terminarJugada({ jugadorId: id });
     }
   }
 
@@ -146,14 +202,13 @@ export default function CargaIncidencia({
     } else if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
       setPaso("convirtio");
     } else {
-      setPaso(esCorreccion ? "cuando" : "confirmar");
+      terminarJugada({ equipo: e });
     }
   }
 
   function siEsElPateador() {
     if (!pateadorEnCancha) return;
-    setJugadorId(pateadorEnCancha.jugadorId);
-    siguientePasoTrasJugador();
+    elegirJugador(pateadorEnCancha.jugadorId);
   }
 
   function elegirConvirtio(convirtioAhora: boolean) {
@@ -161,7 +216,7 @@ export default function CargaIncidencia({
     if (convirtioAhora && equipo === "newman") {
       setPaso("jugadorConversion");
     } else {
-      setPaso(esCorreccion ? "cuando" : "confirmar");
+      terminarJugada({ convirtio: convirtioAhora });
     }
   }
 
@@ -170,13 +225,13 @@ export default function CargaIncidencia({
   function elegirConvirtioConPateador(resultado: "si" | "no" | "otro") {
     if (resultado === "no") {
       setConvirtio(false);
-      setPaso(esCorreccion ? "cuando" : "confirmar");
+      terminarJugada({ convirtio: false });
       return;
     }
     setConvirtio(true);
     if (resultado === "si" && pateadorEnCancha) {
       setJugadorConversionId(pateadorEnCancha.jugadorId);
-      setPaso(esCorreccion ? "cuando" : "confirmar");
+      terminarJugada({ convirtio: true, jugadorConversionId: pateadorEnCancha.jugadorId });
     } else {
       setPaso("jugadorConversion");
     }
@@ -184,31 +239,13 @@ export default function CargaIncidencia({
 
   function elegirJugadorConversion(id: string) {
     setJugadorConversionId(id);
-    setPaso(esCorreccion ? "cuando" : "confirmar");
+    terminarJugada({ convirtio: true, jugadorConversionId: id });
   }
 
-  // Publica el try y, si convirtio, la conversion asociada en el mismo tap de "Publicar" -- sin
-  // pausa entre ambas donde el componente pueda desmontarse a mitad de camino.
+  // Usado por el boton "Publicar" a mano -- tarjetas en vivo, y cualquier jugada en correccion
+  // post-partido (ahi el estado ya esta asentado, sin riesgo de leerlo stale).
   function confirmar() {
-    if (!tipo || !equipo) return;
-    setError(null);
-    const cuando = esCorreccion
-      ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) }
-      : {};
-    const inputTry: PublicarIncidenteInput = { tipo, equipo, jugadorId: jugadorId ?? undefined, ...cuando };
-    const necesitaConversion = TIPOS_CON_CONVERSION.includes(tipo) && convirtio === true;
-    const inputConversion: PublicarIncidenteInput | null = necesitaConversion
-      ? { tipo: "conversion", equipo, jugadorId: equipo === "newman" ? (jugadorConversionId ?? undefined) : undefined, ...cuando }
-      : null;
-    startTransition(async () => {
-      try {
-        await publicarIncidente(partidoId, inputTry);
-        if (inputConversion) await publicarIncidente(partidoId, inputConversion);
-        reset();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "No se pudo publicar");
-      }
-    });
+    publicarDirecto();
   }
 
   return (
@@ -216,6 +253,11 @@ export default function CargaIncidencia({
       <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
         Cargar jugada
       </h3>
+
+      {/* Jugadas de puntos en vivo se publican solas (ver terminarJugada) -- sin pantalla de
+          Confirmar donde mostrar el error, asi que va arriba de todo, visible sea cual sea el
+          paso en el que se corte. */}
+      {error && paso !== "confirmar" && <p style={{ color: "crimson" }}>{error}</p>}
 
       {paso === "tipo" && (
         <div style={grillaOpciones}>
@@ -257,13 +299,13 @@ export default function CargaIncidencia({
 
       {paso === "equipo" && (
         <div style={listaOpciones}>
-          <button style={botonPrimario} onClick={() => elegirEquipo("newman")}>
+          <button style={botonPrimario} disabled={isPending} onClick={() => elegirEquipo("newman")}>
             Newman
           </button>
-          <button style={botonPrimario} onClick={() => elegirEquipo("rival")}>
+          <button style={botonPrimario} disabled={isPending} onClick={() => elegirEquipo("rival")}>
             Rival
           </button>
-          <button style={botonSecundario} onClick={reset}>
+          <button style={botonSecundario} disabled={isPending} onClick={reset}>
             Cancelar
           </button>
         </div>
@@ -273,10 +315,10 @@ export default function CargaIncidencia({
         <div style={listaOpciones}>
           <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Fue {pateadorEnCancha.nombre} quien la pateó?</p>
           <BarraAccionFija>
-            <button style={botonPrimario} onClick={siEsElPateador}>
-              Sí, fue {pateadorEnCancha.nombre}
+            <button style={botonPrimario} disabled={isPending} onClick={siEsElPateador}>
+              {isPending ? "Publicando…" : `Sí, fue ${pateadorEnCancha.nombre}`}
             </button>
-            <button style={botonSecundario} onClick={() => setPaso("jugador")}>
+            <button style={botonSecundario} disabled={isPending} onClick={() => setPaso("jugador")}>
               No, otro jugador
             </button>
           </BarraAccionFija>
@@ -287,11 +329,11 @@ export default function CargaIncidencia({
         <div style={listaOpciones}>
           {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
           {enCancha.map((j) => (
-            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setJugadorId(j.jugadorId); siguientePasoTrasJugador(); }}>
+            <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirJugador(j.jugadorId)}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
-          <button style={botonSecundario} onClick={reset}>
+          <button style={botonSecundario} disabled={isPending} onClick={reset}>
             Cancelar
           </button>
         </div>
@@ -355,13 +397,13 @@ export default function CargaIncidencia({
             <>
               <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió {pateadorEnCancha.nombre}?</p>
               <BarraAccionFija>
-                <button style={botonPrimario} onClick={() => elegirConvirtioConPateador("si")}>
-                  Sí
+                <button style={botonPrimario} disabled={isPending} onClick={() => elegirConvirtioConPateador("si")}>
+                  {isPending ? "Publicando…" : "Sí"}
                 </button>
-                <button style={botonSecundario} onClick={() => elegirConvirtioConPateador("no")}>
+                <button style={botonSecundario} disabled={isPending} onClick={() => elegirConvirtioConPateador("no")}>
                   No convirtió
                 </button>
-                <button style={botonSecundario} onClick={() => elegirConvirtioConPateador("otro")}>
+                <button style={botonSecundario} disabled={isPending} onClick={() => elegirConvirtioConPateador("otro")}>
                   Convirtió, otro jugador
                 </button>
               </BarraAccionFija>
@@ -370,11 +412,11 @@ export default function CargaIncidencia({
             <>
               <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió?</p>
               <BarraAccionFija>
-                <button style={botonPrimario} onClick={() => elegirConvirtio(true)}>
+                <button style={botonPrimario} disabled={isPending} onClick={() => elegirConvirtio(true)}>
                   Sí, convirtió
                 </button>
-                <button style={botonSecundario} onClick={() => elegirConvirtio(false)}>
-                  No convirtió
+                <button style={botonSecundario} disabled={isPending} onClick={() => elegirConvirtio(false)}>
+                  {isPending ? "Publicando…" : "No convirtió"}
                 </button>
               </BarraAccionFija>
             </>
@@ -387,11 +429,11 @@ export default function CargaIncidencia({
           <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién pateó la conversión?</p>
           {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
           {enCancha.map((j) => (
-            <button key={j.jugadorId} style={botonOpcion} onClick={() => elegirJugadorConversion(j.jugadorId)}>
+            <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirJugadorConversion(j.jugadorId)}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
-          <button style={botonSecundario} onClick={reset}>
+          <button style={botonSecundario} disabled={isPending} onClick={reset}>
             Cancelar
           </button>
         </div>
