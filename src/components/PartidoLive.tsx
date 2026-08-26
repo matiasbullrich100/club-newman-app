@@ -29,6 +29,7 @@ export default function PartidoLive({
   plantel,
   plantelCompleto,
   apellidosAmbiguos,
+  sugeridoPateadorId,
 }: {
   partidoId: string;
   inicial: Partido;
@@ -36,6 +37,7 @@ export default function PartidoLive({
   plantel: RosterJugador[];
   plantelCompleto: JugadorBusqueda[];
   apellidosAmbiguos?: string[];
+  sugeridoPateadorId?: string | null;
 }) {
   const [partido, setPartido] = useState<Partido>(inicial);
   const [periodo, setPeriodo] = useState<LiveState["periodo"]>(null);
@@ -134,6 +136,7 @@ export default function PartidoLive({
           plantelCompleto={plantelCompleto}
           periodo={periodo}
           apellidosAmbiguos={apellidosAmbiguos}
+          sugeridoPateadorId={sugeridoPateadorId}
         />
       ) : (
         <IncidentesFeed

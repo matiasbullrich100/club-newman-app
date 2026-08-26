@@ -116,6 +116,28 @@ export async function adelantarReloj(partidoId: string, segundos: 30 | 60): Prom
   revalidatePath(`/partido/${partidoId}`);
 }
 
+/**
+ * Fija (o borra, con jugadorId null) el pateador habitual de este partido -- se pregunta una vez
+ * apenas arranca (ver PateadorHabitual.tsx) y CargaIncidencia lo usa para no tener que buscar
+ * quien convierte/patea un penal cada vez. No valida que jugadorId este en el plantel: quien
+ * elige ya lo hace de esa lista, y si sale de cancha mas tarde el atajo se desactiva solo (ver
+ * pateadorEnCancha en CargaIncidencia.tsx) sin que haga falta tocar este valor.
+ */
+export async function setPateadorHabitual(partidoId: string, jugadorId: string | null): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const partidoSnap = await tx.get(partidoRef);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    tx.update(partidoRef, { pateadorHabitualId: jugadorId, updatedAt: FieldValue.serverTimestamp() });
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
 export async function cortar1T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
@@ -1368,6 +1390,8 @@ export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> 
     estado: "programado",
     resultado: { newman: 0, rival: 0 },
     enCanchaIds: titularesIds,
+    // Vuelve a preguntar el pateador habitual al arrancar de nuevo -- ver PateadorHabitual.tsx.
+    pateadorHabitualId: FieldValue.delete(),
     updatedAt: FieldValue.serverTimestamp(),
   });
 
@@ -1428,6 +1452,8 @@ export async function reiniciarPartido(partidoId: string): Promise<void> {
     estado: "programado",
     resultado: { newman: 0, rival: 0 },
     enCanchaIds: titularesIds,
+    // Vuelve a preguntar el pateador habitual al arrancar de nuevo -- ver PateadorHabitual.tsx.
+    pateadorHabitualId: FieldValue.delete(),
     updatedAt: FieldValue.serverTimestamp(),
   });
 

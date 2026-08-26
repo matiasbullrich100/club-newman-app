@@ -25,10 +25,12 @@ async function main() {
   const batch = adminDb.batch();
 
   const titularesIds = plantelSnap.docs.filter((d) => d.data().titular).map((d) => d.id);
+  const { FieldValue } = await import("firebase-admin/firestore");
   batch.update(partidoRef, {
     estado: "programado",
     resultado: { newman: 0, rival: 0 },
     enCanchaIds: titularesIds,
+    pateadorHabitualId: FieldValue.delete(),
     updatedAt: new Date(),
   });
 

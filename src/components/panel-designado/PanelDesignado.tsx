@@ -16,6 +16,7 @@ import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
 import SancionesActivas from "./SancionesActivas";
+import PateadorHabitual from "./PateadorHabitual";
 import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
 import { nombreNewmanDe } from "@/lib/categorias";
@@ -55,6 +56,7 @@ export default function PanelDesignado({
   plantelCompleto = [],
   periodo,
   apellidosAmbiguos,
+  sugeridoPateadorId,
 }: {
   partidoId: string;
   partido: Partido;
@@ -62,6 +64,7 @@ export default function PanelDesignado({
   plantelCompleto?: JugadorBusqueda[];
   periodo: LiveState["periodo"];
   apellidosAmbiguos?: string[];
+  sugeridoPateadorId?: string | null;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
@@ -215,10 +218,21 @@ export default function PanelDesignado({
 
       {(partido.estado === "en_juego" || partido.estado === "entretiempo") && (
         <div style={{ display: "grid", gap: "1rem" }}>
+          {/* Se pregunta una sola vez apenas arranca el partido -- pateadorHabitualId sigue
+              undefined hasta que el designado contesta (incluso "sin pateador fijo" ya cuenta
+              como contestado, ver PateadorHabitual.tsx). */}
+          {partido.pateadorHabitualId === undefined && (
+            <PateadorHabitual partidoId={partidoId} plantel={plantel} sugeridoId={sugeridoPateadorId} />
+          )}
           {/* Try/tarjeta solo tienen sentido con la pelota en juego -- en el entretiempo el
               reloj esta frenado, no hay jugadas nuevas, pero si se hacen cambios tacticos. */}
           {partido.estado === "en_juego" && (
-            <CargaIncidencia partidoId={partidoId} plantel={plantel} enCanchaIds={partido.enCanchaIds} />
+            <CargaIncidencia
+              partidoId={partidoId}
+              plantel={plantel}
+              enCanchaIds={partido.enCanchaIds}
+              pateadorHabitualId={partido.pateadorHabitualId}
+            />
           )}
           <SancionesActivas
             partidoId={partidoId}

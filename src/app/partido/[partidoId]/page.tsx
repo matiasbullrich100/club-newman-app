@@ -19,6 +19,7 @@ import type { RosterJugador } from "@/components/panel-designado/types";
 import { apellidosAmbiguos, ordenarPorDorsal } from "@/lib/players";
 import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
 import { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
+import { sugerirPateador } from "@/lib/match/pateador";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function PartidoPage({
@@ -149,6 +150,7 @@ export default async function PartidoPage({
     estado: partido.estado,
     resultado: partido.resultado,
     enCanchaIds: partido.enCanchaIds,
+    pateadorHabitualId: partido.pateadorHabitualId,
   };
   const plantel: RosterJugador[] = ordenarPorDorsal(
     plantelSnap.docs.map((d) => {
@@ -162,6 +164,13 @@ export default async function PartidoPage({
       };
     })
   );
+  // Solo hace falta calcularla mientras nadie contesto todavia -- una vez que el designado elige
+  // (incluido "sin pateador fijo", que guarda null) pateadorHabitualId deja de ser undefined y no
+  // se vuelve a preguntar ni a leer el historial de partidos de esta categoria.
+  const sugeridoPateadorId =
+    partido.pateadorHabitualId === undefined
+      ? await sugerirPateador(partido.categoriaId, plantel.map((j) => j.jugadorId))
+      : null;
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -173,6 +182,7 @@ export default async function PartidoPage({
         plantel={plantel}
         plantelCompleto={plantelCompleto}
         apellidosAmbiguos={apellidosAmbiguosClub}
+        sugeridoPateadorId={sugeridoPateadorId}
       />
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
       <FooterChip />

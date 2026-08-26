@@ -25,21 +25,30 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t" | "fi
   { tipo: "tarjeta_azul", label: "Tarjeta azul" },
 ];
 
-type Paso = "tipo" | "equipo" | "jugador" | "convirtio" | "jugadorConversion" | "cuando" | "confirmar";
+type Paso = "tipo" | "equipo" | "jugador" | "confirmarPateador" | "convirtio" | "jugadorConversion" | "cuando" | "confirmar";
 
 // Try y Try Scrum pueden convertirse -- Try Penal ya suma los 7 puntos (try+conversion
 // automatica), no se le vuelve a preguntar.
 const TIPOS_CON_CONVERSION: (typeof TIPOS)[number]["tipo"][] = ["try", "try_scrum"];
 
+// Patadas donde, si hay un pateador habitual preseteado (ver PateadorHabitual.tsx) y sigue en
+// cancha, se pregunta "¿Fue [fulano]?" en vez de buscarlo en la lista completa. Drop queda afuera
+// a pedido del club -- mucho menos repetible, no siempre lo patea el mismo.
+const TIPOS_CON_PATEADOR_PRESETEADO: (typeof TIPOS)[number]["tipo"][] = ["conversion", "penal"];
+
 export default function CargaIncidencia({
   partidoId,
   plantel,
   enCanchaIds,
+  pateadorHabitualId,
   soloEnCancha = true,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
   enCanchaIds: string[];
+  /** jugadorId del pateador habitual de este partido (Partido.pateadorHabitualId), si esta en
+   * cancha -- ver pateadorEnCancha mas abajo. */
+  pateadorHabitualId?: string | null;
   /** false en correcciones post-partido: cualquiera del plantel pudo haber anotado, no solo
    * quien estaba en cancha al momento de cortar (ya no hay forma de saberlo con certeza). */
   soloEnCancha?: boolean;
@@ -66,6 +75,13 @@ export default function CargaIncidencia({
   // Try Penal / Try Scrum se le dan al equipo entero, no a un jugador puntual.
   const requiereJugador = equipo === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
   const jugador = plantel.find((j) => j.jugadorId === jugadorId);
+  // Si el pateador preseteado salio de cancha (cambio, sancion), se cae el atajo entero y se
+  // vuelve al circuito de siempre (buscarlo en la lista) -- no aplica en correcciones post-partido,
+  // ahi enCanchaIds ya no refleja quien jugaba en el momento.
+  const pateadorEnCancha =
+    soloEnCancha && pateadorHabitualId
+      ? plantel.find((j) => j.jugadorId === pateadorHabitualId && enCanchaIds.includes(j.jugadorId))
+      : undefined;
 
   function reset() {
     setPaso("tipo");
@@ -120,12 +136,24 @@ export default function CargaIncidencia({
     setEquipo(e);
     const necesitaJugador = e === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
     if (necesitaJugador) {
-      setPaso("jugador");
+      // Conversion/penal sueltos (no encadenados desde un try): si el pateador habitual sigue en
+      // cancha, confirmar en un tap en vez de listar todo el plantel.
+      if (tipo && TIPOS_CON_PATEADOR_PRESETEADO.includes(tipo) && pateadorEnCancha) {
+        setPaso("confirmarPateador");
+      } else {
+        setPaso("jugador");
+      }
     } else if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
       setPaso("convirtio");
     } else {
       setPaso(esCorreccion ? "cuando" : "confirmar");
     }
+  }
+
+  function siEsElPateador() {
+    if (!pateadorEnCancha) return;
+    setJugadorId(pateadorEnCancha.jugadorId);
+    siguientePasoTrasJugador();
   }
 
   function elegirConvirtio(convirtioAhora: boolean) {
@@ -134,6 +162,23 @@ export default function CargaIncidencia({
       setPaso("jugadorConversion");
     } else {
       setPaso(esCorreccion ? "cuando" : "confirmar");
+    }
+  }
+
+  // Variante de arriba cuando hay pateador habitual en cancha: "¿Convirtió?" y "¿fue [fulano]?" en
+  // un solo tap para el caso comun, sin perder la salida a elegir otro jugador.
+  function elegirConvirtioConPateador(resultado: "si" | "no" | "otro") {
+    if (resultado === "no") {
+      setConvirtio(false);
+      setPaso(esCorreccion ? "cuando" : "confirmar");
+      return;
+    }
+    setConvirtio(true);
+    if (resultado === "si" && pateadorEnCancha) {
+      setJugadorConversionId(pateadorEnCancha.jugadorId);
+      setPaso(esCorreccion ? "cuando" : "confirmar");
+    } else {
+      setPaso("jugadorConversion");
     }
   }
 
@@ -224,6 +269,20 @@ export default function CargaIncidencia({
         </div>
       )}
 
+      {paso === "confirmarPateador" && pateadorEnCancha && (
+        <div style={listaOpciones}>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Fue {pateadorEnCancha.nombre} quien la pateó?</p>
+          <BarraAccionFija>
+            <button style={botonPrimario} onClick={siEsElPateador}>
+              Sí, fue {pateadorEnCancha.nombre}
+            </button>
+            <button style={botonSecundario} onClick={() => setPaso("jugador")}>
+              No, otro jugador
+            </button>
+          </BarraAccionFija>
+        </div>
+      )}
+
       {paso === "jugador" && requiereJugador && (
         <div style={listaOpciones}>
           {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
@@ -292,15 +351,34 @@ export default function CargaIncidencia({
 
       {paso === "convirtio" && (
         <div style={listaOpciones}>
-          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió?</p>
-          <BarraAccionFija>
-            <button style={botonPrimario} onClick={() => elegirConvirtio(true)}>
-              Sí, convirtió
-            </button>
-            <button style={botonSecundario} onClick={() => elegirConvirtio(false)}>
-              No convirtió
-            </button>
-          </BarraAccionFija>
+          {equipo === "newman" && pateadorEnCancha ? (
+            <>
+              <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió {pateadorEnCancha.nombre}?</p>
+              <BarraAccionFija>
+                <button style={botonPrimario} onClick={() => elegirConvirtioConPateador("si")}>
+                  Sí
+                </button>
+                <button style={botonSecundario} onClick={() => elegirConvirtioConPateador("no")}>
+                  No convirtió
+                </button>
+                <button style={botonSecundario} onClick={() => elegirConvirtioConPateador("otro")}>
+                  Convirtió, otro jugador
+                </button>
+              </BarraAccionFija>
+            </>
+          ) : (
+            <>
+              <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Convirtió?</p>
+              <BarraAccionFija>
+                <button style={botonPrimario} onClick={() => elegirConvirtio(true)}>
+                  Sí, convirtió
+                </button>
+                <button style={botonSecundario} onClick={() => elegirConvirtio(false)}>
+                  No convirtió
+                </button>
+              </BarraAccionFija>
+            </>
+          )}
         </div>
       )}
 

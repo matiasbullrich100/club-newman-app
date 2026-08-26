@@ -66,6 +66,12 @@ export interface Partido {
   // el resto ve "aun no publicada" hasta que se aprieta "Publicar formacion" (ver
   // publicarFormacion en match/actions.ts).
   formacionPublicada?: boolean;
+  // jugadorId del pateador habitual de ESTE partido (conversiones/penales -- drop queda afuera,
+  // menos repetible). Se pregunta una sola vez, apenas arranca el partido (ver PateadorHabitual.tsx
+  // y sugerirPateador() en match/pateador.ts para la sugerencia automatica). undefined = todavia no
+  // se preguntó; null = el designado eligió explícitamente "sin pateador fijo" para no volver a
+  // preguntar. Habilita el atajo "¿Fue [fulano]?" en CargaIncidencia en vez de buscarlo en la lista.
+  pateadorHabitualId?: string | null;
   createdAt?: Timestamp | Date;
   updatedAt?: Timestamp | Date;
 }
