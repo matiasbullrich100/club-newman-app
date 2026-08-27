@@ -36,7 +36,6 @@ export default async function FechaJuvenilesPage({
   const ganados = jugados.filter((p) => p.resultado.newman > p.resultado.rival).length;
   const empatados = jugados.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidos = jugados.filter((p) => p.resultado.newman < p.resultado.rival).length;
-  const fullHouse = jugados.length > 0 && ganados === jugados.length;
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -73,9 +72,9 @@ export default async function FechaJuvenilesPage({
           }}
         >
           <span>
-            Partidos Ganados: {ganados} · Partidos Empatados: {empatados} · Partidos Perdidos: {perdidos}
+            P. Ganados: {ganados}
+            {empatados > 0 && ` · P. Empatados: ${empatados}`} · P. Perdidos: {perdidos}
           </span>
-          {fullHouse && <span style={{ color: DORADO, fontWeight: 700, letterSpacing: 1 }}>FULL HOUSE</span>}
         </div>
       )}
 
