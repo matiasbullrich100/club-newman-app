@@ -1,4 +1,4 @@
-// Cuenta "administrador" (clave "admin") -- rol manager SIN alcance, mismo fallback sin
+// Cuenta "admin" (clave "admin") -- rol manager SIN alcance, mismo fallback sin
 // restriccion que ya soporta puedeOperarCategoria/puedeVerEstadisticas para "alcance ausente"
 // (ver src/lib/auth/scope.ts). Pensada para cargar formaciones de cualquier division como
 // borrador (formacionPublicada: false) y publicarlas cuando el club lo comunique -- ver
@@ -16,11 +16,13 @@ async function main() {
   const passwordHash = await hashPassword("admin");
   const cuenta: Omit<Cuenta, "createdAt"> = {
     rol: "manager",
-    username: "administrador",
+    username: "admin",
     passwordHash,
   };
-  await adminDb.collection("cuentas").doc("administrador").set({ ...cuenta, createdAt: new Date() }, { merge: true });
-  console.log('Listo: cuenta "administrador" (clave "admin"), sin alcance -- acceso a las 5 divisiones.');
+  await adminDb.collection("cuentas").doc("admin").set({ ...cuenta, createdAt: new Date() }, { merge: true });
+  // Borra la cuenta vieja "administrador" si existe (migracion de username -- ver docs/auth-and-roles.md).
+  await adminDb.collection("cuentas").doc("administrador").delete().catch(() => {});
+  console.log('Listo: cuenta "admin" (clave "admin"), sin alcance -- acceso a las 5 divisiones.');
 }
 
 main()

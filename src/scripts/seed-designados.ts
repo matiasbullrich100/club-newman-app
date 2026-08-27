@@ -1,10 +1,12 @@
 // Cuentas reales de Designado, una por categoria. Correr con: npm run seed-designados
-// Usuario = nombre de la categoria en minuscula (espacio en vez de guion), misma clave para
-// las 11. Idempotente: pisa el doc si ya existe (permite recorrer de nuevo si cambia la clave).
+// Usuario = id de la categoria sin guion ni espacio (ej. "pre-a" -> "prea", "m-22" -> "m22"),
+// mismo patron que los designados de Juveniles. "intermedia" es caso especial: usuario "inter".
+// Misma clave para las 11. Idempotente: pisa el doc si ya existe y borra el doc con el nombre
+// viejo (con espacio) si quedo de una corrida anterior.
 
 import { config } from "dotenv";
 import { resolve } from "path";
-import { CATEGORIAS } from "../lib/categorias";
+import { CATEGORIAS_SUPERIOR } from "../lib/categorias";
 import type { Cuenta } from "../types/firestore";
 
 const CLAVE_DESIGNADOS = "dalebordo";
@@ -18,8 +20,9 @@ async function main() {
 
   console.log("Sembrando cuentas Designado (una por categoria)...");
   const batch = adminDb.batch();
-  for (const cat of CATEGORIAS) {
-    const username = cat.id.replace("-", " ");
+  for (const cat of CATEGORIAS_SUPERIOR) {
+    const username = cat.id === "intermedia" ? "inter" : cat.id.replace("-", "");
+    const usuarioViejo = cat.id.replace("-", " "); // nombre con espacio de la version anterior
     const cuenta: Omit<Cuenta, "createdAt"> = {
       rol: "designado",
       username,
@@ -27,6 +30,9 @@ async function main() {
       categoriaId: cat.id,
     };
     batch.set(adminDb.collection("cuentas").doc(username), { ...cuenta, createdAt: new Date() });
+    if (usuarioViejo !== username) {
+      batch.delete(adminDb.collection("cuentas").doc(usuarioViejo));
+    }
     console.log(`  usuario: "${username}"  ->  categoria: ${cat.nombre}`);
   }
   await batch.commit();

@@ -13,8 +13,8 @@ Detalle de archivos: [`src/lib/auth/CLAUDE.md`](../src/lib/auth/CLAUDE.md). Esto
    cualquier categoría (Plantel Superior + las 4 divisiones de Juveniles) y ve `/estadisticas`
    completo. Con `alcance` seteado a `"superior"` o a un `edadId` (`"m15"|"m16"|"m17"|"m19"`),
    queda acotado a esa división — mismos poderes que el manager sin restricción, pero solo ahí.
-   Cuentas: `manager`/`pelu` (alcance `"superior"`) + `managerm15`/`managerm16`/`managerm17`/
-   `managerm19` (con alcance de su edad), más `administrador`/`admin` (sin alcance, acceso total).
+   Cuentas: `manager`/`pelu` (alcance `"superior"`) + `manm15`/`manm16`/`manm17`/
+   `manm19` (clave = la edad, con alcance de su edad), más `admin`/`admin` (sin alcance, acceso total).
 
 ## Dónde vive la lógica de alcance
 

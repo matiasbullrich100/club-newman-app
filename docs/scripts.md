@@ -10,9 +10,9 @@ pero algunos son destructivos — están marcados abajo.
 | `seed` | Categoría/partido/cuentas de prueba mínimas (Fase 1) | Una sola vez, al bootstrapear un ambiente nuevo |
 | `seed-demo-extra` | 2 partidos demo más (M-22, Pre A) | Igual que `seed` |
 | `reset-demo` | Resetea `demo-partido-1` a 0-0 vía CLI | Alternativa al botón "Resetear" en la UI |
-| `seed-designados` | Cuentas Designado de Plantel Superior | Una sola vez |
+| `seed-designados` | Cuentas Designado de Plantel Superior (usuario = id sin guion, ej. `prea`, `m22`; `intermedia` → `inter`; clave `dalebordo`). Borra los docs con el nombre viejo (con espacio). | Una sola vez |
 | `seed-designados-juveniles` | Cuentas Designado de Juveniles (usuario=clave, ej. `m15b`/`m15b`) | Al sumar una división nueva |
-| `seed-managers-juveniles` | Cuentas Manager por división (`managerm15`, etc., `alcance` seteado) | Una sola vez |
+| `seed-managers-juveniles` | Cuentas Manager por división (`manm15`/`m15`, etc., `alcance` seteado). Borra los docs con el nombre viejo (`managerm15`). | Una sola vez |
 | `seed-test-cambio` | Recrea `pre-a-test-cambio` (partido de prueba invisible, plantel completo) | Si hace falta reconstruirlo desde cero (normalmente alcanza con el botón "Resetear" de su propia página) |
 | `migrate-historical` | Migra las 26 fechas × 11 categorías de Plantel Superior desde los JSON curados en `Downloads/handoff/` | Ya corrido — no hace falta re-correr salvo que cambien los datos fuente |
 | `migrate-m15-fecha1` / `migrate-m15-fecha2` | Cargan el fixture + formaciones de una fecha puntual de M15 | Patrón a copiar para cargar fechas nuevas de Juveniles |
