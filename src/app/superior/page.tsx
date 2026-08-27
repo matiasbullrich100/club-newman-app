@@ -56,9 +56,10 @@ export default async function PlantelSuperiorPage() {
   const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
   const proximasFechasPrimera = mostrarProximaFechaPrimera ? await proximasFechasDe("primera", 3) : [];
 
-  // El resto de las categorias (Primera tambien, si no le toca el cartel de 3 fechas de arriba):
-  // fresca -> LiveBanner; si no, su propia proxima fecha -> ProximaFechaRow.
-  const categoriasEnFilas = CATEGORIAS_SUPERIOR.filter((cat) => !(cat.id === "primera" && mostrarProximaFechaPrimera));
+  // Todas las categorias arman su fila: fresca -> LiveBanner; si no, su proxima fecha ->
+  // ProximaFechaRow. Primera tambien lleva su fila (con los botones Tabla/Fixt./Fixt Divis.)
+  // aunque ademas tenga el cartel de "Proximas Fechas" arriba -- el cartel no tiene esos botones.
+  const categoriasEnFilas = [...CATEGORIAS_SUPERIOR];
   const idsSinResumenFresco = categoriasEnFilas.map((c) => c.id).filter((id) => !fresco(resumen.find((p) => p.categoriaId === id)));
   const proximasPorCategoria = new Map<string, ProximaFecha>();
   await Promise.all(
