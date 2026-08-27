@@ -49,16 +49,26 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     const createdAt = data.createdAt as unknown as FirebaseFirestore.Timestamp;
     return { id: d.id, ...data, createdAt: createdAt?.toDate?.() ?? data.createdAt };
   });
-  // Terminado el partido, las tarjetas (y el "Fin {tarjeta}: sale/entra" que las cierra) se ocultan
-  // del feed para todos menos el manager de esta categoria -- se siguen viendo durante el partido
-  // (en_juego/entretiempo, ver /partido/[id]/page.tsx) y siguen sumando al stock de jugadores/ vía
+  // Terminado el partido, la tarjeta Y el reingreso que la cierra se ocultan del feed para todos
+  // menos el manager de esta categoria -- se siguen viendo durante el partido (en_juego/
+  // entretiempo, ver /partido/[id]/page.tsx) y siguen sumando al stock de jugadores/ vía
   // publicarIncidente. Pensado para que el manager pueda reconciliar contra lo que URBA denuncia
   // antes de que la tarjeta quede visible para todos -- si el arbitro no la denuncio, el manager la
   // borra (Corregir → Eliminar jugada, ya resta del stock) sin que haya llegado a mostrarse en
-  // público.
+  // público. Si queda solo el reingreso ("Entra X (reingreso)") sin la amarilla que lo explica,
+  // se ve raro/sospechoso -- por eso van los dos juntos.
+  const esCierreDeSancion = (inc: Incidente) => {
+    if (inc.tipo !== "cambio") return false;
+    if (inc.cierreSancionTipo) return true; // via reingresarSancion
+    // Reingreso cargado "suelto": un cambio de un solo lado (solo entra = reingreso, solo sale =
+    // salida por sancion). Un cambio normal siempre tiene sale + entra.
+    const tieneEntra = !!inc.jugadorEntraId || !!inc.jugadorEntraNombre;
+    const tieneSale = !!inc.jugadorSaleId || !!inc.jugadorSaleNombre;
+    return tieneEntra !== tieneSale;
+  };
   const incidentes = esManager
     ? todasLasIncidencias
-    : todasLasIncidencias.filter((inc) => !FAMILIA_TARJETA.includes(inc.tipo) && !(inc.tipo === "cambio" && inc.cierreSancionTipo));
+    : todasLasIncidencias.filter((inc) => !FAMILIA_TARJETA.includes(inc.tipo) && !esCierreDeSancion(inc));
 
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
