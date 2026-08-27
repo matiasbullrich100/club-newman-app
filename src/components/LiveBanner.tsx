@@ -103,28 +103,32 @@ export default function LiveBanner({
           >
             {categoriaNombre}
           </span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {/* La fila del marcador es SOLO categoria + "Newman - Rival", y puede envolver a 2
+              lineas: con la letra agrandada, antes "En juego" y el reloj apretaban el marcador
+              hasta cortar contra quien juega Newman. El estado y el reloj van en su fila de abajo. */}
+          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", lineHeight: 1.2 }}>
             {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
             {partido.notaEspecial ?? (
               <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
             )}
           </span>
-          <span
+        </div>
+        {!partido.notaEspecial && (
+          <div
             style={{
-              flex: "0 0 auto",
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-              fontSize: "0.6rem",
-              color: DORADO,
-              textAlign: "right",
+              marginTop: 4,
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "baseline",
+              justifyContent: "center",
+              columnGap: 8,
+              rowGap: 2,
             }}
           >
-            {partido.notaEspecial ? "" : enVivo ? "● En juego" : "Final"}
-          </span>
-        </div>
-        {enVivo && (
-          <div style={{ marginTop: 4, textAlign: "center" }}>
-            <Cronometro partidoId={partidoId} estado={partido.estado} />
+            <span style={{ textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO }}>
+              {enVivo ? "● En juego" : "Final"}
+            </span>
+            {enVivo && <Cronometro partidoId={partidoId} estado={partido.estado} compact />}
           </div>
         )}
       </Link>
