@@ -61,8 +61,10 @@ export default function ProximaFechaRow({
         marginBottom: 8,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <Link href={`/partido/${partidoId}`} style={{ display: "flex", flex: 1, minWidth: 0, alignItems: "center", gap: 8 }}>
+      {/* Mismo layout que LiveBanner: la fila de texto es UN Link, y los botones van en una
+          segunda fila abajo -- meterlos en la misma linea aplastaba "Newman - Hindu" en el celular. */}
+      <Link href={`/partido/${partidoId}`} style={{ display: "block" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span
             style={{
               flex: "0 0 auto",
@@ -71,14 +73,19 @@ export default function ProximaFechaRow({
               letterSpacing: 0.3,
               fontSize: "0.62rem",
               color: DORADO_SUAVE,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {categoriaNombre}
           </span>
           <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-            {proxima.notaEspecial ?? (
-              <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
-            )}
+            <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {proxima.notaEspecial ?? (
+                <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
+              )}
+            </span>
             {textoCancha(proxima) && (
               <span style={{ fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
                 {textoCancha(proxima)}
@@ -97,23 +104,27 @@ export default function ProximaFechaRow({
           >
             {proxima.fecha && formatFechaCorta(proxima.fecha)}
           </span>
-        </Link>
-        {posicionesHref && (
-          <Link href={posicionesHref} style={botonChico}>
-            Tabla
-          </Link>
-        )}
-        {fixtureHref && (
-          <Link href={fixtureHref} style={botonChico}>
-            Fixt. New.
-          </Link>
-        )}
-        {fixtureDivisionHref && (
-          <Link href={fixtureDivisionHref} style={botonChico}>
-            Fixt Divis.
-          </Link>
-        )}
-      </div>
+        </div>
+      </Link>
+      {(posicionesHref || fixtureHref || fixtureDivisionHref) && (
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
+          {posicionesHref && (
+            <Link href={posicionesHref} style={botonChico}>
+              Tabla
+            </Link>
+          )}
+          {fixtureHref && (
+            <Link href={fixtureHref} style={botonChico}>
+              Fixt. New.
+            </Link>
+          )}
+          {fixtureDivisionHref && (
+            <Link href={fixtureDivisionHref} style={botonChico}>
+              Fixt Divis.
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }
