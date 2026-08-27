@@ -11,10 +11,6 @@ import Cronometro from "./Cronometro";
 
 const ESTADOS_EN_VIVO = new Set<EstadoPartido>(["en_juego", "entretiempo", "suspendido"]);
 
-// Solo para achicar el nombre en este banner angosto -- en el resto de la app (grillas,
-// encabezados) se sigue mostrando el nombre completo de categorias.ts.
-const NOMBRES_CORTOS: Record<string, string> = { Intermedia: "Inter" };
-
 const botonChico: React.CSSProperties = {
   flex: "0 0 auto",
   fontSize: "0.55rem",
@@ -105,7 +101,7 @@ export default function LiveBanner({
               textOverflow: "ellipsis",
             }}
           >
-            {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+            {categoriaNombre}
           </span>
           <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}

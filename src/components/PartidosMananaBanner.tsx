@@ -3,8 +3,6 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { MatchupText } from "./FixtureRow";
 import type { PartidoDeFecha } from "@/lib/match/resumenSeccion";
 
-const NOMBRES_CORTOS: Record<string, string> = { Intermedia: "Inter" };
-
 const botonChico: React.CSSProperties = {
   flex: "0 0 auto",
   fontSize: "0.55rem",
@@ -58,7 +56,7 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
                   textOverflow: "ellipsis",
                 }}
               >
-                {NOMBRES_CORTOS[categoriaNombre] ?? categoriaNombre}
+                {categoriaNombre}
               </span>
               {!partido.notaEspecial && !partido.jugado && (
                 <span style={{ display: "block", fontSize: "0.68rem", fontWeight: 600, color: DORADO_SUAVE, opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>

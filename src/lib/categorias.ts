@@ -5,7 +5,7 @@
 // de NUMERO_FECHAS_JUVENILES fechas, separado del de plantel superior.
 export const CATEGORIAS = [
   { id: "primera", nombre: "Primera", orden: 0, grupo: "superior" },
-  { id: "intermedia", nombre: "Intermedia", orden: 1, grupo: "superior" },
+  { id: "intermedia", nombre: "Inter", orden: 1, grupo: "superior" },
   { id: "pre-a", nombre: "Pre A", orden: 2, grupo: "superior" },
   { id: "pre-b", nombre: "Pre B", orden: 3, grupo: "superior" },
   { id: "m-22", nombre: "M-22", orden: 4, grupo: "superior" },
@@ -109,4 +109,10 @@ export function categoriaIdPorNombre(nombre: string): string {
   const id = NOMBRE_A_ID.get(nombre);
   if (!id) throw new Error(`Categoria desconocida: "${nombre}"`);
   return id;
+}
+
+// Nombre visible de una categoria a partir de su id (ej. "intermedia" -> "Inter"). Fallback al
+// id crudo si no esta en CATEGORIAS.
+export function nombreCategoria(categoriaId: string): string {
+  return CATEGORIAS.find((c) => c.id === categoriaId)?.nombre ?? categoriaId;
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { logout } from "@/lib/auth/actions";
 import type { SessionPayload } from "@/lib/auth/session";
+import { nombreCategoria } from "@/lib/categorias";
 import { DORADO, DORADO_SUAVE, TINTA } from "@/lib/colors";
 
 const pillBase = {
@@ -35,8 +36,10 @@ export default function SessionBar({ session }: { session: SessionPayload | null
       {session ? (
         <>
           <span style={{ ...pillBase, border: `1px solid ${DORADO}`, color: TINTA, background: DORADO }}>
-            {session.username === "administrador" ? "Administrador" : ETIQUETA_ROL[session.rol]}
-            {session.categoriaId ? ` · ${session.categoriaId}` : ""}
+            {session.username === "admin" ? "Administrador" : ETIQUETA_ROL[session.rol]}
+            {/* Nombre de la categoria del designado, derivado de categoriaId (no del username de la
+                sesion) para que valga aunque la cuenta se haya renombrado despues de loguearse. */}
+            {session.categoriaId ? ` · ${nombreCategoria(session.categoriaId)}` : ""}
             {session.alcance ? ` · ${session.alcance.toUpperCase()}` : ""}
           </span>
           <form action={logout}>
