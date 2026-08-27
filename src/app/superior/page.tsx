@@ -39,13 +39,18 @@ export default async function PlantelSuperiorPage() {
   const fresco = (p: (typeof resumen)[number] | undefined) =>
     !!p && (ESTADOS_EN_VIVO.has(p.estado) || ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3));
 
-  // Mismo resumen "Ganados/Empatados/Perdidos" + "Full House" que ya existe en /fecha/[n], pero
-  // arriba de todo en /superior -- usa el ultimo resultado de cada categoria (el mismo `resumen`
-  // de mas arriba), asi que rota solo a la fecha nueva cuando esa categoria termina su partido.
+  // Mismo resumen "Ganados/Empatados/Perdidos" que ya existe en /fecha/[n], pero arriba de todo
+  // en /superior -- usa el ultimo resultado de cada categoria (el mismo `resumen` de mas arriba),
+  // asi que rota solo a la fecha nueva cuando esa categoria termina su partido.
   const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
   const ganadosSemana = jugadosSemana.filter((p) => p.resultado.newman > p.resultado.rival).length;
+  const empatadosSemana = jugadosSemana.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidosSemana = jugadosSemana.filter((p) => p.resultado.newman < p.resultado.rival).length;
-  const fullHouseSemana = jugadosSemana.length > 0 && ganadosSemana === jugadosSemana.length;
+  // De jueves 06:00 a domingo (ventana de "Proxima Fecha", ver debeMostrarProximaFechaEnArgentina)
+  // el resumen de la fecha anterior ya quedo viejo -- se saca esta banda salvo que haya algun
+  // resultado todavia fresco (en vivo o recien jugado).
+  const mostrarResumenSemana =
+    jugadosSemana.length > 0 && (!debeMostrarProximaFechaEnArgentina() || jugadosSemana.some(fresco));
 
   const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
   const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
@@ -125,7 +130,7 @@ export default async function PlantelSuperiorPage() {
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
 
-      {jugadosSemana.length > 0 && (
+      {mostrarResumenSemana && (
         <div
           style={{
             display: "flex",
@@ -145,9 +150,9 @@ export default async function PlantelSuperiorPage() {
           }}
         >
           <span>
-            P. Gan. {ganadosSemana} · P. Perd. {perdidosSemana}
+            P. Ganados: {ganadosSemana}
+            {empatadosSemana > 0 && ` · P. Empatados: ${empatadosSemana}`} · P. Perdidos: {perdidosSemana}
           </span>
-          {fullHouseSemana && <span style={{ color: DORADO, fontWeight: 800, letterSpacing: 1.5 }}>FULL HOUSE</span>}
         </div>
       )}
 

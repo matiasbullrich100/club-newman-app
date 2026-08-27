@@ -119,6 +119,10 @@ export interface ProximaFecha {
   esLocal: boolean;
   rival: string;
   cancha?: string;
+  // Cancha PUNTUAL dentro del predio (ej. "1" -> "Cancha 1"). El club la confirma recien unos dias
+  // antes -- el resumen de Proxima Fecha muestra el rotulo "Cancha" vacio hasta que llega el dato
+  // (Primera de local en Newman ya se sabe: Cancha 1). Ver Partido.numeroCancha en firestore.ts.
+  numeroCancha?: string;
   notaEspecial?: string;
 }
 
@@ -149,6 +153,7 @@ export async function proximasFechasDe(categoriaId: string, cantidad: number): P
     esLocal: p.esLocal,
     rival: p.rival,
     cancha: p.cancha,
+    numeroCancha: p.numeroCancha,
     notaEspecial: p.notaEspecial,
   }));
 }
@@ -236,6 +241,7 @@ async function proximaFechaJuvenilDe(categoriaId: string): Promise<ProximaFecha 
     esLocal: proxima.esLocal,
     rival: proxima.rival,
     cancha: proxima.cancha,
+    numeroCancha: proxima.numeroCancha,
     notaEspecial: proxima.notaEspecial,
   };
 }

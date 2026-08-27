@@ -4,6 +4,13 @@ import { formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 
+// Rotulo "Cancha" del resumen de Proxima Fecha -- "Cancha 3" si ya se sabe, "Cancha —" (vacio)
+// hasta que el club confirme en que cancha juega cada equipo. Fecha libre no lleva cancha.
+function textoCancha(proxima: ProximaFecha): string | null {
+  if (proxima.notaEspecial) return null;
+  return proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —";
+}
+
 const botonChico: React.CSSProperties = {
   flex: "0 0 auto",
   fontSize: "0.55rem",
@@ -68,9 +75,14 @@ export default function ProximaFechaRow({
           >
             {categoriaNombre}
           </span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center" }}>
+          <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
             {proxima.notaEspecial ?? (
               <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
+            )}
+            {textoCancha(proxima) && (
+              <span style={{ fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
+                {textoCancha(proxima)}
+              </span>
             )}
           </span>
           <span

@@ -50,11 +50,11 @@ export function diasDesdeEnArgentina(fechaIso: string): number {
   return Math.round(diff);
 }
 
-// Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 20:30 (pedido
-// explicito, es cuando el club arma la previa del fin de semana) hasta el domingo, el resumen de
-// /superior y /juveniles deja de mostrar el resultado de la fecha pasada (ya viejo a esa altura) y
-// muestra la Proxima Fecha en su lugar, hasta que haya un partido en vivo o recien terminado que
-// lo reemplace (ver el chequeo de "terminados" en cada pagina, no solo esta funcion).
+// Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 06:00 (pedido
+// explicito, es cuando el club arranca a armar la previa del fin de semana) hasta el domingo, el
+// resumen de /superior y /juveniles deja de mostrar el resultado de la fecha pasada (ya viejo a esa
+// altura) y muestra la Proxima Fecha en su lugar, hasta que haya un partido en vivo o recien
+// terminado que lo reemplace (ver el chequeo de "terminados" en cada pagina, no solo esta funcion).
 export function debeMostrarProximaFechaEnArgentina(): boolean {
   const partes = Object.fromEntries(
     new Intl.DateTimeFormat("en-US", {
@@ -70,7 +70,7 @@ export function debeMostrarProximaFechaEnArgentina(): boolean {
   if (dia === "Fri" || dia === "Sat" || dia === "Sun") return true;
   if (dia === "Thu") {
     const horas = Number(partes.hour) % 24 + Number(partes.minute) / 60;
-    return horas >= 20.5;
+    return horas >= 6;
   }
   return false;
 }
