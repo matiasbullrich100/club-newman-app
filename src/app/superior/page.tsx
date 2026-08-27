@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
-import { tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
@@ -69,6 +69,12 @@ export default async function PlantelSuperiorPage() {
     })
   );
 
+  // Partido interno Newman vs Newman (ej. "Newman G"): el equipo propio se muestra con el nombre
+  // de la división ("Newman F") en vez de "Newman" a secas, para que el resumen diga
+  // "Newman F - Newman G" y no "Newman - Newman G".
+  const propioSi = (rival: string | undefined, catId: string) =>
+    rival?.startsWith("Newman ") ? nombrePropioDivision(catId) : undefined;
+
   const filas = categoriasEnFilas
     .map((cat) => {
       const p = resumen.find((r) => r.categoriaId === cat.id);
@@ -81,6 +87,7 @@ export default async function PlantelSuperiorPage() {
               partidoId={p.id}
               categoriaNombre={cat.nombre}
               inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
+              nombreNewman={propioSi(p.rival, cat.id)}
               esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
               posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
               fixtureNewmanHref={`/categoria/${cat.id}/fixture`}
@@ -99,6 +106,7 @@ export default async function PlantelSuperiorPage() {
             partidoId={partidoId(cat.id, proxima.numeroFecha)}
             categoriaNombre={cat.nombre}
             proxima={proxima}
+            nombreNewman={propioSi(proxima.rival, cat.id)}
             posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
             fixtureHref={`/categoria/${cat.id}/fixture`}
             fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}

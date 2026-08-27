@@ -9,7 +9,13 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
 import FixtureRowLive from "@/components/FixtureRowLive";
+import { nombrePropioDivision } from "@/lib/fixtureDivision";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+
+// Partido interno Newman vs Newman: el equipo propio se muestra con el nombre de la división
+// ("Newman F") en vez de "Newman", para que diga "Newman F - Newman G".
+const propioSi = (rival: string | undefined, catId: string) =>
+  rival?.startsWith("Newman ") ? nombrePropioDivision(catId) : undefined;
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
@@ -86,6 +92,7 @@ export default async function VistaDeFecha({
               categoriaNombre={cat.nombre}
               esLocal={partido.esLocal}
               rival={partido.rival}
+              nombreNewman={propioSi(partido.rival, cat.id)}
               inicial={{ estado: partido.estado, resultado: partido.resultado, notaEspecial: partido.notaEspecial }}
             />
           ) : (
@@ -96,7 +103,7 @@ export default async function VistaDeFecha({
               tituloPrincipal={cat.nombre}
               notaSecundaria={
                 partido.notaEspecial ?? (
-                  <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
+                  <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} nombreNewman={propioSi(partido.rival, cat.id)} />
                 )
               }
             />

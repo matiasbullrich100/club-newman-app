@@ -49,6 +49,15 @@ export function tieneFixtureDivision(categoriaId: string): categoriaId is Catego
   return (CATEGORIAS_CON_FIXTURE_DIVISION as readonly string[]).includes(categoriaId);
 }
 
+// Nombre del equipo propio de Newman en una división de Plantel Superior cuando NO es solo "Newman"
+// -- de Preintermedia B a H el club mete varios planteles ("Newman B" … "Newman H"). Primera,
+// Intermedia, Pre A y M-22 son "Newman" a secas → undefined. Se usa en el resumen de partidos
+// internos (ej. Newman F vs Newman G), donde el rival también empieza con "Newman ".
+export function nombrePropioDivision(categoriaId: string): string | undefined {
+  const m = /^pre-([b-h])$/.exec(categoriaId);
+  return m ? `Newman ${m[1].toUpperCase()}` : undefined;
+}
+
 // Cuantas fechas tiene el picker/paginador de Fixture Division de esta categoria -- 26 en Plantel
 // Superior (TOP 14), 11 en Juveniles (un solo round robin de Segunda Rueda).
 export function numeroFechasDivisionDe(categoriaId: string): number {
