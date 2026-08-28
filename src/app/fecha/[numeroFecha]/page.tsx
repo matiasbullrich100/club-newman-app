@@ -34,7 +34,11 @@ export default async function VistaDeFecha({
 
   const primera = filas.find((f) => f.cat.id === "primera")?.partido;
 
-  const jugados = filas.filter((f) => f.partido?.estado === "terminado").map((f) => f.partido!);
+  // Los partidos internos Newman vs Newman (rival "Newman ...") no cuentan para "P. Ganados /
+  // P. Perdidos" -- son amistosos.
+  const jugados = filas
+    .filter((f) => f.partido?.estado === "terminado" && !f.partido.rival?.startsWith("Newman "))
+    .map((f) => f.partido!);
   const ganados = jugados.filter((p) => p.resultado.newman > p.resultado.rival).length;
   const empatados = jugados.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidos = jugados.filter((p) => p.resultado.newman < p.resultado.rival).length;

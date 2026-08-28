@@ -39,18 +39,18 @@ export default async function PlantelSuperiorPage() {
   const fresco = (p: (typeof resumen)[number] | undefined) =>
     !!p && (ESTADOS_EN_VIVO.has(p.estado) || ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3));
 
-  // Mismo resumen "Ganados/Empatados/Perdidos" que ya existe en /fecha/[n], pero arriba de todo
-  // en /superior -- usa el ultimo resultado de cada categoria (el mismo `resumen` de mas arriba),
-  // asi que rota solo a la fecha nueva cuando esa categoria termina su partido.
-  const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
-  const ganadosSemana = jugadosSemana.filter((p) => p.resultado.newman > p.resultado.rival).length;
-  const empatadosSemana = jugadosSemana.filter((p) => p.resultado.newman === p.resultado.rival).length;
-  const perdidosSemana = jugadosSemana.filter((p) => p.resultado.newman < p.resultado.rival).length;
-  // De jueves 06:00 a domingo (ventana de "Proxima Fecha", ver debeMostrarProximaFechaEnArgentina)
-  // el resumen de la fecha anterior ya quedo viejo -- se saca esta banda salvo que haya algun
-  // resultado todavia fresco (en vivo o recien jugado).
-  const mostrarResumenSemana =
-    jugadosSemana.length > 0 && (!debeMostrarProximaFechaEnArgentina() || jugadosSemana.some(fresco));
+  // Banda "P. Ganados / P. Perdidos" arriba de todo en /superior. Los partidos internos
+  // Newman vs Newman (rival "Newman ...") NO cuentan -- son amistosos, no "cómo le fue al club
+  // esta fecha". Fuera de la ventana de "Proxima Fecha" (dom→mié) muestra el último resultado de
+  // cada categoría; dentro de esa ventana (jue 06:00→dom) solo aparece si hay resultados FRESCOS
+  // (en vivo / recién jugados) y cuenta SOLO esos -- si no, un amistoso suelto entre semana
+  // reactivaba la banda con los resultados viejos de la fecha pasada.
+  const jugadosSemana = resumen.filter((p) => p.estado === "terminado" && !p.rival?.startsWith("Newman "));
+  const paraLaBanda = debeMostrarProximaFechaEnArgentina() ? jugadosSemana.filter(fresco) : jugadosSemana;
+  const ganadosSemana = paraLaBanda.filter((p) => p.resultado.newman > p.resultado.rival).length;
+  const empatadosSemana = paraLaBanda.filter((p) => p.resultado.newman === p.resultado.rival).length;
+  const perdidosSemana = paraLaBanda.filter((p) => p.resultado.newman < p.resultado.rival).length;
+  const mostrarResumenSemana = paraLaBanda.length > 0;
 
   const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
   const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
