@@ -75,6 +75,13 @@ export default async function PlantelSuperiorPage() {
   const propioSi = (rival: string | undefined, catId: string) =>
     rival?.startsWith("Newman ") ? nombrePropioDivision(catId) : undefined;
 
+  // Los partidos de mañana ya salen en su propio banner (PartidosMananaBanner, con horario y los
+  // mismos botones Tabla/Fixt.) -- si además armáramos su ProximaFechaRow, la misma categoría
+  // aparecería dos veces. Así que la fila de "Próxima Fecha" es solo para las categorías cuyo
+  // próximo partido NO es mañana.
+  const partidosManana = await partidosDeFechaExacta(CATEGORIAS_SUPERIOR.map((c) => c.id), mananaIsoEnArgentina());
+  const idsJuegaManana = new Set(partidosManana.map((p) => p.categoriaId));
+
   const filas = categoriasEnFilas
     .map((cat) => {
       const p = resumen.find((r) => r.categoriaId === cat.id);
@@ -96,6 +103,7 @@ export default async function PlantelSuperiorPage() {
           ),
         };
       }
+      if (idsJuegaManana.has(cat.id)) return null; // ya sale en PartidosMananaBanner
       const proxima = proximasPorCategoria.get(cat.id);
       if (!proxima) return null;
       return {
@@ -122,8 +130,8 @@ export default async function PlantelSuperiorPage() {
   const filasResto = filas.filter((f) => !f.esVivo);
 
   // Resumen "Partidos de Mañana" -- todas las categorias de Plantel Superior que juegan manana,
-  // con horario, para verlas de un vistazo sin entrar categoria por categoria.
-  const partidosManana = await partidosDeFechaExacta(CATEGORIAS_SUPERIOR.map((c) => c.id), mananaIsoEnArgentina());
+  // con horario, para verlas de un vistazo sin entrar categoria por categoria (partidosManana se
+  // calculo mas arriba, tambien se usa para no duplicar la fila de "Proxima Fecha").
   const partidosMananaConNombre = partidosManana.map((p) => ({
     categoriaId: p.categoriaId,
     categoriaNombre: CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId,
