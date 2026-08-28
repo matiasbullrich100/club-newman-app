@@ -42,10 +42,28 @@ export default async function Home() {
           Juveniles
         </Link>
         {(puedeSuperior || puedeJuveniles) && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {puedeSuperior && <PublicarDivisionButton grupo="superior" label="Plantel" />}
-            {puedeJuveniles && <PublicarDivisionButton grupo="juveniles" label="Juveniles" />}
-          </div>
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {puedeSuperior && <PublicarDivisionButton grupo="superior" label="Plantel" />}
+              {puedeJuveniles && <PublicarDivisionButton grupo="juveniles" label="Juveniles" />}
+            </div>
+            <Link
+              href="/formaciones"
+              style={{
+                display: "block",
+                textAlign: "center",
+                textTransform: "uppercase",
+                letterSpacing: 1,
+                fontSize: "0.72rem",
+                padding: "8px 10px",
+                borderRadius: 8,
+                border: "1px solid rgba(226,197,120,.35)",
+                color: DORADO_SUAVE,
+              }}
+            >
+              Ver estado de formaciones
+            </Link>
+          </>
         )}
         {mostrarPruebas && (
           <Link href="/pruebas" style={botonStyle}>
