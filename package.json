@@ -23,6 +23,8 @@
     "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts",
     "migrate-m15-fecha2": "tsx src/scripts/migrate-juveniles-m15-fecha2.ts",
     "migrate-m16-m17-m19-fecha1": "tsx src/scripts/migrate-juveniles-m16-m17-m19-fecha1.ts",
+    "migrate-superior-fecha20-formaciones": "tsx src/scripts/migrate-superior-fecha20-formaciones.ts",
+    "migrate-m19-fecha4-formaciones": "tsx src/scripts/migrate-m19-fecha4-formaciones.ts",
     "migrate-juveniles-fixture": "tsx src/scripts/migrate-juveniles-fixture.ts",
     "actualizar-posiciones": "tsx src/scripts/actualizar-posiciones.ts",
     "resolver-torneos-urba": "tsx src/scripts/resolver-torneos-urba.ts",
