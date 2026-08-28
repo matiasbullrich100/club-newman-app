@@ -7,93 +7,142 @@ import {
   NUMERO_FECHAS_SUPERIOR,
   NUMERO_FECHAS_JUVENILES,
   partidoId,
+  partidoIdsDeGrupo,
 } from "@/lib/categorias";
 import { hoyIsoEnArgentina } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 
-export type EstadoSubida = "sin-subir" | "borrador" | "publicada" | "sin-fecha";
+export type EstadoSubida = "sin-subir" | "borrador" | "publicada" | "libre" | "sin-fecha";
+
+// Fecha libre / walkover: rival "Libre" o notaEspecial -- no lleva formación.
+function esBye(p: Partido): boolean {
+  return !!p.notaEspecial || /^libre$/i.test((p.rival ?? "").trim());
+}
 
 export interface EstadoFormacion {
   categoriaId: string;
   categoriaNombre: string;
   partidoId: string | null;
-  numeroFecha: number | null;
   rival: string | null;
   fecha: string | null;
+  estadoPartido: Partido["estado"] | null;
   jugadores: number;
   estado: EstadoSubida;
 }
 
 export interface GrupoEstadoFormaciones {
   titulo: string;
+  numeroFecha: number | null;
   filas: EstadoFormacion[];
 }
 
-async function estadoDeCategoria(
-  categoriaId: string,
-  categoriaNombre: string,
+async function estadoDeGrupo(
+  titulo: string,
+  grupoKey: string, // "superior" | edadId
+  categorias: { id: string; nombre: string }[],
   numFechas: number
-): Promise<EstadoFormacion> {
-  const hoy = hoyIsoEnArgentina();
-  const refs = Array.from({ length: numFechas }, (_, i) =>
-    adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1))
-  );
-  const snaps = await adminDb.getAll(...refs);
-  const proximo = snaps
-    .filter((s) => s.exists)
-    .map((s) => ({ id: s.id, ...(s.data() as Partido) }))
-    // Proxima fecha "programado" que todavia no paso -- la que el club esta por mandar.
-    .filter((p) => p.estado === "programado" && (!p.fecha || p.fecha >= hoy))
-    .sort((a, b) => Number(a.numeroFecha) - Number(b.numeroFecha))[0];
-
-  if (!proximo) {
-    return {
-      categoriaId,
-      categoriaNombre,
-      partidoId: null,
-      numeroFecha: null,
-      rival: null,
-      fecha: null,
-      jugadores: 0,
-      estado: "sin-fecha",
-    };
+): Promise<GrupoEstadoFormaciones> {
+  // Traigo todos los partidos del grupo de una (ids deterministicos) para calcular la fecha en curso.
+  const ids = partidoIdsDeGrupo(grupoKey);
+  const snaps = await adminDb.getAll(...ids.map((id) => adminDb.collection("partidos").doc(id)));
+  const porFecha = new Map<number, Partido[]>();
+  for (const s of snaps) {
+    if (!s.exists) continue;
+    const p = s.data() as Partido;
+    const n = Number(p.numeroFecha);
+    if (!Number.isFinite(n)) continue;
+    (porFecha.get(n) ?? porFecha.set(n, []).get(n)!).push(p);
   }
 
-  const plantelSnap = await adminDb.collection("partidos").doc(proximo.id).collection("plantel").get();
-  const jugadores = plantelSnap.size;
-  // formacionPublicada ausente o true = publicada (default historico); solo false explicito = borrador.
-  const estado: EstadoSubida =
-    jugadores === 0 ? "sin-subir" : proximo.formacionPublicada === false ? "borrador" : "publicada";
+  // "Fecha en curso" = la menor numeroFecha con algún partido cuya fecha calendario sea hoy o
+  // posterior (la que se está por jugar). Se usa la fecha del fixture, no el estado
+  // "terminado/programado" -- fechas viejas a veces quedaron con algún partido sin cerrar. Si están
+  // todas en el pasado, la última con partidos.
+  const hoy = hoyIsoEnArgentina();
+  let numeroFecha: number | null = null;
+  for (let n = 1; n <= numFechas; n++) {
+    const ps = porFecha.get(n);
+    if (!ps || ps.length === 0) continue;
+    numeroFecha = n;
+    if (ps.some((p) => p.fecha && p.fecha >= hoy)) break;
+  }
 
+  if (numeroFecha === null) {
+    return { titulo, numeroFecha: null, filas: categorias.map((c) => vacia(c)) };
+  }
+
+  const filas = await Promise.all(
+    categorias.map(async (c): Promise<EstadoFormacion> => {
+      const pid = partidoId(c.id, numeroFecha!);
+      const partido = (porFecha.get(numeroFecha!) ?? []).find((p) => p.categoriaId === c.id) ?? null;
+      if (!partido) {
+        return { ...vacia(c), partidoId: null, estado: "sin-fecha" as EstadoSubida };
+      }
+      if (esBye(partido)) {
+        return {
+          categoriaId: c.id,
+          categoriaNombre: c.nombre,
+          partidoId: pid,
+          rival: partido.rival,
+          fecha: partido.fecha ?? null,
+          estadoPartido: partido.estado,
+          jugadores: 0,
+          estado: "libre",
+        };
+      }
+      const plantelSnap = await adminDb.collection("partidos").doc(pid).collection("plantel").get();
+      const jugadores = plantelSnap.size;
+      // formacionPublicada ausente/true = publicada (default historico); solo false = borrador.
+      // Un partido ya jugado con plantel cuenta como publicado.
+      const estado: EstadoSubida =
+        jugadores === 0
+          ? "sin-subir"
+          : partido.estado !== "programado"
+            ? "publicada"
+            : partido.formacionPublicada === false
+              ? "borrador"
+              : "publicada";
+      return {
+        categoriaId: c.id,
+        categoriaNombre: c.nombre,
+        partidoId: pid,
+        rival: partido.rival,
+        fecha: partido.fecha ?? null,
+        estadoPartido: partido.estado,
+        jugadores,
+        estado,
+      };
+    })
+  );
+
+  return { titulo, numeroFecha, filas };
+}
+
+function vacia(c: { id: string; nombre: string }): EstadoFormacion {
   return {
-    categoriaId,
-    categoriaNombre,
-    partidoId: proximo.id,
-    numeroFecha: Number(proximo.numeroFecha),
-    rival: proximo.rival,
-    fecha: proximo.fecha ?? null,
-    jugadores,
-    estado,
+    categoriaId: c.id,
+    categoriaNombre: c.nombre,
+    partidoId: null,
+    rival: null,
+    fecha: null,
+    estadoPartido: null,
+    jugadores: 0,
+    estado: "sin-fecha",
   };
 }
 
 /**
- * Para cada categoria (Plantel Superior + las 4 edades de Juveniles), en que estado esta la
- * formacion de su PROXIMA fecha: sin subir / borrador (subida, no publicada) / publicada. Sirve
- * para ver de un vistazo que equipos faltan cargar -- sobre todo en Juveniles, que van llegando
- * por division.
+ * Para cada grupo (Plantel Superior + las 4 edades de Juveniles): la FECHA en curso (la menor
+ * sin terminar) y, para esa fecha, en qué estado está la formación de cada equipo -- Sin subir /
+ * Borrador (cargada, no publicada) / Publicada. Sirve para ver de un vistazo qué equipos faltan
+ * cargar, sobre todo en Juveniles, que llegan por división.
  */
 export async function estadoFormaciones(): Promise<GrupoEstadoFormaciones[]> {
-  const superior = await Promise.all(
-    CATEGORIAS_SUPERIOR.map((c) => estadoDeCategoria(c.id, c.nombre, NUMERO_FECHAS_SUPERIOR))
-  );
-  const grupos: GrupoEstadoFormaciones[] = [{ titulo: "Plantel Superior", filas: superior }];
-
-  for (const edad of EDADES) {
-    const filas = await Promise.all(
-      equiposDeEdad(edad.id).map((c) => estadoDeCategoria(c.id, c.nombre, NUMERO_FECHAS_JUVENILES))
-    );
-    grupos.push({ titulo: edad.nombre, filas });
-  }
+  const grupos = await Promise.all([
+    estadoDeGrupo("Plantel Superior", "superior", CATEGORIAS_SUPERIOR.map((c) => ({ id: c.id, nombre: c.nombre })), NUMERO_FECHAS_SUPERIOR),
+    ...EDADES.map((edad) =>
+      estadoDeGrupo(edad.nombre, edad.id, equiposDeEdad(edad.id).map((c) => ({ id: c.id, nombre: c.nombre })), NUMERO_FECHAS_JUVENILES)
+    ),
+  ]);
   return grupos;
 }

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
-import PublicarDivisionButton from "@/components/PublicarDivisionButton";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -22,9 +21,8 @@ const botonStyle: React.CSSProperties = {
 
 export default async function Home() {
   const session = await getSession();
-  // Solo Administrador (sin alcance) y el Manager de la division correspondiente ven el boton de
-  // publicar en bloque -- un manager de Juveniles acotado a una sola edad igual ve "Subir
-  // Juveniles", pero publicarFormacionesGrupo se salta las edades que no puede operar.
+  // El boton "Formaciones" (pantalla /formaciones para cargar/publicar) lo ven el Administrador
+  // (sin alcance) y cualquier Manager de division.
   const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
   const puedeJuveniles = session?.rol === "manager" && (!session.alcance || session.alcance !== "superior");
   const mostrarPruebas = pruebasVisiblesPara(session);
@@ -42,28 +40,9 @@ export default async function Home() {
           Juveniles
         </Link>
         {(puedeSuperior || puedeJuveniles) && (
-          <>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {puedeSuperior && <PublicarDivisionButton grupo="superior" label="Plantel" />}
-              {puedeJuveniles && <PublicarDivisionButton grupo="juveniles" label="Juveniles" />}
-            </div>
-            <Link
-              href="/formaciones"
-              style={{
-                display: "block",
-                textAlign: "center",
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                fontSize: "0.72rem",
-                padding: "8px 10px",
-                borderRadius: 8,
-                border: "1px solid rgba(226,197,120,.35)",
-                color: DORADO_SUAVE,
-              }}
-            >
-              Ver estado de formaciones
-            </Link>
-          </>
+          <Link href="/formaciones" style={botonStyle}>
+            Formaciones
+          </Link>
         )}
         {mostrarPruebas && (
           <Link href="/pruebas" style={botonStyle}>
