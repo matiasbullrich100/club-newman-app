@@ -152,10 +152,7 @@ interface RoundUrbaRaw {
 export async function fetchResultadosDivisionUrba(
   championshipId: number
 ): Promise<Record<string, FechaResultadosDivisionUrba>> {
-  const res = await fetch(`${URBA_API_BASE}/championship/${championshipId}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(15000), // no dejar colgado al cron si URBA no responde
-  });
+  const res = await fetch(`${URBA_API_BASE}/championship/${championshipId}`, { cache: "no-store" });
   if (!res.ok) throw new Error(`URBA respondió ${res.status} para el torneo ${championshipId}`);
   const json: { championship?: Record<string, { rounds?: RoundUrbaRaw[] }> } = await res.json();
   const rounds = json.championship?.["0"]?.rounds ?? [];

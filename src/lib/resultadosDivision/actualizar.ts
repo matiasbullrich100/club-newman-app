@@ -20,43 +20,27 @@ export interface ResultadoActualizacionDivision {
 export async function actualizarResultadosDivision(
   grupo?: "superior" | "juveniles"
 ): Promise<ResultadoActualizacionDivision[]> {
+  const resultados: ResultadoActualizacionDivision[] = [];
+  const cachePorTorneo = new Map<number, Record<string, FechaResultadosDivisionUrba>>();
+
   const entradas = Object.entries(TORNEOS_URBA).filter(
     ([categoriaId]) =>
       tieneFixtureDivision(categoriaId) && (!grupo || grupoDeCategoria(categoriaId).grupo === grupo)
   );
 
-  // Varias categorias pueden compartir championshipId (ej. Pre F/G/H) -- se baja cada torneo UNA
-  // sola vez, y en paralelo (el cron corre seguido durante la fecha, no conviene encadenar ~16
-  // fetches de 400KB de a uno).
-  const torneosUnicos = [...new Set(entradas.map(([, t]) => t.championshipId))];
-  const porTorneo = new Map<
-    number,
-    { fechas: Record<string, FechaResultadosDivisionUrba> } | { error: string }
-  >();
-  await Promise.all(
-    torneosUnicos.map(async (championshipId) => {
-      try {
-        porTorneo.set(championshipId, { fechas: await fetchResultadosDivisionUrba(championshipId) });
-      } catch (e) {
-        porTorneo.set(championshipId, { error: e instanceof Error ? e.message : String(e) });
-      }
-    })
-  );
-
-  const resultados: ResultadoActualizacionDivision[] = [];
   for (const [categoriaId, { championshipId }] of entradas) {
-    const datos = porTorneo.get(championshipId);
-    if (!datos || "error" in datos) {
-      resultados.push({ categoriaId, ok: false, error: datos?.error ?? "sin datos" });
-      continue;
-    }
     try {
+      let fechas = cachePorTorneo.get(championshipId);
+      if (!fechas) {
+        fechas = await fetchResultadosDivisionUrba(championshipId);
+        cachePorTorneo.set(championshipId, fechas);
+      }
       await adminDb.collection("resultadosDivision").doc(categoriaId).set({
         championshipId,
-        fechas: datos.fechas,
+        fechas,
         updatedAt: FieldValue.serverTimestamp(),
       });
-      resultados.push({ categoriaId, ok: true, fechas: Object.keys(datos.fechas).length });
+      resultados.push({ categoriaId, ok: true, fechas: Object.keys(fechas).length });
     } catch (e) {
       resultados.push({ categoriaId, ok: false, error: e instanceof Error ? e.message : String(e) });
     }
