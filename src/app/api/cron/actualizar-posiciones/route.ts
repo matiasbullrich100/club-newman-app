@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { actualizarPosiciones } from "@/lib/posiciones/actualizar";
+import { actualizarResultadosDivision } from "@/lib/resultadosDivision/actualizar";
 
 // Disparado por el workflow de GitHub Actions (.github/workflows/actualizar-posiciones.yml),
 // que maneja el cronograma real (sabados por hora para Plantel Superior, domingos por minuto
@@ -15,6 +16,10 @@ export async function GET(request: NextRequest) {
   const grupoParam = request.nextUrl.searchParams.get("grupo");
   const grupo = grupoParam === "superior" || grupoParam === "juveniles" ? grupoParam : undefined;
 
-  const resultados = await actualizarPosiciones(grupo);
-  return NextResponse.json({ resultados });
+  // Tabla de posiciones + resultados del Fixt. Division (misma fuente URBA, misma cadencia).
+  const [resultados, resultadosDivision] = await Promise.all([
+    actualizarPosiciones(grupo),
+    actualizarResultadosDivision(grupo),
+  ]);
+  return NextResponse.json({ resultados, resultadosDivision });
 }

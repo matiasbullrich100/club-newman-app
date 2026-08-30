@@ -30,6 +30,7 @@
     "migrate-m15-fecha4-formaciones": "tsx src/scripts/migrate-m15-fecha4-formaciones.ts",
     "migrate-juveniles-fixture": "tsx src/scripts/migrate-juveniles-fixture.ts",
     "actualizar-posiciones": "tsx src/scripts/actualizar-posiciones.ts",
+    "actualizar-resultados-division": "tsx src/scripts/actualizar-resultados-division.ts",
     "resolver-torneos-urba": "tsx src/scripts/resolver-torneos-urba.ts",
     "seed-admin": "tsx src/scripts/seed-admin.ts"
   },

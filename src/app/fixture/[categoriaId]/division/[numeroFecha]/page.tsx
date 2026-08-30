@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, grupoDeCategoria, partidoId } from "@/lib/categorias";
-import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { fixtureDivisionConResultados } from "@/lib/resultadosDivision/consultar";
 import { formatFecha, fechaFixtureYaPaso } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -25,7 +26,7 @@ export default async function FixtureDivisionFechaPage({
   const numeroFechas = numeroFechasDivisionDe(categoriaId);
   if (!Number.isInteger(numeroFecha) || numeroFecha < 1 || numeroFecha > numeroFechas) notFound();
 
-  const fecha = fixtureDivisionDe(categoriaId, numeroFecha);
+  const fecha = await fixtureDivisionConResultados(categoriaId, numeroFecha);
   if (!fecha) notFound();
 
   const session = await getSession();
