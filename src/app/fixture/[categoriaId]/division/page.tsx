@@ -53,7 +53,8 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   const fechas = Array.from({ length: numeroFechasDivisionDe(categoriaId) }, (_, i) => {
     const n = i + 1;
     const datos = fixtureDivisionDe(categoriaId, n);
-    return { n, fecha: datos?.fecha, yaPaso: !!datos && datos.fecha < hoy };
+    // Hoy incluido: el dia del partido la fecha ya cuenta como pasada (se juega esa misma jornada).
+    return { n, fecha: datos?.fecha, yaPaso: !!datos && datos.fecha <= hoy };
   });
 
   return (

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { formatFecha } from "@/lib/fecha";
+import { formatFecha, hoyIsoEnArgentina } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -29,6 +29,8 @@ export default async function FixtureDivisionFechaPage({
   if (!fecha) notFound();
 
   const session = await getSession();
+  // Fecha ya pasada (hoy incluido): se pinta en negro aunque no se haya cargado el resultado.
+  const fechaYaPaso = fecha.fecha <= hoyIsoEnArgentina();
   const hayAnterior = numeroFecha > 1;
   const haySiguiente = numeroFecha < numeroFechas;
 
@@ -56,8 +58,8 @@ export default async function FixtureDivisionFechaPage({
             gap: 8,
             padding: "10px 12px",
             borderRadius: 10,
-            border: `1px solid ${p.esNewman ? DORADO : p.jugado ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.2)"}`,
-            background: p.jugado ? NEGRO_JUGADA : p.esNewman ? "rgba(226,197,120,.08)" : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
+            border: `1px solid ${p.esNewman ? DORADO : p.jugado || fechaYaPaso ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.2)"}`,
+            background: p.jugado || fechaYaPaso ? NEGRO_JUGADA : p.esNewman ? "rgba(226,197,120,.08)" : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
             fontSize: "0.85rem",
             fontWeight: p.esNewman ? 700 : 400,
             color: p.esNewman ? DORADO_SUAVE : "#f7f1e4",
