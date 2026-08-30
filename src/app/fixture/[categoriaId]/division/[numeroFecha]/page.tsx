@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS, partidoId } from "@/lib/categorias";
+import { CATEGORIAS, grupoDeCategoria, partidoId } from "@/lib/categorias";
 import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { formatFecha, hoyIsoEnArgentina } from "@/lib/fecha";
+import { formatFecha, fechaFixtureYaPaso } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -29,8 +29,9 @@ export default async function FixtureDivisionFechaPage({
   if (!fecha) notFound();
 
   const session = await getSession();
-  // Fecha ya pasada (hoy incluido): se pinta en negro aunque no se haya cargado el resultado.
-  const fechaYaPaso = fecha.fecha <= hoyIsoEnArgentina();
+  // Ya pasada = en negro aunque no se haya cargado el resultado: desde las 18:00 del sábado
+  // (Superior) / 16:00 del domingo (Juveniles) de esa jornada -- ver fechaFixtureYaPaso.
+  const fechaYaPaso = fechaFixtureYaPaso(fecha.fecha, grupoDeCategoria(categoriaId).grupo);
   const hayAnterior = numeroFecha > 1;
   const haySiguiente = numeroFecha < numeroFechas;
 

@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth/session";
 import { EDADES, NUMERO_FECHAS_JUVENILES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { formatFechaCorta } from "@/lib/fecha";
+import { formatFechaCorta, fechaFixtureYaPaso } from "@/lib/fecha";
 import type { Partido, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -92,7 +92,7 @@ export default async function EquipoJuvenilesPage({
             <FixtureRow
               key={numeroFecha}
               href={`/partido/${partidoId(equipoId, numeroFecha)}`}
-              jugada={partido.estado === "terminado" || !!partido.notaEspecial}
+              jugada={partido.estado === "terminado" || !!partido.notaEspecial || fechaFixtureYaPaso(partido.fecha, "juveniles")}
               tituloPrincipal={
                 partido.notaEspecial ? (
                   <>

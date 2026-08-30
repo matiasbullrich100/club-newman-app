@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { formatFechaCorta, hoyIsoEnArgentina } from "@/lib/fecha";
+import { formatFechaCorta, fechaFixtureYaPaso } from "@/lib/fecha";
 import type { Partido, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -48,9 +48,6 @@ export default async function CategoriaFixturePage({
     getSession(),
   ]);
   const fechas = snaps.map((snap, i) => ({ numeroFecha: i + 1, partido: snap.exists ? (snap.data() as Partido) : null }));
-  // Una fecha ya pasada se pinta en negro aunque todavía no se haya cargado el resultado -- la
-  // fecha calendario de hoy incluida (el partido se juega ese mismo día).
-  const hoy = hoyIsoEnArgentina();
   const posiciones = posicionesSnap?.exists ? (posicionesSnap.data() as PosicionesTorneo) : null;
   const actualizado = posiciones
     ? ((posiciones.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (posiciones.updatedAt as Date))
@@ -98,7 +95,7 @@ export default async function CategoriaFixturePage({
             <FixtureRow
               key={numeroFecha}
               href={`/partido/${partidoId(categoriaId, numeroFecha)}`}
-              jugada={partido.estado === "terminado" || !!partido.notaEspecial || (!!partido.fecha && partido.fecha <= hoy)}
+              jugada={partido.estado === "terminado" || !!partido.notaEspecial || fechaFixtureYaPaso(partido.fecha, "superior")}
               tituloPrincipal={
                 partido.notaEspecial ? (
                   <>

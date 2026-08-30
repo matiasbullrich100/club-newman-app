@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { fixtureDivisionDe, numeroFechasDivisionDe, tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { formatFechaCorta } from "@/lib/fecha";
+import { formatFechaCorta, fechaFixtureYaPaso } from "@/lib/fecha";
 import { adminDb } from "@/lib/firebase-admin";
 import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
@@ -47,14 +47,12 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   // llega aca, tanto de vuelta (BackLink) como para el boton de "Fixt. New." en si.
   const hubHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = grupo.grupo === "juveniles" ? hubHref : `/categoria/${categoriaId}/fixture`;
-  // "en_CA" da "YYYY-MM-DD", comparable como string contra el ISO de cada fecha del fixture --
-  // mismo truco que esHoyEnArgentina() en lib/fecha.ts, sin importar el huso horario del server.
-  const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
   const fechas = Array.from({ length: numeroFechasDivisionDe(categoriaId) }, (_, i) => {
     const n = i + 1;
     const datos = fixtureDivisionDe(categoriaId, n);
-    // Hoy incluido: el dia del partido la fecha ya cuenta como pasada (se juega esa misma jornada).
-    return { n, fecha: datos?.fecha, yaPaso: !!datos && datos.fecha <= hoy };
+    // "En negro" recién desde las 18:00 del sábado (Superior) / 16:00 del domingo (Juveniles) de
+    // esa jornada -- ver fechaFixtureYaPaso.
+    return { n, fecha: datos?.fecha, yaPaso: fechaFixtureYaPaso(datos?.fecha, grupo.grupo) };
   });
 
   return (

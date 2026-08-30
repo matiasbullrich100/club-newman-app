@@ -33,6 +33,29 @@ export function hoyIsoEnArgentina(): string {
   return new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 }
 
+// Una fecha del fixture se pinta "en negro" (ya pasó) recién cuando el partido de esa jornada ya
+// se jugó a esta altura: Plantel Superior juega el sábado, así que desde las 18:00 de ese sábado;
+// Juveniles juega el domingo, desde las 16:00. Antes de esa hora el mismo día la fecha sigue "por
+// jugar" (dorada). Días anteriores: siempre pasada. Días posteriores: siempre por jugar.
+export function fechaFixtureYaPaso(fechaIso: string | undefined, grupo: "superior" | "juveniles"): boolean {
+  if (!fechaIso) return false;
+  const hoy = hoyIsoEnArgentina();
+  if (fechaIso < hoy) return true;
+  if (fechaIso > hoy) return false;
+  const partes = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+      .formatToParts(new Date())
+      .map((p) => [p.type, p.value])
+  );
+  const horas = (Number(partes.hour) % 24) + Number(partes.minute) / 60;
+  return horas >= (grupo === "juveniles" ? 16 : 18);
+}
+
 // "YYYY-MM-DD" de mañana en Argentina -- para el resumen de "Partidos de Mañana" en /superior.
 export function mananaIsoEnArgentina(): string {
   const hoy = new Date(`${hoyIsoEnArgentina()}T00:00:00Z`);
