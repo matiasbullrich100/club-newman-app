@@ -10,9 +10,13 @@ function nombreEquipo(nombre: string) {
 function golesDe(equipo: Equipo, resultado: Resultado) {
   const goles = equipo === "newman" ? resultado.newman : resultado.rival;
   const bonus = equipo === "newman" ? resultado.bonusNewman : resultado.bonusRival;
+  const tries = equipo === "newman" ? resultado.triesNewman : resultado.triesRival;
   return (
     <>
       {goles}
+      {typeof tries === "number" && tries > 0 && (
+        <span style={{ color: DORADO_SUAVE, fontSize: "0.7em", fontWeight: 400 }}> ({tries}T)</span>
+      )}
       {bonus && <span style={{ color: DORADO, fontSize: "0.75em" }}> (B)</span>}
     </>
   );

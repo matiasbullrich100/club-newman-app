@@ -35,6 +35,11 @@ export interface Resultado {
   rival: number;
   bonusNewman?: boolean;
   bonusRival?: boolean;
+  // Tries de cada equipo (try + try_scrum + try_penal). Se lleva un contador incremental en vivo
+  // (publicarIncidente/corregir/eliminar) y se recalcula exacto desde las incidencias en
+  // terminarPartido. Se muestra "(4T)" al lado del marcador, en vivo y al terminar.
+  triesNewman?: number;
+  triesRival?: number;
 }
 
 export interface Partido {

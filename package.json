@@ -16,6 +16,7 @@
     "set-alcance-manager-superior": "tsx src/scripts/set-alcance-manager-superior.ts",
     "rebuild-jugadores": "tsx src/scripts/rebuild-jugadores.ts",
     "backfill-historial-tarjetas": "tsx src/scripts/backfill-historial-tarjetas.ts",
+    "backfill-tries-resultado": "tsx src/scripts/backfill-tries-resultado.ts",
     "seed-test-cambio": "tsx src/scripts/seed-test-cambio.ts",
     "seed-test-cambio-juveniles": "tsx src/scripts/seed-test-cambio-juveniles.ts",
     "seed-test-beromama": "tsx src/scripts/seed-test-beromama.ts",

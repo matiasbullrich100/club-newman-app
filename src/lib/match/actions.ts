@@ -6,7 +6,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession, puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
-import { calcularBonus } from "./bonus";
+import { calcularBonus, contarTries, esTry } from "./bonus";
 import {
   DURACION_SANCION_SEGUNDOS,
   FAMILIA_PUNTOS,
@@ -292,12 +292,17 @@ export async function terminarPartido(partidoId: string): Promise<void> {
 
   const minutos = calcularMinutos(plantel, cambios, period1DurationSeconds / 60, period2DurationSeconds / 60);
   const { bonusNewman, bonusRival } = calcularBonus(incidentes, partido.resultado);
+  // Recalculo exacto desde las incidencias -- ademas de mantener el contador incremental en vivo,
+  // asi cualquier desvio queda corregido al terminar.
+  const { triesNewman, triesRival } = contarTries(incidentes);
 
   const batch = adminDb.batch();
   batch.update(partidoRef, {
     estado: "terminado",
     "resultado.bonusNewman": bonusNewman,
     "resultado.bonusRival": bonusRival,
+    "resultado.triesNewman": triesNewman,
+    "resultado.triesRival": triesRival,
     updatedAt: FieldValue.serverTimestamp(),
   });
   batch.update(liveStateRef, {
@@ -499,7 +504,13 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
 
     if (puntos !== undefined) {
       const campo = input.equipo === "newman" ? "resultado.newman" : "resultado.rival";
-      tx.update(partidoRef, { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() });
+      const cambios: Record<string, unknown> = { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() };
+      // Contador de tries en vivo -- se muestra "(4T)" al lado del marcador. terminarPartido lo
+      // recalcula exacto por si hubo alguna correccion en el medio.
+      if (esTry(tipoReal)) {
+        cambios[input.equipo === "newman" ? "resultado.triesNewman" : "resultado.triesRival"] = FieldValue.increment(1);
+      }
+      tx.update(partidoRef, cambios);
     }
 
     // Toda tarjeta que saca al jugador de la cancha (amarilla, roja de 20, roja, doble amarilla --
@@ -616,6 +627,13 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
       if (delta !== 0) {
         const campo = inc.equipo === "newman" ? "resultado.newman" : "resultado.rival";
         cambiosPartido[campo] = inc.equipo === "newman" ? nuevoResultado.newman : nuevoResultado.rival;
+      }
+      // Ajuste del contador de tries si la correccion entra o saca un try (ej. try -> penal).
+      const deltaTries = (esTry(nuevoTipo) ? 1 : 0) - (esTry(inc.tipo) ? 1 : 0);
+      if (deltaTries !== 0 && inc.equipo) {
+        const campoTries = inc.equipo === "newman" ? "resultado.triesNewman" : "resultado.triesRival";
+        const actuales = (inc.equipo === "newman" ? partido.resultado.triesNewman : partido.resultado.triesRival) ?? 0;
+        cambiosPartido[campoTries] = Math.max(0, actuales + deltaTries);
       }
       // Corregir un try (agregarlo o sacarlo) despues de terminado puede cambiar el bonus --
       // recalcular con el tipo ya corregido, no hace falta esperar a un nuevo terminarPartido.
@@ -924,6 +942,12 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
       if (puntos !== 0) {
         const campo = inc.equipo === "newman" ? "resultado.newman" : "resultado.rival";
         cambiosPartido[campo] = inc.equipo === "newman" ? nuevoResultado.newman : nuevoResultado.rival;
+      }
+      // Descontar del contador de tries si la jugada borrada era un try.
+      if (esTry(inc.tipo) && inc.equipo) {
+        const campoTries = inc.equipo === "newman" ? "resultado.triesNewman" : "resultado.triesRival";
+        const actuales = (inc.equipo === "newman" ? partido.resultado.triesNewman : partido.resultado.triesRival) ?? 0;
+        cambiosPartido[campoTries] = Math.max(0, actuales - 1);
       }
       // Borrar un try despues de terminado puede cambiar el bonus -- ver el mismo comentario en
       // corregirTipoIncidente.

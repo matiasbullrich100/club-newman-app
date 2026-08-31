@@ -14,6 +14,17 @@ import { nombreNewmanDe } from "@/lib/categorias";
 import { puedeOperarCategoria } from "@/lib/auth/scope";
 import { CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
+// "(4T)" chico debajo del marcador grande -- misma info que aparece al lado del resultado cuando
+// el partido termina (ver golesDe en FixtureRow). No se muestra nada si el equipo no metio tries.
+function TriesTag({ tries }: { tries?: number }) {
+  if (typeof tries !== "number" || tries <= 0) return null;
+  return (
+    <span style={{ display: "block", fontSize: "0.3em", fontWeight: 400, letterSpacing: 1, color: DORADO_SUAVE, marginTop: 2 }}>
+      ({tries}T)
+    </span>
+  );
+}
+
 const ESTADO_BADGE: Record<EstadoPartido, { label: string; bg: string; color: string }> = {
   programado: { label: "No iniciado", bg: "rgba(255,255,255,.1)", color: "#ccc" },
   en_juego: { label: "En juego", bg: "#245c2c", color: "#c6f0cc" },
@@ -82,7 +93,10 @@ export default function PartidoLive({
       >
         <div style={{ flex: 1, textAlign: "center" }}>
           <div style={{ textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: 1, color: DORADO_SUAVE }}>Newman</div>
-          <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>{partido.resultado.newman}</div>
+          <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>
+            {partido.resultado.newman}
+            <TriesTag tries={partido.resultado.triesNewman} />
+          </div>
         </div>
         <div style={{ textAlign: "center", padding: "0 8px" }}>
           <Cronometro partidoId={partidoId} estado={partido.estado} />
@@ -106,7 +120,10 @@ export default function PartidoLive({
         </div>
         <div style={{ flex: 1, textAlign: "center" }}>
           <div style={{ textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: 1, color: DORADO_SUAVE }}>{partido.rival}</div>
-          <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>{partido.resultado.rival}</div>
+          <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>
+            {partido.resultado.rival}
+            <TriesTag tries={partido.resultado.triesRival} />
+          </div>
         </div>
       </div>
 

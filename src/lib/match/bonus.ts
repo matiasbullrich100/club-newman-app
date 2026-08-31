@@ -4,6 +4,25 @@ import type { Incidente, Resultado } from "@/types/firestore";
 // suman puntos pero no tries.
 const TIPOS_TRY = new Set<Incidente["tipo"]>(["try", "try_scrum", "try_penal"]);
 
+export function esTry(tipo: Incidente["tipo"]): boolean {
+  return TIPOS_TRY.has(tipo);
+}
+
+// Cuenta los tries de cada equipo. Se usa para el "(4T)" al lado del marcador -- tanto en vivo
+// (contador incremental en actions.ts) como al terminar (recalculo exacto desde las incidencias).
+export function contarTries(
+  incidentes: Pick<Incidente, "tipo" | "equipo">[]
+): { triesNewman: number; triesRival: number } {
+  let triesNewman = 0;
+  let triesRival = 0;
+  for (const inc of incidentes) {
+    if (!TIPOS_TRY.has(inc.tipo)) continue;
+    if (inc.equipo === "newman") triesNewman++;
+    else if (inc.equipo === "rival") triesRival++;
+  }
+  return { triesNewman, triesRival };
+}
+
 /**
  * Bonus ofensivo: 3 tries o mas de diferencia contra el rival, sin importar el resultado.
  * Bonus defensivo: perder por 7 puntos o menos. Un equipo puede tener los dos en el mismo
