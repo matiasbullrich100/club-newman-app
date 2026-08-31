@@ -1,0 +1,30 @@
+name: Actualizar resultados Fixt. Division
+
+# Baja de URBA los resultados de todos los cruces de cada zona con Fixt. Division y los guarda en
+# Firestore (resultadosDivision/{categoriaId}), pegandole a
+# src/app/api/cron/actualizar-resultados-division/route.ts.
+#
+# A PROPOSITO separado del workflow de la tabla de posiciones (actualizar-posiciones.yml), que
+# corre cada pocos minutos DURANTE los partidos: esta baja hace varios fetches grandes a
+# /championship/{id} y no queremos que comparta recursos serverless con la app en vivo mientras
+# el Designado carga cambios/incidencias. Por eso corre solo DESPUES de cada jornada, de noche.
+#
+# Horarios en UTC (GitHub Actions no soporta zona horaria en `schedule`). Argentina es UTC-3 todo
+# el año, asi que cada horario ART de abajo es UTC + 3. Cada corrida actualiza TODO (Superior +
+# Juveniles) -- es liviano y no hay trafico en vivo a esa hora, no hace falta filtrar por grupo.
+on:
+  schedule:
+    - cron: "0 1 * * 0" # 22:00 ART sabado -- despues de la fecha de Plantel Superior
+    - cron: "0 1 * * 1" # 22:00 ART domingo -- despues de la fecha de Juveniles
+    - cron: "0 12 * * 1" # 09:00 ART lunes -- repaso por si URBA cargo resultados tarde
+  workflow_dispatch: # correr a mano desde GitHub, cualquier dia
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pegarle al endpoint de actualizacion
+        run: |
+          curl --fail --silent --show-error --max-time 90 \
+            "${{ vars.APP_URL }}/api/cron/actualizar-resultados-division" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

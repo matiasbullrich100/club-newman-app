@@ -84,7 +84,7 @@ export interface FechaDivision {
 }
 
 type DatosFixtureCategoria = Record<string, { fecha: string; partidos: string[][] }>;
-type PartidoResultadoRaw = {
+export type PartidoResultadoRaw = {
   local: string;
   visitante: string;
   golesLocal?: number;
@@ -143,9 +143,15 @@ function nombreCorto(nombre: string, propio: string): string {
   return nombre === propio ? "Newman" : normalizarNombreEquipo(nombre);
 }
 
-export function fixtureDivisionDe(categoriaId: CategoriaConFixtureDivision, numeroFecha: number): FechaDivision | null {
+export function fixtureDivisionDe(
+  categoriaId: CategoriaConFixtureDivision,
+  numeroFecha: number,
+  // Resultados frescos de URBA para ESTA fecha (ver src/lib/resultadosDivision/). Si se pasa,
+  // reemplaza a lo que haya en el JSON estatico -- que queda solo como semilla/fallback historico.
+  resultadoOverride?: { fecha: string | null; partidos: PartidoResultadoRaw[] }
+): FechaDivision | null {
   const propio = NOMBRE_PROPIO[categoriaId];
-  const resultado = RESULTADOS[categoriaId]?.[String(numeroFecha)];
+  const resultado = resultadoOverride ?? RESULTADOS[categoriaId]?.[String(numeroFecha)];
 
   if (resultado) {
     return {

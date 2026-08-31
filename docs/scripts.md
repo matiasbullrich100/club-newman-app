@@ -19,6 +19,8 @@ pero algunos son destructivos — están marcados abajo.
 | `migrate-m16-m17-m19-fecha1` | Resultados de fecha 1 de M16/M17/M19 (transcriptos a mano de una imagen del club, sin formaciones) | Ya corrido |
 | `migrate-m16-m17-m19-fixture` | Fixture de fechas 2 a 11 de M16/M17/M19 (sin resultado todavía) | Ya corrido — patrón a copiar para cargar el fixture de una temporada nueva |
 | **`rebuild-jugadores`** | **Destructivo**: borra TODA la colección `jugadores/` y la repuebla desde el histórico (Superior) + partidos `terminado` en Firestore (Juveniles) | Solo si la colección se mezcló/ensució (ver [data-model.md](data-model.md)) — no es parte del flujo normal |
+| `actualizar-posiciones` | Baja de URBA la tabla de posiciones de cada categoría a `posiciones/{categoriaId}` | Lo hace solo el cron (sáb/dom); a mano para poblar la primera vez o forzar sin esperar |
+| `actualizar-resultados-division` | Baja de URBA los resultados de todos los cruces de cada zona con Fixt. División a `resultadosDivision/{categoriaId}` | Lo hace solo un cron propio *después* de cada jornada (sáb/dom noche + lunes); a mano para forzar. Acepta `superior`\|`juveniles` |
 | `deploy-rules` | Sube `firestore.rules` | Después de tocar ese archivo |
 
 ## Antes de correr algo destructivo
