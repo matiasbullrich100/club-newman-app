@@ -5,12 +5,14 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // Escala el tamano de fuente de TODA la app -- casi todo el texto ya usa "rem" (relativo al
 // font-size del <html>), asi que un solo cambio ahi alcanza sin tocar cada componente.
-const NIVELES = [100, 115, 130, 145];
+// 100 es el tamano por defecto; 85 es para quien lo quiere MAS chico, el resto agranda.
+const NIVELES = [85, 100, 115, 130, 145];
+const NIVEL_DEFAULT = NIVELES.indexOf(100);
 const CLAVE_STORAGE = "tamanoFuente";
 
 const botonStyle: React.CSSProperties = {
-  width: 32,
-  height: 32,
+  width: 38,
+  height: 38,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -29,10 +31,10 @@ const botonStyle: React.CSSProperties = {
 // incorrecto por un instante hasta que React hidrate con el valor real -- por eso llevan
 // suppressHydrationMismatch.
 function leerNivelGuardado(): number {
-  if (typeof window === "undefined") return 0;
+  if (typeof window === "undefined") return NIVEL_DEFAULT;
   const guardado = Number(localStorage.getItem(CLAVE_STORAGE));
   const idx = NIVELES.indexOf(guardado);
-  return idx >= 0 ? idx : 0;
+  return idx >= 0 ? idx : NIVEL_DEFAULT;
 }
 
 export default function FontSizeControl() {
@@ -47,7 +49,7 @@ export default function FontSizeControl() {
   }
 
   return (
-    <div style={{ position: "fixed", bottom: 14, right: 14, zIndex: 100, display: "flex", gap: 6 }}>
+    <div style={{ position: "fixed", bottom: 16, right: 14, zIndex: 100, display: "flex", gap: 8 }}>
       <button
         type="button"
         aria-label="Achicar letra"

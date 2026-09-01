@@ -1,11 +1,19 @@
 html {
   height: 100%;
+  /* Sin esto, Android Chrome (font boosting) e iOS reescalan el texto por su cuenta y el
+     control A- / A+ (FontSizeControl, cambia el font-size del <html>) casi no se nota en el
+     celular. Con 100% el navegador respeta el tamano que fijamos. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  /* "clip" en vez de "hidden": corta el desborde horizontal igual, pero NO crea un contenedor
+     de scroll -- asi el control A- / A+ (position: fixed) no se despega y se va scrolleando en
+     el celular en las pantallas largas (feed de incidencias). */
+  overflow-x: clip;
 }
 
 body {
