@@ -143,7 +143,9 @@ export default function PartidoLive({
         </div>
       </div>
 
-      {plantel.length > 0 && (
+      {/* Para el Designado, las formaciones van adentro del panel, debajo de "Cargar jugada"
+          (más a mano las acciones que se usan a cada rato). El resto lo ve acá arriba. */}
+      {plantel.length > 0 && !puedeOperar && (
         <div
           style={{
             background: "rgba(255,255,255,.045)",

@@ -18,6 +18,7 @@ import CargaIncidencia from "./CargaIncidencia";
 import CargaCambio from "./CargaCambio";
 import SancionesActivas from "./SancionesActivas";
 import PateadorHabitual from "./PateadorHabitual";
+import Formaciones from "@/components/Formaciones";
 import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
 import { nombreNewmanDe } from "@/lib/categorias";
@@ -268,6 +269,22 @@ export default function PanelDesignado({
               pateadorHabitualId={partido.pateadorHabitualId}
               onBloqueoChange={setBloqueoTry}
             />
+          )}
+          {/* Formaciones para el Designado -- debajo de "Cargar jugada", no arriba de todo. */}
+          {plantel.length > 0 && !bloqueoTry && (
+            <div
+              style={{
+                background: "rgba(255,255,255,.045)",
+                border: "1px solid rgba(226,197,120,.2)",
+                borderRadius: 12,
+                padding: 16,
+              }}
+            >
+              <h3 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 10 }}>
+                Formaciones
+              </h3>
+              <Formaciones plantel={plantel} />
+            </div>
           )}
           <SancionesActivas
             partidoId={partidoId}
