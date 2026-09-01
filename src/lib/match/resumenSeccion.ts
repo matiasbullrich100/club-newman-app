@@ -118,8 +118,8 @@ export interface ProximaFecha {
   fecha?: string;
   esLocal: boolean;
   rival: string;
-  // Horario del partido. En el resumen de Proxima Fecha se muestra solo cuando Newman juega de
-  // local (de visitante el horario/cancha los pone el club rival, no los cargamos).
+  // Horario del partido -- lo carga el manager/admin desde /programar, sea Newman local o
+  // visitante. El resumen de Proxima Fecha lo muestra si esta cargado.
   hora?: string;
   cancha?: string;
   // Cancha PUNTUAL dentro del predio (ej. "1" -> "Cancha 1"). El club la confirma recien unos dias

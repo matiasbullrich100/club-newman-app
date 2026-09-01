@@ -17,6 +17,7 @@ export default function ProgramarFechaFila({
   fecha,
   notaEspecial,
   horaInicial,
+  canchaInicial,
   numeroCanchaInicial,
 }: {
   partidoId: string;
@@ -27,22 +28,25 @@ export default function ProgramarFechaFila({
   fecha?: string;
   notaEspecial?: string;
   horaInicial?: string;
+  canchaInicial?: string;
   numeroCanchaInicial?: string;
 }) {
   const [hora, setHora] = useState(horaInicial ?? "");
+  const [cancha, setCancha] = useState(canchaInicial ?? "");
   const [numeroCancha, setNumeroCancha] = useState(numeroCanchaInicial ?? "");
   const [estado, setEstado] = useState<"idle" | "guardado" | "error">("idle");
   const [mensajeError, setMensajeError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const sinCambios = hora === (horaInicial ?? "") && numeroCancha === (numeroCanchaInicial ?? "");
+  const sinCambios =
+    hora === (horaInicial ?? "") && cancha === (canchaInicial ?? "") && numeroCancha === (numeroCanchaInicial ?? "");
 
   function guardar() {
     setEstado("idle");
     setMensajeError(null);
     startTransition(async () => {
       try {
-        await setHorarioCancha(partidoId, { hora, numeroCancha });
+        await setHorarioCancha(partidoId, { hora, cancha, numeroCancha });
         setEstado("guardado");
       } catch (e) {
         setEstado("error");
@@ -74,7 +78,7 @@ export default function ProgramarFechaFila({
         <>
           {!esLocal && (
             <p style={{ margin: "0 0 6px", fontSize: "0.7rem", color: DORADO_SUAVE, opacity: 0.7 }}>
-              De visitante — el horario/cancha los pone {rival}. Podés cargarlo igual si lo sabés.
+              De visitante — normalmente lo define {rival}. Cargalo cuando lo sepas.
             </p>
           )}
           <div style={{ display: "flex", gap: 8, alignItems: "flex-end", flexWrap: "wrap" }}>
@@ -88,6 +92,19 @@ export default function ProgramarFechaFila({
                   setEstado("idle");
                 }}
                 style={inputStyle}
+              />
+            </label>
+            <label style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: "0.62rem", color: DORADO_SUAVE, textTransform: "uppercase", letterSpacing: 0.4 }}>
+              {esLocal ? "Sede" : "Sede / club"}
+              <input
+                type="text"
+                placeholder={esLocal ? "Newman" : rival}
+                value={cancha}
+                onChange={(e) => {
+                  setCancha(e.target.value);
+                  setEstado("idle");
+                }}
+                style={{ ...inputStyle, width: 130 }}
               />
             </label>
             <label style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: "0.62rem", color: DORADO_SUAVE, textTransform: "uppercase", letterSpacing: 0.4 }}>

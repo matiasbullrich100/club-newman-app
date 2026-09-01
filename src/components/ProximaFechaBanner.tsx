@@ -36,8 +36,8 @@ export default function ProximaFechaBanner({ proximas }: { proximas: ProximaFech
                 {/* "en Champa", no "en Champagnat" -- el rival ya viene abreviado (ver normalizarNombreEquipo),
                     a diferencia de `cancha` que guarda el nombre completo del club. */}
                 {!proxima.esLocal && ` · en ${proxima.rival}`}
-                {/* De local mostramos el horario (de visitante lo pone el club rival). */}
-                {proxima.esLocal && proxima.hora && ` · ${proxima.hora} hs`}
+                {/* Horario -- lo carga el manager desde /programar, sea Newman local o visitante. */}
+                {proxima.hora && ` · ${proxima.hora} hs`}
                 {/* Rotulo "Cancha" -- "Cancha 1" si ya se sabe, vacio ("Cancha —") hasta que el club confirme. */}
                 {` · ${proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —"}`}
               </span>

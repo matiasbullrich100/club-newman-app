@@ -1289,14 +1289,15 @@ export async function resolverSancionRival(partidoId: string, incidenteId: strin
 }
 
 /**
- * Carga/edita el horario y la cancha puntual de un partido que todavia no arranco -- desde la
- * pantalla /programar (solo manager de la division o administrador). Vacio = borra el dato (vuelve
- * a "sin confirmar"). El resumen de Proxima Fecha muestra el horario solo cuando Newman juega de
- * local (ver ProximaFechaBanner/ProximaFechaRow).
+ * Carga/edita el horario, la sede y la cancha puntual de un partido que todavia no arranco --
+ * desde la pantalla /programar (solo manager de la division o administrador), sea Newman local o
+ * visitante. Cada campo vacio borra ese dato (vuelve a "sin confirmar"). El resumen de Proxima
+ * Fecha muestra el horario haya Newman jugado de local o de visitante (ver ProximaFechaBanner /
+ * ProximaFechaRow).
  */
 export async function setHorarioCancha(
   partidoId: string,
-  input: { hora?: string; numeroCancha?: string }
+  input: { hora?: string; cancha?: string; numeroCancha?: string }
 ): Promise<void> {
   const session = await getSession();
   const { partidoRef } = refs(partidoId);
@@ -1311,9 +1312,11 @@ export async function setHorarioCancha(
     }
 
     const hora = input.hora?.trim();
+    const cancha = input.cancha?.trim();
     const numeroCancha = input.numeroCancha?.trim();
     tx.update(partidoRef, {
       hora: hora ? hora : FieldValue.delete(),
+      cancha: cancha ? cancha : FieldValue.delete(),
       numeroCancha: numeroCancha ? numeroCancha : FieldValue.delete(),
       updatedAt: FieldValue.serverTimestamp(),
     });

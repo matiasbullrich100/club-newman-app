@@ -4,13 +4,13 @@ import { formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 
-// Sublinea del resumen de Proxima Fecha: cancha ("Cancha 3" si ya se sabe, "Cancha —" hasta que
-// el club confirme) y, cuando Newman juega de local, tambien el horario (de visitante lo pone el
-// club rival, no lo cargamos). Fecha libre no lleva nada.
+// Sublinea del resumen de Proxima Fecha: horario (si el manager lo cargo desde /programar, sea
+// Newman local o visitante) + cancha ("Cancha 3" si ya se sabe, "Cancha —" hasta que se
+// confirme). Fecha libre no lleva nada.
 function textoHorarioCancha(proxima: ProximaFecha): string | null {
   if (proxima.notaEspecial) return null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —";
-  return proxima.esLocal && proxima.hora ? `${proxima.hora} hs · ${cancha}` : cancha;
+  return proxima.hora ? `${proxima.hora} hs · ${cancha}` : cancha;
 }
 
 const botonChico: React.CSSProperties = {

@@ -69,6 +69,7 @@ export default async function ProgramarPage() {
                 fecha={proxima.fecha}
                 notaEspecial={proxima.notaEspecial}
                 horaInicial={proxima.hora}
+                canchaInicial={proxima.cancha}
                 numeroCanchaInicial={proxima.numeroCancha}
               />
             ))}
