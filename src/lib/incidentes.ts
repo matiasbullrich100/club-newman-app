@@ -96,7 +96,8 @@ export function resultadosAcumulados(incidentesAscendente: Incidente[]): { newma
  * nombreNewman: "Newman" salvo en Juveniles, donde se pide aclarar el equipo (ej. "Newman A").
  * finDePrimerTiempo: solo para inc.tipo === "fin_1t" -- esLocal del partido + el resultado
  * acumulado (ver resultadosAcumulados) al llegar a esa incidencia, para mostrar "Final 1 T. Rival
- * X - Y Newman" respetando la localia, igual que el resto de la app (ver MatchupText).
+ * X - Newman Y" respetando la localia. Cada nombre va pegado a su propio marcador (no "X - Y
+ * Newman") para que al cortar en dos renglones no quede el nombre suelto separado de su numero.
  * nombreCorto: acorta un nombre completo (ej. "Bullrich Simón" -> "Bullrich") para el feed -- ver
  * crearNombreCorto() en lib/players.ts. Sin este parametro se muestra el nombre tal cual vino.
  */
@@ -113,7 +114,7 @@ export function describirIncidente(
     const visitante = esLocal ? (rivalNombre ?? "Rival") : nombreNewman;
     const golesLocal = esLocal ? resultadoParcial.newman : resultadoParcial.rival;
     const golesVisitante = esLocal ? resultadoParcial.rival : resultadoParcial.newman;
-    return `${ETIQUETAS_INCIDENTE.fin_1t} ${local} ${golesLocal} - ${golesVisitante} ${visitante}`;
+    return `${ETIQUETAS_INCIDENTE.fin_1t} ${local} ${golesLocal} - ${visitante} ${golesVisitante}`;
   }
   if (inc.tipo === "cambio") {
     // Cierre de una sancion (amarilla/roja de 20) -- ver reingresarSancion/resolverSancionRival en
