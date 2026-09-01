@@ -25,17 +25,6 @@ pero algunos son destructivos — están marcados abajo.
 | `programar-superior-desde-jugados` | Igual pero para Plantel Superior, separando local/visitante: usa el `hora` del último jugado de local y el del último de visitante (+ nº de cancha del último de local). Horario base — los de Superior cambian fecha a fecha, se corrigen desde `/programar` | Una vez; re-correr si hace falta refrescar la base |
 | `deploy-rules` | Sube `firestore.rules` | Después de tocar ese archivo |
 
-## Cargar formaciones sin script
-
-Las formaciones de una fecha ya no necesitan un `migrate-*-formaciones` nuevo: el Manager (o el
-Administrador) las carga desde el celular en **`/formaciones` → botón "Subir"**, que abre
-`/formaciones/cargar/[partidoId]` — un cuadro de texto (un jugador por línea, primeros 15
-titulares, resto suplentes; acepta números de camiseta adelante, línea `SUPLENTES:` y suplentes
-separados por `;`). El parseo tolerante vive en `src/lib/formacionTexto.ts`; la Server Action es
-`cargarFormacion()` en `src/lib/match/actions.ts` (deja el plantel en **borrador**, igual que los
-scripts). Después se publica con el botón "Publicar" de esa misma lista. Los `migrate-*` viejos se
-mantienen como referencia / para cargas masivas de temporada.
-
 ## Antes de correr algo destructivo
 
 `rebuild-jugadores` borra y reconstruye una colección entera. Si se agregan más divisiones de
