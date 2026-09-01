@@ -30,15 +30,17 @@ export default async function JuvenilesPage() {
     (a, b) => RANGO_EDAD_DESC[a.edadId] - RANGO_EDAD_DESC[b.edadId] || a.orden - b.orden
   );
 
-  // "resumen" queda pegado toda la semana (el ultimo terminado de cada equipo, ver
-  // partidosEnVivoOUltimoTerminado) -- de jueves a la noche a domingo (juega Juveniles), si ese
-  // resultado ya tiene mas de unos dias, esta viejo: se muestra la Proxima Fecha del equipo en su
-  // lugar (misma idea que /superior, pero acá por equipo en vez de uno solo, porque esta pantalla
-  // ya agrupaba las 17 categorias de entrada).
+  // El bloque de resultados aparece/desaparece ENTERO, no equipo por equipo: si UN equipo jugo
+  // recien (ej. M17 movido al viernes) o hay algo en vivo, TODAS las Juveniles siguen mostrando
+  // su ultimo resultado -- no se rota a "Proxima Fecha" hasta que el grupo entero deja de tener
+  // algo reciente Y estamos en la ventana de Proxima Fecha.
   const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
+  const modoResultados =
+    resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3) ||
+    !debeMostrarProximaFechaEnArgentina();
   const fresco = (p: (typeof resumen)[number]) =>
-    ESTADOS_EN_VIVO.has(p.estado) ||
-    ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3);
+    ESTADOS_EN_VIVO.has(p.estado) || (modoResultados && (p.estado === "terminado" || !!p.notaEspecial));
   const idsSinResumenFresco = equiposOrdenados
     .map((e) => e.id)
     .filter((id) => !resumen.some((p) => p.categoriaId === id && fresco(p)));

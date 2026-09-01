@@ -32,12 +32,18 @@ export default async function PlantelSuperiorPage() {
   const pruebasVisibles = pruebasVisiblesPara(session);
   const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
 
-  // "Fresco" = en vivo, o terminado/Fecha libre hace <=3 dias -- una categoria que TODAVIA no
-  // arranco su partido de esta semana no cuenta como fresca aunque otra categoria si este en vivo
-  // (antes, si CUALQUIER categoria arrancaba, las demas se quedaban pegadas mostrando el resultado
-  // de la semana pasada en vez de la proxima fecha).
+  // El bloque de resultados aparece/desaparece ENTERO, no categoria por categoria: si UNA
+  // categoria jugo recien (ej. Pre F movida al jueves) o hay algo en vivo, TODO Plantel Superior
+  // sigue mostrando su ultimo resultado -- no se rota a "Proxima Fecha" hasta que el grupo entero
+  // deja de tener algo reciente Y estamos en la ventana de Proxima Fecha (jue 06:00 -> dom).
+  const modoResultados =
+    resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3) ||
+    !debeMostrarProximaFechaEnArgentina();
+
+  // "Fresco" = en vivo, o (grupo en modo resultados y esta categoria tiene un resultado/Fecha libre).
   const fresco = (p: (typeof resumen)[number] | undefined) =>
-    !!p && (ESTADOS_EN_VIVO.has(p.estado) || ((p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3));
+    !!p && (ESTADOS_EN_VIVO.has(p.estado) || (modoResultados && (p.estado === "terminado" || !!p.notaEspecial)));
 
   // Banda "P. Ganados / P. Perdidos" arriba de todo en /superior. Los partidos internos
   // Newman vs Newman (rival "Newman ...") NO cuentan -- son amistosos, no "cómo le fue al club
