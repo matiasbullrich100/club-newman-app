@@ -39,7 +39,14 @@ export default function Cronometro({
     return <span style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.75, color: DORADO_SUAVE }}>—</span>;
   }
 
-  const motivoLabel = liveState.motivoInterrupcion === "medico" ? "Médico" : liveState.motivoInterrupcion === "clima" ? "Clima" : null;
+  const motivoLabel =
+    liveState.motivoInterrupcion === "medico"
+      ? "Médico"
+      : liveState.motivoInterrupcion === "clima"
+        ? "Clima"
+        : liveState.motivoInterrupcion === "referee"
+          ? "Referee"
+          : null;
   // cortar1T() deja liveState.periodo en "1T" (solo iniciar2T lo pasa a "2T") -- sin este chequeo
   // del estado del partido, el entretiempo se mostraba como "1T · Detenido", igual que un partido
   // interrumpido sin motivo.

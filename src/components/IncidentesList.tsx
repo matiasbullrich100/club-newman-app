@@ -27,10 +27,18 @@ const ICONOS: Partial<Record<Incidente["tipo"], string>> = {
   try_penal: "🏉",
   interrupcion_medica: "🏥",
   interrupcion_clima: "⛈️",
+  interrupcion_referee: "🧑‍⚖️",
   walkover: "🚫",
 };
 
-const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t", "fin_partido", "interrupcion_medica", "interrupcion_clima"];
+const SIN_EQUIPO: Incidente["tipo"][] = [
+  "fin_1t",
+  "fin_2t",
+  "fin_partido",
+  "interrupcion_medica",
+  "interrupcion_clima",
+  "interrupcion_referee",
+];
 
 function familiaDe(tipo: Incidente["tipo"]): Incidente["tipo"][] | null {
   if (FAMILIA_PUNTOS.includes(tipo)) return FAMILIA_PUNTOS;

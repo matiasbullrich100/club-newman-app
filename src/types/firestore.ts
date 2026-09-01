@@ -117,7 +117,7 @@ export interface LiveState {
   accumulatedSeconds: number;
   period1DurationSeconds?: number;
   period2DurationSeconds?: number;
-  motivoInterrupcion?: "medico" | "clima" | null;
+  motivoInterrupcion?: "medico" | "clima" | "referee" | null;
 }
 
 // Subcollection `partidos/{id}/plantel/{jugadorId}`.
@@ -162,6 +162,7 @@ export type TipoIncidente =
   | "fin_partido"
   | "interrupcion_medica"
   | "interrupcion_clima"
+  | "interrupcion_referee"
   | "walkover";
 
 export type Equipo = "newman" | "rival";

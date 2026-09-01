@@ -96,7 +96,14 @@ export default function PartidoLive({
 
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
   const badge = ESTADO_BADGE[partido.estado];
-  const motivoLabel = motivoInterrupcion === "medico" ? "Médico" : motivoInterrupcion === "clima" ? "Clima" : null;
+  const motivoLabel =
+    motivoInterrupcion === "medico"
+      ? "Médico"
+      : motivoInterrupcion === "clima"
+        ? "Clima"
+        : motivoInterrupcion === "referee"
+          ? "Referee"
+          : null;
   const badgeLabel = partido.estado === "suspendido" && motivoLabel ? `${badge.label} · ${motivoLabel}` : badge.label;
 
   return (

@@ -261,7 +261,7 @@ export async function iniciar2T(partidoId: string): Promise<void> {
   revalidatePath(`/partido/${partidoId}`);
 }
 
-export async function suspender(partidoId: string, motivo: "medico" | "clima"): Promise<void> {
+export async function suspender(partidoId: string, motivo: "medico" | "clima" | "referee"): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc();
@@ -280,7 +280,8 @@ export async function suspender(partidoId: string, motivo: "medico" | "clima"): 
     tx.update(liveStateRef, { clockRunning: false, clockAnchor: null, accumulatedSeconds: accumulated, motivoInterrupcion: motivo });
 
     const incidente: Incidente = {
-      tipo: motivo === "medico" ? "interrupcion_medica" : "interrupcion_clima",
+      tipo:
+        motivo === "medico" ? "interrupcion_medica" : motivo === "clima" ? "interrupcion_clima" : "interrupcion_referee",
       periodo: liveState.periodo,
       minuto: Math.floor(accumulated / 60) + 1,
       segundoAbsoluto: Math.floor(accumulated),

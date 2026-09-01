@@ -18,7 +18,7 @@ estaba al cortar y borrando el incidente `fin_1t`. Solo se puede antes de que `i
 
 - **`programado`** — antes de arrancar. Puede tener plantel cargado o no.
 - **`en_juego` / `entretiempo` / `suspendido`** — en curso. `suspendido` es una pausa por el
-  Designado con motivo (`motivoInterrupcion: "medico"|"clima"`) — **no confundir** con
+  Designado con motivo (`motivoInterrupcion: "medico"|"clima"|"referee"`) — **no confundir** con
   `notaEspecial` en `Partido` (eso es para partidos que directamente no se jugaron, ver
   [data-model.md](data-model.md)).
 - **`terminado`** — fin, para siempre. La página `/partido/[id]` bifurca en este campo: terminado

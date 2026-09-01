@@ -19,12 +19,20 @@ export const ETIQUETAS_INCIDENTE: Record<Incidente["tipo"], string> = {
   fin_partido: "Final del partido",
   interrupcion_medica: "Partido interrumpido — Médico",
   interrupcion_clima: "Partido interrumpido — Clima",
+  interrupcion_referee: "Partido interrumpido — Referee",
   walkover: "W.O. — sin primera línea",
 };
 
 // Try Penal y Try Scrum se le dan al equipo, no a un jugador puntual.
 const SIN_JUGADOR_PUNTUAL: Incidente["tipo"][] = ["try_penal", "try_scrum"];
-const SIN_EQUIPO: Incidente["tipo"][] = ["fin_1t", "fin_2t", "fin_partido", "interrupcion_medica", "interrupcion_clima"];
+const SIN_EQUIPO: Incidente["tipo"][] = [
+  "fin_1t",
+  "fin_2t",
+  "fin_partido",
+  "interrupcion_medica",
+  "interrupcion_clima",
+  "interrupcion_referee",
+];
 
 // Una incidencia mal cargada solo se puede corregir dentro de su propia familia (puntos<->puntos
 // o tarjeta<->tarjeta) -- cambiar de familia dejaria campos inconsistentes (una tarjeta no tiene

@@ -105,7 +105,7 @@ export default function PanelDesignado({
     setPendiente(null);
   }
 
-  function interrumpirPor(motivo: "medico" | "clima") {
+  function interrumpirPor(motivo: "medico" | "clima" | "referee") {
     setEligiendoMotivo(false);
     ejecutar((id) => suspender(id, motivo));
   }
@@ -148,6 +148,9 @@ export default function PanelDesignado({
             </button>
             <button style={btnStyle} disabled={isPending} onClick={() => interrumpirPor("clima")}>
               Clima
+            </button>
+            <button style={btnStyle} disabled={isPending} onClick={() => interrumpirPor("referee")}>
+              Referee
             </button>
             <button style={botonSecundario} disabled={isPending} onClick={() => setEligiendoMotivo(false)}>
               Cancelar
