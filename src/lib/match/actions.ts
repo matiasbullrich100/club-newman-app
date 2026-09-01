@@ -16,6 +16,7 @@ import {
   TARJETAS_SACAN_DE_CANCHA,
 } from "@/lib/incidentes";
 import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
+import { playerId } from "@/lib/players";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import {
   PUNTOS_POR_TIPO,
@@ -1424,6 +1425,73 @@ export async function reemplazarJugadorFormacion(
   });
 
   revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
+ * Carga (o reemplaza) la formacion completa de un partido "programado" como BORRADOR
+ * (`formacionPublicada: false`). Es el equivalente, desde el celular, a correr un script
+ * migrate-*-formaciones: `titulares` van con camiseta 1..N en ese orden y `suplentes`, 16..N.
+ * Idempotente -- pisa el plantel que hubiera y borra los jugadores que ya no esten en la lista.
+ * Solo Manager de la categoria (o administrador), y solo antes de que el partido arranque.
+ * Despues se publica con `publicarFormacion` / el boton "Publicar" de /formaciones.
+ */
+export async function cargarFormacion(
+  partidoId: string,
+  input: { titulares: string[]; suplentes: string[] }
+): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const plantelRef = partidoRef.collection("plantel");
+
+  const limpiar = (xs: string[]) => (xs ?? []).map((s) => s.trim().replace(/\s+/g, " ")).filter(Boolean);
+  const titulares = limpiar(input.titulares);
+  const suplentes = limpiar(input.suplentes);
+  if (titulares.length === 0) throw new Error("La formación no tiene titulares.");
+  if (titulares.length > 15) throw new Error(`Hay ${titulares.length} titulares (el máximo es 15).`);
+  if (suplentes.length > 15) throw new Error(`Hay ${suplentes.length} suplentes (el máximo es 15).`);
+
+  const jugadores: JugadorPartido[] = [
+    ...titulares.map((nombre, i) => ({ nombre, dorsal: String(i + 1), titular: true, enCancha: true })),
+    ...suplentes.map((nombre, i) => ({ nombre, dorsal: String(16 + i), titular: false, enCancha: false })),
+  ];
+
+  // Colision de ids dentro de la misma lista (dos nombres que normalizan igual) -- mismo chequeo
+  // que hacen los scripts migrate-*-formaciones.
+  const porId = new Map<string, string>();
+  for (const j of jugadores) {
+    const id = playerId(j.nombre);
+    const previo = porId.get(id);
+    if (previo) throw new Error(`"${j.nombre}" y "${previo}" cuentan como el mismo jugador — dejá uno solo.`);
+    porId.set(id, j.nombre);
+  }
+  const nuevosIds = new Set(porId.keys());
+  const titularesIds = jugadores.filter((j) => j.titular).map((j) => playerId(j.nombre));
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, plantelSnap] = await Promise.all([tx.get(partidoRef), tx.get(plantelRef)]);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    if (!esManagerDeCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "programado") {
+      throw new Error("Solo se puede cargar la formación de un partido que todavía no arrancó.");
+    }
+
+    for (const d of plantelSnap.docs) {
+      if (!nuevosIds.has(d.id)) tx.delete(d.ref);
+    }
+    for (const j of jugadores) tx.set(plantelRef.doc(playerId(j.nombre)), j);
+    tx.update(partidoRef, {
+      formacionPublicada: false,
+      enCanchaIds: titularesIds,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  });
+
+  revalidatePath("/formaciones");
+  revalidatePath(`/formaciones/cargar/${partidoId}`);
+  revalidatePath(`/partido/${partidoId}`);
+  revalidatePath("/superior");
+  revalidatePath("/juveniles");
 }
 
 /**

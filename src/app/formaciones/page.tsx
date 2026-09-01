@@ -34,8 +34,9 @@ export default async function EstadoFormacionesPage() {
       ) : (
         <>
           <p style={{ fontSize: "0.8rem", color: DORADO_SUAVE, opacity: 0.8, textAlign: "center", margin: "0 0 18px" }}>
-            Formación de la fecha en curso, equipo por equipo. <b>Subir</b> abre el partido para cargar
-            la formación; <b>Publicar</b> la hace pública (habilitado solo si está en borrador).
+            Formación de la fecha en curso, equipo por equipo. <b>Subir</b> abre una pantalla para
+            escribir o pegar la formación (queda en borrador); <b>Publicar</b> la hace pública
+            (habilitado solo si está en borrador).
           </p>
 
           {grupos.map((grupo) => {

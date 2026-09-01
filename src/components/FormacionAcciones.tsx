@@ -51,7 +51,7 @@ export default function FormacionAcciones({
 
   return (
     <div style={{ display: "flex", gap: 6, alignItems: "center", flex: "0 0 auto" }}>
-      <Link href={`/partido/${partidoId}`} style={botonBase}>
+      <Link href={`/formaciones/cargar/${partidoId}`} style={botonBase}>
         Subir
       </Link>
       <button
