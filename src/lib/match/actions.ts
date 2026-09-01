@@ -473,6 +473,10 @@ export interface PublicarIncidenteInput {
   tipo: Exclude<TipoIncidente, "cambio">;
   equipo: Equipo;
   jugadorId?: string;
+  // true = publicar la jugada de Newman SIN el jugador (ej. no había formación cargada y la lista
+  // de "¿quién la hizo?" estaba vacía). Los puntos van igual al marcador; el nombre se completa
+  // después con "Corregir → Cambiar jugador" en el feed.
+  sinJugador?: boolean;
   // Solo para corregir un partido terminado: el reloj ya esta congelado, asi que el momento de
   // la jugada lo elige quien la carga (para que quede ordenada cronologicamente entre las demas).
   periodoManual?: Periodo;
@@ -516,27 +520,32 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     // en el picker, ver CargaIncidencia.tsx).
     let tipoReal: TipoIncidente = input.tipo;
     if (input.equipo === "newman" && requierePlayerSelection(input.tipo)) {
-      if (!input.jugadorId) throw new Error("Falta el jugador");
-      const jugadorSnap = await tx.get(partidoRef.collection("plantel").doc(input.jugadorId));
-      if (!jugadorSnap.exists) throw new Error("Jugador no encontrado en el plantel");
-      // Que esté "en cancha" es un chequeo de coherencia, no una regla dura: si enCanchaIds no se
-      // pudo reconstruir (quedó vacío), basta con que el jugador esté en el plantel.
-      if (!esCorreccionPostPartido && enCanchaIds.length > 0 && !enCanchaIds.includes(input.jugadorId)) {
-        throw new Error("El jugador no está en cancha");
-      }
-      const jugador = jugadorSnap.data() as JugadorPartido;
-      jugadorNombre = jugador.nombre;
-      dorsal = jugador.dorsal;
+      if (!input.jugadorId) {
+        // Sin jugador: solo si quien carga lo eligió a propósito (no había formación / lista
+        // vacía). La jugada se publica igual y se completa después con "Cambiar jugador".
+        if (!input.sinJugador) throw new Error("Falta el jugador");
+      } else {
+        const jugadorSnap = await tx.get(partidoRef.collection("plantel").doc(input.jugadorId));
+        if (!jugadorSnap.exists) throw new Error("Jugador no encontrado en el plantel");
+        // Que esté "en cancha" es un chequeo de coherencia, no una regla dura: si enCanchaIds no
+        // se pudo reconstruir (quedó vacío), basta con que el jugador esté en el plantel.
+        if (!esCorreccionPostPartido && enCanchaIds.length > 0 && !enCanchaIds.includes(input.jugadorId)) {
+          throw new Error("El jugador no está en cancha");
+        }
+        const jugador = jugadorSnap.data() as JugadorPartido;
+        jugadorNombre = jugador.nombre;
+        dorsal = jugador.dorsal;
 
-      if (input.tipo === "tarjeta_amarilla") {
-        const previasSnap = await tx.get(
-          partidoRef
-            .collection("incidentes")
-            .where("equipo", "==", "newman")
-            .where("jugadorId", "==", input.jugadorId)
-            .where("tipo", "==", "tarjeta_amarilla")
-        );
-        if (!previasSnap.empty) tipoReal = "tarjeta_doble_amarilla";
+        if (input.tipo === "tarjeta_amarilla") {
+          const previasSnap = await tx.get(
+            partidoRef
+              .collection("incidentes")
+              .where("equipo", "==", "newman")
+              .where("jugadorId", "==", input.jugadorId)
+              .where("tipo", "==", "tarjeta_amarilla")
+          );
+          if (!previasSnap.empty) tipoReal = "tarjeta_doble_amarilla";
+        }
       }
     }
 

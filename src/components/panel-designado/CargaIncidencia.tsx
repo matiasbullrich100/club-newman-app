@@ -128,6 +128,8 @@ export default function CargaIncidencia({
     jugadorId?: string | null;
     convirtio?: boolean | null;
     jugadorConversionId?: string | null;
+    // true = publicar la jugada de Newman sin el jugador (lista vacía, no había formación).
+    sinJugador?: boolean;
   };
 
   // Publica directo, sin pasar por la pantalla "Confirmar / Publicar" -- solo para jugadas de
@@ -146,13 +148,15 @@ export default function CargaIncidencia({
     const cuando = esCorreccion
       ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) }
       : {};
-    const inputTry: PublicarIncidenteInput = { tipo, equipo: equipoUsar, jugadorId: jugadorIdUsar ?? undefined, ...cuando };
+    const sinJugador = overrides.sinJugador ? { sinJugador: true as const } : {};
+    const inputTry: PublicarIncidenteInput = { tipo, equipo: equipoUsar, jugadorId: jugadorIdUsar ?? undefined, ...sinJugador, ...cuando };
     const necesitaConversion = TIPOS_CON_CONVERSION.includes(tipo) && convirtioUsar === true;
     const inputConversion: PublicarIncidenteInput | null = necesitaConversion
       ? {
           tipo: "conversion",
           equipo: equipoUsar,
           jugadorId: equipoUsar === "newman" ? (jugadorConversionIdUsar ?? undefined) : undefined,
+          ...sinJugador,
           ...cuando,
         }
       : null;
@@ -188,12 +192,17 @@ export default function CargaIncidencia({
   // conversion ni al pateador -- eso se pregunta despues, con el try ya publicado. La conversion
   // se publica como una incidencia aparte (ver publicarSoloConversion). En correccion post-partido
   // el circuito viejo sigue igual (try + conversion juntos al final, via publicarDirecto).
-  function publicarSoloTry(overrides: { equipo?: Equipo; jugadorId?: string | null } = {}) {
+  function publicarSoloTry(overrides: { equipo?: Equipo; jugadorId?: string | null; sinJugador?: boolean } = {}) {
     const equipoUsar = overrides.equipo ?? equipo;
     if (!tipo || !equipoUsar) return;
     setError(null);
     const jugadorIdUsar = overrides.jugadorId !== undefined ? overrides.jugadorId : jugadorId;
-    const input: PublicarIncidenteInput = { tipo, equipo: equipoUsar, jugadorId: jugadorIdUsar ?? undefined };
+    const input: PublicarIncidenteInput = {
+      tipo,
+      equipo: equipoUsar,
+      jugadorId: jugadorIdUsar ?? undefined,
+      ...(overrides.sinJugador ? { sinJugador: true } : {}),
+    };
     startTransition(async () => {
       try {
         await publicarIncidente(partidoId, input);
@@ -206,7 +215,9 @@ export default function CargaIncidencia({
 
   // EN VIVO: publica SOLO la conversion (el try ya se publico antes). "No convirtio" no publica
   // nada. Del rival no se registra el pateador.
-  function publicarSoloConversion(overrides: { convirtio?: boolean; jugadorConversionId?: string | null } = {}) {
+  function publicarSoloConversion(
+    overrides: { convirtio?: boolean; jugadorConversionId?: string | null; sinJugador?: boolean } = {}
+  ) {
     const convirtioUsar = overrides.convirtio !== undefined ? overrides.convirtio : convirtio;
     if (convirtioUsar !== true) {
       reset();
@@ -221,6 +232,7 @@ export default function CargaIncidencia({
       tipo: "conversion",
       equipo: equipoUsar,
       jugadorId: equipoUsar === "newman" ? (jugadorConversionIdUsar ?? undefined) : undefined,
+      ...(overrides.sinJugador ? { sinJugador: true } : {}),
     };
     startTransition(async () => {
       try {
@@ -301,7 +313,7 @@ export default function CargaIncidencia({
 
   // En vivo la conversion se publica sola como incidencia aparte (el try ya esta); en correccion
   // post-partido sigue yendo con el try al paso "cuando" -> "confirmar" (terminarJugada).
-  function resolverConversion(overrides: { convirtio?: boolean; jugadorConversionId?: string | null }) {
+  function resolverConversion(overrides: { convirtio?: boolean; jugadorConversionId?: string | null; sinJugador?: boolean }) {
     if (esCorreccion) terminarJugada(overrides);
     else publicarSoloConversion(overrides);
   }
@@ -454,7 +466,18 @@ export default function CargaIncidencia({
               ¿Quién hizo el try? Elegí el jugador para publicarlo{isPending ? " (publicando…)" : ""}.
             </p>
           )}
-          {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
+          {enCancha.length === 0 && (
+            <>
+              <p style={{ margin: 0, fontSize: "0.88rem", color: DORADO_SUAVE }}>
+                {soloEnCancha ? "No hay formación cargada para elegir el jugador." : "No hay jugadores cargados."}
+              </p>
+              {!esCorreccion && (
+                <button style={botonPrimario} disabled={isPending} onClick={() => publicarSoloTry({ sinJugador: true })}>
+                  {isPending ? "Publicando…" : "Anotar el try igual (sin jugador — lo corrijo después)"}
+                </button>
+              )}
+            </>
+          )}
           {enCancha.map((j) => (
             <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirJugador(j.jugadorId)}>
               {j.dorsal} — {j.nombre}
@@ -554,7 +577,22 @@ export default function CargaIncidencia({
       {paso === "jugadorConversion" && (
         <div style={listaOpciones}>
           <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién pateó la conversión?</p>
-          {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
+          {enCancha.length === 0 && (
+            <>
+              <p style={{ margin: 0, fontSize: "0.88rem", color: DORADO_SUAVE }}>
+                {soloEnCancha ? "No hay formación cargada para elegir el pateador." : "No hay jugadores cargados."}
+              </p>
+              {!esCorreccion && (
+                <button
+                  style={botonPrimario}
+                  disabled={isPending}
+                  onClick={() => publicarSoloConversion({ convirtio: true, sinJugador: true })}
+                >
+                  {isPending ? "Publicando…" : "Anotar la conversión igual (sin pateador)"}
+                </button>
+              )}
+            </>
+          )}
           {enCancha.map((j) => (
             <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirJugadorConversion(j.jugadorId)}>
               {j.dorsal} — {j.nombre}

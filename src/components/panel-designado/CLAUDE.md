@@ -14,7 +14,10 @@ Panel de control del Designado durante un partido en vivo. Motor/acciones que ll
   (rival) o el jugador (Newman) — sin esperar la conversión — y recién después se pregunta
   "¿convirtió?"; la conversión va como incidencia aparte (`publicarSoloTry` / `publicarSoloConversion`).
   Mientras un try de Newman espera que se elija el jugador, `onBloqueoChange(true)` avisa al
-  `PanelDesignado`, que bloquea el resto (estados, cambios) hasta que se elige o se cancela. En
+  `PanelDesignado`, que bloquea el resto (estados, cambios) hasta que se elige o se cancela. Si la
+  lista de jugadores está **vacía** (no se cargó la formación / se perdió `enCanchaIds`), aparece
+  un botón "Anotar el try igual (sin jugador)" — publica los puntos con `sinJugador: true` y el
+  nombre se completa después con "Corregir → Cambiar jugador". Ídem para la conversión. En
   corrección post-partido (`soloEnCancha=false`) sigue el circuito viejo (try + conversión juntos
   al final, con paso "cuándo" para el minuto).
 - **`CargaCambio.tsx`** — **entra → sale**, y en vivo se publica ahí mismo (los suplentes se ven
