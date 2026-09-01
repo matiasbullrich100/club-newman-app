@@ -236,7 +236,7 @@ export default function PanelDesignado({
       {!pendiente && !eligiendoMotivo && !eligiendoWalkover && error && <p style={{ color: "#f3caca" }}>{error}</p>}
 
       {/* El pateador preseleccionado se puede elegir YA, antes de arrancar, asi el designado no
-          pierde el 1er minuto de juego. Despues queda a la vista (abajo, arriba de los cambios). */}
+          pierde el 1er minuto de juego. En vivo queda a la vista arriba de "Cargar jugada". */}
       {partido.estado === "programado" && (
         <PateadorHabitual
           partidoId={partidoId}
@@ -248,6 +248,16 @@ export default function PanelDesignado({
 
       {(partido.estado === "en_juego" || partido.estado === "entretiempo") && (
         <div style={{ display: "grid", gap: "1rem" }}>
+          {/* Pateador preseleccionado: abajo de los botones de estado, arriba de "Cargar jugada",
+              a la vista con "Cambiar". */}
+          {!bloqueoTry && (
+            <PateadorHabitual
+              partidoId={partidoId}
+              plantel={plantel}
+              sugeridoId={sugeridoPateadorId}
+              pateadorHabitualId={partido.pateadorHabitualId}
+            />
+          )}
           {/* Try/tarjeta solo tienen sentido con la pelota en juego -- en el entretiempo el
               reloj esta frenado, no hay jugadas nuevas, pero si se hacen cambios tacticos. */}
           {partido.estado === "en_juego" && (
@@ -277,15 +287,6 @@ export default function PanelDesignado({
             plantel={plantel}
             apellidosAmbiguos={apellidosAmbiguos}
           />
-          {/* Arriba de los cambios: quien quedo como pateador preseleccionado, con "Cambiar". */}
-          {!bloqueoTry && (
-            <PateadorHabitual
-              partidoId={partidoId}
-              plantel={plantel}
-              sugeridoId={sugeridoPateadorId}
-              pateadorHabitualId={partido.pateadorHabitualId}
-            />
-          )}
           {!bloqueoTry && (
             <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
           )}
