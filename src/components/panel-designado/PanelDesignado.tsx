@@ -249,6 +249,15 @@ export default function PanelDesignado({
 
       {(partido.estado === "en_juego" || partido.estado === "entretiempo") && (
         <div style={{ display: "grid", gap: "1rem" }}>
+          {/* Los relojes de las tarjetas (sancion en curso) van arriba de todo -- hay que estar
+              mirandolos. SancionesActivas devuelve null si no hay ninguna activa. */}
+          <SancionesActivas
+            partidoId={partidoId}
+            enCanchaIds={partido.enCanchaIds}
+            plantel={plantel}
+            plantelCompleto={plantelCompleto}
+            rivalNombre={partido.rival}
+          />
           {/* Try/tarjeta solo tienen sentido con la pelota en juego -- en el entretiempo el
               reloj esta frenado, no hay jugadas nuevas, pero si se hacen cambios tacticos. */}
           {partido.estado === "en_juego" && (
@@ -298,15 +307,6 @@ export default function PanelDesignado({
               <Formaciones plantel={plantel} />
             </div>
           )}
-          <SancionesActivas
-            partidoId={partidoId}
-            enCanchaIds={partido.enCanchaIds}
-            plantel={plantel}
-            plantelCompleto={plantelCompleto}
-            rivalNombre={partido.rival}
-          />
-          {/* El feed de incidencias del Designado ahora va arriba de todo, pegado al marcador
-              (ver PartidoLive.tsx) -- así ve cómo cambia el tanteador mientras carga. */}
           {!bloqueoTry && (
             <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
           )}
