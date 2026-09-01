@@ -17,6 +17,10 @@ export interface PartidoResumen {
   // /superior y /juveniles puedan distinguir un resultado "de esta semana" de uno ya viejo (ver
   // diasDesdeEnArgentina en lib/fecha.ts).
   fecha?: string;
+  // Numero de fecha del torneo (ej. 20) -- para rotularlo en el cuadro "P. Ganados / P. Perdidos"
+  // de /superior. -Infinity si el partido no tiene numero valido (partidos de prueba); filtrar
+  // con Number.isFinite antes de mostrarlo.
+  numeroFecha: number;
   // "Fecha libre" si esta fecha fue un bye -- LiveBanner muestra esto en vez del resultado.
   notaEspecial?: string;
 }
@@ -109,6 +113,7 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
     estado: p.estado,
     resultado: p.resultado,
     fecha: p.fecha,
+    numeroFecha: comoNumero(p.numeroFecha),
     notaEspecial: p.notaEspecial,
   }));
 }

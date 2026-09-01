@@ -58,6 +58,18 @@ export default async function PlantelSuperiorPage() {
   const perdidosSemana = paraLaBanda.filter((p) => p.resultado.newman < p.resultado.rival).length;
   const mostrarResumenSemana = paraLaBanda.length > 0;
 
+  // Rotulo "Fecha 20" al principio del cuadro -- para saber a que fecha corresponden estos
+  // resultados sin tener que entrar a un partido (sobre todo cuando el bloque quedo mostrando la
+  // fecha pasada un dia o dos de mas). Normalmente todo Plantel Superior juega la misma fecha; si
+  // por reprogramaciones hay dos numeros distintos entre los contados, se muestra el rango.
+  const numerosFecha = [...new Set(paraLaBanda.map((p) => p.numeroFecha).filter(Number.isFinite))].sort((a, b) => a - b);
+  const rotuloFecha =
+    numerosFecha.length === 0
+      ? null
+      : numerosFecha.length === 1
+        ? `Fecha ${numerosFecha[0]}`
+        : `Fechas ${numerosFecha[0]}-${numerosFecha[numerosFecha.length - 1]}`;
+
   const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
   const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
   const proximasFechasPrimera = mostrarProximaFechaPrimera ? await proximasFechasDe("primera", 3) : [];
@@ -173,6 +185,7 @@ export default async function PlantelSuperiorPage() {
           }}
         >
           <span>
+            {rotuloFecha && <strong style={{ color: DORADO }}>{rotuloFecha} · </strong>}
             P. Ganados: {ganadosSemana}
             {empatadosSemana > 0 && ` · P. Empatados: ${empatadosSemana}`} · P. Perdidos: {perdidosSemana}
           </span>
