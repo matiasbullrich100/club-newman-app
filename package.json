@@ -18,6 +18,7 @@
     "backfill-historial-tarjetas": "tsx src/scripts/backfill-historial-tarjetas.ts",
     "backfill-tries-resultado": "tsx src/scripts/backfill-tries-resultado.ts",
     "recontar-tries-partido": "tsx src/scripts/recontar-tries-partido.ts",
+    "programar-juveniles-desde-jugados": "tsx src/scripts/programar-juveniles-desde-jugados.ts",
     "seed-test-cambio": "tsx src/scripts/seed-test-cambio.ts",
     "seed-test-cambio-juveniles": "tsx src/scripts/seed-test-cambio-juveniles.ts",
     "seed-test-beromama": "tsx src/scripts/seed-test-beromama.ts",

@@ -21,6 +21,7 @@ pero algunos son destructivos — están marcados abajo.
 | **`rebuild-jugadores`** | **Destructivo**: borra TODA la colección `jugadores/` y la repuebla desde el histórico (Superior) + partidos `terminado` en Firestore (Juveniles) | Solo si la colección se mezcló/ensució (ver [data-model.md](data-model.md)) — no es parte del flujo normal |
 | `actualizar-posiciones` | Baja de URBA la tabla de posiciones de cada categoría a `posiciones/{categoriaId}` | Lo hace solo el cron (sáb/dom); a mano para poblar la primera vez o forzar sin esperar |
 | `actualizar-resultados-division` | Baja de URBA los resultados de todos los cruces de cada zona con Fixt. División a `resultadosDivision/{categoriaId}` | Lo hace solo un cron propio *después* de cada jornada (sáb/dom noche + lunes); a mano para forzar. Acepta `superior`\|`juveniles` |
+| `programar-juveniles-desde-jugados` | Pone en cada categoría de Juveniles el `hora` más repetido de sus partidos jugados, sobre todos los `programado` que vienen (horario base; se corrige después desde `/programar`) | Una vez al arrancar; re-correr si se cargan fechas nuevas de Juveniles |
 | `deploy-rules` | Sube `firestore.rules` | Después de tocar ese archivo |
 
 ## Antes de correr algo destructivo
