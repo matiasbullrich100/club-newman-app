@@ -40,16 +40,21 @@ function leerNivelGuardado(): number {
 export default function FontSizeControl() {
   const [nivel, setNivel] = useState(leerNivelGuardado);
 
-  function cambiar(delta: number) {
-    const nuevo = Math.min(NIVELES.length - 1, Math.max(0, nivel + delta));
+  function aplicar(nuevo: number) {
     if (nuevo === nivel) return;
     setNivel(nuevo);
     document.documentElement.style.fontSize = `${NIVELES[nuevo]}%`;
     localStorage.setItem(CLAVE_STORAGE, String(NIVELES[nuevo]));
   }
 
+  function cambiar(delta: number) {
+    aplicar(Math.min(NIVELES.length - 1, Math.max(0, nivel + delta)));
+  }
+
+  const esDefault = nivel === NIVEL_DEFAULT;
+
   return (
-    <div style={{ position: "fixed", bottom: 16, right: 14, zIndex: 100, display: "flex", gap: 8 }}>
+    <div style={{ position: "fixed", bottom: 16, right: 14, zIndex: 100, display: "flex", alignItems: "center", gap: 8 }}>
       <button
         type="button"
         aria-label="Achicar letra"
@@ -58,6 +63,32 @@ export default function FontSizeControl() {
         style={{ ...botonStyle, opacity: nivel === 0 ? 0.4 : 1, fontSize: "0.75rem" }}
       >
         A-
+      </button>
+      {/* Muestra el tamano actual y, si no esta en el normal, sirve para volver a 100 de un toque
+          (asi nadie queda "trabado" arriba sin darse cuenta de por que A+ esta gris). */}
+      <button
+        type="button"
+        aria-label={esDefault ? "Tamaño de letra normal" : "Volver al tamaño de letra normal"}
+        onClick={() => aplicar(NIVEL_DEFAULT)}
+        disabled={esDefault}
+        style={{
+          height: 38,
+          minWidth: 44,
+          padding: "0 8px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 19,
+          background: "rgba(53,9,22,.92)",
+          border: `1px solid ${DORADO}`,
+          color: DORADO_SUAVE,
+          fontWeight: 700,
+          fontSize: "0.72rem",
+          cursor: esDefault ? "default" : "pointer",
+          opacity: esDefault ? 0.6 : 1,
+        }}
+      >
+        {NIVELES[nivel]}%
       </button>
       <button
         type="button"
