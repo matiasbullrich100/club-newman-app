@@ -43,8 +43,8 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
     ? ((posiciones.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (posiciones.updatedAt as Date))
     : null;
   const grupo = grupoDeCategoria(categoriaId);
-  // "Resumen del partido" -- mismo hub con los 3 botones (Tabla/Fixt. New./Fixt Divis.) del que se
-  // llega aca, tanto de vuelta (BackLink) como para el boton de "Fixt. New." en si.
+  // "Resumen del partido" -- mismo hub con los 3 botones (Tabla/Fixt. Newm./Fixt Divis.) del que se
+  // llega aca, tanto de vuelta (BackLink) como para el boton de "Fixt. Newm." en si.
   const hubHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = grupo.grupo === "juveniles" ? hubHref : `/categoria/${categoriaId}/fixture`;
   const fechas = Array.from({ length: numeroFechasDivisionDe(categoriaId) }, (_, i) => {
@@ -73,7 +73,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
           </Link>
         )}
         <Link href={fixtureNewmanHref} replace style={botonEstilo}>
-          Fixt. New.
+          Fixt. Newm.
         </Link>
       </div>
 

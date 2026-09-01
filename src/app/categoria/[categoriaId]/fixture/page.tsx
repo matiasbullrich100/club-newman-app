@@ -30,7 +30,7 @@ const botonEstilo: React.CSSProperties = {
 
 // El fixture completo (jugado y por jugar) de un equipo de Plantel Superior -- vive en su propia
 // pagina, aparte de /categoria/[categoriaId] (que ahora muestra la formacion del proximo partido
-// directo, sin este paso) para no alargar esa pantalla. Se llega aca tocando "Fixt. New.".
+// directo, sin este paso) para no alargar esa pantalla. Se llega aca tocando "Fixt. Newm.".
 export default async function CategoriaFixturePage({
   params,
 }: {

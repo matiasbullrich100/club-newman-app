@@ -115,7 +115,7 @@ export default function ProximaFechaRow({
           )}
           {fixtureHref && (
             <Link href={fixtureHref} style={botonChico}>
-              Fixt. New.
+              Fixt. Newm.
             </Link>
           )}
           {fixtureDivisionHref && (

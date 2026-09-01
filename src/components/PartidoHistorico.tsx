@@ -68,7 +68,7 @@ export default function PartidoHistorico({
   // claro que no es "la tabla como estaba ese dia".
   posicionesHref?: string;
   posicionesActualizado?: Date | null;
-  // Mismos "Fixt. New." / "Fixt Divis." que ya aparecen en el resumen -- solo se pasan desde
+  // Mismos "Fixt. Newm." / "Fixt Divis." que ya aparecen en el resumen -- solo se pasan desde
   // /partido/[id] (que no tenia otro lugar con estos botones); en /categoria/[id] quedan sin
   // definir a proposito porque esa pagina ya los muestra aparte, arriba del panel.
   fixtureNewmanHref?: string;
@@ -100,7 +100,7 @@ export default function PartidoHistorico({
           )}
           {fixtureNewmanHref && (
             <Link href={fixtureNewmanHref} style={botonEstilo}>
-              Fixt. New.
+              Fixt. Newm.
             </Link>
           )}
           {fixtureDivisionHref && (

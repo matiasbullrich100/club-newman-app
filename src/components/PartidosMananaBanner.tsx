@@ -25,7 +25,7 @@ interface PartidoManana {
 }
 
 // Resumen de los partidos de MAÑANA, uno por categoria -- mismo formato de tarjeta (y mismos
-// botones Tabla/Fixt. New./Fixt Divis.) que LiveBanner, ya usado en /juveniles y en el resto de
+// botones Tabla/Fixt. Newm./Fixt Divis.) que LiveBanner, ya usado en /juveniles y en el resto de
 // /superior. La fila principal lleva a /categoria/[categoriaId] (mismo destino que el boton de esa
 // categoria mas abajo) y muestra el horario en vez de la fecha (ya se sabe que es "mañana").
 export default function PartidosMananaBanner({ partidos }: { partidos: PartidoManana[] }) {
@@ -80,7 +80,7 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
               </Link>
             )}
             <Link href={fixtureNewmanHref} style={botonChico}>
-              Fixt. New.
+              Fixt. Newm.
             </Link>
             {fixtureDivisionHref && (
               <Link href={fixtureDivisionHref} style={botonChico}>

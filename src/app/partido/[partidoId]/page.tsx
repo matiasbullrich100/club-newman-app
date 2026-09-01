@@ -40,7 +40,7 @@ export default async function PartidoPage({
   // categoria ni el publico general, aunque conozcan la URL directa (ver partidosPrueba.ts).
   if (esPartidoDePrueba && !pruebasVisiblesPara(session)) notFound();
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
-  // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. New."
+  // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. Newm."
   // o tocando la fila en LiveBanner/ProximaFechaRow), no la vieja vista /fecha/[n] (huerfana --
   // nada mas en la app linkeaba ahi).
   const backHref = PARTIDOS_DEMO_IDS.includes(partidoId)
@@ -63,7 +63,7 @@ export default async function PartidoPage({
     : null;
   const posicionesHref = tienePosiciones ? `/posiciones/${partido.categoriaId}` : undefined;
 
-  // Mismos "Fixt. New." / "Fixt Divis." que ya aparecen en el resumen (LiveBanner/ProximaFechaRow)
+  // Mismos "Fixt. Newm." / "Fixt Divis." que ya aparecen en el resumen (LiveBanner/ProximaFechaRow)
   // y en /categoria/[id] -- aca tambien hacen falta porque esta pagina (formacion + incidencias)
   // es a la que se llega tocando un partido puntual, y antes solo tenia el boton de Tabla.
   const grupo = grupoDeCategoria(partido.categoriaId);

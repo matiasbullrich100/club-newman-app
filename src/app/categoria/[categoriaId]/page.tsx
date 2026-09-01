@@ -35,13 +35,13 @@ const botonEstilo: React.CSSProperties = {
   color: DORADO_SUAVE,
 };
 
-// Landing de un equipo de Plantel Superior: los 3 botones (Tabla / Fixt. New. / Fixt Divis.) y, en
+// Landing de un equipo de Plantel Superior: los 3 botones (Tabla / Fixt. Newm. / Fixt Divis.) y, en
 // la MISMA pantalla, el partido mas relevante ahora mismo -- si esta en vivo o se acaba de
 // resolver (terminado o walkover, "fresco" = dentro de los ultimos 3 dias, mismo criterio que
 // /superior), ese; si no, el proximo programado. Sin un link aparte a "ver partido completo": un
 // socio sin loguearse ve formacion + incidencias, y si puede operar esta categoria ve ademas el
 // panel para publicar formacion/iniciar el partido/cargar cambios. El fixture completo (jugado y
-// por jugar) vive en /categoria/[id]/fixture, detras de "Fixt. New.".
+// por jugar) vive en /categoria/[id]/fixture, detras de "Fixt. Newm.".
 export default async function CategoriaPage({
   params,
 }: {
@@ -132,7 +132,7 @@ export default async function CategoriaPage({
           </Link>
         )}
         <Link href={`/categoria/${categoriaId}/fixture`} style={botonEstilo}>
-          Fixt. New.
+          Fixt. Newm.
         </Link>
         {tieneFixtureDivision(categoriaId) && (
           <Link href={`/fixture/${categoriaId}/division`} style={botonEstilo}>

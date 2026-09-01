@@ -141,7 +141,7 @@ export default function LiveBanner({
           )}
           {fixtureNewmanHref && (
             <Link href={fixtureNewmanHref} style={botonChico}>
-              Fixt. New.
+              Fixt. Newm.
             </Link>
           )}
           {fixtureDivisionHref && (

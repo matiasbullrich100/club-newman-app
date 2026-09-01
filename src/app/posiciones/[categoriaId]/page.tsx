@@ -50,13 +50,13 @@ export default async function PosicionesPage({
         {categoria.nombre} - Tabla de Posiciones
       </div>
 
-      {/* replace, no push -- Tabla/Fixt. New./Fixt Divis. son 3 vistas alternativas del mismo
+      {/* replace, no push -- Tabla/Fixt. Newm./Fixt Divis. son 3 vistas alternativas del mismo
           nivel (no una mas adentro de la otra), asi que saltar entre ellas no debe apilar
           historial: "Atras" desde cualquiera vuelve a la pantalla de la que se entro a esta
           terna, no a la anterior de la terna. */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         <Link href={fixtureNewmanHref} replace style={botonEstilo}>
-          Fixt. New.
+          Fixt. Newm.
         </Link>
         {fixtureDivisionHref && (
           <Link href={fixtureDivisionHref} replace style={botonEstilo}>
