@@ -6,7 +6,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { getSession, puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
-import { calcularBonus, contarTries, esTry } from "./bonus";
+import { calcularBonus } from "./bonus";
 import {
   DURACION_SANCION_SEGUNDOS,
   FAMILIA_PUNTOS,
@@ -32,6 +32,21 @@ import {
 function refs(partidoId: string) {
   const partidoRef = adminDb.collection("partidos").doc(partidoId);
   return { partidoRef, liveStateRef: partidoRef.collection("liveState").doc("state") };
+}
+
+// try / try_scrum / try_penal cuentan como "try" para el "(4T)" del marcador (contarTries en
+// ./bonus hace lo mismo). Inline aca a proposito: el contador de tries en vivo esta en el camino
+// critico de publicarIncidente y no queremos que dependa de resolver un import extra.
+const ES_TRY: ReadonlySet<TipoIncidente> = new Set<TipoIncidente>(["try", "try_scrum", "try_penal"]);
+function contarTriesLocal(incidentes: Pick<Incidente, "tipo" | "equipo">[]): { triesNewman: number; triesRival: number } {
+  let triesNewman = 0;
+  let triesRival = 0;
+  for (const inc of incidentes) {
+    if (!ES_TRY.has(inc.tipo)) continue;
+    if (inc.equipo === "newman") triesNewman++;
+    else if (inc.equipo === "rival") triesRival++;
+  }
+  return { triesNewman, triesRival };
 }
 
 // Campo en jugadores/{id} que acumula cada tipo de tarjeta -- compartido entre publicarIncidente
@@ -294,7 +309,7 @@ export async function terminarPartido(partidoId: string): Promise<void> {
   const { bonusNewman, bonusRival } = calcularBonus(incidentes, partido.resultado);
   // Recalculo exacto desde las incidencias -- ademas de mantener el contador incremental en vivo,
   // asi cualquier desvio queda corregido al terminar.
-  const { triesNewman, triesRival } = contarTries(incidentes);
+  const { triesNewman, triesRival } = contarTriesLocal(incidentes);
 
   const batch = adminDb.batch();
   batch.update(partidoRef, {
@@ -507,7 +522,7 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       const cambios: Record<string, unknown> = { [campo]: FieldValue.increment(puntos), updatedAt: FieldValue.serverTimestamp() };
       // Contador de tries en vivo -- se muestra "(4T)" al lado del marcador. terminarPartido lo
       // recalcula exacto por si hubo alguna correccion en el medio.
-      if (esTry(tipoReal)) {
+      if (ES_TRY.has(tipoReal)) {
         cambios[input.equipo === "newman" ? "resultado.triesNewman" : "resultado.triesRival"] = FieldValue.increment(1);
       }
       tx.update(partidoRef, cambios);
@@ -629,7 +644,7 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
         cambiosPartido[campo] = inc.equipo === "newman" ? nuevoResultado.newman : nuevoResultado.rival;
       }
       // Ajuste del contador de tries si la correccion entra o saca un try (ej. try -> penal).
-      const deltaTries = (esTry(nuevoTipo) ? 1 : 0) - (esTry(inc.tipo) ? 1 : 0);
+      const deltaTries = (ES_TRY.has(nuevoTipo) ? 1 : 0) - (ES_TRY.has(inc.tipo) ? 1 : 0);
       if (deltaTries !== 0 && inc.equipo) {
         const campoTries = inc.equipo === "newman" ? "resultado.triesNewman" : "resultado.triesRival";
         const actuales = (inc.equipo === "newman" ? partido.resultado.triesNewman : partido.resultado.triesRival) ?? 0;
@@ -944,7 +959,7 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
         cambiosPartido[campo] = inc.equipo === "newman" ? nuevoResultado.newman : nuevoResultado.rival;
       }
       // Descontar del contador de tries si la jugada borrada era un try.
-      if (esTry(inc.tipo) && inc.equipo) {
+      if (ES_TRY.has(inc.tipo) && inc.equipo) {
         const campoTries = inc.equipo === "newman" ? "resultado.triesNewman" : "resultado.triesRival";
         const actuales = (inc.equipo === "newman" ? partido.resultado.triesNewman : partido.resultado.triesRival) ?? 0;
         cambiosPartido[campoTries] = Math.max(0, actuales - 1);
