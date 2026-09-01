@@ -249,16 +249,6 @@ export default function PanelDesignado({
 
       {(partido.estado === "en_juego" || partido.estado === "entretiempo") && (
         <div style={{ display: "grid", gap: "1rem" }}>
-          {/* Pateador preseleccionado: abajo de los botones de estado, arriba de "Cargar jugada",
-              a la vista con "Cambiar". */}
-          {!bloqueoTry && (
-            <PateadorHabitual
-              partidoId={partidoId}
-              plantel={plantel}
-              sugeridoId={sugeridoPateadorId}
-              pateadorHabitualId={partido.pateadorHabitualId}
-            />
-          )}
           {/* Try/tarjeta solo tienen sentido con la pelota en juego -- en el entretiempo el
               reloj esta frenado, no hay jugadas nuevas, pero si se hacen cambios tacticos. */}
           {partido.estado === "en_juego" && (
@@ -268,6 +258,15 @@ export default function PanelDesignado({
               enCanchaIds={partido.enCanchaIds}
               pateadorHabitualId={partido.pateadorHabitualId}
               onBloqueoChange={setBloqueoTry}
+            />
+          )}
+          {/* Pateador preseleccionado: abajo de "Cargar jugada", a la vista con "Cambiar". */}
+          {!bloqueoTry && (
+            <PateadorHabitual
+              partidoId={partidoId}
+              plantel={plantel}
+              sugeridoId={sugeridoPateadorId}
+              pateadorHabitualId={partido.pateadorHabitualId}
             />
           )}
           {/* Feed arriba de las formaciones -- asi "Cargar jugada" queda cerca del reloj y no se
