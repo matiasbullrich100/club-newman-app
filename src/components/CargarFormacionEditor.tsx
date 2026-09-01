@@ -1,20 +1,16 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cargarFormacion } from "@/lib/match/actions";
 import { parsearFormacion } from "@/lib/formacionTexto";
-import { parsearExcelFormaciones, type EquipoExcel } from "@/lib/formacionExcel";
 import { playerId } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-// Editor de la formación de un partido (pantalla /formaciones/cargar/[partidoId]).
-//  - Subir Excel: lee el .xlsx del club y llena el cuadro (si trae varios equipos, elegís cuál).
-//  - Pegar: el texto que copiaste de una foto (Live Text / Google Lens) o de otro lado.
-//  - Escribir a mano.
-// El parseo tolerante de texto vive en lib/formacionTexto.ts y el de Excel en lib/formacionExcel.ts;
-// acá sólo se muestra el resultado y se manda a la Server Action cargarFormacion (queda en borrador).
+// Editor de la formación de un partido (pantalla /formaciones/cargar/[partidoId]). Un cuadro de
+// texto grande + vista previa numerada. El parseo tolerante vive en lib/formacionTexto.ts; acá
+// sólo se muestra el resultado y se manda a la Server Action cargarFormacion (queda en borrador).
 export default function CargarFormacionEditor({
   partidoId,
   categoriaNombre,
@@ -36,20 +32,10 @@ export default function CargarFormacionEditor({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [equiposExcel, setEquiposExcel] = useState<EquipoExcel[] | null>(null);
-  const [importMsg, setImportMsg] = useState<string | null>(null);
-  const [importError, setImportError] = useState<string | null>(null);
-
-  // Letra del equipo actual ("M19 C" -> "C", "Pre A" -> "A") -- para preseleccionar la columna
-  // correcta cuando el Excel trae varios equipos.
-  const letraEquipo = useMemo(() => {
-    const t = categoriaNombre.trim().split(/\s+/).pop() ?? "";
-    return /^[A-H]$/i.test(t) ? t.toUpperCase() : null;
-  }, [categoriaNombre]);
-
   const { titulares, suplentes, avisos } = useMemo(() => parsearFormacion(texto), [texto]);
 
+  // Nombres que "cuentan como el mismo jugador" (mismo id normalizado) -- bloquean guardar, igual
+  // que en el script y en la propia Server Action.
   const duplicado = useMemo(() => {
     const vistos = new Map<string, string>();
     for (const nombre of [...titulares, ...suplentes]) {
@@ -71,49 +57,6 @@ export default function CargarFormacionEditor({
           : duplicado
             ? `"${duplicado.b}" y "${duplicado.a}" cuentan como el mismo jugador — dejá uno solo.`
             : null;
-
-  function volcarAlCuadro(t: string[], s: string[]) {
-    setTexto([...t, ...(s.length ? ["", "SUPLENTES:"] : []), ...s].join("\n"));
-    setGuardado(false);
-  }
-
-  function elegirEquipoExcel(e: EquipoExcel) {
-    volcarAlCuadro(e.titulares, e.suplentes);
-    setEquiposExcel(null);
-    setImportMsg(`Cargado del Excel: equipo ${e.etiqueta} (${e.titulares.length} titulares, ${e.suplentes.length} suplentes). Revisá la vista previa antes de guardar.`);
-  }
-
-  async function onArchivo(ev: React.ChangeEvent<HTMLInputElement>) {
-    const file = ev.target.files?.[0];
-    ev.target.value = ""; // permite volver a elegir el mismo archivo
-    if (!file) return;
-    setImportMsg(null);
-    setImportError(null);
-    setEquiposExcel(null);
-    try {
-      const equipos = parsearExcelFormaciones(await file.arrayBuffer());
-      if (equipos.length === 0) {
-        setImportError("No encontré ninguna lista de jugadores en ese Excel. Probá copiando el texto y pegándolo abajo.");
-        return;
-      }
-      if (equipos.length === 1) {
-        elegirEquipoExcel(equipos[0]);
-        return;
-      }
-      // Varios equipos en el archivo: si uno coincide con la letra de esta categoría, lo cargo
-      // directo igual (queda para revisar); si no, muestro los botones para elegir.
-      const match = letraEquipo ? equipos.find((e) => e.etiqueta.toUpperCase() === letraEquipo) : undefined;
-      if (match) {
-        elegirEquipoExcel(match);
-        setEquiposExcel(equipos); // deja los botones por si la coincidencia no era la buena
-      } else {
-        setEquiposExcel(equipos);
-        setImportMsg(`El Excel trae ${equipos.length} equipos. Elegí cuál es este.`);
-      }
-    } catch (e) {
-      setImportError(e instanceof Error ? e.message : "No pude leer el Excel.");
-    }
-  }
 
   function guardar() {
     setError(null);
@@ -141,42 +84,11 @@ export default function CargarFormacionEditor({
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
-        <button type="button" onClick={() => fileRef.current?.click()} style={botonSecundario}>
-          📄 Subir Excel
-        </button>
-        <input ref={fileRef} type="file" accept=".xlsx" onChange={onArchivo} style={{ display: "none" }} />
-        <span style={{ fontSize: "0.72rem", color: DORADO_SUAVE, opacity: 0.75 }}>o pegá / escribí abajo</span>
-      </div>
-
-      {equiposExcel && (
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-          {equiposExcel.map((e) => (
-            <button
-              key={e.etiqueta}
-              type="button"
-              onClick={() => elegirEquipoExcel(e)}
-              style={{
-                ...botonSecundario,
-                ...(letraEquipo && e.etiqueta.toUpperCase() === letraEquipo ? { borderColor: DORADO, color: DORADO } : {}),
-              }}
-            >
-              {e.etiqueta} · {e.titulares.length}+{e.suplentes.length}
-            </button>
-          ))}
-        </div>
-      )}
-      {importMsg && <p style={{ margin: "0 0 8px", fontSize: "0.74rem", color: DORADO_SUAVE }}>{importMsg}</p>}
-      {importError && <p style={{ margin: "0 0 8px", fontSize: "0.74rem", color: "crimson" }}>{importError}</p>}
-
-      <p style={{ fontSize: "0.78rem", color: DORADO_SUAVE, opacity: 0.85, margin: "0 0 6px", lineHeight: 1.5 }}>
+      <p style={{ fontSize: "0.78rem", color: DORADO_SUAVE, opacity: 0.85, margin: "0 0 8px", lineHeight: 1.5 }}>
         Un jugador por línea, en orden. Los <b>primeros 15 son titulares</b> (camiseta 1 a 15) y del
-        16 en adelante, suplentes. Poné una línea que diga <b>SUPLENTES</b> para separar el banco. Los
-        números de camiseta que traigas adelante se ignoran.
-      </p>
-      <p style={{ fontSize: "0.72rem", color: DORADO_SUAVE, opacity: 0.7, margin: "0 0 8px", lineHeight: 1.5 }}>
-        📷 ¿Te mandaron una foto? En el celular mantené apretada la imagen y elegí <b>Copiar texto</b>{" "}
-        (Texto en vivo en iPhone, Google Lens en Android); después pegalo acá.
+        16 en adelante, suplentes. Podés escribir mirando la foto o pegar desde el Excel. Si querés
+        marcar el banco, poné una línea que diga <b>SUPLENTES</b>. Los números de camiseta que
+        traigas adelante se ignoran.
       </p>
 
       <textarea
@@ -287,16 +199,3 @@ export default function CargarFormacionEditor({
     </div>
   );
 }
-
-const botonSecundario: React.CSSProperties = {
-  padding: "8px 14px",
-  borderRadius: 8,
-  border: "1px solid rgba(226,197,120,.4)",
-  background: "transparent",
-  color: DORADO_SUAVE,
-  fontWeight: 700,
-  fontSize: "0.72rem",
-  textTransform: "uppercase",
-  letterSpacing: 0.4,
-  cursor: "pointer",
-};

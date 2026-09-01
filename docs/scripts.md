@@ -29,18 +29,9 @@ pero algunos son destructivos — están marcados abajo.
 
 Las formaciones de una fecha ya no necesitan un `migrate-*-formaciones` nuevo: el Manager (o el
 Administrador) las carga desde el celular en **`/formaciones` → botón "Subir"**, que abre
-`/formaciones/cargar/[partidoId]`. Tres maneras de llenarlo:
-
-- **Subir Excel** — lee el `.xlsx` que manda el club (`src/lib/formacionExcel.ts`, unzip con
-  `fflate` + parseo del XML a mano). Detecta cualquier columna con una corrida `1,2,3,…` y toma
-  la columna de texto de al lado como nombres; si el archivo trae varios equipos (A/B/C/…) los
-  ofrece para elegir y preselecciona el que coincide con la letra de la categoría. Ignora los
-  bloques auxiliares (LESIONADOS / NO DISPONIBLES) quedándose con la primera corrida por columna.
-- **Pegar** — el texto copiado de una foto (Live Text / Google Lens) o de cualquier lado.
-- **Escribir a mano.**
-
-El texto del cuadro se parsea con `src/lib/formacionTexto.ts` (tolerante: número de camiseta
-adelante, línea `SUPLENTES:`, suplentes separados por `;`, líneas vacías). La Server Action es
+`/formaciones/cargar/[partidoId]` — un cuadro de texto (un jugador por línea, primeros 15
+titulares, resto suplentes; acepta números de camiseta adelante, línea `SUPLENTES:` y suplentes
+separados por `;`). El parseo tolerante vive en `src/lib/formacionTexto.ts`; la Server Action es
 `cargarFormacion()` en `src/lib/match/actions.ts` (deja el plantel en **borrador**, igual que los
 scripts). Después se publica con el botón "Publicar" de esa misma lista. Los `migrate-*` viejos se
 mantienen como referencia / para cargas masivas de temporada.
