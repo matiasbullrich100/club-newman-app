@@ -42,6 +42,7 @@
     "@opentelemetry/api": "^1.9.1",
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
+    "fflate": "^0.8.3",
     "firebase": "^12.17.1",
     "firebase-admin": "^14.2.0",
     "jose": "^6.2.8",
