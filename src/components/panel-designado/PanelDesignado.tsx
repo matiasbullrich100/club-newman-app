@@ -19,6 +19,7 @@ import CargaCambio from "./CargaCambio";
 import SancionesActivas from "./SancionesActivas";
 import PateadorHabitual from "./PateadorHabitual";
 import Formaciones from "@/components/Formaciones";
+import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -58,6 +59,7 @@ export default function PanelDesignado({
   plantel,
   plantelCompleto = [],
   periodo,
+  apellidosAmbiguos,
   sugeridoPateadorId,
 }: {
   partidoId: string;
@@ -65,6 +67,7 @@ export default function PanelDesignado({
   plantel: RosterJugador[];
   plantelCompleto?: JugadorBusqueda[];
   periodo: LiveState["periodo"];
+  apellidosAmbiguos?: string[];
   sugeridoPateadorId?: string | null;
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -267,7 +270,20 @@ export default function PanelDesignado({
               onBloqueoChange={setBloqueoTry}
             />
           )}
-          {/* Formaciones para el Designado -- debajo de "Cargar jugada", no arriba de todo. */}
+          {/* Feed arriba de las formaciones -- asi "Cargar jugada" queda cerca del reloj y no se
+              va para abajo cuando el feed crece con muchas incidencias. */}
+          {!bloqueoTry && (
+            <IncidentesFeed
+              partidoId={partidoId}
+              rivalNombre={partido.rival}
+              puedeEditar
+              nombreNewman={nombreNewman}
+              esLocal={partido.esLocal}
+              plantel={plantel}
+              apellidosAmbiguos={apellidosAmbiguos}
+            />
+          )}
+          {/* Formaciones para el Designado -- debajo del feed, no arriba de todo. */}
           {plantel.length > 0 && !bloqueoTry && (
             <div
               style={{
