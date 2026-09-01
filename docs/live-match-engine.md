@@ -65,6 +65,13 @@ opción en el picker).
 
 ## Corrección de incidencias
 
+`corregirTipoIncidente` / `corregirJugadorIncidente` / `corregirJugadorCambio` / `eliminarIncidente`
+se pueden usar en **cualquier estado menos `programado`** — en juego, entretiempo, suspendido o
+terminado. Antes exigían "en juego o terminado" y en el **entretiempo** (justo cuando el Designado
+revisa el 1er tiempo y arregla lo que cargó mal) tiraban 500 aunque el feed mostrara el botón
+"Corregir" — fue la causa del spike de 5xx del sábado 2026-08-29. Una corrección nunca toca el
+reloj, así que es segura en todos esos estados.
+
 `corregirTipoIncidente` / `eliminarIncidente` solo permiten moverse **dentro de la misma familia**
 (`FAMILIA_PUNTOS` o `FAMILIA_TARJETA`, en `src/lib/incidentes.ts`) — cambiar de familia dejaría
 una incidencia en un estado inconsistente (una tarjeta no tiene puntos, un cambio no tiene

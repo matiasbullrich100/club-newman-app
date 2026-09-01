@@ -646,8 +646,10 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
  * Corrige el tipo de una incidencia ya publicada (ej. cargaron Try y era Drop) sin tocar
  * equipo/jugador. Solo permite moverse dentro de la misma familia -- puntos<->puntos o
  * tarjeta<->tarjeta -- para no dejar una incidencia en un estado inconsistente (ej. una
- * tarjeta no tiene puntos, un cambio no tiene jugadorId de esta forma). Funciona con el
- * partido en juego o ya terminado (la correccion tipica llega despues, revisando el resultado).
+ * tarjeta no tiene puntos, un cambio no tiene jugadorId de esta forma). Se puede corregir en
+ * cualquier momento despues del arranque -- INCLUIDO el entretiempo, que es justo cuando el
+ * Designado revisa el 1er tiempo. Antes exigia "en juego o terminado" y en el entretiempo tiraba
+ * 500: el feed mostraba el boton "Corregir" pero el server lo rechazaba (spike de 5xx del sábado).
  */
 export async function corregirTipoIncidente(partidoId: string, incidenteId: string, nuevoTipo: TipoIncidente): Promise<void> {
   const session = await getSession();
@@ -664,9 +666,9 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
-      throw new Error("El partido tiene que estar en juego o terminado para corregir una jugada");
-    }
+    // Cualquier estado despues del arranque (en juego, entretiempo, suspendido, terminado). Una
+    // correccion no toca el reloj, asi que es segura en todos -- ver comentario del jsdoc.
+    if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
     if (inc.tipo === nuevoTipo) return;
 
     const esPuntos = FAMILIA_PUNTOS.includes(inc.tipo) && FAMILIA_PUNTOS.includes(nuevoTipo);
@@ -766,9 +768,8 @@ export async function corregirJugadorIncidente(partidoId: string, incidenteId: s
     const inc = incSnap.data() as Incidente;
     const nuevoJugador = nuevoJugadorSnap.data() as JugadorPartido;
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
-      throw new Error("El partido tiene que estar en juego o terminado para corregir una jugada");
-    }
+    // Igual que corregirTipoIncidente: cualquier estado menos "programado" (el entretiempo incluido).
+    if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
     if (inc.equipo !== "newman" || !requierePlayerSelection(inc.tipo)) {
       throw new Error("Esta jugada no tiene un jugador asociado");
     }
@@ -833,9 +834,7 @@ export async function corregirJugadorCambio(partidoId: string, incidenteId: stri
     const nuevo = nuevoSnap.data() as JugadorPartido;
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
     if (inc.tipo !== "cambio") throw new Error("Esta incidencia no es un cambio");
-    if (partido.estado !== "en_juego" && partido.estado !== "entretiempo" && partido.estado !== "terminado") {
-      throw new Error("El partido tiene que estar en juego o terminado para corregir un cambio");
-    }
+    if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
     const viejoId = lado === "sale" ? inc.jugadorSaleId : inc.jugadorEntraId;
     if (!viejoId) throw new Error("Este cambio no tiene ese lado para corregir");
     if (viejoId === nuevoJugadorId) return;
@@ -919,9 +918,9 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
     if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-    if (partido.estado !== "en_juego" && partido.estado !== "terminado") {
-      throw new Error("El partido tiene que estar en juego o terminado para eliminar una jugada");
-    }
+    // Igual que corregir*: se puede eliminar una jugada mal cargada en cualquier estado menos
+    // "programado" (el entretiempo incluido -- es cuando el Designado revisa el 1er tiempo).
+    if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
 
     // "cambio" no pertenece a ninguna familia (FAMILIA_PUNTOS/FAMILIA_TARJETA) -- necesita sus
     // propias lecturas (liveState + plantel de sale/entra) antes de escribir nada, asi que se
