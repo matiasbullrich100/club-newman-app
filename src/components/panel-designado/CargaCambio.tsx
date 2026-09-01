@@ -9,7 +9,10 @@ import BarraAccionFija from "./BarraAccionFija";
 import { norm } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-type Paso = "sale" | "entra" | "cuando" | "confirmar";
+// Primero "entra" (los suplentes se ven en el banco calentando, se sabe antes quien va a entrar)
+// y despues "sale" (lo decide el entrenador sobre la hora). En vivo se publica apenas se elige
+// quien sale; en correccion post-partido pasa por "cuando" (minuto) + "confirmar".
+type Paso = "entra" | "sale" | "cuando" | "confirmar";
 
 interface Seleccion {
   jugadorId: string;
@@ -32,7 +35,7 @@ export default function CargaCambio({
    * hay forma de saber con certeza quien estaba en cancha en ese momento pasado. */
   soloEnCancha?: boolean;
 }) {
-  const [paso, setPaso] = useState<Paso>("sale");
+  const [paso, setPaso] = useState<Paso>("entra");
   const [saleId, setSaleId] = useState<string | null>(null);
   const [entra, setEntra] = useState<Seleccion | null>(null);
   const [buscando, setBuscando] = useState(false);
@@ -58,7 +61,7 @@ export default function CargaCambio({
   }, [busqueda, plantelCompleto, idsPlantel]);
 
   function reset() {
-    setPaso("sale");
+    setPaso("entra");
     setSaleId(null);
     setEntra(null);
     setBuscando(false);
@@ -70,16 +73,21 @@ export default function CargaCambio({
 
   function elegirEntra(seleccion: Seleccion) {
     setEntra(seleccion);
-    setPaso(esCorreccion ? "cuando" : "confirmar");
+    setBuscando(false);
+    setBusqueda("");
+    setPaso("sale");
   }
 
-  function confirmar() {
-    if (!saleId || !entra) return;
+  // `saleIdArg` para no leer un setSaleId() que todavia no se aplico (mismo evento) al publicar
+  // en vivo apenas se elige quien sale.
+  function publicar(saleIdArg?: string) {
+    const sId = saleIdArg ?? saleId;
+    if (!sId || !entra) return;
     setError(null);
     startTransition(async () => {
       try {
         await publicarCambio(partidoId, {
-          jugadorSaleId: saleId,
+          jugadorSaleId: sId,
           jugadorEntraId: entra.jugadorId,
           ...(entra.esNuevo ? { jugadorEntraNombre: entra.nombre } : {}),
           ...(esCorreccion ? { periodoManual: periodoManual ?? undefined, minutoManual: Number(minutoManual) } : {}),
@@ -91,20 +99,35 @@ export default function CargaCambio({
     });
   }
 
+  function elegirSale(id: string) {
+    setSaleId(id);
+    if (esCorreccion) setPaso("cuando");
+    else publicar(id); // en vivo se publica ya, sin pantalla de confirmar
+  }
+
   return (
     <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: "1rem" }}>
       <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
         Cambio
       </h3>
 
+      {/* En vivo se publica solo al elegir quien sale -- no hay pantalla de confirmar donde
+          mostrar el error, asi que va arriba. */}
+      {error && paso !== "confirmar" && <p style={{ color: "crimson" }}>{error}</p>}
+
       {paso === "sale" && (
         <div style={listaOpciones}>
-          <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién sale?</p>
+          <p style={{ margin: 0, fontSize: "0.92rem" }}>
+            Entra <strong>{entra?.nombre}</strong>. ¿Quién sale?{isPending ? " (publicando…)" : ""}
+          </p>
           {enCancha.map((j) => (
-            <button key={j.jugadorId} style={botonOpcion} onClick={() => { setSaleId(j.jugadorId); setPaso("entra"); }}>
+            <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirSale(j.jugadorId)}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
+          <button style={botonSecundario} disabled={isPending} onClick={reset}>
+            Cancelar
+          </button>
         </div>
       )}
 
@@ -229,7 +252,7 @@ export default function CargaCambio({
           </p>
           {error && <p style={{ color: "crimson" }}>{error}</p>}
           <BarraAccionFija>
-            <button style={botonPrimario} disabled={isPending} onClick={confirmar}>
+            <button style={botonPrimario} disabled={isPending} onClick={() => publicar()}>
               {isPending ? "Publicando…" : "Publicar"}
             </button>
             <button style={botonSecundario} disabled={isPending} onClick={reset}>

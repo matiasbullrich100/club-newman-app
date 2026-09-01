@@ -17,10 +17,12 @@ Panel de control del Designado durante un partido en vivo. Motor/acciones que ll
   `PanelDesignado`, que bloquea el resto (estados, cambios) hasta que se elige o se cancela. En
   corrección post-partido (`soloEnCancha=false`) sigue el circuito viejo (try + conversión juntos
   al final, con paso "cuándo" para el minuto).
-- **`CargaCambio.tsx`** — sale → entra → confirmar. El paso "entra" incluye un buscador
+- **`CargaCambio.tsx`** — **entra → sale**, y en vivo se publica ahí mismo (los suplentes se ven
+  calentando, se sabe antes quién entra que quién sale). El paso "entra" incluye un buscador
   ("Buscar otro jugador") sobre el plantel completo del club (prop `plantelCompleto`, filtrado
   por `grupo`/`edadId` en la página que lo llama) para meter a alguien que no estaba en la
-  formación inicial subida — crea su doc en `plantel/` sobre la marcha si hace falta.
+  formación inicial subida — crea su doc en `plantel/` sobre la marcha si hace falta. En
+  corrección post-partido (`soloEnCancha=false`) sigue con paso "cuándo" (minuto) + "confirmar".
 - **`types.ts`** — `RosterJugador` (roster de este partido) y `JugadorBusqueda` (entrada liviana
   del plantel completo, solo para el buscador).
 - **`estilos.ts`** — botones grandes a propósito: el público que carga esto en vivo (Designados,
