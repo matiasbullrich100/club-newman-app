@@ -44,6 +44,11 @@ export default async function Home() {
             Formaciones
           </Link>
         )}
+        {session?.rol === "manager" && (
+          <Link href="/programar" style={botonStyle}>
+            Programar fecha
+          </Link>
+        )}
         {mostrarPruebas && (
           <Link href="/pruebas" style={botonStyle}>
             Partidos de Prueba

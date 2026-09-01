@@ -4,11 +4,13 @@ import { formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 
-// Rotulo "Cancha" del resumen de Proxima Fecha -- "Cancha 3" si ya se sabe, "Cancha —" (vacio)
-// hasta que el club confirme en que cancha juega cada equipo. Fecha libre no lleva cancha.
-function textoCancha(proxima: ProximaFecha): string | null {
+// Sublinea del resumen de Proxima Fecha: cancha ("Cancha 3" si ya se sabe, "Cancha —" hasta que
+// el club confirme) y, cuando Newman juega de local, tambien el horario (de visitante lo pone el
+// club rival, no lo cargamos). Fecha libre no lleva nada.
+function textoHorarioCancha(proxima: ProximaFecha): string | null {
   if (proxima.notaEspecial) return null;
-  return proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —";
+  const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —";
+  return proxima.esLocal && proxima.hora ? `${proxima.hora} hs · ${cancha}` : cancha;
 }
 
 const botonChico: React.CSSProperties = {
@@ -86,9 +88,9 @@ export default function ProximaFechaRow({
                 <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
               )}
             </span>
-            {textoCancha(proxima) && (
+            {textoHorarioCancha(proxima) && (
               <span style={{ fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
-                {textoCancha(proxima)}
+                {textoHorarioCancha(proxima)}
               </span>
             )}
           </span>

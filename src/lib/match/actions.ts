@@ -1289,6 +1289,43 @@ export async function resolverSancionRival(partidoId: string, incidenteId: strin
 }
 
 /**
+ * Carga/edita el horario y la cancha puntual de un partido que todavia no arranco -- desde la
+ * pantalla /programar (solo manager de la division o administrador). Vacio = borra el dato (vuelve
+ * a "sin confirmar"). El resumen de Proxima Fecha muestra el horario solo cuando Newman juega de
+ * local (ver ProximaFechaBanner/ProximaFechaRow).
+ */
+export async function setHorarioCancha(
+  partidoId: string,
+  input: { hora?: string; numeroCancha?: string }
+): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const snap = await tx.get(partidoRef);
+    if (!snap.exists) throw new Error("Partido no encontrado");
+    const partido = snap.data() as Partido;
+    if (!esManagerDeCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "programado") {
+      throw new Error("Solo se puede programar un partido que todavía no arrancó");
+    }
+
+    const hora = input.hora?.trim();
+    const numeroCancha = input.numeroCancha?.trim();
+    tx.update(partidoRef, {
+      hora: hora ? hora : FieldValue.delete(),
+      numeroCancha: numeroCancha ? numeroCancha : FieldValue.delete(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  });
+
+  revalidatePath("/programar");
+  revalidatePath("/superior");
+  revalidatePath("/juveniles");
+  revalidatePath(`/partido/${partidoId}`);
+}
+
+/**
  * Reemplaza a un jugador de la formacion oficial ANTES de que arranque el partido (ej. se
  * enfermo un titular la mañana del partido) -- el que entra hereda el dorsal y el puesto
  * (titular/suplente) del que sale, no arma una jugada nueva ni pasa por el reloj (el partido
