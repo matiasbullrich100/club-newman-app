@@ -498,6 +498,17 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
       throw new Error("El partido no está en juego");
     }
 
+    // Auto-reparación: si `enCanchaIds` quedó vacío con el partido en juego (se perdió o nunca se
+    // seteó -- pasó en Fecha 18 y de nuevo el 2026-08-29), el picker de "¿quién hizo el try?"
+    // queda vacío y NO se puede anotar ningún punto/tarjeta de Newman (los del rival y el try
+    // penal sí, porque no piden jugador). Se reconstruye desde los titulares, igual que hace
+    // iniciarPartido().
+    let enCanchaIds = partido.enCanchaIds;
+    if (!esCorreccionPostPartido && enCanchaIds.length === 0) {
+      const titularesSnap = await tx.get(partidoRef.collection("plantel").where("titular", "==", true));
+      enCanchaIds = titularesSnap.docs.map((d) => d.id);
+    }
+
     let jugadorNombre: string | undefined;
     let dorsal: string | undefined;
     // Segunda amarilla del mismo jugador en el mismo partido = roja por reglamento -- se detecta
@@ -506,11 +517,13 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     let tipoReal: TipoIncidente = input.tipo;
     if (input.equipo === "newman" && requierePlayerSelection(input.tipo)) {
       if (!input.jugadorId) throw new Error("Falta el jugador");
-      if (!esCorreccionPostPartido && !partido.enCanchaIds.includes(input.jugadorId)) {
-        throw new Error("El jugador no está en cancha");
-      }
       const jugadorSnap = await tx.get(partidoRef.collection("plantel").doc(input.jugadorId));
       if (!jugadorSnap.exists) throw new Error("Jugador no encontrado en el plantel");
+      // Que esté "en cancha" es un chequeo de coherencia, no una regla dura: si enCanchaIds no se
+      // pudo reconstruir (quedó vacío), basta con que el jugador esté en el plantel.
+      if (!esCorreccionPostPartido && enCanchaIds.length > 0 && !enCanchaIds.includes(input.jugadorId)) {
+        throw new Error("El jugador no está en cancha");
+      }
       const jugador = jugadorSnap.data() as JugadorPartido;
       jugadorNombre = jugador.nombre;
       dorsal = jugador.dorsal;
@@ -580,20 +593,22 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
     // amarilla (expulsion definitiva) tambien se marca expulsadoDefinitivo en su plantel/ -- no
     // vuelve a aparecer en ningun banco de reingreso/cambio, ni siquiera para que otro designado
     // lo elija por error como "quien entra" de un cambio ajeno.
+    let enCanchaIdsPersistido = false;
     if (
       TARJETAS_SACAN_DE_CANCHA.includes(tipoReal) &&
       input.equipo === "newman" &&
       input.jugadorId &&
       !esCorreccionPostPartido &&
-      partido.enCanchaIds.includes(input.jugadorId)
+      enCanchaIds.includes(input.jugadorId)
     ) {
       const esDefinitiva = TARJETAS_EXPULSION_DEFINITIVA.includes(tipoReal);
       const jugadorRef = partidoRef.collection("plantel").doc(input.jugadorId);
       tx.update(jugadorRef, { enCancha: false, ...(esDefinitiva ? { expulsadoDefinitivo: true } : {}) });
       tx.update(partidoRef, {
-        enCanchaIds: partido.enCanchaIds.filter((id) => id !== input.jugadorId),
+        enCanchaIds: enCanchaIds.filter((id) => id !== input.jugadorId),
         updatedAt: FieldValue.serverTimestamp(),
       });
+      enCanchaIdsPersistido = true;
       const salidaRef = partidoRef.collection("incidentes").doc();
       const salida: Incidente = {
         tipo: "cambio",
@@ -636,6 +651,12 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
         },
         { merge: true }
       );
+    }
+
+    // Si enCanchaIds se reconstruyó recién (estaba vacío) y el bloque de tarjeta de arriba no lo
+    // persistió ya, guardarlo -- así queda sano para el próximo cambio/tarjeta/try.
+    if (enCanchaIds !== partido.enCanchaIds && !enCanchaIdsPersistido) {
+      tx.update(partidoRef, { enCanchaIds, updatedAt: FieldValue.serverTimestamp() });
     }
   });
 

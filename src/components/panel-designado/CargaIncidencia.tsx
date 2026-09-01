@@ -84,7 +84,12 @@ export default function CargaIncidencia({
   // momento paso la jugada para que quede ordenada cronologicamente entre las demas.
   const esCorreccion = !soloEnCancha;
 
-  const enCancha = soloEnCancha ? plantel.filter((j) => enCanchaIds.includes(j.jugadorId)) : plantel;
+  // Normalmente se filtra por quién está en cancha. Pero si `enCanchaIds` se perdió (quedó vacío
+  // -- pasó en Fecha 18 y el 2026-08-29), filtrar dejaría la lista vacía y no se podría anotar
+  // ningún try/tarjeta de Newman -> en ese caso se muestra el plantel completo (el server también
+  // reconstruye enCanchaIds desde los titulares al publicar).
+  const enCancha =
+    !soloEnCancha || enCanchaIds.length === 0 ? plantel : plantel.filter((j) => enCanchaIds.includes(j.jugadorId));
   // Try Penal / Try Scrum se le dan al equipo entero, no a un jugador puntual.
   const requiereJugador = equipo === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
   const jugador = plantel.find((j) => j.jugadorId === jugadorId);
