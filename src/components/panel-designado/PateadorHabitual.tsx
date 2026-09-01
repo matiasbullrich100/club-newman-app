@@ -1,35 +1,47 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { setPateadorHabitual } from "@/lib/match/actions";
 import type { RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, listaOpciones } from "./estilos";
 import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-// Se pregunta una sola vez, apenas arranca el partido (mientras partido.pateadorHabitualId siga
-// undefined -- ver PanelDesignado.tsx) -- despues, elegir "Sí" o "Sin pateador fijo" lo guarda y
-// este bloque desaparece solo (Firestore avisa via onSnapshot en PartidoLive, sin router.refresh).
+// Se puede elegir ANTES de que arranque el partido (ver PanelDesignado / PartidoProgramadoPanel)
+// para no perder el 1er minuto de juego. Una vez elegido queda a la vista (arriba de los cambios)
+// con un boton "Cambiar" para corregirlo. `pateadorHabitualId`: undefined = todavia sin elegir,
+// null = "sin pateador fijo", string = jugadorId elegido. Firestore avisa via onSnapshot en
+// PartidoLive, sin router.refresh.
 export default function PateadorHabitual({
   partidoId,
   plantel,
   sugeridoId,
+  pateadorHabitualId,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
   sugeridoId?: string | null;
+  pateadorHabitualId?: string | null;
 }) {
   const [eligiendoOtro, setEligiendoOtro] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const sugerido = sugeridoId ? plantel.find((j) => j.jugadorId === sugeridoId) : undefined;
+  const yaElegido = pateadorHabitualId !== undefined;
+  const elegidoJugador = pateadorHabitualId ? plantel.find((j) => j.jugadorId === pateadorHabitualId) : undefined;
 
   function elegir(jugadorId: string | null) {
     setError(null);
     startTransition(async () => {
       try {
         await setPateadorHabitual(partidoId, jugadorId);
+        setEligiendoOtro(false);
+        // En vivo el onSnapshot de PartidoLive ya refresca el prop; antes de arrancar (vista
+        // estatica de PartidoProgramadoPanel) hace falta pedirlo a mano.
+        router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo guardar");
       }
@@ -42,14 +54,35 @@ export default function PateadorHabitual({
         Pateador preseleccionado
       </h3>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {eligiendoOtro ? (
+      {yaElegido && !eligiendoOtro ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <span style={{ fontSize: "0.95rem" }}>
+            {pateadorHabitualId === null
+              ? "Sin pateador fijo"
+              : elegidoJugador
+                ? `${elegidoJugador.dorsal} — ${elegidoJugador.nombre}`
+                : "Elegido (no está en la formación cargada)"}
+          </span>
+          <button
+            style={{ ...botonSecundario, flex: "0 0 auto", fontSize: "0.8rem", padding: "8px 14px" }}
+            disabled={isPending}
+            onClick={() => setEligiendoOtro(true)}
+          >
+            Cambiar
+          </button>
+        </div>
+      ) : eligiendoOtro ? (
         <div style={listaOpciones}>
           <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién patea habitualmente?</p>
+          {plantel.length === 0 && <p style={{ margin: 0, fontSize: "0.85rem", color: DORADO_SUAVE }}>Todavía no hay formación cargada.</p>}
           {plantel.map((j) => (
             <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegir(j.jugadorId)}>
               {j.dorsal} — {j.nombre}
             </button>
           ))}
+          <button style={{ ...botonSecundario, fontSize: "0.78rem" }} disabled={isPending} onClick={() => elegir(null)}>
+            Sin pateador fijo
+          </button>
           <button style={botonSecundario} disabled={isPending} onClick={() => setEligiendoOtro(false)}>
             Cancelar
           </button>

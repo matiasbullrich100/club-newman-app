@@ -4,6 +4,7 @@ import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { ordenarPorDorsal } from "@/lib/players";
+import { sugerirPateador } from "@/lib/match/pateador";
 import type { JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 
@@ -41,9 +42,18 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
     estado: partido.estado,
     resultado: partido.resultado,
     enCanchaIds: partido.enCanchaIds,
+    pateadorHabitualId: partido.pateadorHabitualId,
   };
 
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
+
+  // Sugerencia del pateador habitual -- para poder elegirlo YA, antes de arrancar el partido, sin
+  // perder el 1er minuto de juego. Solo hace falta calcularla mientras nadie contesto (una vez
+  // guardado, pateadorHabitualId deja de ser undefined). Ver sugerirPateador.
+  const sugeridoPateadorId =
+    puedeOperar && partido.pateadorHabitualId === undefined
+      ? await sugerirPateador(partido.categoriaId, plantel.map((j) => j.jugadorId))
+      : null;
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
@@ -64,5 +74,6 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
     mostrarReset,
     formacionPublicada,
     ocultarFormacion,
+    sugeridoPateadorId,
   };
 }

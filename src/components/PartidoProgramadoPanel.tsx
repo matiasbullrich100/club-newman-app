@@ -30,8 +30,18 @@ export default function PartidoProgramadoPanel({
   fixtureNewmanHref?: string;
   fixtureDivisionHref?: string;
 }) {
-  const { plantel, plantelCompleto, partidoParaCliente, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, formacionPublicada, ocultarFormacion } =
-    datos;
+  const {
+    plantel,
+    plantelCompleto,
+    partidoParaCliente,
+    puedeOperar,
+    puedeReiniciar,
+    esPartidoDePrueba,
+    mostrarReset,
+    formacionPublicada,
+    ocultarFormacion,
+    sugeridoPateadorId,
+  } = datos;
 
   return (
     <>
@@ -52,6 +62,7 @@ export default function PartidoProgramadoPanel({
           partido={partidoParaCliente}
           plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }) satisfies RosterJugador)}
           periodo={null}
+          sugeridoPateadorId={sugeridoPateadorId}
         />
       )}
       {puedeOperar && plantel.length > 0 && (
