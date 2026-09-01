@@ -36,6 +36,14 @@ const btnStyle: React.CSSProperties = {
   letterSpacing: 1,
 };
 
+// "Iniciar partido": mismo estilo pero 10% más grande (fuente, padding y alto).
+const btnIniciar: React.CSSProperties = {
+  ...btnStyle,
+  fontSize: "1.01rem",
+  padding: "15px 22px",
+  minHeight: 55,
+};
+
 // Estas dos cierran una etapa del partido que no se puede deshacer (el reloj de ese tiempo
 // no vuelve a correr) -- piden confirmacion, igual que publicar una incidencia.
 type AccionConfirmable = "cortar1T" | "terminarPartido" | "retomar1T";
@@ -191,7 +199,8 @@ export default function PanelDesignado({
       ) : (
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem" }}>
           {partido.estado === "programado" && (
-            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciarPartido)}>
+            // 10% más grande que el resto de los botones del panel -- es el que más se busca al llegar a la cancha.
+            <button style={btnIniciar} disabled={isPending} onClick={() => ejecutar(iniciarPartido)}>
               Iniciar partido
             </button>
           )}
