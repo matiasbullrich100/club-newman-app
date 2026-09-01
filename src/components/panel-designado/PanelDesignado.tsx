@@ -19,7 +19,6 @@ import CargaCambio from "./CargaCambio";
 import SancionesActivas from "./SancionesActivas";
 import PateadorHabitual from "./PateadorHabitual";
 import Formaciones from "@/components/Formaciones";
-import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -59,7 +58,6 @@ export default function PanelDesignado({
   plantel,
   plantelCompleto = [],
   periodo,
-  apellidosAmbiguos,
   sugeridoPateadorId,
 }: {
   partidoId: string;
@@ -67,7 +65,6 @@ export default function PanelDesignado({
   plantel: RosterJugador[];
   plantelCompleto?: JugadorBusqueda[];
   periodo: LiveState["periodo"];
-  apellidosAmbiguos?: string[];
   sugeridoPateadorId?: string | null;
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -293,17 +290,8 @@ export default function PanelDesignado({
             plantelCompleto={plantelCompleto}
             rivalNombre={partido.rival}
           />
-          {/* Mas jugadas que cambios -- el feed va entremedio para no tener que scrollear
-              pasando el bloque de cambios (que se usa menos) para verlo. */}
-          <IncidentesFeed
-            partidoId={partidoId}
-            rivalNombre={partido.rival}
-            puedeEditar
-            nombreNewman={nombreNewman}
-            esLocal={partido.esLocal}
-            plantel={plantel}
-            apellidosAmbiguos={apellidosAmbiguos}
-          />
+          {/* El feed de incidencias del Designado ahora va arriba de todo, pegado al marcador
+              (ver PartidoLive.tsx) -- así ve cómo cambia el tanteador mientras carga. */}
           {!bloqueoTry && (
             <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
           )}

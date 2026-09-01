@@ -9,10 +9,12 @@ import BarraAccionFija from "./BarraAccionFija";
 import { norm } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-// Primero "entra" (los suplentes se ven en el banco calentando, se sabe antes quien va a entrar)
-// y despues "sale" (lo decide el entrenador sobre la hora). En vivo se publica apenas se elige
-// quien sale; en correccion post-partido pasa por "cuando" (minuto) + "confirmar".
-type Paso = "entra" | "sale" | "cuando" | "confirmar";
+// "cerrado" = plegado (solo el boton "Cargar un cambio"), asi la barra fija de "Buscar otro
+// jugador" no queda pegada a la pantalla todo el partido. Despues: primero "entra" (los suplentes
+// se ven en el banco calentando, se sabe antes quien va a entrar) y despues "sale" (lo decide el
+// entrenador sobre la hora). En vivo se publica apenas se elige quien sale; en correccion
+// post-partido pasa por "cuando" (minuto) + "confirmar".
+type Paso = "cerrado" | "entra" | "sale" | "cuando" | "confirmar";
 
 interface Seleccion {
   jugadorId: string;
@@ -35,7 +37,7 @@ export default function CargaCambio({
    * hay forma de saber con certeza quien estaba en cancha en ese momento pasado. */
   soloEnCancha?: boolean;
 }) {
-  const [paso, setPaso] = useState<Paso>("entra");
+  const [paso, setPaso] = useState<Paso>("cerrado");
   const [saleId, setSaleId] = useState<string | null>(null);
   const [entra, setEntra] = useState<Seleccion | null>(null);
   const [buscando, setBuscando] = useState(false);
@@ -61,7 +63,7 @@ export default function CargaCambio({
   }, [busqueda, plantelCompleto, idsPlantel]);
 
   function reset() {
-    setPaso("entra");
+    setPaso("cerrado");
     setSaleId(null);
     setEntra(null);
     setBuscando(false);
@@ -114,6 +116,12 @@ export default function CargaCambio({
       {/* En vivo se publica solo al elegir quien sale -- no hay pantalla de confirmar donde
           mostrar el error, asi que va arriba. */}
       {error && paso !== "confirmar" && <p style={{ color: "crimson" }}>{error}</p>}
+
+      {paso === "cerrado" && (
+        <button style={botonPrimario} disabled={isPending} onClick={() => setPaso("entra")}>
+          Cargar un cambio
+        </button>
+      )}
 
       {paso === "sale" && (
         <div style={listaOpciones}>

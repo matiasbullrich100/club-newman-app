@@ -143,6 +143,20 @@ export default function PartidoLive({
         </div>
       </div>
 
+      {/* Para el Designado el feed va acá arriba, pegado al marcador/reloj -- así mientras carga
+          incidencias ve cómo cambia el tanteador y si lo que se publicó está bien. */}
+      {puedeOperar && (
+        <IncidentesFeed
+          partidoId={partidoId}
+          rivalNombre={partido.rival}
+          puedeEditar
+          nombreNewman={nombreNewmanDe(partido.categoriaId)}
+          esLocal={partido.esLocal}
+          plantel={plantel}
+          apellidosAmbiguos={apellidosAmbiguos}
+        />
+      )}
+
       {/* Para el Designado, las formaciones van adentro del panel, debajo de "Cargar jugada"
           (más a mano las acciones que se usan a cada rato). El resto lo ve acá arriba. */}
       {plantel.length > 0 && !puedeOperar && (
@@ -163,14 +177,13 @@ export default function PartidoLive({
       )}
 
       {puedeOperar ? (
-        // El feed para el Designado va adentro del panel (entre jugadas y cambios).
+        // El feed del Designado va arriba, pegado al marcador (ver mas arriba).
         <PanelDesignado
           partidoId={partidoId}
           partido={partido}
           plantel={plantel}
           plantelCompleto={plantelCompleto}
           periodo={periodo}
-          apellidosAmbiguos={apellidosAmbiguos}
           sugeridoPateadorId={sugeridoPateadorId}
         />
       ) : (
