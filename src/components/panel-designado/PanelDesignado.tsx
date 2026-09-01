@@ -36,12 +36,12 @@ const btnStyle: React.CSSProperties = {
   letterSpacing: 1,
 };
 
-// "Iniciar partido": mismo estilo pero 10% más grande (fuente, padding y alto).
+// "Iniciar partido": mismo estilo pero ~15% más grande (fuente, padding y alto).
 const btnIniciar: React.CSSProperties = {
   ...btnStyle,
-  fontSize: "1.01rem",
-  padding: "15px 22px",
-  minHeight: 55,
+  fontSize: "1.06rem",
+  padding: "16px 23px",
+  minHeight: 58,
 };
 
 // Estas dos cierran una etapa del partido que no se puede deshacer (el reloj de ese tiempo
