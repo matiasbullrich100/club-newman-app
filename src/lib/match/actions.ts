@@ -193,6 +193,51 @@ export async function cortar1T(partidoId: string): Promise<void> {
   revalidatePath(`/partido/${partidoId}`);
 }
 
+/**
+ * Deshace un "Final 1er tiempo" que se corto por error -- vuelve de "entretiempo" a "en_juego" en
+ * el 1er tiempo, con el reloj retomando desde donde estaba al cortar (no cuenta el rato que estuvo
+ * frenado). Solo antes de arrancar el 2do tiempo (una vez que iniciar2T puso `periodo: "2T"` ya no
+ * se puede). Borra el incidente "fin_1t" mas reciente para que el feed no muestre un final que no
+ * fue.
+ */
+export async function retomar1T(partidoId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef, liveStateRef } = refs(partidoId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, liveSnap, fin1tSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(liveStateRef),
+      tx.get(partidoRef.collection("incidentes").where("tipo", "==", "fin_1t")),
+    ]);
+    if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    const liveState = liveSnap.data() as LiveState;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "entretiempo" || liveState.periodo !== "1T") {
+      throw new Error("Solo se puede volver al 1er tiempo desde el entretiempo, antes de arrancar el 2do");
+    }
+
+    let ultimoFin1t: FirebaseFirestore.QueryDocumentSnapshot | undefined;
+    for (const d of fin1tSnap.docs) {
+      const t = (d.data().createdAt as Timestamp | undefined)?.toMillis?.() ?? 0;
+      const tUlt = (ultimoFin1t?.data().createdAt as Timestamp | undefined)?.toMillis?.() ?? -1;
+      if (!ultimoFin1t || t > tUlt) ultimoFin1t = d;
+    }
+    if (ultimoFin1t) tx.delete(ultimoFin1t.ref);
+
+    tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
+    tx.update(liveStateRef, {
+      clockRunning: true,
+      clockAnchor: Timestamp.now(),
+      // accumulatedSeconds queda como lo dejo cortar1T -- el reloj sigue desde ese punto.
+      period1DurationSeconds: FieldValue.delete(),
+    });
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+}
+
 export async function iniciar2T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);

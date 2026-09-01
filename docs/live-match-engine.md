@@ -5,10 +5,16 @@ Detalle de archivos: [`src/lib/match/CLAUDE.md`](../src/lib/match/CLAUDE.md). Es
 ## Máquina de estados (`Partido.estado`)
 
 ```
-programado → en_juego ⇄ suspendido → entretiempo → en_juego → terminado
+programado → en_juego ⇄ suspendido → entretiempo ⇄ en_juego → terminado
                   ↓                                                ↑
                   └──────────── walkover (desde cualquier estado) ─┘
 ```
+
+`entretiempo → en_juego` es normalmente `iniciar2T` (pasa a `periodo: "2T"`). Pero si el 1er
+tiempo se cortó por error (`cortar1T`) y todavía se estaba jugando, `retomar1T` vuelve a
+`en_juego` en el 1er tiempo (`periodo` sigue en `"1T"`), con el reloj retomando desde donde
+estaba al cortar y borrando el incidente `fin_1t`. Solo se puede antes de que `iniciar2T` ponga
+`periodo: "2T"`.
 
 - **`programado`** — antes de arrancar. Puede tener plantel cargado o no.
 - **`en_juego` / `entretiempo` / `suspendido`** — en curso. `suspendido` es una pausa por el

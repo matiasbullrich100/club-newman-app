@@ -8,6 +8,7 @@ import {
   iniciarPartido,
   reanudar,
   registrarWalkover,
+  retomar1T,
   suspender,
   terminarPartido,
 } from "@/lib/match/actions";
@@ -37,16 +38,18 @@ const btnStyle: React.CSSProperties = {
 
 // Estas dos cierran una etapa del partido que no se puede deshacer (el reloj de ese tiempo
 // no vuelve a correr) -- piden confirmacion, igual que publicar una incidencia.
-type AccionConfirmable = "cortar1T" | "terminarPartido";
+type AccionConfirmable = "cortar1T" | "terminarPartido" | "retomar1T";
 
 const ACCIONES_CONFIRMABLES: Record<AccionConfirmable, (id: string) => Promise<void>> = {
   cortar1T,
   terminarPartido,
+  retomar1T,
 };
 
 const PREGUNTAS_CONFIRMACION: Record<AccionConfirmable, string> = {
   cortar1T: "¿Final del 1er tiempo?",
   terminarPartido: "¿Terminar el partido?",
+  retomar1T: "¿Volver al 1er tiempo? (el 1er tiempo no había terminado)",
 };
 
 export default function PanelDesignado({
@@ -205,9 +208,15 @@ export default function PanelDesignado({
             </>
           )}
           {partido.estado === "entretiempo" && (
-            <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciar2T)}>
-              Iniciar 2do tiempo
-            </button>
+            <>
+              <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(iniciar2T)}>
+                Iniciar 2do tiempo
+              </button>
+              {/* Por si se corto el 1er tiempo por error y todavia se estaba jugando. */}
+              <button style={botonSecundario} disabled={isPending} onClick={() => pedirConfirmacion("retomar1T")}>
+                Volver al 1er tiempo
+              </button>
+            </>
           )}
           {partido.estado === "suspendido" && (
             <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(reanudar)}>
