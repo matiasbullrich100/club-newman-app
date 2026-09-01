@@ -23,6 +23,11 @@ Panel de control del Designado durante un partido en vivo. Motor/acciones que ll
   por `grupo`/`edadId` en la página que lo llama) para meter a alguien que no estaba en la
   formación inicial subida — crea su doc en `plantel/` sobre la marcha si hace falta. En
   corrección post-partido (`soloEnCancha=false`) sigue con paso "cuándo" (minuto) + "confirmar".
+  En el panel en vivo va **embebido dentro de `CargaIncidencia`** (opción "Cambio" del menú, entre
+  las jugadas de puntos y las tarjetas): `arrancarAbierto` (salta el botón plegado) + `onCerrar`
+  (vuelve al menú de tipos). En el entretiempo `CargaIncidencia` recibe `enJuego=false` y muestra
+  **solo** la opción Cambio (reloj parado, no hay jugadas nuevas). El bloque de Cambio suelto ya
+  no existe en `PanelDesignado`; sí sigue aparte en `PartidoTerminadoPanel` (corrección).
 - **`types.ts`** — `RosterJugador` (roster de este partido) y `JugadorBusqueda` (entrada liviana
   del plantel completo, solo para el buscador).
 - **`estilos.ts`** — botones grandes a propósito: el público que carga esto en vivo (Designados,

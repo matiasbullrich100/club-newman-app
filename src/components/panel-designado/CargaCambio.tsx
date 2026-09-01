@@ -28,6 +28,8 @@ export default function CargaCambio({
   plantelCompleto,
   enCanchaIds,
   soloEnCancha = true,
+  arrancarAbierto = false,
+  onCerrar,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
@@ -36,8 +38,12 @@ export default function CargaCambio({
   /** false en correcciones post-partido: cualquiera del plantel pudo haber salido/entrado, no
    * hay forma de saber con certeza quien estaba en cancha en ese momento pasado. */
   soloEnCancha?: boolean;
+  /** true cuando va embebido dentro de "Cargar jugada": arranca directo en "entra" (no en el
+   * boton plegado) y avisa al padre al terminar/cancelar via onCerrar para volver al menú. */
+  arrancarAbierto?: boolean;
+  onCerrar?: () => void;
 }) {
-  const [paso, setPaso] = useState<Paso>("cerrado");
+  const [paso, setPaso] = useState<Paso>(arrancarAbierto ? "entra" : "cerrado");
   const [saleId, setSaleId] = useState<string | null>(null);
   const [entra, setEntra] = useState<Seleccion | null>(null);
   const [buscando, setBuscando] = useState(false);
@@ -63,7 +69,11 @@ export default function CargaCambio({
   }, [busqueda, plantelCompleto, idsPlantel]);
 
   function reset() {
-    setPaso("cerrado");
+    if (onCerrar) {
+      onCerrar(); // embebido en "Cargar jugada": volver al menu de tipos
+    } else {
+      setPaso("cerrado");
+    }
     setSaleId(null);
     setEntra(null);
     setBuscando(false);

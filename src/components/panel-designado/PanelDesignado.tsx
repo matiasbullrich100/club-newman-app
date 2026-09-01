@@ -15,7 +15,6 @@ import {
 import type { LiveState, Partido } from "@/types/firestore";
 import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
-import CargaCambio from "./CargaCambio";
 import SancionesActivas from "./SancionesActivas";
 import PateadorHabitual from "./PateadorHabitual";
 import Formaciones from "@/components/Formaciones";
@@ -258,17 +257,17 @@ export default function PanelDesignado({
             plantelCompleto={plantelCompleto}
             rivalNombre={partido.rival}
           />
-          {/* Try/tarjeta solo tienen sentido con la pelota en juego -- en el entretiempo el
-              reloj esta frenado, no hay jugadas nuevas, pero si se hacen cambios tacticos. */}
-          {partido.estado === "en_juego" && (
-            <CargaIncidencia
-              partidoId={partidoId}
-              plantel={plantel}
-              enCanchaIds={partido.enCanchaIds}
-              pateadorHabitualId={partido.pateadorHabitualId}
-              onBloqueoChange={setBloqueoTry}
-            />
-          )}
+          {/* Cargar jugada -- en el entretiempo (reloj frenado) solo se ofrece el Cambio, no
+              jugadas nuevas; el Cambio va adentro de este bloque (entre las jugadas y las tarjetas). */}
+          <CargaIncidencia
+            partidoId={partidoId}
+            plantel={plantel}
+            plantelCompleto={plantelCompleto}
+            enCanchaIds={partido.enCanchaIds}
+            pateadorHabitualId={partido.pateadorHabitualId}
+            enJuego={partido.estado === "en_juego"}
+            onBloqueoChange={setBloqueoTry}
+          />
           {/* Pateador preseleccionado: abajo de "Cargar jugada", a la vista con "Cambiar". */}
           {!bloqueoTry && (
             <PateadorHabitual
@@ -306,9 +305,6 @@ export default function PanelDesignado({
               </h3>
               <Formaciones plantel={plantel} />
             </div>
-          )}
-          {!bloqueoTry && (
-            <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
           )}
         </div>
       )}

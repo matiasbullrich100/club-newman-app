@@ -4,7 +4,8 @@ import { useEffect, useState, useTransition } from "react";
 import { adelantarReloj, publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
 import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
 import { FAMILIA_PUNTOS, requierePlayerSelection } from "@/lib/incidentes";
-import type { RosterJugador } from "./types";
+import type { JugadorBusqueda, RosterJugador } from "./types";
+import CargaCambio from "./CargaCambio";
 import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
 import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -25,7 +26,7 @@ const TIPOS: { tipo: Exclude<TipoIncidente, "cambio" | "fin_1t" | "fin_2t" | "fi
   { tipo: "tarjeta_azul", label: "Tarjeta azul" },
 ];
 
-type Paso = "tipo" | "equipo" | "jugador" | "confirmarPateador" | "convirtio" | "jugadorConversion" | "cuando" | "confirmar";
+type Paso = "tipo" | "equipo" | "jugador" | "confirmarPateador" | "convirtio" | "jugadorConversion" | "cuando" | "confirmar" | "cambio";
 
 // Try y Try Scrum pueden convertirse -- Try Penal ya suma los 7 puntos (try+conversion
 // automatica), no se le vuelve a preguntar.
@@ -39,13 +40,17 @@ const TIPOS_CON_PATEADOR_PRESETEADO: (typeof TIPOS)[number]["tipo"][] = ["conver
 export default function CargaIncidencia({
   partidoId,
   plantel,
+  plantelCompleto = [],
   enCanchaIds,
   pateadorHabitualId,
   soloEnCancha = true,
+  enJuego = true,
   onBloqueoChange,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
+  /** Plantel completo del club (para el buscador de "otro jugador" del Cambio embebido). */
+  plantelCompleto?: JugadorBusqueda[];
   enCanchaIds: string[];
   /** jugadorId del pateador habitual de este partido (Partido.pateadorHabitualId), si esta en
    * cancha -- ver pateadorEnCancha mas abajo. */
@@ -53,6 +58,9 @@ export default function CargaIncidencia({
   /** false en correcciones post-partido: cualquiera del plantel pudo haber anotado, no solo
    * quien estaba en cancha al momento de cortar (ya no hay forma de saberlo con certeza). */
   soloEnCancha?: boolean;
+  /** false en el entretiempo (reloj parado): solo se ofrece el Cambio, no jugadas de puntos ni
+   * tarjetas ni correccion de reloj. En vivo y en correccion post-partido va true. */
+  enJuego?: boolean;
   /** Se avisa al panel cuando hay un try de Newman EN VIVO esperando que se elija el jugador que
    * lo hizo -- el panel bloquea el resto de las acciones hasta que se elige (o se cancela), asi
    * el try no se queda sin publicar por olvido. */
@@ -343,13 +351,27 @@ export default function CargaIncidencia({
 
       {paso === "tipo" && (
         <div style={grillaOpciones}>
-          {TIPOS.map(({ tipo: t, label }) => (
-            <button key={t} style={{ ...botonOpcion, textAlign: "center" }} onClick={() => elegirTipo(t)}>
-              {label}
-            </button>
-          ))}
-          {/* Correccion de reloj -- no hay reloj corriendo en una correccion post-partido. */}
+          {/* En el entretiempo (enJuego false, reloj parado) solo tiene sentido el Cambio. */}
+          {(enJuego || esCorreccion) &&
+            TIPOS.slice(0, 6).map(({ tipo: t, label }) => (
+              <button key={t} style={{ ...botonOpcion, textAlign: "center" }} onClick={() => elegirTipo(t)}>
+                {label}
+              </button>
+            ))}
+          {/* "Cargar un cambio" -- entre las jugadas de puntos y las tarjetas. */}
           {!esCorreccion && (
+            <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setPaso("cambio")}>
+              Cambio
+            </button>
+          )}
+          {(enJuego || esCorreccion) &&
+            TIPOS.slice(6).map(({ tipo: t, label }) => (
+              <button key={t} style={{ ...botonOpcion, textAlign: "center" }} onClick={() => elegirTipo(t)}>
+                {label}
+              </button>
+            ))}
+          {/* Correccion de reloj -- no hay reloj corriendo en una correccion post-partido ni en el entretiempo. */}
+          {!esCorreccion && enJuego && (
             <>
               <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(30)}>
                 +30&quot;
@@ -360,6 +382,18 @@ export default function CargaIncidencia({
             </>
           )}
         </div>
+      )}
+
+      {paso === "cambio" && (
+        <CargaCambio
+          partidoId={partidoId}
+          plantel={plantel}
+          plantelCompleto={plantelCompleto}
+          enCanchaIds={enCanchaIds}
+          soloEnCancha={soloEnCancha}
+          arrancarAbierto
+          onCerrar={() => setPaso("tipo")}
+        />
       )}
 
       {paso === "tipo" && confirmandoReloj !== null && (
