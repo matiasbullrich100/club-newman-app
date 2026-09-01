@@ -16,12 +16,18 @@ import { puedeOperarCategoria } from "@/lib/auth/scope";
 import { CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // "(4T)" chico debajo del marcador grande -- misma info que aparece al lado del resultado cuando
-// el partido termina (ver golesDe en FixtureRow). No se muestra nada si el equipo no metio tries.
-function TriesTag({ tries }: { tries?: number }) {
-  if (typeof tries !== "number" || tries <= 0) return null;
+// el partido termina (ver golesDe en FixtureRow). Ademas, EN VIVO, "(B)" si ya se tiene el bonus
+// OFENSIVO (3 tries o mas de diferencia contra el rival). El bonus defensivo (perder por <= 7) no
+// se muestra en vivo -- eso solo tiene sentido con el partido terminado, aparece recien ahi.
+function TriesTag({ tries, triesOtro }: { tries?: number; triesOtro?: number }) {
+  const t = typeof tries === "number" ? tries : 0;
+  const tr = typeof triesOtro === "number" ? triesOtro : 0;
+  const bonusOfensivo = t - tr >= 3;
+  if (t <= 0 && !bonusOfensivo) return null;
   return (
     <span style={{ display: "block", fontSize: "0.3em", fontWeight: 400, letterSpacing: 1, color: DORADO_SUAVE, marginTop: 2 }}>
-      ({tries}T)
+      {t > 0 && `(${t}T)`}
+      {bonusOfensivo && <span style={{ color: DORADO }}> (B)</span>}
     </span>
   );
 }
@@ -111,7 +117,7 @@ export default function PartidoLive({
           <div style={{ textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: 1, color: DORADO_SUAVE }}>Newman</div>
           <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>
             {partido.resultado.newman}
-            <TriesTag tries={partido.resultado.triesNewman} />
+            <TriesTag tries={partido.resultado.triesNewman} triesOtro={partido.resultado.triesRival} />
           </div>
         </div>
         <div style={{ textAlign: "center", padding: "0 8px" }}>
@@ -138,7 +144,7 @@ export default function PartidoLive({
           <div style={{ textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: 1, color: DORADO_SUAVE }}>{partido.rival}</div>
           <div style={{ fontWeight: 700, fontSize: "2.4rem", color: CREMA, lineHeight: 1.1 }}>
             {partido.resultado.rival}
-            <TriesTag tries={partido.resultado.triesRival} />
+            <TriesTag tries={partido.resultado.triesRival} triesOtro={partido.resultado.triesNewman} />
           </div>
         </div>
       </div>
