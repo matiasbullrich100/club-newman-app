@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { adelantarReloj, publicarIncidente, type PublicarIncidenteInput } from "@/lib/match/actions";
 import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
 import { FAMILIA_PUNTOS, requierePlayerSelection } from "@/lib/incidentes";
@@ -42,6 +42,7 @@ export default function CargaIncidencia({
   enCanchaIds,
   pateadorHabitualId,
   soloEnCancha = true,
+  onBloqueoChange,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
@@ -52,6 +53,10 @@ export default function CargaIncidencia({
   /** false en correcciones post-partido: cualquiera del plantel pudo haber anotado, no solo
    * quien estaba en cancha al momento de cortar (ya no hay forma de saberlo con certeza). */
   soloEnCancha?: boolean;
+  /** Se avisa al panel cuando hay un try de Newman EN VIVO esperando que se elija el jugador que
+   * lo hizo -- el panel bloquea el resto de las acciones hasta que se elige (o se cancela), asi
+   * el try no se queda sin publicar por olvido. */
+  onBloqueoChange?: (bloqueado: boolean) => void;
 }) {
   const [paso, setPaso] = useState<Paso>("tipo");
   const [tipo, setTipo] = useState<(typeof TIPOS)[number]["tipo"] | null>(null);
@@ -82,6 +87,16 @@ export default function CargaIncidencia({
     soloEnCancha && pateadorHabitualId
       ? plantel.find((j) => j.jugadorId === pateadorHabitualId && enCanchaIds.includes(j.jugadorId))
       : undefined;
+
+  // Try (o Try Scrum) de Newman, en vivo, que ya sabemos que fue de Newman pero todavia no se
+  // eligio el jugador que lo hizo -- hasta que se elija (y el try se publique) el panel bloquea
+  // el resto de las acciones. Es EN VIVO nomas: en la correccion post-partido no aplica.
+  const tryConversion = !!tipo && TIPOS_CON_CONVERSION.includes(tipo);
+  const bloqueado = !esCorreccion && paso === "jugador" && tryConversion && equipo === "newman";
+  useEffect(() => {
+    onBloqueoChange?.(bloqueado);
+    return () => onBloqueoChange?.(false);
+  }, [bloqueado, onBloqueoChange]);
 
   function reset() {
     setPaso("tipo");
@@ -156,9 +171,59 @@ export default function CargaIncidencia({
     }
   }
 
+  // EN VIVO: publica SOLO el try (o try scrum) apenas se sabe quien lo hizo, sin esperar a la
+  // conversion ni al pateador -- eso se pregunta despues, con el try ya publicado. La conversion
+  // se publica como una incidencia aparte (ver publicarSoloConversion). En correccion post-partido
+  // el circuito viejo sigue igual (try + conversion juntos al final, via publicarDirecto).
+  function publicarSoloTry(overrides: { equipo?: Equipo; jugadorId?: string | null } = {}) {
+    const equipoUsar = overrides.equipo ?? equipo;
+    if (!tipo || !equipoUsar) return;
+    setError(null);
+    const jugadorIdUsar = overrides.jugadorId !== undefined ? overrides.jugadorId : jugadorId;
+    const input: PublicarIncidenteInput = { tipo, equipo: equipoUsar, jugadorId: jugadorIdUsar ?? undefined };
+    startTransition(async () => {
+      try {
+        await publicarIncidente(partidoId, input);
+        setPaso("convirtio"); // el try ya quedo publicado; ahora se pregunta la conversion
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo publicar el try");
+      }
+    });
+  }
+
+  // EN VIVO: publica SOLO la conversion (el try ya se publico antes). "No convirtio" no publica
+  // nada. Del rival no se registra el pateador.
+  function publicarSoloConversion(overrides: { convirtio?: boolean; jugadorConversionId?: string | null } = {}) {
+    const convirtioUsar = overrides.convirtio !== undefined ? overrides.convirtio : convirtio;
+    if (convirtioUsar !== true) {
+      reset();
+      return;
+    }
+    const equipoUsar = equipo;
+    if (!equipoUsar) return;
+    setError(null);
+    const jugadorConversionIdUsar =
+      overrides.jugadorConversionId !== undefined ? overrides.jugadorConversionId : jugadorConversionId;
+    const input: PublicarIncidenteInput = {
+      tipo: "conversion",
+      equipo: equipoUsar,
+      jugadorId: equipoUsar === "newman" ? (jugadorConversionIdUsar ?? undefined) : undefined,
+    };
+    startTransition(async () => {
+      try {
+        await publicarIncidente(partidoId, input);
+        reset();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo publicar la conversión");
+      }
+    });
+  }
+
   function elegirJugador(id: string) {
     setJugadorId(id);
-    if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
+    if (!esCorreccion && tryConversion) {
+      publicarSoloTry({ jugadorId: id }); // publica el try ya, sin esperar la conversion
+    } else if (tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
       setPaso("convirtio");
     } else {
       terminarJugada({ jugadorId: id });
@@ -191,6 +256,16 @@ export default function CargaIncidencia({
   function elegirEquipo(e: Equipo) {
     setEquipo(e);
     const necesitaJugador = e === "newman" && (tipo ? requierePlayerSelection(tipo) : true);
+
+    // EN VIVO, try / try scrum: si es de Newman y hay que elegir jugador, se va a esa pantalla
+    // (el panel queda bloqueado hasta que se elija). Si no (rival, o try scrum sin jugador
+    // puntual), el try se publica ya y despues se pregunta la conversion.
+    if (!esCorreccion && tipo && TIPOS_CON_CONVERSION.includes(tipo)) {
+      if (necesitaJugador) setPaso("jugador");
+      else publicarSoloTry({ equipo: e });
+      return;
+    }
+
     if (necesitaJugador) {
       // Conversion/penal sueltos (no encadenados desde un try): si el pateador habitual sigue en
       // cancha, confirmar en un tap en vez de listar todo el plantel.
@@ -211,12 +286,19 @@ export default function CargaIncidencia({
     elegirJugador(pateadorEnCancha.jugadorId);
   }
 
+  // En vivo la conversion se publica sola como incidencia aparte (el try ya esta); en correccion
+  // post-partido sigue yendo con el try al paso "cuando" -> "confirmar" (terminarJugada).
+  function resolverConversion(overrides: { convirtio?: boolean; jugadorConversionId?: string | null }) {
+    if (esCorreccion) terminarJugada(overrides);
+    else publicarSoloConversion(overrides);
+  }
+
   function elegirConvirtio(convirtioAhora: boolean) {
     setConvirtio(convirtioAhora);
     if (convirtioAhora && equipo === "newman") {
       setPaso("jugadorConversion");
     } else {
-      terminarJugada({ convirtio: convirtioAhora });
+      resolverConversion({ convirtio: convirtioAhora });
     }
   }
 
@@ -225,13 +307,13 @@ export default function CargaIncidencia({
   function elegirConvirtioConPateador(resultado: "si" | "no" | "otro") {
     if (resultado === "no") {
       setConvirtio(false);
-      terminarJugada({ convirtio: false });
+      resolverConversion({ convirtio: false });
       return;
     }
     setConvirtio(true);
     if (resultado === "si" && pateadorEnCancha) {
       setJugadorConversionId(pateadorEnCancha.jugadorId);
-      terminarJugada({ convirtio: true, jugadorConversionId: pateadorEnCancha.jugadorId });
+      resolverConversion({ convirtio: true, jugadorConversionId: pateadorEnCancha.jugadorId });
     } else {
       setPaso("jugadorConversion");
     }
@@ -239,7 +321,7 @@ export default function CargaIncidencia({
 
   function elegirJugadorConversion(id: string) {
     setJugadorConversionId(id);
-    terminarJugada({ convirtio: true, jugadorConversionId: id });
+    resolverConversion({ convirtio: true, jugadorConversionId: id });
   }
 
   // Usado por el boton "Publicar" a mano -- tarjetas en vivo, y cualquier jugada en correccion
@@ -299,6 +381,7 @@ export default function CargaIncidencia({
 
       {paso === "equipo" && (
         <div style={listaOpciones}>
+          {tryConversion && <p style={{ margin: 0, fontSize: "0.92rem" }}>¿Quién hizo el try?</p>}
           <button style={botonPrimario} disabled={isPending} onClick={() => elegirEquipo("newman")}>
             Newman
           </button>
@@ -327,6 +410,11 @@ export default function CargaIncidencia({
 
       {paso === "jugador" && requiereJugador && (
         <div style={listaOpciones}>
+          {bloqueado && (
+            <p style={{ margin: 0, fontWeight: 700, color: DORADO, fontSize: "0.95rem" }}>
+              ¿Quién hizo el try? Elegí el jugador para publicarlo{isPending ? " (publicando…)" : ""}.
+            </p>
+          )}
           {enCancha.length === 0 && <p>{soloEnCancha ? "No hay jugadores en cancha." : "No hay jugadores cargados."}</p>}
           {enCancha.map((j) => (
             <button key={j.jugadorId} style={botonOpcion} disabled={isPending} onClick={() => elegirJugador(j.jugadorId)}>
@@ -334,7 +422,7 @@ export default function CargaIncidencia({
             </button>
           ))}
           <button style={botonSecundario} disabled={isPending} onClick={reset}>
-            Cancelar
+            {bloqueado ? "Cancelar (fue error, no hubo try)" : "Cancelar"}
           </button>
         </div>
       )}

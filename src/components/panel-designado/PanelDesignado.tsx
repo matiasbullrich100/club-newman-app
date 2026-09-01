@@ -70,6 +70,9 @@ export default function PanelDesignado({
   const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
   const [eligiendoMotivo, setEligiendoMotivo] = useState(false);
   const [eligiendoWalkover, setEligiendoWalkover] = useState(false);
+  // true mientras hay un try de Newman esperando que se elija el jugador que lo hizo -- se bloquea
+  // el resto del panel para que el designado no se olvide de cerrarlo (y el try quede sin publicar).
+  const [bloqueoTry, setBloqueoTry] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -125,7 +128,14 @@ export default function PanelDesignado({
         Panel del Designado
       </h2>
 
-      {eligiendoMotivo ? (
+      {bloqueoTry ? (
+        <div style={{ marginBottom: "1rem" }}>
+          <p style={{ color: DORADO, fontWeight: 700 }}>
+            Terminá de cargar el try — elegí abajo quién lo hizo (o cancelá si fue error). El resto del
+            panel queda bloqueado hasta entonces.
+          </p>
+        </div>
+      ) : eligiendoMotivo ? (
         <div style={{ marginBottom: "1rem" }}>
           <p style={{ color: DORADO_SUAVE }}>¿Por qué se interrumpe el partido?</p>
           {error && <p style={{ color: "#f3caca" }}>{error}</p>}
@@ -232,6 +242,7 @@ export default function PanelDesignado({
               plantel={plantel}
               enCanchaIds={partido.enCanchaIds}
               pateadorHabitualId={partido.pateadorHabitualId}
+              onBloqueoChange={setBloqueoTry}
             />
           )}
           <SancionesActivas
@@ -252,7 +263,9 @@ export default function PanelDesignado({
             plantel={plantel}
             apellidosAmbiguos={apellidosAmbiguos}
           />
-          <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
+          {!bloqueoTry && (
+            <CargaCambio partidoId={partidoId} plantel={plantel} plantelCompleto={plantelCompleto} enCanchaIds={partido.enCanchaIds} />
+          )}
         </div>
       )}
     </div>
