@@ -6,7 +6,7 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 // Escala el tamano de fuente de TODA la app -- casi todo el texto ya usa "rem" (relativo al
 // font-size del <html>), asi que un solo cambio ahi alcanza sin tocar cada componente.
 // 100 es el tamano por defecto; 85 es para quien lo quiere MAS chico, el resto agranda.
-const NIVELES = [85, 100, 115, 130, 145];
+const NIVELES = [85, 100, 115, 130, 145, 160];
 const NIVEL_DEFAULT = NIVELES.indexOf(100);
 const CLAVE_STORAGE = "tamanoFuente";
 
