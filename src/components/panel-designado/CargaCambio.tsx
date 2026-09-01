@@ -118,10 +118,14 @@ export default function CargaCambio({
   }
 
   return (
-    <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: "1rem" }}>
-      <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
-        Cambio
-      </h3>
+    <div style={arrancarAbierto ? undefined : { borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: "1rem" }}>
+      {/* Embebido en "Cargar jugada" (arrancarAbierto): sin titulo "Cambio" ni borde -- ya se sabe
+          que es un cambio porque se apreto ese boton; el primer texto que se ve es "¿Quién entra?". */}
+      {!arrancarAbierto && (
+        <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", color: DORADO, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          Cambio
+        </h3>
+      )}
 
       {/* En vivo se publica solo al elegir quien sale -- no hay pantalla de confirmar donde
           mostrar el error, asi que va arriba. */}
