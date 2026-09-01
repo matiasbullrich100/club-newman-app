@@ -68,8 +68,8 @@ export default async function PlantelSuperiorPage() {
     numerosFecha.length === 0
       ? null
       : numerosFecha.length === 1
-        ? `Fecha ${numerosFecha[0]}`
-        : `Fechas ${numerosFecha[0]}-${numerosFecha[numerosFecha.length - 1]}`;
+        ? `Fecha #${numerosFecha[0]}`
+        : `Fechas #${numerosFecha[0]}-${numerosFecha[numerosFecha.length - 1]}`;
 
   const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
   const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
@@ -186,9 +186,9 @@ export default async function PlantelSuperiorPage() {
           }}
         >
           <span>
-            {rotuloFecha && <strong style={{ color: DORADO }}>{rotuloFecha} · </strong>}
-            P. Ganados: {ganadosSemana}
-            {empatadosSemana > 0 && ` · P. Empatados: ${empatadosSemana}`} · P. Perdidos: {perdidosSemana}
+            {rotuloFecha && <strong style={{ color: DORADO }}>{rotuloFecha}: </strong>}
+            Partidos ganados: {ganadosSemana}
+            {empatadosSemana > 0 && `, Partidos empatados: ${empatadosSemana}`}, Partidos perdidos: {perdidosSemana}
           </span>
         </div>
       )}
