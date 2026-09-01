@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
 import Cronometro from "./Cronometro";
@@ -50,6 +51,7 @@ export default function PartidoLive({
   apellidosAmbiguos?: string[];
   sugeridoPateadorId?: string | null;
 }) {
+  const router = useRouter();
   const [partido, setPartido] = useState<Partido>(inicial);
   const [periodo, setPeriodo] = useState<LiveState["periodo"]>(null);
   const [motivoInterrupcion, setMotivoInterrupcion] = useState<LiveState["motivoInterrupcion"]>(null);
@@ -60,6 +62,20 @@ export default function PartidoLive({
       if (snap.exists()) setPartido(snap.data() as Partido);
     });
   }, [partidoId]);
+
+  // La pagina bifurca server-side segun estado: terminado/programado -> vista estatica,
+  // en_juego/entretiempo/suspendido -> este componente. Cuando alguien que tiene el partido
+  // abierto ve que paso a terminado (o lo reiniciaron a programado), hay que refrescar para que
+  // el servidor vuelva a bifurcar -- si no, se queda pegado el feed en vivo (con las tarjetas,
+  // que en el partido terminado se ocultan para todos menos el manager). Mismo router.refresh()
+  // que hace el panel del designado al apretar Terminar, pero para el resto de los que miran.
+  const yaRefresco = useRef(false);
+  useEffect(() => {
+    if ((partido.estado === "terminado" || partido.estado === "programado") && !yaRefresco.current) {
+      yaRefresco.current = true;
+      router.refresh();
+    }
+  }, [partido.estado, router]);
 
   useEffect(() => {
     const ref = doc(db, "partidos", partidoId, "liveState", "state");
