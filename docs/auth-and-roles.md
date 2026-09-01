@@ -28,7 +28,7 @@ Components (directo desde `@/lib/auth/scope`).
 
 ## Sesión
 
-Cookie httpOnly con un JWT (`jose`), 24h, firmado con `AUTH_SECRET`. Payload:
+Cookie httpOnly con un JWT (`jose`), 30 días, firmado con `AUTH_SECRET`. Payload:
 `{ cuentaId, rol, username, categoriaId?, alcance? }`. `login()` en
 [`src/lib/auth/actions.ts`](../src/lib/auth/actions.ts) verifica contra `cuentas/{cuentaId}` con
 el Admin SDK (nunca expuesto al cliente) y compara el hash con `bcryptjs`

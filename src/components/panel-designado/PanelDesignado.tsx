@@ -139,6 +139,25 @@ export default function PanelDesignado({
         Panel del Designado
       </h2>
 
+      {plantel.length === 0 && partido.estado !== "terminado" && (
+        <div
+          style={{
+            marginBottom: "1rem",
+            padding: "10px 12px",
+            borderRadius: 10,
+            background: "rgba(194,59,59,.16)",
+            border: "1px solid rgba(194,59,59,.6)",
+            color: "#f3caca",
+            fontSize: "0.85rem",
+            lineHeight: 1.45,
+          }}
+        >
+          <b>⚠️ No hay formación cargada.</b> Sin ella no vas a poder anotar los tries ni las
+          tarjetas de Newman (te pide el jugador y la lista está vacía). Los del rival sí funcionan.
+          Cargala desde <b>Formaciones → Subir</b>, idealmente antes de arrancar.
+        </div>
+      )}
+
       {bloqueoTry ? (
         <div style={{ marginBottom: "1rem" }}>
           <p style={{ color: DORADO, fontWeight: 700 }}>

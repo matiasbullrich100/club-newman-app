@@ -9,7 +9,11 @@ export { puedeOperarCategoria, puedeVerEstadisticas, esManagerDeCategoria } from
 import { puedeOperarCategoria } from "./scope";
 
 const COOKIE_NAME = "cn_session";
-const SESSION_DURATION = "24h";
+// 30 días: los Designados suelen loguearse días antes del partido (o "la noche anterior para
+// probar"). Con 24h se quedaban sin sesión a mitad de la mañana y no podían operar -- pasó el
+// 2026-08-29. Son cuentas de bajo riesgo (operadores de partido de un club), 30 días es razonable.
+const SESSION_DURATION = "30d";
+const SESSION_DURATION_SEGUNDOS = 60 * 60 * 24 * 30;
 
 function getSecretKey(): Uint8Array {
   const secret = process.env.AUTH_SECRET;
@@ -37,7 +41,7 @@ export async function createSession(payload: SessionPayload): Promise<void> {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24,
+    maxAge: SESSION_DURATION_SEGUNDOS,
   });
 }
 
