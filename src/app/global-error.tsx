@@ -7,9 +7,8 @@ import { useEffect } from "react";
 export default function GlobalError() {
   useEffect(() => {
     try {
-      const ultima = Number(sessionStorage.getItem("globalAutoReload") ?? 0);
-      if (Date.now() - ultima > 20000) {
-        sessionStorage.setItem("globalAutoReload", String(Date.now()));
+      if (!sessionStorage.getItem("globalAutoReload")) {
+        sessionStorage.setItem("globalAutoReload", "1");
         window.location.reload();
       }
     } catch {

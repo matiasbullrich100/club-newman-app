@@ -5,13 +5,12 @@ import { DORADO, CREMA } from "@/lib/colors";
 
 // Boundary genérico para cualquier ruta bajo app/ (la del partido tiene la suya propia). Mismo
 // criterio: el error más común es un desajuste de versión tras un deploy con la página abierta
-// ("Minified React error #4xx") -> se recarga solo una vez y deja un botón manual.
+// ("Minified React error #4xx") -> se recarga solo UNA vez por sesión y deja un botón manual.
 export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     try {
-      const ultima = Number(sessionStorage.getItem("appAutoReload") ?? 0);
-      if (Date.now() - ultima > 20000) {
-        sessionStorage.setItem("appAutoReload", String(Date.now()));
+      if (!sessionStorage.getItem("appAutoReload")) {
+        sessionStorage.setItem("appAutoReload", "1");
         window.location.reload();
       }
     } catch {

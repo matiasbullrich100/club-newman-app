@@ -8,13 +8,13 @@ import { DORADO, CREMA } from "@/lib/colors";
 // incidencia trae un árbol que el código viejo del celular ya no puede reconciliar (el famoso
 // "Minified React error #441"). Recargar una vez toma los archivos nuevos y sigue todo normal.
 // El Designado no debería quedarse mirando un error críptico a mitad de partido -> se recarga solo
-// (una vez cada 20s como mucho, por si fuera un error de verdad y no queremos un loop).
+// UNA vez por sesión (si es un bug de verdad y persiste, la recarga no lo arregla y no queremos un
+// loop -> queda el botón "Recargar" manual).
 export default function ErrorPartido({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     try {
-      const ultima = Number(sessionStorage.getItem("partidoAutoReload") ?? 0);
-      if (Date.now() - ultima > 20000) {
-        sessionStorage.setItem("partidoAutoReload", String(Date.now()));
+      if (!sessionStorage.getItem("partidoAutoReload")) {
+        sessionStorage.setItem("partidoAutoReload", "1");
         window.location.reload();
       }
     } catch {
