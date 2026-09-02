@@ -8,6 +8,8 @@ import { formatFecha, fechaFixtureYaPaso } from "@/lib/fecha";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
+import TiraEquipos from "@/components/TiraEquipos";
+import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
 // Fixture completo de la fecha para TODA la division (los 7 partidos), no solo el de Newman --
@@ -35,6 +37,7 @@ export default async function FixtureDivisionFechaPage({
   const fechaYaPaso = fechaFixtureYaPaso(fecha.fecha, grupoDeCategoria(categoriaId).grupo);
   const hayAnterior = numeroFecha > 1;
   const haySiguiente = numeroFecha < numeroFechas;
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/division/${numeroFecha}`);
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -43,6 +46,8 @@ export default async function FixtureDivisionFechaPage({
       <Header />
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
       <div style={{ textAlign: "center", marginTop: 8 }}>
         <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, textTransform: "uppercase" }}>

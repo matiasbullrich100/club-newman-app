@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
-import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
+import { CATEGORIAS, grupoDeCategoria, partesPartidoId } from "@/lib/categorias";
+import { equiposParaTira } from "@/lib/tiraEquipos";
+import TiraEquipos from "@/components/TiraEquipos";
 import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
@@ -71,6 +73,13 @@ export default async function PartidoPage({
     grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${partido.categoriaId}` : `/categoria/${partido.categoriaId}/fixture`;
   const fixtureDivisionHref = tieneFixtureDivision(partido.categoriaId) ? `/fixture/${partido.categoriaId}/division` : undefined;
 
+  // Barra para saltar al MISMO partido (misma fecha) del equipo hermano -- ver equiposParaTira
+  // (hoy solo M15). partesPartidoId da null en partidos de prueba, así que ahí no aparece.
+  const partesId = partesPartidoId(partidoId);
+  const tiraEquipos = partesId
+    ? equiposParaTira(partesId.categoriaId, (id) => `/partido/${id}-f${partesId.numeroFecha}`)
+    : null;
+
   const cabecera = (
     <>
       <BackLink href={backHref} />
@@ -79,6 +88,7 @@ export default async function PartidoPage({
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, marginBottom: "2%", textTransform: "uppercase" }}>
         {categoriaNombre}
       </div>
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={partido.categoriaId} />}
     </>
   );
 

@@ -89,6 +89,13 @@ export function partidoId(categoriaId: string, numeroFecha: number | string): st
   return `${categoriaId}-f${numeroFecha}`;
 }
 
+// Inverso de partidoId(): "m15-d-f6" -> { categoriaId: "m15-d", numeroFecha: 6 }. null para ids
+// que no siguen ese patrón (ej. los partidos de prueba: "pre-a-test-beromama").
+export function partesPartidoId(id: string): { categoriaId: string; numeroFecha: number } | null {
+  const m = /^(.+)-f(\d+)$/.exec(id);
+  return m ? { categoriaId: m[1], numeroFecha: Number(m[2]) } : null;
+}
+
 // Todos los partidoId posibles de un grupo ("superior" o un edadId de Juveniles) -- ids
 // deterministicos, no hace falta ninguna query para armar la lista. Usado por
 // tarjetasHistorial.ts (recorrer partidos terminados) y por publicarFormacionesGrupo en
