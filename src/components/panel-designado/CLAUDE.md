@@ -31,6 +31,13 @@ Panel de control del Designado durante un partido en vivo. Motor/acciones que ll
   (vuelve al menú de tipos). En el entretiempo `CargaIncidencia` recibe `enJuego=false` y muestra
   **solo** la opción Cambio (reloj parado, no hay jugadas nuevas). El bloque de Cambio suelto ya
   no existe en `PanelDesignado`; sí sigue aparte en `PartidoTerminadoPanel` (corrección).
+- **`PresenciaDesignado.tsx`** — aviso "ya hay alguien operando este partido". Al montar el panel
+  en vivo hace UNA lectura de `partidos/{id}/presencia` (Client SDK, lectura permitida): si ya
+  había otra sesión con `actualizadoEn` fresco (< 70s), el que entró segundo ve un cartel grande
+  (overlay `position: fixed`) que no se va hasta que toca "OK". El primero no ve nada. Escribe su
+  propia presencia vía `registrarPresencia()` (Server Action) al entrar y cada 25s; la borra con
+  `borrarPresencia()` al salir. Solo se activa desde `PartidoLive` (prop `cuentaId`), no en la
+  vista `programado`.
 - **`types.ts`** — `RosterJugador` (roster de este partido) y `JugadorBusqueda` (entrada liviana
   del plantel completo, solo para el buscador).
 - **`estilos.ts`** — botones grandes a propósito: el público que carga esto en vivo (Designados,

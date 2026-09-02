@@ -1510,6 +1510,35 @@ export async function publicarFormacionesGrupo(grupo: string): Promise<{ publica
   return { publicados };
 }
 
+// ---- Presencia del Designado ("ya hay alguien operando este partido") ------------------
+// Escrituras chicas (no llevan revalidatePath -- la presencia no se renderiza server-side; el
+// panel la lee con el Client SDK, que sí tiene permiso de lectura sobre partidos/{id}/presencia).
+// El panel llama a registrarPresencia() al entrar y cada ~25s; la fila se considera "viva" ~70s.
+
+export async function registrarPresencia(partidoId: string): Promise<void> {
+  const session = await getSession();
+  if (!session) return;
+  const { partidoRef } = refs(partidoId);
+  const snap = await partidoRef.get();
+  if (!snap.exists) return;
+  if (!puedeOperarCategoria(session, (snap.data() as Partido).categoriaId)) return;
+  await partidoRef.collection("presencia").doc(session.cuentaId).set({
+    username: session.username,
+    actualizadoEn: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function borrarPresencia(partidoId: string): Promise<void> {
+  const session = await getSession();
+  if (!session) return;
+  const { partidoRef } = refs(partidoId);
+  await partidoRef
+    .collection("presencia")
+    .doc(session.cuentaId)
+    .delete()
+    .catch(() => {});
+}
+
 // ---- Solo para los partidos de prueba (Fase 1) ------------------------------------------
 
 /**

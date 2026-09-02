@@ -185,6 +185,7 @@ export default function PartidoLive({
           periodo={periodo}
           apellidosAmbiguos={apellidosAmbiguos}
           sugeridoPateadorId={sugeridoPateadorId}
+          cuentaId={session?.cuentaId}
         />
       ) : (
         <IncidentesFeed

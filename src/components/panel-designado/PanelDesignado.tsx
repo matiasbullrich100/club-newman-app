@@ -17,6 +17,7 @@ import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaIncidencia from "./CargaIncidencia";
 import SancionesActivas from "./SancionesActivas";
 import PateadorHabitual from "./PateadorHabitual";
+import PresenciaDesignado from "./PresenciaDesignado";
 import Formaciones from "@/components/Formaciones";
 import IncidentesFeed from "@/components/IncidentesFeed";
 import { botonSecundario } from "./estilos";
@@ -68,6 +69,7 @@ export default function PanelDesignado({
   periodo,
   apellidosAmbiguos,
   sugeridoPateadorId,
+  cuentaId,
 }: {
   partidoId: string;
   partido: Partido;
@@ -76,6 +78,9 @@ export default function PanelDesignado({
   periodo: LiveState["periodo"];
   apellidosAmbiguos?: string[];
   sugeridoPateadorId?: string | null;
+  // Solo llega desde PartidoLive (partido en juego) -- habilita el aviso "ya hay alguien operando
+  // este partido". En la vista "programado" no se pasa (no hay riesgo de doble carga ahí).
+  cuentaId?: string;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pendiente, setPendiente] = useState<AccionConfirmable | null>(null);
@@ -138,6 +143,8 @@ export default function PanelDesignado({
       <h2 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 10 }}>
         Panel del Designado
       </h2>
+
+      {cuentaId && <PresenciaDesignado partidoId={partidoId} cuentaId={cuentaId} />}
 
       {plantel.length === 0 && partido.estado !== "terminado" && (
         <div
