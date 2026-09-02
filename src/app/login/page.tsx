@@ -57,7 +57,16 @@ export default function LoginPage() {
         <form action={handleSubmit} style={{ display: "grid", gap: "0.5rem" }}>
           <label style={{ fontSize: "0.75rem", opacity: 0.8, color: DORADO_SUAVE }}>
             Usuario
-            <input name="username" type="text" required style={inputStyle} />
+            <input
+              name="username"
+              type="text"
+              required
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="username"
+              spellCheck={false}
+              style={inputStyle}
+            />
           </label>
           <label style={{ fontSize: "0.75rem", opacity: 0.8, color: DORADO_SUAVE }}>
             <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -78,7 +87,16 @@ export default function LoginPage() {
                 {mostrarPassword ? "Ocultar" : "Mostrar"}
               </button>
             </span>
-            <input name="password" type={mostrarPassword ? "text" : "password"} required style={inputStyle} />
+            <input
+              name="password"
+              type={mostrarPassword ? "text" : "password"}
+              required
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="current-password"
+              spellCheck={false}
+              style={inputStyle}
+            />
           </label>
           {error && <p style={{ color: "#f3caca", fontSize: "0.85rem" }}>{error}</p>}
           <button

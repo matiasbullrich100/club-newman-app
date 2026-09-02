@@ -34,6 +34,11 @@ Cookie httpOnly con un JWT (`jose`), 30 días, firmado con `AUTH_SECRET`. Payloa
 el Admin SDK (nunca expuesto al cliente) y compara el hash con `bcryptjs`
 ([`passwords.ts`](../src/lib/auth/passwords.ts)).
 
+**Usuario y contraseña son case-insensitive.** El `cuentaId` es el usuario en minúscula sin
+espacios (`normalizeUsername`), y `hashPassword`/`verifyPassword` normalizan la clave a minúscula
+antes de hashear/comparar (con fallback a la clave tal cual por si quedara algún hash viejo con
+mayúsculas). Los scripts de seed guardan el hash de la versión en minúscula.
+
 ## Regla de oro al agregar una acción nueva que opera un partido
 
 Toda Server Action en `src/lib/match/actions.ts` que toque un partido debe llamar
