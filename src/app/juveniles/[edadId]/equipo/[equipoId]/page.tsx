@@ -11,6 +11,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
+import TiraEquipos from "@/components/TiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
@@ -59,6 +60,19 @@ export default async function EquipoJuvenilesPage({
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
         {equipo.nombre} - Fixture {nombreNewman}
       </div>
+
+      {/* Prueba: barra para saltar entre equipos de la edad sin volver atrás. Por ahora solo M15
+          (pedido explícito, para probar el patrón antes de sumarlo al resto). */}
+      {edadId === "m15" && (
+        <TiraEquipos
+          equipos={equiposDeEdad(edadId).map((e) => ({
+            id: e.id,
+            nombre: e.nombre,
+            href: `/juveniles/${edadId}/equipo/${e.id}`,
+          }))}
+          actualId={equipoId}
+        />
+      )}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
