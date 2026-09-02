@@ -315,103 +315,105 @@ export async function reanudar(partidoId: string): Promise<void> {
 export async function terminarPartido(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-
-  const partidoSnap = await partidoRef.get();
-  if (!partidoSnap.exists) throw new Error("Partido no encontrado");
-  const partido = partidoSnap.data() as Partido;
-  if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
-  if (partido.estado !== "en_juego" && partido.estado !== "entretiempo") {
-    throw new Error("El partido no se puede terminar desde este estado");
-  }
-
-  const liveSnap = await liveStateRef.get();
-  const liveState = liveSnap.data() as LiveState;
-  const accumulated = liveState.clockRunning ? elapsedSeconds(liveState) : liveState.accumulatedSeconds;
-  const period1DurationSeconds =
-    liveState.periodo === "1T" ? accumulated : liveState.period1DurationSeconds ?? 0;
-  const period2DurationSeconds =
-    liveState.periodo === "2T" ? accumulated : liveState.period2DurationSeconds ?? 0;
-
-  const [plantelSnap, incidentesSnap] = await Promise.all([
-    partidoRef.collection("plantel").get(),
-    partidoRef.collection("incidentes").get(),
-  ]);
-  const incidentes = incidentesSnap.docs.map((d) => d.data() as Incidente);
-
-  const plantel: JugadorInput[] = plantelSnap.docs.map((d) => ({
-    jugadorId: d.id,
-    titular: (d.data() as JugadorPartido).titular,
-  }));
-  const cambios: CambioEvento[] = incidentes
-    .filter((data) => data.tipo === "cambio")
-    .map((data) => ({
-      periodo: data.periodo,
-      minuto: data.minuto,
-      jugadorSaleId: data.jugadorSaleId,
-      jugadorEntraId: data.jugadorEntraId,
-    }));
-
-  const minutos = calcularMinutos(plantel, cambios, period1DurationSeconds / 60, period2DurationSeconds / 60);
-  const { bonusNewman, bonusRival } = calcularBonus(incidentes, partido.resultado);
-  // Recalculo exacto desde las incidencias -- ademas de mantener el contador incremental en vivo,
-  // asi cualquier desvio queda corregido al terminar.
-  const { triesNewman, triesRival } = contarTriesLocal(incidentes);
-
-  const batch = adminDb.batch();
-  batch.update(partidoRef, {
-    estado: "terminado",
-    "resultado.bonusNewman": bonusNewman,
-    "resultado.bonusRival": bonusRival,
-    "resultado.triesNewman": triesNewman,
-    "resultado.triesRival": triesRival,
-    updatedAt: FieldValue.serverTimestamp(),
-  });
-  batch.update(liveStateRef, {
-    clockRunning: false,
-    clockAnchor: null,
-    accumulatedSeconds: accumulated,
-    period1DurationSeconds,
-    period2DurationSeconds,
-  });
-
-  if (liveState.periodo) {
-    // Solo "Final del partido" -- "Final 1er tiempo" ya lo registra cortar1T() en el entretiempo
-    // real; duplicarlo (o agregar "Final 2do tiempo") junto a este es redundante, casi siempre en
-    // el mismo minuto.
-    const finPartidoIncidente: Incidente = {
-      tipo: "fin_partido",
-      periodo: liveState.periodo,
-      // Math.floor(seg/60)+1 -- misma convencion "minuto en curso" que minutoActual(), para que no
-      // quede antes que una jugada publicada segundos antes dentro del mismo minuto.
-      minuto: Math.floor(accumulated / 60) + 1,
-      segundoAbsoluto: Math.floor(accumulated),
-      publicadoPorCuentaId: session!.cuentaId,
-      createdAt: Timestamp.now(),
-    };
-    batch.set(partidoRef.collection("incidentes").doc(), finPartidoIncidente);
-  }
-
-  // Los partidos de prueba (whitelist mas abajo) nunca deben sumar minutos reales a jugadores/,
-  // incluso si se cargan con nombres de jugadores reales para simular cambios de forma realista.
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
-  for (const jugador of plantel) {
-    const m = minutos[jugador.jugadorId];
-    batch.update(partidoRef.collection("plantel").doc(jugador.jugadorId), {
-      minutosJugados1T: m.minutos1T,
-      minutosJugados2T: m.minutos2T,
+  const finPartidoRef = partidoRef.collection("incidentes").doc();
+
+  // Todo adentro de una transacción: el chequeo de estado + la escritura tienen que ser atómicos.
+  // Sin esto, dos "Terminar" casi simultáneos (doble tap, o dos dispositivos) pasaban los dos el
+  // chequeo sobre una lectura vieja y ambos corrían `minutosJugadosTotal: increment(...)` -> los
+  // minutos de todos los jugadores quedaban sumados DOBLE en jugadores/. Ahora el 2do reintento
+  // ve estado="terminado" y corta.
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, liveSnap, plantelSnap, incidentesSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(liveStateRef),
+      tx.get(partidoRef.collection("plantel")),
+      tx.get(partidoRef.collection("incidentes")),
+    ]);
+    if (!partidoSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId)) throw new Error("No autorizado");
+    if (partido.estado !== "en_juego" && partido.estado !== "entretiempo") {
+      throw new Error("El partido no se puede terminar desde este estado");
+    }
+
+    const liveState = liveSnap.data() as LiveState;
+    const accumulated = liveState.clockRunning ? elapsedSeconds(liveState) : liveState.accumulatedSeconds;
+    const period1DurationSeconds = liveState.periodo === "1T" ? accumulated : liveState.period1DurationSeconds ?? 0;
+    const period2DurationSeconds = liveState.periodo === "2T" ? accumulated : liveState.period2DurationSeconds ?? 0;
+
+    const incidentes = incidentesSnap.docs.map((d) => d.data() as Incidente);
+    const plantel: JugadorInput[] = plantelSnap.docs.map((d) => ({
+      jugadorId: d.id,
+      titular: (d.data() as JugadorPartido).titular,
+    }));
+    const cambios: CambioEvento[] = incidentes
+      .filter((data) => data.tipo === "cambio")
+      .map((data) => ({
+        periodo: data.periodo,
+        minuto: data.minuto,
+        jugadorSaleId: data.jugadorSaleId,
+        jugadorEntraId: data.jugadorEntraId,
+      }));
+
+    const minutos = calcularMinutos(plantel, cambios, period1DurationSeconds / 60, period2DurationSeconds / 60);
+    const { bonusNewman, bonusRival } = calcularBonus(incidentes, partido.resultado);
+    // Recalculo exacto desde las incidencias -- ademas de mantener el contador incremental en vivo,
+    // asi cualquier desvio queda corregido al terminar.
+    const { triesNewman, triesRival } = contarTriesLocal(incidentes);
+
+    tx.update(partidoRef, {
+      estado: "terminado",
+      "resultado.bonusNewman": bonusNewman,
+      "resultado.bonusRival": bonusRival,
+      "resultado.triesNewman": triesNewman,
+      "resultado.triesRival": triesRival,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    tx.update(liveStateRef, {
+      clockRunning: false,
+      clockAnchor: null,
+      accumulatedSeconds: accumulated,
+      period1DurationSeconds,
+      period2DurationSeconds,
     });
 
-    if (!esPartidoDePrueba) {
-      const nombre = plantelSnap.docs.find((d) => d.id === jugador.jugadorId)?.data().nombre ?? "";
-      batch.set(
-        adminDb.collection("jugadores").doc(jugador.jugadorId),
-        { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
-        { merge: true }
-      );
+    if (liveState.periodo) {
+      // Solo "Final del partido" -- "Final 1er tiempo" ya lo registra cortar1T() en el entretiempo
+      // real; duplicarlo (o agregar "Final 2do tiempo") junto a este es redundante, casi siempre en
+      // el mismo minuto.
+      const finPartidoIncidente: Incidente = {
+        tipo: "fin_partido",
+        periodo: liveState.periodo,
+        // Math.floor(seg/60)+1 -- misma convencion "minuto en curso" que minutoActual(), para que
+        // no quede antes que una jugada publicada segundos antes dentro del mismo minuto.
+        minuto: Math.floor(accumulated / 60) + 1,
+        segundoAbsoluto: Math.floor(accumulated),
+        publicadoPorCuentaId: session!.cuentaId,
+        createdAt: Timestamp.now(),
+      };
+      tx.set(finPartidoRef, finPartidoIncidente);
     }
-  }
 
-  await batch.commit();
+    // Los partidos de prueba nunca deben sumar minutos reales a jugadores/, incluso si se cargan
+    // con nombres de jugadores reales para simular cambios de forma realista.
+    for (const jugador of plantel) {
+      const m = minutos[jugador.jugadorId];
+      tx.update(partidoRef.collection("plantel").doc(jugador.jugadorId), {
+        minutosJugados1T: m.minutos1T,
+        minutosJugados2T: m.minutos2T,
+      });
+      if (!esPartidoDePrueba) {
+        const nombre = plantelSnap.docs.find((d) => d.id === jugador.jugadorId)?.data().nombre ?? "";
+        tx.set(
+          adminDb.collection("jugadores").doc(jugador.jugadorId),
+          { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
+          { merge: true }
+        );
+      }
+    }
+  });
+
   revalidatePath(`/partido/${partidoId}`);
   revalidatePath("/");
 }
