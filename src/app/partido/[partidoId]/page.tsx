@@ -73,12 +73,24 @@ export default async function PartidoPage({
     grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${partido.categoriaId}` : `/categoria/${partido.categoriaId}/fixture`;
   const fixtureDivisionHref = tieneFixtureDivision(partido.categoriaId) ? `/fixture/${partido.categoriaId}/division` : undefined;
 
-  // Barra para saltar al MISMO partido (misma fecha) del equipo hermano -- ver equiposParaTira
-  // (hoy solo M15). partesPartidoId da null en partidos de prueba, así que ahí no aparece.
+  // Barra para saltar al MISMO partido (misma fecha) del equipo hermano. partesPartidoId da null
+  // en partidos de prueba, así que ahí no aparece. Se filtran los hermanos cuyo partido de esa
+  // fecha no existe todavía (fixture cargado parcial) -- si no, el chip llevaría a un 404.
   const partesId = partesPartidoId(partidoId);
-  const tiraEquipos = partesId
+  const candidatosTira = partesId
     ? equiposParaTira(partesId.categoriaId, (id) => `/partido/${id}-f${partesId.numeroFecha}`)
     : null;
+  let tiraEquipos = candidatosTira;
+  if (partesId && candidatosTira) {
+    const snaps = await adminDb.getAll(
+      ...candidatosTira.map((c) => adminDb.collection("partidos").doc(`${c.id}-f${partesId.numeroFecha}`))
+    );
+    const existen = new Set(snaps.filter((s) => s.exists).map((s) => s.id));
+    const filtrados = candidatosTira.filter(
+      (c) => c.id === partesId.categoriaId || existen.has(`${c.id}-f${partesId.numeroFecha}`)
+    );
+    tiraEquipos = filtrados.length > 1 ? filtrados : null;
+  }
 
   const cabecera = (
     <>

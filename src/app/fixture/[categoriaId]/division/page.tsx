@@ -49,7 +49,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   // llega aca, tanto de vuelta (BackLink) como para el boton de "Fixt. Newm." en si.
   const hubHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = grupo.grupo === "juveniles" ? hubHref : `/categoria/${categoriaId}/fixture`;
-  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/division`);
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/division`, tieneFixtureDivision);
   const fechas = Array.from({ length: numeroFechasDivisionDe(categoriaId) }, (_, i) => {
     const n = i + 1;
     const datos = fixtureDivisionDe(categoriaId, n);

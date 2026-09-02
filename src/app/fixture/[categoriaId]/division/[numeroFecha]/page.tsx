@@ -37,7 +37,7 @@ export default async function FixtureDivisionFechaPage({
   const fechaYaPaso = fechaFixtureYaPaso(fecha.fecha, grupoDeCategoria(categoriaId).grupo);
   const hayAnterior = numeroFecha > 1;
   const haySiguiente = numeroFecha < numeroFechas;
-  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/division/${numeroFecha}`);
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/division/${numeroFecha}`, tieneFixtureDivision);
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>

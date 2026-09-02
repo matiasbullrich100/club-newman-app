@@ -63,8 +63,8 @@ export default async function EquipoJuvenilesPage({
         {equipo.nombre} - Fixture {nombreNewman}
       </div>
 
-      {/* Prueba: barra para saltar entre equipos de la edad sin volver atrás. Por ahora solo M15
-          (ver equiposParaTira), y en las 3 vistas hermanas (Fixt. Newm. / Tabla / Fixt Divis.). */}
+      {/* Barra para saltar entre equipos de la edad sin volver atrás (ver equiposParaTira), en
+          todas las vistas hermanas (esta, Tabla, Fixt Divis. y el partido). */}
       {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={equipoId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}

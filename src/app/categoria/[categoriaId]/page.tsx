@@ -13,6 +13,8 @@ import type { JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
+import TiraEquipos from "@/components/TiraEquipos";
+import { equiposParaTira } from "@/lib/tiraEquipos";
 import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
 import PartidoTerminadoPanel from "@/components/PartidoTerminadoPanel";
 import PartidoLive from "@/components/PartidoLive";
@@ -50,6 +52,7 @@ export default async function CategoriaPage({
   const { categoriaId } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId && c.grupo === "superior");
   if (!categoria) notFound();
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/categoria/${id}`);
 
   const [session, [resumenPropio]] = await Promise.all([getSession(), partidosEnVivoOUltimoTerminado([categoriaId])]);
 
@@ -124,6 +127,8 @@ export default async function CategoriaPage({
       <Header />
 
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>{categoria.nombre}</div>
+
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
         {TORNEOS_URBA[categoriaId] !== undefined && (

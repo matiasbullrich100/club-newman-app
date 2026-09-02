@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS } from "@/lib/categorias";
+import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
@@ -39,7 +40,7 @@ export default async function PosicionesPage({
   const backHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
   const fixtureDivisionHref = tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/division` : undefined;
-  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/posiciones/${id}`);
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/posiciones/${id}`, (id) => TORNEOS_URBA[id] !== undefined);
 
   const [snap, session] = await Promise.all([adminDb.collection("posiciones").doc(categoriaId).get(), getSession()]);
 

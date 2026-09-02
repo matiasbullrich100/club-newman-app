@@ -11,6 +11,8 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
+import TiraEquipos from "@/components/TiraEquipos";
+import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const NUMERO_FECHAS = 26;
@@ -39,6 +41,7 @@ export default async function CategoriaFixturePage({
   const { categoriaId } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId && c.grupo === "superior");
   if (!categoria) notFound();
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/categoria/${id}/fixture`);
 
   const refs = Array.from({ length: NUMERO_FECHAS }, (_, i) => adminDb.collection("partidos").doc(partidoId(categoriaId, i + 1)));
   const tienePosiciones = TORNEOS_URBA[categoriaId] !== undefined;
@@ -62,6 +65,8 @@ export default async function CategoriaFixturePage({
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
         {categoria.nombre} - Fixture Newman
       </div>
+
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
