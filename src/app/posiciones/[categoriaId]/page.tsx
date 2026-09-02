@@ -9,6 +9,8 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TablaPosiciones from "@/components/TablaPosiciones";
+import TiraEquipos from "@/components/TiraEquipos";
+import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
@@ -37,6 +39,7 @@ export default async function PosicionesPage({
   const backHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
   const fixtureDivisionHref = tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/division` : undefined;
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/posiciones/${id}`);
 
   const [snap, session] = await Promise.all([adminDb.collection("posiciones").doc(categoriaId).get(), getSession()]);
 
@@ -49,6 +52,8 @@ export default async function PosicionesPage({
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
         {categoria.nombre} - Tabla de Posiciones
       </div>
+
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
       {/* replace, no push -- Tabla/Fixt. Newm./Fixt Divis. son 3 vistas alternativas del mismo
           nivel (no una mas adentro de la otra), asi que saltar entre ellas no debe apilar

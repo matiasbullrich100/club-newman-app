@@ -12,6 +12,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
 import TiraEquipos from "@/components/TiraEquipos";
+import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
@@ -38,6 +39,7 @@ export default async function EquipoJuvenilesPage({
   if (!edad || !equipo) notFound();
 
   const nombreNewman = nombreNewmanDe(equipoId);
+  const tiraEquipos = equiposParaTira(equipoId, (id) => `/juveniles/${edadId}/equipo/${id}`);
   const refs = Array.from({ length: NUMERO_FECHAS_JUVENILES }, (_, i) => adminDb.collection("partidos").doc(partidoId(equipoId, i + 1)));
   const tienePosiciones = TORNEOS_URBA[equipoId] !== undefined;
   const [snaps, posicionesSnap, session] = await Promise.all([
@@ -62,17 +64,8 @@ export default async function EquipoJuvenilesPage({
       </div>
 
       {/* Prueba: barra para saltar entre equipos de la edad sin volver atrás. Por ahora solo M15
-          (pedido explícito, para probar el patrón antes de sumarlo al resto). */}
-      {edadId === "m15" && (
-        <TiraEquipos
-          equipos={equiposDeEdad(edadId).map((e) => ({
-            id: e.id,
-            nombre: e.nombre,
-            href: `/juveniles/${edadId}/equipo/${e.id}`,
-          }))}
-          actualId={equipoId}
-        />
-      )}
+          (ver equiposParaTira), y en las 3 vistas hermanas (Fixt. Newm. / Tabla / Fixt Divis.). */}
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={equipoId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>

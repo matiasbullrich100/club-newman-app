@@ -10,6 +10,8 @@ import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
+import TiraEquipos from "@/components/TiraEquipos";
+import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
 const botonEstilo: React.CSSProperties = {
@@ -47,6 +49,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
   // llega aca, tanto de vuelta (BackLink) como para el boton de "Fixt. Newm." en si.
   const hubHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = grupo.grupo === "juveniles" ? hubHref : `/categoria/${categoriaId}/fixture`;
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/division`);
   const fechas = Array.from({ length: numeroFechasDivisionDe(categoriaId) }, (_, i) => {
     const n = i + 1;
     const datos = fixtureDivisionDe(categoriaId, n);
@@ -64,6 +67,8 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, textTransform: "uppercase" }}>
         {categoria.nombre} - Fixture División
       </div>
+
+      {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
       <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
