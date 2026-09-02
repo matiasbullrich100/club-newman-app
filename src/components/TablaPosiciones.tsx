@@ -1,11 +1,13 @@
 import type { PosicionesTorneo } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
+// Columnas numéricas: alineadas a la derecha (como cualquier tabla de estadísticas). Además evita
+// que un Dif de 4 caracteres ("-186") toque el valor de la columna de al lado.
 const thStyle: React.CSSProperties = {
-  textAlign: "left",
+  textAlign: "right",
   textTransform: "uppercase",
-  letterSpacing: 0.5,
-  fontSize: "0.65rem",
+  letterSpacing: 0.3,
+  fontSize: "0.63rem",
   color: DORADO,
   padding: "4px 3px",
   borderBottom: "1px solid rgba(226,197,120,.3)",
@@ -14,10 +16,13 @@ const thStyle: React.CSSProperties = {
 
 const tdStyle: React.CSSProperties = {
   padding: "6px 3px",
-  fontSize: "0.78rem",
+  fontSize: "0.76rem",
+  textAlign: "right",
   borderBottom: "1px solid rgba(255,255,255,.06)",
   whiteSpace: "nowrap",
 };
+
+const izq: React.CSSProperties = { textAlign: "left" };
 
 // Nombres largos ("Atletico del Rosario B", "Buenos Aires C&RC B") empujaban la tabla entera mas
 // alla del ancho de la pantalla -- esta columna especificamente puede envolver en 2 lineas en vez
@@ -25,8 +30,14 @@ const tdStyle: React.CSSProperties = {
 const tdEquipoStyle: React.CSSProperties = {
   ...tdStyle,
   whiteSpace: "normal",
-  maxWidth: 78,
 };
+
+// `table-layout: fixed` + anchos por columna: sin esto cada tabla calcula el ancho segun su
+// contenido, asi que M15 A / B / C / D quedan con las columnas en posiciones distintas y la tabla
+// "salta" al pasar de una a otra con la barra de equipos (se nota en la compu). Con esto todas
+// las tablas quedan identicas. Las columnas de 1 digito (PJ/G/E/P/BO/BD) van angostas y fijas;
+// las que pueden tener 3-4 caracteres (PF/PC/Dif/Pts) se reparten lo que sobra.
+const colEquipoWidth = 80;
 
 export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
@@ -47,11 +58,28 @@ export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
         )}
       </p>
       <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table style={{ width: "100%", minWidth: 330, borderCollapse: "collapse", tableLayout: "fixed" }}>
+          <colgroup>
+            <col style={{ width: 20 }} />
+            <col style={{ width: colEquipoWidth }} />
+            {/* PJ · G · E · P (1 dígito) */}
+            {Array.from({ length: 4 }, (_, i) => (
+              <col key={`u${i}`} style={{ width: 22 }} />
+            ))}
+            {/* PF · PC · Dif (hasta 3-4 caracteres): sin ancho -> se reparten lo que sobra */}
+            <col />
+            <col />
+            <col />
+            {/* BO · BD (1 dígito) */}
+            <col style={{ width: 22 }} />
+            <col style={{ width: 22 }} />
+            {/* Pts */}
+            <col />
+          </colgroup>
           <thead>
             <tr>
-              <th style={thStyle}>#</th>
-              <th style={thStyle}>Equipo</th>
+              <th style={{ ...thStyle, ...izq }}>#</th>
+              <th style={{ ...thStyle, ...izq }}>Equipo</th>
               <th style={thStyle}>PJ</th>
               <th style={thStyle}>G</th>
               <th style={thStyle}>E</th>
@@ -71,8 +99,8 @@ export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
               const esNewman = f.equipo === data.nuestroEquipo;
               return (
                 <tr key={f.posicion} style={esNewman ? { background: "rgba(226,197,120,.12)" } : undefined}>
-                  <td style={tdStyle}>{f.posicion}</td>
-                  <td style={{ ...tdEquipoStyle, color: DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
+                  <td style={{ ...tdStyle, ...izq }}>{f.posicion}</td>
+                  <td style={{ ...tdEquipoStyle, ...izq, color: DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
                   <td style={tdStyle}>{f.jugados}</td>
                   <td style={tdStyle}>{f.ganados}</td>
                   <td style={tdStyle}>{f.empatados}</td>
