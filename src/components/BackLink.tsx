@@ -6,6 +6,7 @@ import { DORADO } from "@/lib/colors";
 const pastilla: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
+  justifyContent: "center",
   gap: 6,
   fontWeight: 700,
   fontSize: "0.78rem",
@@ -23,13 +24,16 @@ const pastilla: React.CSSProperties = {
 // del club, valido para todas las pantallas. `href` es solo el fallback para cuando esta pagina
 // es la primera de la pestaña (llegada por link externo/directo), sin nada antes en el historial.
 //
-// "Inicio" va al lado, para no tener que apretar "Atrás" muchas veces cuando querés cambiar de
-// division (ej. de la tabla de M15 B a Pre A).
+// "Inicio" va arriba de "Atrás" (apiladas), para no tener que apretar "Atrás" muchas veces cuando
+// querés cambiar de division (ej. de la tabla de M15 B a Pre A).
 export default function BackLink({ href }: { href: string }) {
   const router = useRouter();
 
   return (
-    <div style={{ position: "fixed", top: 12, left: 12, zIndex: 100, display: "flex", gap: 6 }}>
+    <div style={{ position: "fixed", top: 12, left: 12, zIndex: 100, display: "flex", flexDirection: "column", gap: 6 }}>
+      <button onClick={() => router.push("/")} style={pastilla}>
+        Inicio
+      </button>
       <button
         onClick={() => {
           if (typeof window !== "undefined" && window.history.length > 1) {
@@ -41,9 +45,6 @@ export default function BackLink({ href }: { href: string }) {
         style={pastilla}
       >
         ← Atrás
-      </button>
-      <button onClick={() => router.push("/")} style={pastilla}>
-        Inicio
       </button>
     </div>
   );
