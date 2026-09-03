@@ -28,7 +28,7 @@ const izq: React.CSSProperties = { textAlign: "left" };
 // zona tiene mas de 4 equipos, si no no hay "corte"). Es independiente de la marca de Newman
 // (fondo dorado mas marcado + nombre mas claro + negrita): la fila de Newman si esta entre los 4
 // muestra las dos.
-const bgPlayoff = "rgba(70,196,106,.20)";
+const bgPlayoff = "rgba(70,196,106,.30)";
 const bgPropio = "rgba(226,197,120,.26)";
 
 // Nombres largos ("Atletico del Rosario B", "Buenos Aires C&RC B") empujaban la tabla entera mas
