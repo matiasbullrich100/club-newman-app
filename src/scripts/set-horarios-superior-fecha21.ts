@@ -10,11 +10,11 @@ import { resolve } from "path";
 
 const FECHA = 21;
 
-// categoriaId -> { hora, cancha (predio), rival? (si cambia respecto al fixture) }
-const HORARIOS: Record<string, { hora: string; cancha: string; rival?: string }> = {
+// categoriaId -> { hora, cancha (predio), rival?/esLocal? (si cambian respecto al fixture) }
+const HORARIOS: Record<string, { hora: string; cancha: string; rival?: string; esLocal?: boolean }> = {
   "m-22": { hora: "10:15", cancha: "La Plata Rugby Club" },
   "pre-b": { hora: "10:15", cancha: "La Plata Rugby Club" },
-  "pre-g": { hora: "10:15", cancha: "Newman", rival: "Alumni" }, // en el Club, vs Alumni
+  "pre-g": { hora: "10:15", cancha: "Newman", rival: "Alumni", esLocal: true }, // en el Club (local), vs Alumni
   "pre-e": { hora: "12:00", cancha: "La Plata Rugby Club" },
   "pre-c": { hora: "12:00", cancha: "La Plata Rugby Club" },
   "pre-a": { hora: "12:00", cancha: "La Plata Rugby Club" },
@@ -34,7 +34,7 @@ async function main() {
 
   const batch = adminDb.batch();
 
-  for (const [categoriaId, { hora, cancha, rival }] of Object.entries(HORARIOS)) {
+  for (const [categoriaId, { hora, cancha, rival, esLocal }] of Object.entries(HORARIOS)) {
     const ref = adminDb.collection("partidos").doc(partidoId(categoriaId, FECHA));
     const snap = await ref.get();
     if (!snap.exists || snap.data()!.estado !== "programado") {
@@ -44,9 +44,10 @@ async function main() {
     const d = snap.data()!;
     const data: FirebaseFirestore.DocumentData = { hora, cancha, updatedAt: FieldValue.serverTimestamp() };
     if (rival) data.rival = rival;
+    if (esLocal !== undefined) data.esLocal = esLocal;
     batch.update(ref, data);
     console.log(
-      `${categoriaId.padEnd(10)} ${hora}  ${cancha}${rival ? `  vs ${rival}` : ""}   (antes: ${d.hora ?? "-"} / ${d.cancha ?? "-"} / vs ${d.rival})`
+      `${categoriaId.padEnd(10)} ${hora}  ${cancha}${rival ? `  vs ${rival}` : ""}${esLocal !== undefined ? `  (local=${esLocal})` : ""}   (antes: ${d.hora ?? "-"} / ${d.cancha ?? "-"} / vs ${d.rival} / local=${d.esLocal})`
     );
   }
 
