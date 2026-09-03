@@ -3,10 +3,15 @@ import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 export default function Header({
   rightLabel,
+  rightLabelShift = 0,
   tituloHome,
   logo = "top14",
 }: {
   rightLabel?: string;
+  // Corrimiento en px del texto de la derecha (rightLabel) hacia el escudo/logo. Se usa en
+  // /juveniles, donde el logo de URBA es mas grande y "Juveniles" queda demasiado a la izquierda
+  // comparado con "Plantel Superior".
+  rightLabelShift?: number;
   tituloHome?: boolean;
   // Juveniles no juega el torneo "TOP 14" (eso es una categoria puntual de Plantel Superior) --
   // ahi va el escudo generico de URBA en vez del de TOP 14.
@@ -146,6 +151,7 @@ export default function Header({
             <span
               style={{
                 marginRight: 8,
+                transform: rightLabelShift ? `translateX(${rightLabelShift}px)` : undefined,
                 // Etiquetas largas ("M15 · Fecha 1") no entran en una linea a este tamano --
                 // en vez de cortarlas con "...", se achican y se dejan envolver en 2 lineas.
                 fontSize: rightLabel.length > 8 ? "0.72rem" : "1em",
