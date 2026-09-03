@@ -46,8 +46,12 @@ const tdEquipoStyle: React.CSSProperties = {
 // las que pueden tener 3-4 caracteres (PF/PC/Dif/Pts) se reparten lo que sobra.
 const colEquipoWidth = 80;
 
-export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
+// conPlayoff: en Plantel Superior los primeros 4 clasifican a playoff -> se marcan + leyenda al
+// pie. En Juveniles NO hay playoff (el 1º sale campeón), así que va en false y la tabla queda
+// "normal", con la única marca de Newman.
+export default function TablaPosiciones({ data, conPlayoff = true }: { data: PosicionesTorneo; conPlayoff?: boolean }) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
+  const marcarTop4 = conPlayoff && data.filas.length > 4;
 
   return (
     <>
@@ -104,7 +108,7 @@ export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
               // No alcanza con "empieza con Newman" -- algunas zonas juntan a mas de un equipo del
               // club (ver Pre F/G/H en torneos-urba.ts), asi que hay que resaltar el equipo exacto.
               const esNewman = f.equipo === data.nuestroEquipo;
-              const clasifica = data.filas.length > 4 && idx < 4;
+              const clasifica = marcarTop4 && idx < 4;
               return (
                 <tr
                   key={f.posicion}
@@ -128,7 +132,7 @@ export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
           </tbody>
         </table>
       </div>
-      {data.filas.length > 4 && (
+      {marcarTop4 && (
         <p style={{ fontSize: "0.7rem", opacity: 0.75, margin: "8px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
           <span
             aria-hidden

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { CATEGORIAS } from "@/lib/categorias";
+import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import type { PosicionesTorneo } from "@/types/firestore";
@@ -77,7 +77,7 @@ export default async function PosicionesPage({
             Todavía no hay tabla de posiciones cargada para esta categoría.
           </p>
         ) : (
-          <TablaPosiciones data={snap.data() as PosicionesTorneo} />
+          <TablaPosiciones data={snap.data() as PosicionesTorneo} conPlayoff={grupoDeCategoria(categoriaId).grupo === "superior"} />
         )}
       </div>
     </main>
