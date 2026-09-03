@@ -24,6 +24,14 @@ const tdStyle: React.CSSProperties = {
 
 const izq: React.CSSProperties = { textAlign: "left" };
 
+// Los primeros 4 de cada zona clasifican a playoff -> se marca el fondo de esas filas + una barra
+// verde a la izquierda. Es independiente de la marca del equipo propio (fondo dorado + negrita):
+// una fila que es propia Y top 4 muestra las dos cosas. Solo se marca si la zona tiene mas de 4
+// equipos (con 4 o menos no hay "corte").
+const VERDE_PLAYOFF = "#46c46a";
+const bgPlayoff = "rgba(70,196,106,.13)";
+const bgPropio = "rgba(226,197,120,.12)";
+
 // Nombres largos ("Atletico del Rosario B", "Buenos Aires C&RC B") empujaban la tabla entera mas
 // alla del ancho de la pantalla -- esta columna especificamente puede envolver en 2 lineas en vez
 // de forzar scroll horizontal en todo el resto de columnas (numericas, angostas).
@@ -93,13 +101,25 @@ export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
             </tr>
           </thead>
           <tbody>
-            {data.filas.map((f) => {
+            {data.filas.map((f, idx) => {
               // No alcanza con "empieza con Newman" -- algunas zonas juntan a mas de un equipo del
               // club (ver Pre F/G/H en torneos-urba.ts), asi que hay que resaltar el equipo exacto.
               const esNewman = f.equipo === data.nuestroEquipo;
+              const clasifica = data.filas.length > 4 && idx < 4;
               return (
-                <tr key={f.posicion} style={esNewman ? { background: "rgba(226,197,120,.12)" } : undefined}>
-                  <td style={{ ...tdStyle, ...izq }}>{f.posicion}</td>
+                <tr
+                  key={f.posicion}
+                  style={{ background: esNewman ? bgPropio : clasifica ? bgPlayoff : undefined }}
+                >
+                  <td
+                    style={{
+                      ...tdStyle,
+                      ...izq,
+                      borderLeft: `3px solid ${clasifica ? VERDE_PLAYOFF : "transparent"}`,
+                    }}
+                  >
+                    {f.posicion}
+                  </td>
                   <td style={{ ...tdEquipoStyle, ...izq, color: DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
                   <td style={tdStyle}>{f.jugados}</td>
                   <td style={tdStyle}>{f.ganados}</td>
@@ -117,6 +137,22 @@ export default function TablaPosiciones({ data }: { data: PosicionesTorneo }) {
           </tbody>
         </table>
       </div>
+      {data.filas.length > 4 && (
+        <p style={{ fontSize: "0.7rem", opacity: 0.75, margin: "8px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
+          <span
+            aria-hidden
+            style={{
+              display: "inline-block",
+              width: 14,
+              height: 12,
+              background: bgPlayoff,
+              borderLeft: `3px solid ${VERDE_PLAYOFF}`,
+              flexShrink: 0,
+            }}
+          />
+          Los primeros 4 clasifican a playoff
+        </p>
+      )}
     </>
   );
 }
