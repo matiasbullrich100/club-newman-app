@@ -58,9 +58,9 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
               >
                 {categoriaNombre}
               </span>
-              {!partido.notaEspecial && !partido.jugado && (
+              {!partido.notaEspecial && !partido.jugado && partido.numeroCancha && (
                 <span style={{ display: "block", fontSize: "0.68rem", fontWeight: 600, color: DORADO_SUAVE, opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  Cancha{partido.numeroCancha ? ` ${partido.numeroCancha}` : ""}
+                  Cancha {partido.numeroCancha}
                 </span>
               )}
             </span>

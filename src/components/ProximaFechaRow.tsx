@@ -5,12 +5,13 @@ import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 
 // Sublinea del resumen de Proxima Fecha: horario (si el manager lo cargo desde /programar, sea
-// Newman local o visitante) + cancha ("Cancha 3" si ya se sabe, "Cancha —" hasta que se
-// confirme). Fecha libre no lleva nada.
+// Newman local o visitante) + cancha ("Cancha 3" SOLO si ya se sabe -- hasta que el club confirme
+// no se muestra nada, ni el rotulo "Cancha"). Fecha libre no lleva nada.
 function textoHorarioCancha(proxima: ProximaFecha): string | null {
   if (proxima.notaEspecial) return null;
-  const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —";
-  return proxima.hora ? `${proxima.hora} hs · ${cancha}` : cancha;
+  const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
+  if (proxima.hora) return cancha ? `${proxima.hora} hs · ${cancha}` : `${proxima.hora} hs`;
+  return cancha;
 }
 
 const botonChico: React.CSSProperties = {

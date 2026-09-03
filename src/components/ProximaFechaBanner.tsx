@@ -38,8 +38,8 @@ export default function ProximaFechaBanner({ proximas }: { proximas: ProximaFech
                 {!proxima.esLocal && ` · en ${proxima.rival}`}
                 {/* Horario -- lo carga el manager desde /programar, sea Newman local o visitante. */}
                 {proxima.hora && ` · ${proxima.hora} hs`}
-                {/* Rotulo "Cancha" -- "Cancha 1" si ya se sabe, vacio ("Cancha —") hasta que el club confirme. */}
-                {` · ${proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : "Cancha —"}`}
+                {/* Cancha -- solo cuando el club confirma el numero; hasta entonces no se muestra nada. */}
+                {proxima.numeroCancha && ` · Cancha ${proxima.numeroCancha}`}
               </span>
             </div>
           )}
