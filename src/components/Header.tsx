@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO } from "@/lib/colors";
 
 export default function Header({
   rightLabel,
@@ -77,28 +77,6 @@ export default function Header({
             zIndex: 0,
           }}
         />
-        {/* "Certa Bonum Certamen" / "Viriliter Age" -- una a cada lado del escudo, chicas, justo
-            arriba de la linea (no una fila centrada debajo de todo el escudo). */}
-        {["Certa Bonum Certamen", "Viriliter Age"].map((lema, i) => (
-          <div
-            key={lema}
-            style={{
-              position: "absolute",
-              zIndex: 1,
-              top: 66,
-              left: i === 0 ? "22%" : "78%",
-              transform: "translateX(-50%)",
-              fontSize: "0.34rem",
-              letterSpacing: 0.5,
-              textTransform: "uppercase",
-              color: DORADO_SUAVE,
-              opacity: 0.9,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {lema}
-          </div>
-        ))}
         <div
           style={{
             position: "relative",
