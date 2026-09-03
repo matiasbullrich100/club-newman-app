@@ -1,18 +1,20 @@
-// Horarios y sedes de la Fecha 21 de Plantel Superior (sábado), pasados por el club por WhatsApp.
-// Todo en La Plata salvo Pre G, que juega en el Club (cancha "Newman"). Pre H NO se toca acá
-// (el club avisó que queda libre porque Champa no presenta equipo -- se decide aparte).
-// La cancha PUNTUAL (numeroCancha) la confirman unos días antes; se carga después desde /programar.
+// Horarios y sedes de la Fecha 21 de Plantel Superior (sábado), pasados por el club por WhatsApp
+// (son EL DATO REAL, pisan lo que hubiera en el fixture).
+//  - Todo en La Plata salvo Pre G, que juega en el Club (cancha "Newman") vs Alumni.
+//  - Pre H queda LIBRE (Champa no presenta equipo).
+//  - La cancha PUNTUAL (numeroCancha) la confirman unos días antes; se carga luego desde /programar.
 // Correr con: npx tsx src/scripts/set-horarios-superior-fecha21.ts
 
 import { config } from "dotenv";
 import { resolve } from "path";
 
 const FECHA = 21;
-// categoriaId -> { hora, cancha (predio) }
-const HORARIOS: Record<string, { hora: string; cancha: string }> = {
+
+// categoriaId -> { hora, cancha (predio), rival? (si cambia respecto al fixture) }
+const HORARIOS: Record<string, { hora: string; cancha: string; rival?: string }> = {
   "m-22": { hora: "10:15", cancha: "La Plata Rugby Club" },
   "pre-b": { hora: "10:15", cancha: "La Plata Rugby Club" },
-  "pre-g": { hora: "10:15", cancha: "Newman" }, // en el Club
+  "pre-g": { hora: "10:15", cancha: "Newman", rival: "Alumni" }, // en el Club, vs Alumni
   "pre-e": { hora: "12:00", cancha: "La Plata Rugby Club" },
   "pre-c": { hora: "12:00", cancha: "La Plata Rugby Club" },
   "pre-a": { hora: "12:00", cancha: "La Plata Rugby Club" },
@@ -22,6 +24,8 @@ const HORARIOS: Record<string, { hora: string; cancha: string }> = {
   primera: { hora: "15:30", cancha: "La Plata Rugby Club" },
 };
 
+const LIBRES = ["pre-h"]; // Champa no presenta equipo
+
 async function main() {
   config({ path: resolve(__dirname, "../../.env.local") });
   const { adminDb } = await import("../lib/firebase-admin");
@@ -29,21 +33,40 @@ async function main() {
   const { FieldValue } = await import("firebase-admin/firestore");
 
   const batch = adminDb.batch();
-  for (const [categoriaId, { hora, cancha }] of Object.entries(HORARIOS)) {
+
+  for (const [categoriaId, { hora, cancha, rival }] of Object.entries(HORARIOS)) {
     const ref = adminDb.collection("partidos").doc(partidoId(categoriaId, FECHA));
     const snap = await ref.get();
-    if (!snap.exists) {
-      console.log(`${categoriaId.padEnd(10)} NO EXISTE ${partidoId(categoriaId, FECHA)} -- se saltea`);
+    if (!snap.exists || snap.data()!.estado !== "programado") {
+      console.log(`${categoriaId.padEnd(10)} se saltea (${snap.exists ? snap.data()!.estado : "no existe"})`);
       continue;
     }
     const d = snap.data()!;
-    if (d.estado !== "programado") {
-      console.log(`${categoriaId.padEnd(10)} estado=${d.estado} (no "programado") -- se saltea`);
+    const data: FirebaseFirestore.DocumentData = { hora, cancha, updatedAt: FieldValue.serverTimestamp() };
+    if (rival) data.rival = rival;
+    batch.update(ref, data);
+    console.log(
+      `${categoriaId.padEnd(10)} ${hora}  ${cancha}${rival ? `  vs ${rival}` : ""}   (antes: ${d.hora ?? "-"} / ${d.cancha ?? "-"} / vs ${d.rival})`
+    );
+  }
+
+  for (const categoriaId of LIBRES) {
+    const ref = adminDb.collection("partidos").doc(partidoId(categoriaId, FECHA));
+    const snap = await ref.get();
+    if (!snap.exists || snap.data()!.estado !== "programado") {
+      console.log(`${categoriaId.padEnd(10)} LIBRE: se saltea (${snap.exists ? snap.data()!.estado : "no existe"})`);
       continue;
     }
-    batch.update(ref, { hora, cancha, updatedAt: FieldValue.serverTimestamp() });
-    console.log(`${categoriaId.padEnd(10)} ${hora}  ${cancha}   (antes: ${d.hora ?? "-"} / ${d.cancha ?? "-"})`);
+    batch.update(ref, {
+      rival: "Libre",
+      notaEspecial: "Fecha libre",
+      hora: FieldValue.delete(),
+      numeroCancha: FieldValue.delete(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    console.log(`${categoriaId.padEnd(10)} -> Fecha libre`);
   }
+
   await batch.commit();
   console.log("\nListo. numeroCancha se carga después desde /programar.");
 }
