@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { setPateadorHabitual } from "@/lib/match/actions";
 import type { RosterJugador } from "./types";
 import { botonOpcion, botonPrimario, botonSecundario, listaOpciones } from "./estilos";
-import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // Se puede elegir ANTES de que arranque el partido (ver PanelDesignado / PartidoProgramadoPanel)
@@ -93,14 +92,19 @@ export default function PateadorHabitual({
             ¿{sugerido.nombre} es el pateador habitual de este partido? Así no hay que buscarlo cada vez que
             convierte un try o patea un penal.
           </p>
-          <BarraAccionFija>
+          {/* Esta pregunta aparece en la vista estatica de "antes de arrancar", debajo de una
+              formacion larga -- BarraAccionFija (pensada para cuando una lista se achica DURANTE
+              una jugada en curso, ver su propio comentario) quedaba fija abajo de la pantalla,
+              tapando Formaciones y separada de esta pregunta (bug real reportado: se veian los
+              botones "Si"/"No" sin la pregunta a la vista). Botones en linea, sin fijar. */}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button style={botonPrimario} disabled={isPending} onClick={() => elegir(sugerido.jugadorId)}>
               Sí
             </button>
             <button style={botonSecundario} disabled={isPending} onClick={() => setEligiendoOtro(true)}>
               No, otro jugador
             </button>
-          </BarraAccionFija>
+          </div>
           <button
             style={{ ...botonSecundario, fontSize: "0.78rem", marginTop: 8 }}
             disabled={isPending}
