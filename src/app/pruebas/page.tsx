@@ -13,7 +13,6 @@ import { DORADO_SUAVE } from "@/lib/colors";
 // que necesitan su propio link (nunca aparecen en /fecha ni /categoria).
 const PARTIDOS_DEMO = [
   { id: "pre-a-test-beromama", label: "Pre A · Beromama", categoriaId: "pre-a" },
-  { id: "pre-a-test-cambio", label: "Pre A · Cambios", categoriaId: "pre-a" },
   { id: "m15-c-test-cambio", label: "M15 C · Cambios", categoriaId: "m15-c" },
 ];
 
