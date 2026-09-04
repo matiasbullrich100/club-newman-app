@@ -14,8 +14,6 @@ import { DORADO_SUAVE } from "@/lib/colors";
 const PARTIDOS_DEMO = [
   { id: "pre-a-test-beromama", label: "Pre A · Beromama", categoriaId: "pre-a" },
   { id: "pre-a-test-cambio", label: "Pre A · Cambios", categoriaId: "pre-a" },
-  { id: "demo-partido-2", label: "M-22", categoriaId: "m-22" },
-  { id: "m15-c-test-cambio", label: "M15 C", categoriaId: "m15-c" },
 ];
 
 export default async function PruebasPage() {

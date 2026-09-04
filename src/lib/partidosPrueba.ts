@@ -4,12 +4,7 @@ import type { SessionPayload } from "@/lib/auth/session";
 // puede tocar un partido real, ni sus tarjetas/minutos contaminan jugadores/. Compartida entre
 // match/actions.ts, partido/[partidoId]/page.tsx y las paginas que arman el banner de "en vivo"
 // (superior, juveniles) para no duplicarla en varios lugares.
-export const PARTIDOS_DEMO_IDS = [
-  "demo-partido-2", // M-22, formacion real de la Fecha 5 (vs Alumni)
-  "pre-a-test-cambio",
-  "pre-a-test-beromama",
-  "m15-c-test-cambio", // formacion real de la fecha 1 vs Regatas C
-];
+export const PARTIDOS_DEMO_IDS = ["pre-a-test-cambio", "pre-a-test-beromama"];
 
 // Los partidos de prueba son para el administrador (manager sin alcance, acceso total) y para la
 // cuenta de practica dedicada ("demo", designado atado a categoriaId "demo") -- pensada para que
