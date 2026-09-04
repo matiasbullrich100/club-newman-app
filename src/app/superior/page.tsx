@@ -5,7 +5,7 @@ import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina } from "@/lib/fecha";
-import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
+import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -22,15 +22,12 @@ const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 // no aca. El selector de categoria lleva a /categoria/[categoriaId], que ya muestra la formacion
 // del proximo partido directo.
 export default async function PlantelSuperiorPage() {
-  const [session, resumenCompleto] = await Promise.all([
-    getSession(),
-    partidosEnVivoOUltimoTerminado(CATEGORIAS_SUPERIOR.map((c) => c.id)),
-  ]);
+  const session = await getSession();
   // Algunas categorias de prueba (ej. "pre-a", "m-22") coinciden con categorias reales, asi que
-  // un partido de PARTIDOS_DEMO_IDS puede aparecer en este mismo banner -- se marca "PRUEBA" y,
-  // pasado el corte, se oculta para quien no sea el Administrador (ver partidosPrueba.ts).
-  const pruebasVisibles = pruebasVisiblesPara(session);
-  const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
+  // un partido de PARTIDOS_DEMO_IDS puede aparecer en este mismo banner -- partidosEnVivoOUltimo
+  // Terminado ya lo filtra para quien no puede ver partidos de prueba (ver partidosPrueba.ts); acá
+  // solo queda marcarlo "PRUEBA" para quien sí los ve (administrador o la cuenta de práctica).
+  const resumen = await partidosEnVivoOUltimoTerminado(CATEGORIAS_SUPERIOR.map((c) => c.id), session);
 
   // El bloque de resultados aparece/desaparece ENTERO, no categoria por categoria: si UNA
   // categoria jugo recien (ej. Pre F movida al jueves) o hay algo en vivo, TODO Plantel Superior

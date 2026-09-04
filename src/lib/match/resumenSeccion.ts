@@ -2,7 +2,9 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina, hoyIsoEnArgentina } from "@/lib/fecha";
 import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR, NUMERO_FECHAS_JUVENILES, grupoDeCategoria, partidoId } from "@/lib/categorias";
+import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import type { Partido, Resultado } from "@/types/firestore";
+import type { SessionPayload } from "@/lib/auth/session";
 
 const ESTADOS_EN_VIVO = ["en_juego", "entretiempo", "suspendido"] as const;
 
@@ -40,10 +42,19 @@ function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
  * libre queda "programado" para siempre, nunca pasa a "terminado"). No hace falta indice
  * compuesto: se trae "estado==terminado" y "notaEspecial==Fecha libre" enteros (el volumen de
  * partidos de este club es chico) y se filtra/agrupa en memoria.
+ *
+ * `session`: los partidos de prueba (PARTIDOS_DEMO_IDS) reusan a proposito el categoriaId de una
+ * division real, para poder practicar/probar colisiones -- pero este resumen lo ve CUALQUIERA que
+ * entre a /categoria, /superior o /juveniles, sin login. Si alguien esta practicando un partido de
+ * prueba mientras el resto mira el sitio (ej. un sabado de Primera), nadie que no sea quien
+ * practica (o el administrador) tiene que ver aparecer un "PARTIDO EN VIVO" con un resultado que
+ * no es real -- por eso se esconden salvo para quien puede verlos (ver pruebasVisiblesPara en
+ * partidosPrueba.ts).
  */
-export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Promise<PartidoResumen[]> {
+export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], session: SessionPayload | null): Promise<PartidoResumen[]> {
   const idsSet = new Set(categoriaIds);
   const hoy = hoyIsoEnArgentina();
+  const puedeVerPruebas = pruebasVisiblesPara(session);
   const [enVivoSnap, terminadosSnap, librePasadaSnap] = await Promise.all([
     adminDb.collection("partidos").where("estado", "in", ESTADOS_EN_VIVO).get(),
     adminDb.collection("partidos").where("estado", "==", "terminado").get(),
@@ -52,7 +63,7 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
 
   const enVivo = enVivoSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
-    .filter((p) => idsSet.has(p.categoriaId));
+    .filter((p) => idsSet.has(p.categoriaId) && (puedeVerPruebas || !PARTIDOS_DEMO_IDS.includes(p.id)));
 
   const terminados = terminadosSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
@@ -75,7 +86,8 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[]): Pr
 
   // Partidos de prueba (sin fecha calendario real, numeroFecha "demo") -- "recien terminado"
   // sigue midiendose por la ultima edicion de hoy, no tiene sentido que queden pegados una semana.
-  const pruebasHoy = terminados.filter((p) => {
+  // Mismo ocultamiento que en vivo: solo para quien puede ver partidos de prueba.
+  const pruebasHoy = !puedeVerPruebas ? [] : terminados.filter((p) => {
     if (p.fecha) return false;
     const updatedAt = p.updatedAt;
     if (!updatedAt) return false;

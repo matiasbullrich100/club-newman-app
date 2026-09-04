@@ -54,7 +54,8 @@ export default async function CategoriaPage({
   if (!categoria) notFound();
   const tiraEquipos = equiposParaTira(categoriaId, (id) => `/categoria/${id}`);
 
-  const [session, [resumenPropio]] = await Promise.all([getSession(), partidosEnVivoOUltimoTerminado([categoriaId])]);
+  const session = await getSession();
+  const [resumenPropio] = await partidosEnVivoOUltimoTerminado([categoriaId], session);
 
   const esVivo = !!resumenPropio && ESTADOS_EN_VIVO.has(resumenPropio.estado);
   const esFresco =

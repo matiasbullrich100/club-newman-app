@@ -5,7 +5,7 @@ import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina } from "@/lib/fecha";
-import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
+import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -19,9 +19,7 @@ export default async function JuvenilesPage() {
   // Mismo patron que /superior y /juveniles/[edadId], pero con las 4 divisiones juntas -- para no
   // tener que entrar a cada edad para ver que se esta jugando/se jugo hoy (antes solo aparecia un
   // nivel mas abajo, division por division).
-  const resumenCompleto = await partidosEnVivoOUltimoTerminado(CATEGORIAS_JUVENILES.map((c) => c.id));
-  const pruebasVisibles = pruebasVisiblesPara(session);
-  const resumen = resumenCompleto.filter((p) => pruebasVisibles || !PARTIDOS_DEMO_IDS.includes(p.id));
+  const resumen = await partidosEnVivoOUltimoTerminado(CATEGORIAS_JUVENILES.map((c) => c.id), session);
 
   // Grilla de equipos al pie: M19 primero, M15 al final (orden pedido explicitamente, al reves
   // del orden de CATEGORIAS_JUVENILES que va de menor a mayor edad).
