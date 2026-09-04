@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase-admin";
-import { getSession, puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/session";
+import { getSession, puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "@/lib/auth/session";
 import { elapsedSeconds, minutoActual } from "./clock";
 import { calcularMinutos, type CambioEvento, type JugadorInput } from "./minutes";
 import { calcularBonus } from "./bonus";
@@ -1565,12 +1565,13 @@ export async function borrarPresencia(partidoId: string): Promise<void> {
  */
 export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> {
   const session = await getSession();
-  if (!session || session.rol !== "manager") throw new Error("No autorizado");
   if (!PARTIDOS_DEMO_IDS.includes(partidoDemoId)) throw new Error("Ese partido no se puede resetear");
 
   const partidoRef = adminDb.collection("partidos").doc(partidoDemoId);
   const partidoSnap = await partidoRef.get();
   if (!partidoSnap.exists) throw new Error("El partido de prueba no existe");
+  const partido = partidoSnap.data() as Partido;
+  if (!puedeResetearPartidoDePrueba(session, partido.categoriaId)) throw new Error("No autorizado");
 
   const [plantelSnap, incidentesSnap] = await Promise.all([
     partidoRef.collection("plantel").get(),

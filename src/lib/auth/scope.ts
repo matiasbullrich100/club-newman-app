@@ -40,6 +40,18 @@ export function esManagerDeCategoria(session: SessionPayload | null, categoriaId
   return cat?.grupo === "juveniles" && cat.edadId === session.alcance;
 }
 
+/**
+ * Quien puede resetear un partido de prueba a 0-0 (boton "Resetear partido de prueba"): el
+ * manager de esa categoria (o administrador, via esManagerDeCategoria) Y TAMBIEN la cuenta de
+ * practica dedicada -- para que quien esta practicando pueda reiniciar las veces que haga falta
+ * sin depender de un admin. Solo tiene sentido llamarla ya sabiendo que el partido es de prueba
+ * (ver PARTIDOS_DEMO_IDS en lib/partidosPrueba.ts) -- no existe "resetear" para un partido real.
+ */
+export function puedeResetearPartidoDePrueba(session: SessionPayload | null, categoriaId: string): boolean {
+  if (esManagerDeCategoria(session, categoriaId)) return true;
+  return !!session && session.rol === "designado" && session.categoriaId === "demo";
+}
+
 /** Mismo alcance que puedeOperarCategoria, pero para entrar a /estadisticas/[grupoId]. */
 export function puedeVerEstadisticas(session: SessionPayload | null, grupoId: string): boolean {
   if (!session) return false;

@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import type { Rol } from "@/types/firestore";
 // Re-exportado desde scope.ts (archivo sin "server-only", importable desde Client Components)
 // para no romper los imports server-side existentes de `puedeOperarCategoria`.
-export { puedeOperarCategoria, puedeVerEstadisticas, esManagerDeCategoria } from "./scope";
+export { puedeOperarCategoria, puedeVerEstadisticas, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "./scope";
 import { puedeOperarCategoria } from "./scope";
 
 const COOKIE_NAME = "cn_session";

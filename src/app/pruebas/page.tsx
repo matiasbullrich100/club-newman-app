@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { puedeOperarCategoria } from "@/lib/auth/scope";
+import { puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -52,7 +52,7 @@ export default async function PruebasPage() {
             >
               {p.label}
             </Link>
-            {session?.rol === "manager" && puedeOperarCategoria(session, p.categoriaId) && (
+            {puedeResetearPartidoDePrueba(session, p.categoriaId) && (
               <ResetDemoButton partidoId={p.id} label={p.label} />
             )}
           </div>

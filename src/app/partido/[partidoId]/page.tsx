@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
-import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
+import { puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { CATEGORIAS, grupoDeCategoria, partesPartidoId } from "@/lib/categorias";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import TiraEquipos from "@/components/TiraEquipos";
@@ -42,7 +42,7 @@ export default async function PartidoPage({
   // un designado real de esa categoria ni el publico general, aunque conozcan la URL directa (ver
   // partidosPrueba.ts).
   if (esPartidoDePrueba && !pruebasVisiblesPara(session)) notFound();
-  const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
+  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId);
   // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. Newm."
   // o tocando la fila en LiveBanner/ProximaFechaRow), no la vieja vista /fecha/[n] (huerfana --
   // nada mas en la app linkeaba ahi).

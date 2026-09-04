@@ -1,6 +1,6 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
-import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
+import { puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { ordenarPorDorsal } from "@/lib/players";
@@ -56,7 +56,7 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
       ? await sugerirPateador(partido.categoriaId, plantel.map((j) => j.jugadorId))
       : null;
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
-  const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
+  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId);
 
   // Formacion cargada como borrador (ver formacionPublicada en types/firestore.ts) -- quien no
   // puede operar esta categoria no ve la formacion real hasta que se publique.

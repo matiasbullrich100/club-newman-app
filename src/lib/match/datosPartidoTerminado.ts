@@ -1,6 +1,6 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
-import { puedeOperarCategoria, esManagerDeCategoria } from "@/lib/auth/scope";
+import { puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
 import { FAMILIA_TARJETA } from "@/lib/incidentes";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
@@ -72,7 +72,7 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
 
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
-  const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
+  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId);
   const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
 
   return { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos: ambiguos };
