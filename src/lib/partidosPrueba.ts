@@ -5,11 +5,10 @@ import type { SessionPayload } from "@/lib/auth/session";
 // match/actions.ts, partido/[partidoId]/page.tsx y las paginas que arman el banner de "en vivo"
 // (superior, juveniles) para no duplicarla en varios lugares.
 export const PARTIDOS_DEMO_IDS = [
-  "demo-partido-1",
-  "demo-partido-2",
+  "demo-partido-2", // M-22, formacion real de la Fecha 21
   "pre-a-test-cambio",
   "pre-a-test-beromama",
-  "m15-c-test-cambio",
+  "m15-c-test-cambio", // formacion real de la fecha 1 vs Regatas C
 ];
 
 // Los partidos de prueba son solo para el administrador (manager sin alcance, acceso total) --

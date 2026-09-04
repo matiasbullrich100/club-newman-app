@@ -12,8 +12,8 @@ import { DORADO_SUAVE } from "@/lib/colors";
 // Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
 // que necesitan su propio link (nunca aparecen en /fecha ni /categoria).
 const PARTIDOS_DEMO = [
-  { id: "pre-a-test-beromama", label: "Pre A", categoriaId: "pre-a" },
-  { id: "demo-partido-1", label: "Pre B", categoriaId: "demo" },
+  { id: "pre-a-test-beromama", label: "Pre A · Beromama", categoriaId: "pre-a" },
+  { id: "pre-a-test-cambio", label: "Pre A · Cambios", categoriaId: "pre-a" },
   { id: "demo-partido-2", label: "M-22", categoriaId: "m-22" },
   { id: "m15-c-test-cambio", label: "M15 C", categoriaId: "m15-c" },
 ];
