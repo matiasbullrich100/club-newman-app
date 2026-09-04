@@ -357,6 +357,7 @@ async function main() {
     batch.update(partidoRef, {
       formacionPublicada: false,
       enCanchaIds: titularesIds,
+      formacionActualizadaEn: new Date(),
       updatedAt: new Date(),
     });
     totalDocs++;

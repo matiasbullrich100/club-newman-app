@@ -71,6 +71,11 @@ export interface Partido {
   // el resto ve "aun no publicada" hasta que se aprieta "Publicar formacion" (ver
   // publicarFormacion en match/actions.ts).
   formacionPublicada?: boolean;
+  // Cuándo se cargó/tocó por última vez la formación de este partido (un script de migración, o
+  // reemplazarJugadorFormacion). Sirve para que en /formaciones se vea de un vistazo si lo que
+  // estás por publicar es lo que se subió recién o algo viejo -- no confundir con `updatedAt`,
+  // que también lo tocan el motor en vivo, /programar, etc.
+  formacionActualizadaEn?: Timestamp | Date;
   // jugadorId del pateador habitual de ESTE partido (conversiones/penales -- drop queda afuera,
   // menos repetible). Se pregunta una sola vez, apenas arranca el partido (ver PateadorHabitual.tsx
   // y sugerirPateador() en match/pateador.ts para la sugerencia automatica). undefined = todavia no

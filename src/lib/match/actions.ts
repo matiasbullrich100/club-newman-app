@@ -1452,7 +1452,11 @@ export async function reemplazarJugadorFormacion(
 
     const enCanchaIds = partido.enCanchaIds.filter((id) => id !== viejoJugadorId && id !== nuevoJugadorId);
     if (nuevo.enCancha) enCanchaIds.push(nuevoJugadorId);
-    tx.update(partidoRef, { enCanchaIds, updatedAt: FieldValue.serverTimestamp() });
+    tx.update(partidoRef, {
+      enCanchaIds,
+      formacionActualizadaEn: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
   });
 
   revalidatePath(`/partido/${partidoId}`);

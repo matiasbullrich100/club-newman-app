@@ -15,6 +15,26 @@ const CHIP: Record<EstadoSubida, { label: string; bg: string; color: string }> =
   "sin-fecha": { label: "Sin fecha", bg: "rgba(255,255,255,.06)", color: DORADO_SUAVE },
 };
 
+// "Cargado 04/09 10:32" -- para distinguir de un vistazo la formación recién subida de una vieja
+// que quedó de otra fecha (ver Partido.formacionActualizadaEn).
+function formatCargado(valor: unknown): string | null {
+  const fecha =
+    valor && typeof valor === "object" && "toDate" in valor && typeof (valor as { toDate: unknown }).toDate === "function"
+      ? (valor as { toDate: () => Date }).toDate()
+      : valor instanceof Date
+        ? valor
+        : null;
+  if (!fecha) return null;
+  const texto = fecha.toLocaleString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `Cargado ${texto}`;
+}
+
 export default async function EstadoFormacionesPage() {
   const session = await getSession();
   const autorizado = session?.rol === "manager";
@@ -97,12 +117,19 @@ export default async function EstadoFormacionesPage() {
                         >
                           {f.categoriaNombre}
                         </span>
-                        <span style={{ flex: 1, minWidth: 0, fontSize: "0.72rem", color: DORADO_SUAVE, opacity: 0.85, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {f.estado === "sin-fecha"
-                            ? "sin fecha en el fixture"
-                            : `${f.rival ?? ""}${f.fecha ? ` · ${formatFechaCorta(f.fecha)}` : ""}${
-                                f.estadoPartido && f.estadoPartido !== "programado" ? " · jugado" : ""
-                              }`}
+                        <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 1, overflow: "hidden" }}>
+                          <span style={{ fontSize: "0.72rem", color: DORADO_SUAVE, opacity: 0.85, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {f.estado === "sin-fecha"
+                              ? "sin fecha en el fixture"
+                              : `${f.rival ?? ""}${f.fecha ? ` · ${formatFechaCorta(f.fecha)}` : ""}${
+                                  f.estadoPartido && f.estadoPartido !== "programado" ? " · jugado" : ""
+                                }`}
+                          </span>
+                          {formatCargado(f.formacionActualizadaEn) && (
+                            <span style={{ fontSize: "0.62rem", color: DORADO_SUAVE, opacity: 0.6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {formatCargado(f.formacionActualizadaEn)}
+                            </span>
+                          )}
                         </span>
                         <span
                           style={{

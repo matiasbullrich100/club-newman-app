@@ -10,6 +10,7 @@ import {
   partidoIdsDeGrupo,
 } from "@/lib/categorias";
 import { hoyIsoEnArgentina } from "@/lib/fecha";
+import type { Timestamp } from "firebase-admin/firestore";
 import type { Partido } from "@/types/firestore";
 
 export type EstadoSubida = "sin-subir" | "borrador" | "publicada" | "libre" | "sin-fecha";
@@ -28,6 +29,8 @@ export interface EstadoFormacion {
   estadoPartido: Partido["estado"] | null;
   jugadores: number;
   estado: EstadoSubida;
+  // Cuándo se cargó/tocó la formación por última vez -- ver Partido.formacionActualizadaEn.
+  formacionActualizadaEn: Timestamp | Date | null;
 }
 
 export interface GrupoEstadoFormaciones {
@@ -88,6 +91,7 @@ async function estadoDeGrupo(
           estadoPartido: partido.estado,
           jugadores: 0,
           estado: "libre",
+          formacionActualizadaEn: null,
         };
       }
       const plantelSnap = await adminDb.collection("partidos").doc(pid).collection("plantel").get();
@@ -111,6 +115,7 @@ async function estadoDeGrupo(
         estadoPartido: partido.estado,
         jugadores,
         estado,
+        formacionActualizadaEn: partido.formacionActualizadaEn ?? null,
       };
     })
   );
@@ -128,6 +133,7 @@ function vacia(c: { id: string; nombre: string }): EstadoFormacion {
     estadoPartido: null,
     jugadores: 0,
     estado: "sin-fecha",
+    formacionActualizadaEn: null,
   };
 }
 
