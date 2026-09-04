@@ -13,9 +13,16 @@ import type { SessionPayload } from "./session";
  * (Plantel Superior, cuenta "manager"/"pelu") o `alcance` = un edadId de Juveniles
  * (m15/m16/m17/m19). `alcance` ausente = sin restriccion -- hoy ninguna cuenta usa este caso,
  * queda como resguardo si se crea una cuenta manager nueva sin setearlo.
+ *
+ * `partidoDePrueba`: pasar `true` cuando el partido esta en PARTIDOS_DEMO_IDS (ver
+ * lib/partidosPrueba.ts) -- ahi ademas del manager y el designado de esa categoria, puede operar
+ * la cuenta de practica dedicada (designado con categoriaId "demo"), sin que eso le de acceso a
+ * NINGUN partido real. No se importa PARTIDOS_DEMO_IDS aca para no acoplar este archivo (que se
+ * usa desde Client Components) a esa lista -- cada callsite ya calcula `esPartidoDePrueba`.
  */
-export function puedeOperarCategoria(session: SessionPayload | null, categoriaId: string): boolean {
+export function puedeOperarCategoria(session: SessionPayload | null, categoriaId: string, partidoDePrueba = false): boolean {
   if (!session) return false;
+  if (partidoDePrueba && session.rol === "designado" && session.categoriaId === "demo") return true;
   if (session.rol === "manager") return esManagerDeCategoria(session, categoriaId);
   return session.rol === "designado" && session.categoriaId === categoriaId;
 }

@@ -70,8 +70,8 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     ? todasLasIncidencias
     : todasLasIncidencias.filter((inc) => !FAMILIA_TARJETA.includes(inc.tipo) && !esCierreDeSancion(inc));
 
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
   const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
 

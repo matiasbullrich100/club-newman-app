@@ -38,8 +38,9 @@ export default async function PartidoPage({
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
   const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
-  // Solo managers/administrador pueden ver un partido de prueba -- ni el designado de esa
-  // categoria ni el publico general, aunque conozcan la URL directa (ver partidosPrueba.ts).
+  // Solo el administrador y la cuenta de practica dedicada pueden ver un partido de prueba -- ni
+  // un designado real de esa categoria ni el publico general, aunque conozcan la URL directa (ver
+  // partidosPrueba.ts).
   if (esPartidoDePrueba && !pruebasVisiblesPara(session)) notFound();
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
   // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. Newm."
@@ -52,7 +53,7 @@ export default async function PartidoPage({
       : categoria.grupo === "juveniles"
         ? `/juveniles/${categoria.edadId}`
         : "/superior";
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
 
   // Boton "Tabla de posiciones al [fecha]" en PartidoHistorico -- la fecha es la de la ULTIMA

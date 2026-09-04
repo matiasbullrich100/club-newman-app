@@ -45,7 +45,8 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
     pateadorHabitualId: partido.pateadorHabitualId,
   };
 
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId);
+  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
 
   // Sugerencia del pateador habitual -- para poder elegirlo YA, antes de arrancar el partido, sin
   // perder el 1er minuto de juego. Solo hace falta calcularla mientras nadie contesto (una vez
@@ -55,7 +56,6 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
       ? await sugerirPateador(partido.categoriaId, plantel.map((j) => j.jugadorId))
       : null;
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
   const mostrarReset = esPartidoDePrueba && esManagerDeCategoria(session, partido.categoriaId);
 
   // Formacion cargada como borrador (ver formacionPublicada en types/firestore.ts) -- quien no
