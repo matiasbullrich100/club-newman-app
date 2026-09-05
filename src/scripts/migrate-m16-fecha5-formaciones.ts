@@ -4,13 +4,12 @@
 // Belgrano), pero el club confirmo que el CONTENIDO de la planilla (que jugador esta en que
 // equipo) es el de esta semana -- se ignora el encabezado, se toma solo la lista de jugadores.
 //
-// Dos casilleros NO se pudieron transcribir con confianza y se dejaron afuera (revisar y cargar a
-// mano con "Editar Formacion" una vez confirmados):
-// - m16-a dorsal 14: la captura repetia "Bestani, Cruz" (mismo nombre que el dorsal 11) -- no se
-//   pudo saber si es un error de la planilla o falta un nombre distinto.
+// El club paso la lista definitiva de A y B (reemplaza la transcripcion original, que tenia dos
+// nombres sin confirmar en A: dorsal 14 repetia "Bestani, Cruz" -- ahora Bestani pasa a la B,
+// dorsal 13, y Peters se mueve de la B a la A, dorsal 14). C sigue con UN casillero sin confirmar
+// (revisar y cargar a mano con "Editar Formacion" una vez confirmado):
 // - m16-c dorsal 14: la celda de la captura decia literalmente "#REF!" (formula rota en el
-//   original), no un nombre.
-// Por eso A y C quedan con 14 titulares en vez de 15 hasta que el club confirme esos dos nombres.
+//   original), no un nombre. Por eso C queda con 14 titulares en vez de 15.
 //
 // Nombres: se toma el que ya esta cargado en la base para ese jugador (mismas fechas previas de
 // M16) si el id coincide (ignora may/min y acentos); si es nuevo, se pasa de MAYUSCULAS a Title
@@ -52,11 +51,11 @@ const EQUIPOS: EquipoFormacion[] = [
       "MÜLLER, Santino",
       "DIAZ DE VIVAR, Ramon",
       "SACKMANN, Ramon",
+      "REYNAL, Jeronimo",
       "URANGA, Mateo",
-      "BESTANI, Cruz",
       "CONTEPOMI, Silvestre",
-      "SLUZEWSKI, Rafael",
-      // dorsal 14: sin confirmar (ver comentario arriba) -- se omite.
+      "SLUZEWSKI, Tomas",
+      "PETERS, Justo",
       "RODRIGUEZ RIBAS, Agustin",
     ],
     suplentes: [],
@@ -64,9 +63,9 @@ const EQUIPOS: EquipoFormacion[] = [
   {
     categoriaId: "m16-b",
     titulares: [
-      "SOLA, Juan",
       "POLIZZA, Delfin",
       "MIGUENS, Santiago",
+      "SOLA, Juan",
       "FABBRI, Santino",
       "ARAMBURU, Santiago",
       "CASTELLI, Felipe",
@@ -76,11 +75,11 @@ const EQUIPOS: EquipoFormacion[] = [
       "SUAYA, Lorenzo",
       "HERRERA, Rufino",
       "RENTERIA, Marcos",
-      "PETERS, Justo",
+      "BESTANI, Cruz",
+      "NORMAN, Marcos",
       "AUTILIO, Benjamin",
-      "LALOR, Miguel",
     ],
-    suplentes: ["VEDOYA, Alfonso", "VAZQUEZ CAPUTO, Agustin", "OLIVERA, Diogenes"],
+    suplentes: ["LALOR, Miguel", "VEDOYA, Alfonso", "VAZQUEZ CAPUTO, Agustin", "OLIVERA, Diogenes"],
   },
   {
     categoriaId: "m16-c",
