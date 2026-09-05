@@ -104,7 +104,7 @@ const EQUIPOS: EquipoFormacion[] = [
   {
     categoriaId: "m16-d",
     titulares: [
-      "KEMP, Cruz",
+      "ALVEAR, Francisco",
       "BECU, Marcos",
       "MC CORMICK, Alfonso",
       "OLMOS, Felipe",
@@ -113,14 +113,14 @@ const EQUIPOS: EquipoFormacion[] = [
       "HELBIG, Rufino",
       "BULLRICH, Hilario",
       "LEONARD, Salvador",
+      "OCAMPO, Salvador",
       "ACHAVAL, Mateo",
       "MAQUEDA, Rafael",
       "NICHOLSON, Mateo",
       "CASTELLI, Pedro",
       "GUYOT, Lucas",
-      "MOYANO, Santiago",
     ],
-    suplentes: [],
+    suplentes: ["MOYANO, Santiago", "KAPLUN, Juan", "CAPUTO, Felix", "SOUTHALL, Galo", "FITZGERALD, Cristobal", "KEMP, Cruz"],
   },
 ];
 
