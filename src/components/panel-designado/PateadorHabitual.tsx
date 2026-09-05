@@ -17,11 +17,15 @@ export default function PateadorHabitual({
   plantel,
   sugeridoId,
   pateadorHabitualId,
+  onElegido,
 }: {
   partidoId: string;
   plantel: RosterJugador[];
   sugeridoId?: string | null;
   pateadorHabitualId?: string | null;
+  // Solo la usa PateadorGate.tsx -- avisa que se confirmo una eleccion en ESTA visita (aunque haya
+  // sido la misma que ya estaba guardada), para poder destapar el resto del panel.
+  onElegido?: () => void;
 }) {
   const [eligiendoOtro, setEligiendoOtro] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +42,7 @@ export default function PateadorHabitual({
       try {
         await setPateadorHabitual(partidoId, jugadorId);
         setEligiendoOtro(false);
+        onElegido?.();
         // En vivo el onSnapshot de PartidoLive ya refresca el prop; antes de arrancar (vista
         // estatica de PartidoProgramadoPanel) hace falta pedirlo a mano.
         router.refresh();

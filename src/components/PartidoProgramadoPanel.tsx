@@ -3,12 +3,11 @@ import PartidoHistorico from "./PartidoHistorico";
 import PublicarFormacionButton from "./PublicarFormacionButton";
 import PanelDesignado from "./panel-designado/PanelDesignado";
 import EditarFormacion from "./panel-designado/EditarFormacion";
-import PateadorHabitual from "./panel-designado/PateadorHabitual";
+import PateadorGate from "./panel-designado/PateadorGate";
 import ResetDemoButton from "./ResetDemoButton";
 import ReiniciarPartidoButton from "./ReiniciarPartidoButton";
 import type { RosterJugador } from "./panel-designado/types";
 import type { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // Todo lo que se ve para un partido "programado": formacion (PartidoHistorico) +, si quien mira
 // puede operar esa categoria, el panel para publicar formacion/iniciar el partido/cargar cambios.
@@ -45,42 +44,11 @@ export default function PartidoProgramadoPanel({
     sugeridoPateadorId,
   } = datos;
 
-  // Pedido explicito del club: antes de arrancar, el designado tiene que elegir el pateador (o
-  // "Sin pateador fijo") sin que le quede otra -- no alcanza con que la pregunta este mas abajo
-  // de Formaciones/Iniciar Partido, porque en la practica nadie scrolleaba hasta ahi y quedaba sin
-  // contestar. Mientras no haya una decision tomada (pateadorHabitualId sigue "undefined" -- ver
-  // el mismo chequeo en datosPartidoProgramado.ts), se tapa TODO lo demas (formacion, Iniciar
-  // Partido, editar formacion) y esto es lo unico que se ve. Apenas elige algo (aunque sea "Sin
-  // pateador fijo"), PateadorHabitual llama a router.refresh() y esta pantalla desaparece sola.
-  const debeElegirPateador = puedeOperar && plantel.length > 0 && partido.pateadorHabitualId === undefined;
+  const plantelRoster: RosterJugador[] = plantel.map(
+    (j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }) satisfies RosterJugador
+  );
 
-  if (debeElegirPateador) {
-    return (
-      <div
-        style={{
-          background: "rgba(255,255,255,.045)",
-          border: "1px solid rgba(226,197,120,.2)",
-          borderRadius: 12,
-          padding: 16,
-        }}
-      >
-        <h2 style={{ textTransform: "uppercase", letterSpacing: 1, fontSize: "0.85rem", color: DORADO, marginTop: 0, marginBottom: 4 }}>
-          Antes de arrancar
-        </h2>
-        <p style={{ margin: "0 0 14px", fontSize: "0.85rem", color: DORADO_SUAVE }}>
-          Elegí el pateador para poder iniciar el partido.
-        </p>
-        <PateadorHabitual
-          partidoId={partidoId}
-          plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }) satisfies RosterJugador)}
-          sugeridoId={sugeridoPateadorId}
-          pateadorHabitualId={partido.pateadorHabitualId}
-        />
-      </div>
-    );
-  }
-
-  return (
+  const panel = (
     <>
       <PartidoHistorico
         partido={partido}
@@ -97,20 +65,28 @@ export default function PartidoProgramadoPanel({
         <PanelDesignado
           partidoId={partidoId}
           partido={partidoParaCliente}
-          plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }) satisfies RosterJugador)}
+          plantel={plantelRoster}
           periodo={null}
           sugeridoPateadorId={sugeridoPateadorId}
         />
       )}
-      {puedeOperar && plantel.length > 0 && (
-        <EditarFormacion
-          partidoId={partidoId}
-          plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }) satisfies RosterJugador)}
-          plantelCompleto={plantelCompleto}
-        />
-      )}
+      {puedeOperar && plantel.length > 0 && <EditarFormacion partidoId={partidoId} plantel={plantelRoster} plantelCompleto={plantelCompleto} />}
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
       {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
     </>
+  );
+
+  // Pedido explicito del club: cada vez que alguien ENTRA a un partido que puede operar (no
+  // arrancado todavia, con formacion cargada) se tapa todo lo demas -- Formaciones, Iniciar
+  // Partido, Editar Formacion -- hasta que contesta la pregunta del pateador EN ESTA VISITA, sin
+  // importar si ya habia una eleccion guardada de antes (ver PateadorGate.tsx: el dato viejo no se
+  // toca, solo se vuelve a preguntar). Si no puede operar o no hay plantel, no tiene sentido tapar
+  // nada -- se muestra el panel directo.
+  if (!puedeOperar || plantel.length === 0) return panel;
+
+  return (
+    <PateadorGate partidoId={partidoId} plantel={plantelRoster} sugeridoId={sugeridoPateadorId}>
+      {panel}
+    </PateadorGate>
   );
 }
