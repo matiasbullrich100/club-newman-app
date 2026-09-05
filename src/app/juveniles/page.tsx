@@ -37,8 +37,12 @@ export default async function JuvenilesPage() {
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
     resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= 3) ||
     !debeMostrarProximaFechaEnArgentina();
+  // El chequeo de fecha propio (no solo "modoResultados") evita que una categoria SIN nada
+  // reciente muestre su ultimo resultado viejo solo porque OTRA categoria del grupo disparo el
+  // modo (ver el mismo comentario en /superior/page.tsx).
   const fresco = (p: (typeof resumen)[number]) =>
-    ESTADOS_EN_VIVO.has(p.estado) || (modoResultados && (p.estado === "terminado" || !!p.notaEspecial));
+    ESTADOS_EN_VIVO.has(p.estado) ||
+    (modoResultados && (p.estado === "terminado" || !!p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= 3);
   const idsSinResumenFresco = equiposOrdenados
     .map((e) => e.id)
     .filter((id) => !resumen.some((p) => p.categoriaId === id && fresco(p)));

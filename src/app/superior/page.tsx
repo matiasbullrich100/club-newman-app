@@ -45,9 +45,23 @@ export default async function PlantelSuperiorPage() {
     resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= 3) ||
     !debeMostrarProximaFechaEnArgentina();
 
-  // "Fresco" = en vivo, o (grupo en modo resultados y esta categoria tiene un resultado/Fecha libre).
+  // "Fresco" = en vivo, o (grupo en modo resultados y ESTA categoria puntual tiene un resultado/
+  // Fecha libre de HOY o los ultimos 3 dias). El chequeo de fecha propio (no solo "modoResultados")
+  // es necesario porque modoResultados es de TODO el grupo: alcanza con que UNA categoria dispare
+  // el modo (ej. Pre H con Fecha libre hoy, o un walkover resuelto temprano) para que las demas,
+  // que todavia no jugaron esta fecha, cayeran en esta rama igual -- y como su ultimo "terminado"
+  // real es la fecha pasada (ej. Hindu, de hace una semana), lo mostraban en vez de pasar a
+  // "Proxima Fecha" (bug real reportado un sabado con partidos de hoy sin jugar todavia: aparecia
+  // el resultado contra Hindu, de la semana pasada). Con este chequeo cada categoria solo se
+  // considera "fresca" si SU PROPIO resultado es de hoy/reciente, no por contagio del grupo.
   const fresco = (p: (typeof resumen)[number] | undefined) =>
-    !!p && (ESTADOS_EN_VIVO.has(p.estado) || (modoResultados && (p.estado === "terminado" || !!p.notaEspecial)));
+    !!p &&
+    (ESTADOS_EN_VIVO.has(p.estado) ||
+      (modoResultados &&
+        (p.estado === "terminado" || !!p.notaEspecial) &&
+        !!p.fecha &&
+        diasDesdeEnArgentina(p.fecha) >= 0 &&
+        diasDesdeEnArgentina(p.fecha) <= 3));
 
   // Banda "P. Ganados / P. Perdidos" arriba de todo en /superior. Cuenta TODOS los partidos
   // terminados de la fecha, incluidos los internos Newman vs Newman (ej. Pre F vs Pre G): cada
