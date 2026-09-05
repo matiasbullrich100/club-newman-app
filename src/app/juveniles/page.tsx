@@ -35,7 +35,7 @@ export default async function JuvenilesPage() {
   const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
   const modoResultados =
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
-    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= 3) ||
     !debeMostrarProximaFechaEnArgentina();
   const fresco = (p: (typeof resumen)[number]) =>
     ESTADOS_EN_VIVO.has(p.estado) || (modoResultados && (p.estado === "terminado" || !!p.notaEspecial));

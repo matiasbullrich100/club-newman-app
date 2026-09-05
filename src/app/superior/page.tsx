@@ -33,9 +33,16 @@ export default async function PlantelSuperiorPage() {
   // categoria jugo recien (ej. Pre F movida al jueves) o hay algo en vivo, TODO Plantel Superior
   // sigue mostrando su ultimo resultado -- no se rota a "Proxima Fecha" hasta que el grupo entero
   // deja de tener algo reciente Y estamos en la ventana de Proxima Fecha (jue 06:00 -> dom).
+  // El ">= 0" es necesario porque un walkover se puede registrar ANTES de la fecha calendario del
+  // partido (ej. se confirma el jueves que el rival no presenta primera linea, para un partido
+  // programado el sabado) -- ese partido queda "terminado" con `fecha` en el FUTURO, y sin este
+  // chequeo diasDesdeEnArgentina() da negativo pero igual pasa el "<= 3" (bug real: un walkover de
+  // Pre F cargado el viernes con fecha del sabado dejo pegado TODO Plantel Superior mostrando los
+  // resultados de la fecha pasada -- Hindu -- en vez de pasar a "Proxima Fecha", igual que habia
+  // pasado la semana de Champa).
   const modoResultados =
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
-    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) <= 3) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= 3) ||
     !debeMostrarProximaFechaEnArgentina();
 
   // "Fresco" = en vivo, o (grupo en modo resultados y esta categoria tiene un resultado/Fecha libre).

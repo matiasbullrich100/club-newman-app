@@ -60,7 +60,11 @@ export default async function CategoriaPage({
   const esVivo = !!resumenPropio && ESTADOS_EN_VIVO.has(resumenPropio.estado);
   const esFresco =
     !!resumenPropio &&
-    (esVivo || ((resumenPropio.estado === "terminado" || resumenPropio.notaEspecial) && !!resumenPropio.fecha && diasDesdeEnArgentina(resumenPropio.fecha) <= 3));
+    (esVivo ||
+      ((resumenPropio.estado === "terminado" || resumenPropio.notaEspecial) &&
+        !!resumenPropio.fecha &&
+        diasDesdeEnArgentina(resumenPropio.fecha) >= 0 &&
+        diasDesdeEnArgentina(resumenPropio.fecha) <= 3));
 
   let panel: React.ReactNode = null;
   let titulo = "Próximo Partido";
