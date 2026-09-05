@@ -4,12 +4,11 @@
 // Belgrano), pero el club confirmo que el CONTENIDO de la planilla (que jugador esta en que
 // equipo) es el de esta semana -- se ignora el encabezado, se toma solo la lista de jugadores.
 //
-// El club paso la lista definitiva de A y B (reemplaza la transcripcion original, que tenia dos
-// nombres sin confirmar en A: dorsal 14 repetia "Bestani, Cruz" -- ahora Bestani pasa a la B,
-// dorsal 13, y Peters se mueve de la B a la A, dorsal 14). C sigue con UN casillero sin confirmar
-// (revisar y cargar a mano con "Editar Formacion" una vez confirmado):
-// - m16-c dorsal 14: la celda de la captura decia literalmente "#REF!" (formula rota en el
-//   original), no un nombre. Por eso C queda con 14 titulares en vez de 15.
+// El club paso la lista definitiva de A, B y C (reemplaza la transcripcion original, que tenia
+// nombres sin confirmar): en A, Bestani pasa a la B (dorsal 13) y Peters se mueve de la B a la A
+// (dorsal 14); en C, el dorsal 14 -- que en la captura decia literalmente "#REF!" (formula rota en
+// el original) -- es Vila, Juan, y Mammolino pasa al dorsal 15. Los 4 equipos quedan con 15
+// titulares completos.
 //
 // Nombres: se toma el que ya esta cargado en la base para ese jugador (mismas fechas previas de
 // M16) si el id coincide (ignora may/min y acentos); si es nuevo, se pasa de MAYUSCULAS a Title
@@ -97,10 +96,10 @@ const EQUIPOS: EquipoFormacion[] = [
       "FRAVEGA, Jeronimo",
       "SIMON PADROS, Juan",
       "MERELLO, Simon",
-      // dorsal 14: sin confirmar (ver comentario arriba, "#REF!" en la planilla) -- se omite.
+      "VILA, Juan",
       "MAMMOLINO, Francisco",
     ],
-    suplentes: ["BOURDIEU, Max", "CORREA, Santiago"],
+    suplentes: ["BOURDIEU, Max", "CORREA, Santiago", "SUMMERS, Oliver"],
   },
   {
     categoriaId: "m16-d",
