@@ -167,15 +167,12 @@ export default function InstalarApp() {
 
   return (
     <div style={marco}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
         <FlechaDescarga />
         <span style={{ fontWeight: 700, fontSize: "0.95rem", lineHeight: 1.25 }}>
           Instalar app EnJuego en mi dispositivo
         </span>
       </div>
-      <p style={{ margin: "0 0 14px", fontSize: "0.82rem", opacity: 0.9 }}>
-        Queda el ícono en la pantalla del celular y abre en pantalla completa, como una app.
-      </p>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
         <button type="button" onClick={instalar} style={botonPrimario}>
           Instalar
