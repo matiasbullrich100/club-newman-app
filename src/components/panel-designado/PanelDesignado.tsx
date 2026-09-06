@@ -45,19 +45,17 @@ const btnIniciar: React.CSSProperties = {
   minHeight: 58,
 };
 
-// Estas dos cierran una etapa del partido que no se puede deshacer (el reloj de ese tiempo
-// no vuelve a correr) -- piden confirmacion, igual que publicar una incidencia.
-type AccionConfirmable = "cortar1T" | "terminarPartido" | "retomar1T";
+// "Final 1er tiempo" y "Terminar partido" se ejecutan directo, sin confirmacion: los Designados
+// se olvidaban de tocar el segundo boton y el reloj seguia corriendo. Si se corta el 1er tiempo
+// antes de tiempo, esta el boton "Volver al 1er tiempo" para recuperarlo -- esa si pide
+// confirmacion (es la marcha atras, no deberia dispararse sola).
+type AccionConfirmable = "retomar1T";
 
 const ACCIONES_CONFIRMABLES: Record<AccionConfirmable, (id: string) => Promise<void>> = {
-  cortar1T,
-  terminarPartido,
   retomar1T,
 };
 
 const PREGUNTAS_CONFIRMACION: Record<AccionConfirmable, string> = {
-  cortar1T: "¿Final del 1er tiempo?",
-  terminarPartido: "¿Terminar el partido?",
   retomar1T: "¿Volver al 1er tiempo? (el 1er tiempo no había terminado)",
 };
 
@@ -236,11 +234,11 @@ export default function PanelDesignado({
                 Interrumpir
               </button>
               {periodo === "1T" && (
-                <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("cortar1T")}>
+                <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(cortar1T)}>
                   Final 1er tiempo
                 </button>
               )}
-              <button style={btnStyle} disabled={isPending} onClick={() => pedirConfirmacion("terminarPartido")}>
+              <button style={btnStyle} disabled={isPending} onClick={() => ejecutar(terminarPartido)}>
                 Terminar partido
               </button>
             </>
