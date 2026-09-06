@@ -65,13 +65,15 @@ export function apellidosAmbiguos(nombres: string[]): string[] {
 
 /**
  * Nombre corto para el feed de incidencias: solo el apellido, salvo que ese apellido este en
- * `ambiguos` (ver apellidosAmbiguos), en cuyo caso se muestra el nombre completo para no generar
- * ambiguedad.
+ * `ambiguos` (ver apellidosAmbiguos), en cuyo caso se agrega la inicial del nombre para
+ * distinguirlos ("Bullrich M." / "Bullrich S.") sin alargar tanto el feed.
  */
 export function crearNombreCorto(ambiguos: string[]): (nombreCompleto: string) => string {
   const set = new Set(ambiguos);
   return (nombreCompleto: string) => {
-    const { apellido } = splitNombre(nombreCompleto);
-    return set.has(apellido) ? nombreCompleto : apellido;
+    const { apellido, nombre } = splitNombre(nombreCompleto);
+    if (!set.has(apellido)) return apellido;
+    const inicial = nombre.trim().charAt(0).toUpperCase();
+    return inicial ? `${apellido} ${inicial}.` : apellido;
   };
 }

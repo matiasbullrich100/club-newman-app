@@ -100,6 +100,24 @@ export default function IncidentesList({
   const acumulados = resultadosAcumulados(cronologico);
   const ordenadas = [...cronologico].reverse();
 
+  // Para el que MIRA (no el que edita), el try convertido va en UNA linea: "Try Newman — Wright.
+  // Conv. Bullrich M." en vez de dos renglones. Se aparea la conversion con el try inmediatamente
+  // anterior del mismo equipo (orden cronologico). Si no calza (conversion errada = sin registro,
+  // u orden raro) se muestra sola como siempre. El Designado (puedeEditar) sigue viendo las dos
+  // por separado para poder corregir/borrar cada una.
+  const conversionDelTry = new Map<string, (typeof cronologico)[number]>();
+  const conversionesFundidas = new Set<string>();
+  if (!puedeEditar) {
+    for (let k = 1; k < cronologico.length; k++) {
+      const conv = cronologico[k];
+      const prev = cronologico[k - 1];
+      if (conv.tipo === "conversion" && (prev.tipo === "try" || prev.tipo === "try_scrum") && conv.equipo === prev.equipo) {
+        conversionDelTry.set(prev.id, conv);
+        conversionesFundidas.add(conv.id);
+      }
+    }
+  }
+
   function corregir(incidenteId: string, nuevoTipo: Incidente["tipo"]) {
     if (!partidoId) return;
     setError(null);
@@ -162,6 +180,8 @@ export default function IncidentesList({
   return (
     <div>
       {ordenadas.map((inc, i) => {
+        // La conversion ya se muestra pegada a su try (ver conversionDelTry) -- no va como renglon aparte.
+        if (conversionesFundidas.has(inc.id)) return null;
         // El entretiempo forma su propio grupo (aunque comparta periodo "1T" con las jugadas de
         // antes del entretiempo) -- si no, la linea punteada solo aparece arriba del bloque de
         // Entretiempo y no abajo, porque el periodo no cambia entre el ultimo cambio y "Final 1er
@@ -216,7 +236,15 @@ export default function IncidentesList({
                   fontWeight: esFinDeTiempo ? 700 : 400,
                 }}
               >
-                {describirIncidente(inc, rivalNombre, nombreNewman, finDePrimerTiempo, nombreCorto)}
+                {(() => {
+                  const base = describirIncidente(inc, rivalNombre, nombreNewman, finDePrimerTiempo, nombreCorto);
+                  const conv = conversionDelTry.get(inc.id);
+                  if (!conv) return base;
+                  const pateador = conv.jugadorNombre ? ` ${nombreCorto(conv.jugadorNombre)}` : "";
+                  // Si el apellido es ambiguo termina en "." (ej. "Uranga M.") -- no duplicar el punto.
+                  const sep = base.endsWith(".") ? " Conv." : ". Conv.";
+                  return `${base}${sep}${pateador}`;
+                })()}
               </div>
               {editable && !editando && (
                 <button
