@@ -43,12 +43,10 @@ function yaInstalada(): boolean {
 
 export default function InstalarApp() {
   const [vista, setVista] = useState<"oculto" | "cartel" | "pasos">("oculto");
-  const [plataforma, setPlataforma] = useState<Plataforma>("otro");
   const [promptNativo, setPromptNativo] = useState<PromptInstalacion | null>(null);
 
   useEffect(() => {
     if (yaInstalada()) return;
-    setPlataforma(detectarPlataforma());
 
     let guardado: string | null = null;
     try {
@@ -64,6 +62,10 @@ export default function InstalarApp() {
       setPromptNativo(e as PromptInstalacion);
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
+    // El cartel depende de datos que solo existen en el cliente (standalone / localStorage), asi
+    // que se muestra despues del montaje a proposito -- en SSR y en la primera pasada de hidratacion
+    // no se renderiza nada, evitando un mismatch de hidratacion.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVista("cartel");
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
@@ -131,10 +133,13 @@ export default function InstalarApp() {
   };
 
   if (vista === "pasos") {
-    const pasos =
+    const plataforma = detectarPlataforma();
+    const pasos: React.ReactNode[] =
       plataforma === "ios"
         ? [
-            "Tocá el botón Compartir (un cuadrado con una flecha hacia arriba) en la barra de abajo de Safari.",
+            <span key="compartir">
+              Tocá el botón Compartir <IconoCompartir /> en la barra de abajo de Safari.
+            </span>,
             'Deslizá hacia abajo y elegí "Agregar a inicio".',
             "Listo: te queda el ícono de EnJuego en la pantalla del celular.",
           ]
@@ -196,6 +201,29 @@ function FlechaDescarga() {
       <path d="M12 3v12" />
       <path d="m7 10 5 5 5-5" />
       <path d="M5 21h14" />
+    </svg>
+  );
+}
+
+// Icono "Compartir" de iOS (caja abierta arriba + flecha hacia arriba) -- va incrustado en el
+// texto del paso 1, en lugar de describirlo con palabras.
+function IconoCompartir() {
+  return (
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-label="Compartir"
+      style={{ verticalAlign: "-2px", margin: "0 1px" }}
+    >
+      <path d="M12 3v12" />
+      <path d="m8 7 4-4 4 4" />
+      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
     </svg>
   );
 }
