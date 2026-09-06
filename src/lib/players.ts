@@ -67,6 +67,72 @@ export function apellidosAmbiguos(nombres: string[]): string[] {
 // ("Mc Grech" no es "M. Grech", "de la Cruz" no es "d. la Cruz").
 const PARTICULAS_APELLIDO = new Set(["mc", "mac", "de", "del", "la", "las", "los", "van", "von", "di", "da", "san", "santa", "o", "y"]);
 
+// Apellido corto elegido A MANO por el club para el feed de incidencias -- apellidos dobles que la
+// regla automatica de abajo no acorta como se quiere. Clave = "Apellido, Nombre" (se indexa por
+// playerId, asi que da igual como venga guardado: con o sin coma, mayus/minus, acentos). El resto
+// de los jugadores sigue la regla automatica.
+const APELLIDO_CORTO_MANUAL: Record<string, string> = Object.fromEntries(
+  (
+    [
+      ["Achaval Rodriguez, Felix", "Achaval"],
+      ["Aguilar Quesada, Félix", "Aguilar"],
+      ["Amaral Trigo, Milo", "Amaral"],
+      ["Arnaudo Losada, Ignacio Javier", "Arnaudo"],
+      ["Barbeito Ortelli, Federico", "Barbeito"],
+      ["Barros Ocampo, Bartolome", "B. Ocampo"],
+      ["BERTON MORENO, Gonzalo", "Berton"],
+      ["Bertón Moreno, Ignacio", "Bertón I."],
+      ["Bosch Holmberg, Lucio", "Bosch"],
+      ["Busto Cavanagh, Fermin", "Busto"],
+      ["Carey Paez, Marcos", "Carey"],
+      ["Castro Lacroze, Benjamin", "Castro"],
+      ["Chevallier Boutell, Gonzalo", "C. Boutell"],
+      ["Chiappe Beccar Varela, Pedro", "Chiappe"],
+      ["Coll Uriburu, Bautista", "Coll"],
+      ["Dominguez Olivera, Jose", "Dominguez J."],
+      ["Dominguez Olivera, Ramon", "Dominguez R."],
+      ["Dominguez Roviralta, Tobias", "D. Roviralta"],
+      ["Fellner Otoole, Benjamin", "Fellner"],
+      ["Galice Naon, Felix", "Galice F."],
+      ["Galice Naon, Rodrigo", "Galice R."],
+      ["Garat Nolting, Iñaki", "Garat"],
+      ["Garat Nölting, Jaime", "Garat"],
+      ["García Zavaleta, Fermín", "G. Zavaleta F."],
+      ["Gimenez Zapiola, Santos", "G. Zapiola"],
+      ["Gonzalez Calderon, Isidro", "G. Calderon"],
+      ["Gonzalez Hughes, Marcos", "G. Hughes"],
+      ["Iglesias Arrieta, Beltrán", "Iglesias"],
+      ["Llambi Bovino, Felipe", "Llambi"],
+      ["Lopez Olaciregui, Cruz", "L. Olaciregui"],
+      ["LOPEZ SAUBIDET, Facundo", "L. Saubidet"],
+      ["Lucero Torres, Marcos", "Lucero"],
+      ["Luna Alurralde, Ignacio", "Luna"],
+      ["Marino Aguirre, Agustin", "Marino"],
+      ["Oneto Gaona, Alejandro Blas", "Oneto A."],
+      ["Oneto Gaona, Francisco", "Oneto F."],
+      ["Oneto Gaona, Simon", "Oneto S."],
+      ["ONETO GAONA, Ignacio", "Oneto"],
+      ["Oris de Roa, Teófilo", "O. de Roa"],
+      ["Otero Monsegur, Ramon", "O. Monsegur"],
+      ["Palette Pueyrredon, Bautista", "Palette"],
+      ["Restucci Micheli, Lucio", "Restucci"],
+      ["Ruiz Guiñazu, Santos", "R. Guiñazu"],
+      ["Saenz Valiente, Iñaki", "S. Valiente I."],
+      ["Saenz Valiente, Tomas", "S. Valiente T."],
+      ["Santamarina Bergada, Eduardo", "Santamarina"],
+      ["Santamarina Bergadá, Jerónimo", "Santamarina"],
+      ["Serra Gallo, Gonzalo", "Serra"],
+      ["Sluzewski Monti, Ramon", "Sluzewski"],
+      ["Sluzewski Monto, Santiago", "Sluzewski"],
+      ["Tezanos Pinto, Segundo", "T. Pinto S."],
+      ["Trigo de la Balze, Honorio", "Trigo"],
+      ["Vazquez Caputo, Agustin", "V. Caputo"],
+      ["Velarde Pennella, Tomas", "Velarde"],
+      ["Vinent Fernandez Speroni, Benjamín", "Vinent"],
+    ] as [string, string][]
+  ).map(([nombreCompleto, corto]) => [playerId(nombreCompleto), corto])
+);
+
 /**
  * Nombre corto para el feed de incidencias. Apellido no repetido en el club -> solo el apellido.
  * Apellido repetido (ver apellidosAmbiguos) -> se agrega la inicial del nombre, y si el apellido
@@ -76,6 +142,9 @@ const PARTICULAS_APELLIDO = new Set(["mc", "mac", "de", "del", "la", "las", "los
 export function crearNombreCorto(ambiguos: string[]): (nombreCompleto: string) => string {
   const set = new Set(ambiguos);
   return (nombreCompleto: string) => {
+    const manual = APELLIDO_CORTO_MANUAL[playerId(nombreCompleto)];
+    if (manual) return manual;
+
     const { apellido, nombre } = splitNombre(nombreCompleto);
     if (!set.has(apellido)) return apellido;
 
