@@ -63,17 +63,34 @@ export function apellidosAmbiguos(nombres: string[]): string[] {
   return [...conteo.entries()].filter(([, c]) => c > 1).map(([apellido]) => apellido);
 }
 
+// Prefijos/particulas que NO se abrevian aunque sean la primera palabra de un apellido compuesto
+// ("Mc Grech" no es "M. Grech", "de la Cruz" no es "d. la Cruz").
+const PARTICULAS_APELLIDO = new Set(["mc", "mac", "de", "del", "la", "las", "los", "van", "von", "di", "da", "san", "santa", "o", "y"]);
+
 /**
- * Nombre corto para el feed de incidencias: solo el apellido, salvo que ese apellido este en
- * `ambiguos` (ver apellidosAmbiguos), en cuyo caso se agrega la inicial del nombre para
- * distinguirlos ("Bullrich M." / "Bullrich S.") sin alargar tanto el feed.
+ * Nombre corto para el feed de incidencias. Apellido no repetido en el club -> solo el apellido.
+ * Apellido repetido (ver apellidosAmbiguos) -> se agrega la inicial del nombre, y si el apellido
+ * es compuesto se abrevia la primera palabra: "Bullrich S." / "G. Taboada G.". Las formaciones
+ * NO usan esto -- ahi va el nombre completo.
  */
 export function crearNombreCorto(ambiguos: string[]): (nombreCompleto: string) => string {
   const set = new Set(ambiguos);
   return (nombreCompleto: string) => {
     const { apellido, nombre } = splitNombre(nombreCompleto);
     if (!set.has(apellido)) return apellido;
-    const inicial = nombre.trim().charAt(0).toUpperCase();
-    return inicial ? `${apellido} ${inicial}.` : apellido;
+
+    const palabras = apellido.split(/\s+/).filter(Boolean);
+    let apellidoCorto = apellido;
+    if (palabras.length > 1) {
+      const primera = palabras[0];
+      const abreviable =
+        primera.length >= 3 &&
+        !PARTICULAS_APELLIDO.has(primera.toLowerCase()) &&
+        primera[0] === primera[0].toUpperCase();
+      if (abreviable) apellidoCorto = `${primera[0].toUpperCase()}. ${palabras.slice(1).join(" ")}`;
+    }
+
+    const inicialNombre = nombre.trim().charAt(0).toUpperCase();
+    return inicialNombre ? `${apellidoCorto} ${inicialNombre}.` : apellidoCorto;
   };
 }
