@@ -29,7 +29,7 @@ const PLANTEL: { nombre: string; dorsal: string; titular: boolean }[] = [
   { nombre: "Butler Bautista", dorsal: "12", titular: true },
   { nombre: "Iribarren Marcos", dorsal: "13", titular: true },
   { nombre: "Silva Alfonso", dorsal: "14", titular: true },
-  { nombre: "G. Taboada Santiago", dorsal: "15", titular: true },
+  { nombre: "Gutierrez Taboada Santiago", dorsal: "15", titular: true },
   { nombre: "Walker Bautista", dorsal: "16", titular: false },
   { nombre: "Ureta Tomas", dorsal: "17", titular: false },
 ];
