@@ -5,6 +5,7 @@ import { EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
+import { diasDesdeEnArgentina } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -40,13 +41,28 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
   // una real; partidosEnVivoOUltimoTerminado ya oculta esos partidos para quien no puede verlos.
   const resumen = await partidosEnVivoOUltimoTerminado(equipos.map((e) => e.id), session);
 
+  // Esta pantalla es "lo que pasa HOY": solo se muestra el banner de una categoria si esta en vivo
+  // o si SU resultado / Fecha libre es de hoy o los ultimos 3 dias. partidosEnVivoOUltimoTerminado
+  // devuelve el ultimo terminado por mas viejo que sea, asi que sin este filtro un resultado de la
+  // fecha pasada quedaba pegado aca para siempre -- mismo criterio que el `fresco()` de /juveniles
+  // y /superior. El fixture completo esta un nivel mas adentro.
+  const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
+  const frescos = resumen.filter(
+    (p) =>
+      ESTADOS_EN_VIVO.has(p.estado) ||
+      ((p.estado === "terminado" || !!p.notaEspecial) &&
+        !!p.fecha &&
+        diasDesdeEnArgentina(p.fecha) >= 0 &&
+        diasDesdeEnArgentina(p.fecha) <= 3)
+  );
+
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href="/juveniles" />
       <SessionBar session={session} />
       <Header rightLabel={edad.nombre} logo="urba" />
 
-      {resumen.map((p) => (
+      {frescos.map((p) => (
         <LiveBanner
           key={p.id}
           partidoId={p.id}
