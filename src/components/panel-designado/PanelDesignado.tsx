@@ -47,7 +47,7 @@ const btnIniciar: React.CSSProperties = {
 
 // "Final 1er tiempo" y "Terminar partido" se ejecutan directo, sin confirmacion: los Designados
 // se olvidaban de tocar el segundo boton y el reloj seguia corriendo. Si se corta el 1er tiempo
-// antes de tiempo, esta el boton "Volver al 1er tiempo" para recuperarlo -- esa si pide
+// antes de tiempo, esta el boton "Reiniciar 1er tiempo" para recuperarlo -- esa si pide
 // confirmacion (es la marcha atras, no deberia dispararse sola).
 type AccionConfirmable = "retomar1T";
 
@@ -56,7 +56,7 @@ const ACCIONES_CONFIRMABLES: Record<AccionConfirmable, (id: string) => Promise<v
 };
 
 const PREGUNTAS_CONFIRMACION: Record<AccionConfirmable, string> = {
-  retomar1T: "¿Volver al 1er tiempo? (el 1er tiempo no había terminado)",
+  retomar1T: "¿Reiniciar el 1er tiempo? (no había terminado)",
 };
 
 export default function PanelDesignado({
@@ -250,7 +250,7 @@ export default function PanelDesignado({
               </button>
               {/* Por si se corto el 1er tiempo por error y todavia se estaba jugando. */}
               <button style={botonSecundario} disabled={isPending} onClick={() => pedirConfirmacion("retomar1T")}>
-                Volver al 1er tiempo
+                Reiniciar 1er tiempo
               </button>
             </>
           )}
