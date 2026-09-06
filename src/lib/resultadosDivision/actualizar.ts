@@ -19,11 +19,15 @@ export interface ResultadoActualizacionDivision {
 // corre cada pocos minutos durante los partidos, para no compartir recursos con la app en vivo.
 // Script manual: src/scripts/actualizar-resultados-division.ts.
 export async function actualizarResultadosDivision(
-  grupo?: "superior" | "juveniles"
+  grupo?: "superior" | "juveniles",
+  soloCategorias?: string[]
 ): Promise<ResultadoActualizacionDivision[]> {
+  const filtro = soloCategorias ? new Set(soloCategorias) : null;
   const entradas = Object.entries(TORNEOS_URBA).filter(
     ([categoriaId]) =>
-      tieneFixtureDivision(categoriaId) && (!grupo || grupoDeCategoria(categoriaId).grupo === grupo)
+      tieneFixtureDivision(categoriaId) &&
+      (!grupo || grupoDeCategoria(categoriaId).grupo === grupo) &&
+      (!filtro || filtro.has(categoriaId))
   );
 
   // Varias categorias pueden compartir championshipId (ej. Pre F/G/H) -- se baja cada torneo UNA
