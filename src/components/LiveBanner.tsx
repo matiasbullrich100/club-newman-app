@@ -37,6 +37,7 @@ export default function LiveBanner({
   inicial,
   nombreNewman,
   esPrueba,
+  ultimaFechaHref,
   posicionesHref,
   fixtureNewmanHref,
   fixtureDivisionHref,
@@ -49,6 +50,9 @@ export default function LiveBanner({
   // con categorias reales, asi que sin esta marca un partido de prueba en vivo podria confundirse
   // con uno real en este mismo banner.
   esPrueba?: boolean;
+  // Fixture Division de la ULTIMA fecha jugada por esta categoria (ej. /fixture/pre-a/division/21)
+  // -- para ver de un toque como salio toda la zona. Solo si la categoria tiene Fixture Division.
+  ultimaFechaHref?: string;
   // Solo si la categoria tiene torneo de URBA asignado (ver TORNEOS_URBA) -- si no hay, no hay
   // tabla de posiciones para mostrar.
   posicionesHref?: string;
@@ -132,8 +136,13 @@ export default function LiveBanner({
           </div>
         )}
       </Link>
-      {(posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
+      {(ultimaFechaHref || posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
+          {ultimaFechaHref && (
+            <Link href={ultimaFechaHref} style={botonChico}>
+              Última Fecha
+            </Link>
+          )}
           {posicionesHref && (
             <Link href={posicionesHref} style={botonChico}>
               Tabla

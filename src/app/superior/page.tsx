@@ -13,6 +13,7 @@ import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
+import EnJuegoTips from "@/components/EnJuegoTips";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
@@ -133,6 +134,11 @@ export default async function PlantelSuperiorPage() {
               inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
               nombreNewman={propioSi(p.rival, cat.id)}
               esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+              ultimaFechaHref={
+                tieneFixtureDivision(cat.id) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
+                  ? `/fixture/${cat.id}/division/${p.numeroFecha}`
+                  : undefined
+              }
               posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
               fixtureNewmanHref={`/categoria/${cat.id}/fixture`}
               fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}
@@ -183,6 +189,8 @@ export default async function PlantelSuperiorPage() {
       <BackLink href="/" />
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
+
+      <EnJuegoTips />
 
       {mostrarResumenSemana && (
         <div

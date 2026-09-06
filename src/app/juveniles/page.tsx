@@ -11,6 +11,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
+import EnJuegoTips from "@/components/EnJuegoTips";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function JuvenilesPage() {
@@ -56,6 +57,8 @@ export default async function JuvenilesPage() {
       <SessionBar session={session} />
       <Header rightLabel="Juveniles" logo="urba" rightLabelShift={14} />
 
+      <EnJuegoTips />
+
       {equiposOrdenados
         .map((equipo) => {
           const p = resumen.find((r) => r.categoriaId === equipo.id);
@@ -74,6 +77,11 @@ export default async function JuvenilesPage() {
                   inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
                   nombreNewman={nombreNewmanDe(p.categoriaId)}
                   esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+                  ultimaFechaHref={
+                    tieneFixtureDivision(p.categoriaId) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
+                      ? `/fixture/${p.categoriaId}/division/${p.numeroFecha}`
+                      : undefined
+                  }
                   posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
                   fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
                   fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
