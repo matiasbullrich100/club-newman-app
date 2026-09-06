@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
+import InstalarApp from "@/components/InstalarApp";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -31,6 +32,8 @@ export default async function Home() {
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <Header tituloHome />
       <SessionBar session={session} />
+
+      <InstalarApp />
 
       <div style={{ display: "grid", gap: 12, marginTop: 24 }}>
         <Link href="/superior" style={botonStyle}>

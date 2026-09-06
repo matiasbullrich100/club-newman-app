@@ -40,7 +40,8 @@
     "actualizar-posiciones": "tsx src/scripts/actualizar-posiciones.ts",
     "actualizar-resultados-division": "tsx src/scripts/actualizar-resultados-division.ts",
     "resolver-torneos-urba": "tsx src/scripts/resolver-torneos-urba.ts",
-    "seed-admin": "tsx src/scripts/seed-admin.ts"
+    "seed-admin": "tsx src/scripts/seed-admin.ts",
+    "gen-iconos-pwa": "tsx src/scripts/gen-iconos-pwa.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",
