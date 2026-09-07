@@ -73,9 +73,10 @@ export interface PartidoDivision {
   golesVisitante?: number;
   bonusLocal?: boolean;
   bonusVisitante?: boolean;
-  // "sin_info" (URBA todavia no cargo ese cruce) o "postergado" (partido postergado/suspendido) --
-  // en cualquiera de los dos casos no hay resultado que mostrar aunque la fecha ya haya pasado.
-  especial?: "sin_info" | "postergado";
+  // "sin_info" (URBA todavia no cargo ese cruce), "postergado" (partido postergado/suspendido) --
+  // en ambos casos no hay resultado que mostrar aunque la fecha ya haya pasado -- o "libre" (uno
+  // de los dos lados era "Bye" en URBA: ese equipo tuvo fecha libre; `local` es el equipo real).
+  especial?: "sin_info" | "postergado" | "libre";
 }
 
 export interface FechaDivision {
@@ -143,6 +144,28 @@ function nombreCorto(nombre: string, propio: string): string {
   return nombre === propio ? "Newman" : normalizarNombreEquipo(nombre);
 }
 
+const esBye = (nombre: string) => nombre.trim().toLowerCase() === "bye";
+
+// URBA arma las zonas impares con un cruce contra "Bye": ese equipo tuvo fecha libre. Se convierte
+// en una fila `especial: "libre"` (con el equipo real en `local`); un "Bye vs Bye" no tiene equipo
+// real, se descarta (null -> se filtra).
+function filaLibreODescarte(
+  localRaw: string,
+  visitanteRaw: string,
+  propio: string,
+  jugado: boolean
+): PartidoDivision | null {
+  const equipoRaw = esBye(localRaw) ? visitanteRaw : localRaw;
+  if (esBye(equipoRaw)) return null; // "Bye vs Bye"
+  return {
+    local: nombreCorto(equipoRaw, propio),
+    visitante: "",
+    esNewman: equipoRaw === propio,
+    jugado,
+    especial: "libre",
+  };
+}
+
 export function fixtureDivisionDe(
   categoriaId: CategoriaConFixtureDivision,
   numeroFecha: number,
@@ -156,17 +179,23 @@ export function fixtureDivisionDe(
   if (resultado) {
     return {
       fecha: resultado.fecha ?? "",
-      partidos: resultado.partidos.map((p) => ({
-        local: nombreCorto(p.local, propio),
-        visitante: nombreCorto(p.visitante, propio),
-        esNewman: p.local === propio || p.visitante === propio,
-        jugado: true,
-        golesLocal: p.golesLocal,
-        golesVisitante: p.golesVisitante,
-        bonusLocal: p.bonusLocal,
-        bonusVisitante: p.bonusVisitante,
-        especial: p.especial,
-      })),
+      partidos: resultado.partidos
+        .map((p): PartidoDivision | null =>
+          esBye(p.local) || esBye(p.visitante)
+            ? filaLibreODescarte(p.local, p.visitante, propio, true)
+            : {
+                local: nombreCorto(p.local, propio),
+                visitante: nombreCorto(p.visitante, propio),
+                esNewman: p.local === propio || p.visitante === propio,
+                jugado: true,
+                golesLocal: p.golesLocal,
+                golesVisitante: p.golesVisitante,
+                bonusLocal: p.bonusLocal,
+                bonusVisitante: p.bonusVisitante,
+                especial: p.especial,
+              }
+        )
+        .filter((p): p is PartidoDivision => p !== null),
     };
   }
 
@@ -174,11 +203,17 @@ export function fixtureDivisionDe(
   if (!fecha) return null;
   return {
     fecha: fecha.fecha,
-    partidos: fecha.partidos.map(([local, visitante]) => ({
-      local: nombreCorto(local, propio),
-      visitante: nombreCorto(visitante, propio),
-      esNewman: local === propio || visitante === propio,
-      jugado: false,
-    })),
+    partidos: fecha.partidos
+      .map(([local, visitante]): PartidoDivision | null =>
+        esBye(local) || esBye(visitante)
+          ? filaLibreODescarte(local, visitante, propio, false)
+          : {
+              local: nombreCorto(local, propio),
+              visitante: nombreCorto(visitante, propio),
+              esNewman: local === propio || visitante === propio,
+              jugado: false,
+            }
+      )
+      .filter((p): p is PartidoDivision => p !== null),
   };
 }
