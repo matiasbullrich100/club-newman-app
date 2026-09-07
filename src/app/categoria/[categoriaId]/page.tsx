@@ -21,6 +21,7 @@ import PartidoLive from "@/components/PartidoLive";
 import type { RosterJugador } from "@/components/panel-designado/types";
 import { ordenarPorDorsal } from "@/lib/players";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { Seuo } from "@/components/PieNota";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
@@ -158,6 +159,7 @@ export default async function CategoriaPage({
       {panel ?? (
         <p style={{ textAlign: "center", color: DORADO_SUAVE, fontStyle: "italic", opacity: 0.75 }}>No hay próximo partido programado.</p>
       )}
+      <Seuo />
     </main>
   );
 }

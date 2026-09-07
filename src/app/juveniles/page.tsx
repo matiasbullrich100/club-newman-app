@@ -13,6 +13,7 @@ import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
 import EnJuegoTips from "@/components/EnJuegoTips";
 import { DORADO_SUAVE } from "@/lib/colors";
+import { Seuo } from "@/components/PieNota";
 
 export default async function JuvenilesPage() {
   const session = await getSession();
@@ -135,6 +136,7 @@ export default async function JuvenilesPage() {
           </Link>
         ))}
       </div>
+      <Seuo />
     </main>
   );
 }

@@ -14,6 +14,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FooterChip from "@/components/FooterChip";
+import { Seuo } from "@/components/PieNota";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import PartidoProgramadoPanel from "@/components/PartidoProgramadoPanel";
 import PartidoTerminadoPanel from "@/components/PartidoTerminadoPanel";
@@ -121,6 +122,7 @@ export default async function PartidoPage({
           fixtureDivisionHref={fixtureDivisionHref}
         />
         <FooterChip />
+        <Seuo />
       </main>
     );
   }
@@ -142,6 +144,7 @@ export default async function PartidoPage({
           fixtureDivisionHref={fixtureDivisionHref}
         />
         <FooterChip />
+        <Seuo />
       </main>
     );
   }
@@ -209,6 +212,7 @@ export default async function PartidoPage({
       />
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
       <FooterChip />
+      <Seuo />
     </main>
   );
 }
