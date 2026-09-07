@@ -8,7 +8,7 @@ import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
 import { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
-import { diasDesdeEnArgentina } from "@/lib/fecha";
+import { diasDesdeEnArgentina, DIAS_RESULTADO_FRESCO } from "@/lib/fecha";
 import type { JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -64,7 +64,7 @@ export default async function CategoriaPage({
       ((resumenPropio.estado === "terminado" || resumenPropio.notaEspecial) &&
         !!resumenPropio.fecha &&
         diasDesdeEnArgentina(resumenPropio.fecha) >= 0 &&
-        diasDesdeEnArgentina(resumenPropio.fecha) <= 3));
+        diasDesdeEnArgentina(resumenPropio.fecha) <= DIAS_RESULTADO_FRESCO));
 
   let panel: React.ReactNode = null;
   let titulo = "Próximo Partido";

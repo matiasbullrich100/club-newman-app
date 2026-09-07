@@ -4,7 +4,7 @@ import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina, DIAS_RESULTADO_FRESCO } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -37,13 +37,13 @@ export default async function PlantelSuperiorPage() {
   // El ">= 0" es necesario porque un walkover se puede registrar ANTES de la fecha calendario del
   // partido (ej. se confirma el jueves que el rival no presenta primera linea, para un partido
   // programado el sabado) -- ese partido queda "terminado" con `fecha` en el FUTURO, y sin este
-  // chequeo diasDesdeEnArgentina() da negativo pero igual pasa el "<= 3" (bug real: un walkover de
+  // chequeo diasDesdeEnArgentina() da negativo pero igual pasa el chequeo de dias (bug real: un walkover de
   // Pre F cargado el viernes con fecha del sabado dejo pegado TODO Plantel Superior mostrando los
   // resultados de la fecha pasada -- Hindu -- en vez de pasar a "Proxima Fecha", igual que habia
   // pasado la semana de Champa).
   const modoResultados =
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
-    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= 3) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= DIAS_RESULTADO_FRESCO) ||
     !debeMostrarProximaFechaEnArgentina();
 
   // "Fresco" = en vivo, o (grupo en modo resultados y ESTA categoria puntual tiene un resultado/
@@ -62,7 +62,7 @@ export default async function PlantelSuperiorPage() {
         (p.estado === "terminado" || !!p.notaEspecial) &&
         !!p.fecha &&
         diasDesdeEnArgentina(p.fecha) >= 0 &&
-        diasDesdeEnArgentina(p.fecha) <= 3));
+        diasDesdeEnArgentina(p.fecha) <= DIAS_RESULTADO_FRESCO));
 
   // Banda "P. Ganados / P. Perdidos" arriba de todo en /superior. Cuenta TODOS los partidos
   // terminados de la fecha, incluidos los internos Newman vs Newman (ej. Pre F vs Pre G): cada

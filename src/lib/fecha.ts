@@ -73,6 +73,12 @@ export function diasDesdeEnArgentina(fechaIso: string): number {
   return Math.round(diff);
 }
 
+// Cuantos dias sigue "fresco" un resultado en los resumenes (/superior, /juveniles, /categoria):
+// se muestra desde que se juega hasta DIAS_RESULTADO_FRESCO dias despues. Con 5, un resultado del
+// sabado/domingo se ve toda la semana y recien desaparece el viernes, justo antes de la fecha
+// siguiente.
+export const DIAS_RESULTADO_FRESCO = 5;
+
 // Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 06:00 (pedido
 // explicito, es cuando el club arranca a armar la previa del fin de semana) hasta el domingo, el
 // resumen de /superior y /juveniles deja de mostrar el resultado de la fecha pasada (ya viejo a esa
