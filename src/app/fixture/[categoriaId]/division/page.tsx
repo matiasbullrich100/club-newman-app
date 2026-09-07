@@ -11,6 +11,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TiraEquipos from "@/components/TiraEquipos";
+import { FuenteUrba } from "@/components/PieNota";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
@@ -119,6 +120,8 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
           </Link>
         ))}
       </div>
+
+      <FuenteUrba />
     </main>
   );
 }

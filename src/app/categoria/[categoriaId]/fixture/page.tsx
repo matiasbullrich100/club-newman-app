@@ -12,6 +12,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import FixtureRow, { MatchupText } from "@/components/FixtureRow";
 import TiraEquipos from "@/components/TiraEquipos";
+import { FuenteUrba } from "@/components/PieNota";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -128,6 +129,8 @@ export default async function CategoriaFixturePage({
           ) : null
         )}
       </div>
+
+      <FuenteUrba />
     </main>
   );
 }

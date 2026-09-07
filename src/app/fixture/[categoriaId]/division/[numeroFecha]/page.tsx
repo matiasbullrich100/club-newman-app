@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TiraEquipos from "@/components/TiraEquipos";
+import { FuenteUrba } from "@/components/PieNota";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
@@ -74,7 +75,11 @@ export default async function FixtureDivisionFechaPage({
           };
           const contenido = (
             <>
-              {p.jugado && p.especial ? (
+              {p.especial === "libre" ? (
+                <span>
+                  {p.local} <span style={{ opacity: 0.7, fontStyle: "italic", fontWeight: 400 }}>· Fecha libre</span>
+                </span>
+              ) : p.jugado && p.especial ? (
                 <span style={{ fontSize: "0.85em", opacity: 0.75, fontStyle: "italic" }}>
                   {p.local} - {p.visitante} · {p.especial === "postergado" ? "Postergado" : "Sin información"}
                 </span>
@@ -136,6 +141,8 @@ export default async function FixtureDivisionFechaPage({
           </Link>
         )}
       </div>
+
+      <FuenteUrba />
     </main>
   );
 }

@@ -11,6 +11,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TablaPosiciones from "@/components/TablaPosiciones";
 import TiraEquipos from "@/components/TiraEquipos";
+import { FuenteUrba } from "@/components/PieNota";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -80,6 +81,8 @@ export default async function PosicionesPage({
           <TablaPosiciones data={snap.data() as PosicionesTorneo} conPlayoff={grupoDeCategoria(categoriaId).grupo === "superior"} />
         )}
       </div>
+
+      {snap.exists && <FuenteUrba />}
     </main>
   );
 }
