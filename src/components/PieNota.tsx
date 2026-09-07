@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 // Aclaraciones al pie, chiquitas y alineadas a la derecha:
 //  - <FuenteUrba/>: en Tabla de Posiciones, Fixt. División y el fixture propio del club, para
 //    dejar claro que esos datos salen de la web de la URBA.
-//  - <Seuo/>: en la pantalla de un partido ("salvo error u omisión").
+//  - <Seuo/>: disclaimer global "salvo error u omisión" -- va en el layout, en todas las paginas.
 const estilo: CSSProperties = {
   textAlign: "right",
   fontSize: "0.66rem",

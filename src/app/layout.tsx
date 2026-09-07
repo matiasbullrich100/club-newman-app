@@ -3,6 +3,7 @@ import { Lato } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import FontSizeControl from "@/components/FontSizeControl";
+import { Seuo } from "@/components/PieNota";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -48,6 +49,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         {children}
+        {/* Disclaimer global "salvo error u omision" -- alineado con la columna de contenido. */}
+        <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 8px" }}>
+          <Seuo />
+        </div>
         <FontSizeControl />
         <Analytics />
       </body>
