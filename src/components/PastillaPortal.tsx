@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DORADO } from "@/lib/colors";
 
 // Pastilla "← Portal" fija arriba a la izquierda, ENCIMA de Inicio/Atrás. Aparece SOLO si se llegó
 // a Newman desde el portal de torneos (link con `?from=portal`), y solo durante esa pestaña
@@ -47,9 +46,10 @@ export default function PastillaPortal() {
         fontSize: "0.78rem",
         letterSpacing: 1,
         textTransform: "uppercase",
-        color: DORADO,
-        background: "rgba(53,9,22,.92)",
-        border: `2px solid ${DORADO}`,
+        // Colores del PORTAL (verde cancha + lima), no los de Newman -> se distingue de Inicio/Atrás.
+        color: "#8ce99a",
+        background: "#16241c",
+        border: "2px solid #8ce99a",
         padding: "5px 10px",
         borderRadius: 20,
         textDecoration: "none",

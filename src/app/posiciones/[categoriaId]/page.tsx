@@ -9,11 +9,27 @@ import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
-import TablaPosiciones from "@/components/TablaPosiciones";
+import TablaPosiciones, { type ZonaTabla } from "@/components/TablaPosiciones";
 import TiraEquipos from "@/components/TiraEquipos";
 import { FuenteUrba } from "@/components/PieNota";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import { DORADO_SUAVE } from "@/lib/colors";
+
+// En el TOP 14 de la URBA (donde juega Newman en Primera) los dos últimos de la tabla general
+// descienden directo al terminar la fase regular. Se marca solo en la tabla de "primera".
+function zonasDe(categoriaId: string, totalFilas: number): ZonaTabla[] | undefined {
+  if (categoriaId !== "primera" || totalFilas < 4) return undefined;
+  return [
+    {
+      desde: totalFilas - 1,
+      hasta: totalFilas,
+      fondo: "rgba(226,75,74,.26)",
+      borde: "rgba(226,75,74,.65)",
+      marca: "**",
+      nota: "** Los dos últimos descienden directamente al terminar la fase regular.",
+    },
+  ];
+}
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -78,7 +94,11 @@ export default async function PosicionesPage({
             Todavía no hay tabla de posiciones cargada para esta categoría.
           </p>
         ) : (
-          <TablaPosiciones data={snap.data() as PosicionesTorneo} conPlayoff={grupoDeCategoria(categoriaId).grupo === "superior"} />
+          <TablaPosiciones
+            data={snap.data() as PosicionesTorneo}
+            conPlayoff={grupoDeCategoria(categoriaId).grupo === "superior"}
+            zonas={zonasDe(categoriaId, (snap.data() as PosicionesTorneo).filas.length)}
+          />
         )}
       </div>
 

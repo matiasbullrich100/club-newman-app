@@ -46,12 +46,34 @@ const tdEquipoStyle: React.CSSProperties = {
 // las que pueden tener 3-4 caracteres (PF/PC/Dif/Pts) se reparten lo que sobra.
 const colEquipoWidth = 80;
 
+// Una "zona" extra de la tabla (ascenso / descenso): pinta el rango de posiciones [desde..hasta]
+// con `fondo`, opcionalmente le agrega `marca` (ej. "**") al numero de posicion, y muestra `nota`
+// en la referencia al pie. Convive con `conPlayoff` (no se pisan si los rangos no se solapan).
+export interface ZonaTabla {
+  desde: number;
+  hasta: number;
+  fondo: string;
+  borde: string;
+  nota: string;
+  marca?: string;
+}
+
 // conPlayoff: en Plantel Superior los primeros 4 clasifican a playoff -> se marcan + leyenda al
 // pie. En Juveniles NO hay playoff (el 1º sale campeón), así que va en false y la tabla queda
 // "normal", con la única marca de Newman.
-export default function TablaPosiciones({ data, conPlayoff = true }: { data: PosicionesTorneo; conPlayoff?: boolean }) {
+// zonas: rangos extra (ej. los 2 últimos con descenso directo) -> color + referencia al pie.
+export default function TablaPosiciones({
+  data,
+  conPlayoff = true,
+  zonas,
+}: {
+  data: PosicionesTorneo;
+  conPlayoff?: boolean;
+  zonas?: ZonaTabla[];
+}) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
   const marcarTop4 = conPlayoff && data.filas.length > 4;
+  const zonaDe = (pos: number) => zonas?.find((z) => pos >= z.desde && pos <= z.hasta);
 
   return (
     <>
@@ -71,7 +93,7 @@ export default function TablaPosiciones({ data, conPlayoff = true }: { data: Pos
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", minWidth: 330, borderCollapse: "collapse", tableLayout: "fixed" }}>
           <colgroup>
-            <col style={{ width: 20 }} />
+            <col style={{ width: zonas ? 26 : 20 }} />
             <col style={{ width: colEquipoWidth }} />
             {/* PJ · G · E · P (1 dígito) */}
             {Array.from({ length: 4 }, (_, i) => (
@@ -109,12 +131,16 @@ export default function TablaPosiciones({ data, conPlayoff = true }: { data: Pos
               // club (ver Pre F/G/H en torneos-urba.ts), asi que hay que resaltar el equipo exacto.
               const esNewman = f.equipo === data.nuestroEquipo;
               const clasifica = marcarTop4 && idx < 4;
+              const zona = zonaDe(f.posicion);
               return (
                 <tr
                   key={f.posicion}
-                  style={{ background: esNewman ? bgPropio : clasifica ? bgPlayoff : undefined }}
+                  style={{ background: esNewman ? bgPropio : zona?.fondo ?? (clasifica ? bgPlayoff : undefined) }}
                 >
-                  <td style={{ ...tdStyle, ...izq }}>{f.posicion}</td>
+                  <td style={{ ...tdStyle, ...izq }}>
+                    {f.posicion}
+                    {zona?.marca && <sup style={{ fontSize: "0.7em", opacity: 0.85 }}>{zona.marca}</sup>}
+                  </td>
                   <td style={{ ...tdEquipoStyle, ...izq, color: esNewman ? DORADO : DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
                   <td style={tdStyle}>{f.jugados}</td>
                   <td style={tdStyle}>{f.ganados}</td>
@@ -148,6 +174,15 @@ export default function TablaPosiciones({ data, conPlayoff = true }: { data: Pos
           Los primeros 4 clasifican a playoff
         </p>
       )}
+      {zonas?.map((z) => (
+        <p key={z.nota} style={{ fontSize: "0.7rem", opacity: 0.8, margin: "8px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
+          <span
+            aria-hidden
+            style={{ display: "inline-block", width: 14, height: 12, background: z.fondo, border: `1px solid ${z.borde}`, flexShrink: 0 }}
+          />
+          {z.nota}
+        </p>
+      ))}
     </>
   );
 }
