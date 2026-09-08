@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { vieneDelPortal } from "@/components/PastillaPortal";
 import { DORADO } from "@/lib/colors";
 
 const pastilla: React.CSSProperties = {
@@ -28,9 +30,15 @@ const pastilla: React.CSSProperties = {
 // querés cambiar de division (ej. de la tabla de M15 B a Pre A).
 export default function BackLink({ href }: { href: string }) {
   const router = useRouter();
+  // Si se llegó desde el portal, la pastilla "← Portal" ocupa el top-left -> este stack baja.
+  const [conPortal, setConPortal] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setConPortal(vieneDelPortal());
+  }, []);
 
   return (
-    <div style={{ position: "fixed", top: 12, left: 12, zIndex: 100, display: "flex", flexDirection: "column", gap: 6 }}>
+    <div style={{ position: "fixed", top: conPortal ? 52 : 12, left: 12, zIndex: 100, display: "flex", flexDirection: "column", gap: 6 }}>
       <button onClick={() => router.push("/")} style={pastilla}>
         Inicio
       </button>

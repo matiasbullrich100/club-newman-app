@@ -3,6 +3,7 @@ import { Lato } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import FontSizeControl from "@/components/FontSizeControl";
+import PastillaPortal from "@/components/PastillaPortal";
 import { Seuo } from "@/components/PieNota";
 
 const lato = Lato({
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 8px" }}>
           <Seuo />
         </div>
+        <PastillaPortal />
         <FontSizeControl />
         <Analytics />
       </body>
