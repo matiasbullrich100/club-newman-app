@@ -138,8 +138,8 @@ export default function TablaPosiciones({
                   style={{
                     // El color de la ZONA (ej. descenso) SIEMPRE gana -> los 2 últimos se ven
                     // idénticos aunque uno sea Newman (que igual se distingue por negrita/acento).
+                    // Sin contorno por fila: las 2 filas forman UN bloque (la barra del puesto lo enmarca).
                     background: zona?.fondo ?? (esNewman ? bgPropio : clasifica ? bgPlayoff : undefined),
-                    ...(zona?.marca ? { outline: `2px solid ${zona.borde}`, outlineOffset: "-2px" } : {}),
                   }}
                 >
                   <td style={{ ...tdStyle, ...izq, ...(zona?.marca ? { borderLeft: `3px solid ${zona.borde}` } : {}) }}>
