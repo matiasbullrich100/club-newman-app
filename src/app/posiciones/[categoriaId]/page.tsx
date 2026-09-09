@@ -23,7 +23,7 @@ function zonasDe(categoriaId: string, totalFilas: number): ZonaTabla[] | undefin
     {
       desde: totalFilas - 1,
       hasta: totalFilas,
-      fondo: "rgba(125,14,14,.5)",
+      fondo: "rgba(150,26,26,.42)",
       borde: "#ff6b6b",
       marca: "**",
       nota: "** Los dos últimos descienden directamente al terminar la fase regular.",
