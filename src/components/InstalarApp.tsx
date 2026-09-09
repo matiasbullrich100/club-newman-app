@@ -41,8 +41,19 @@ function yaInstalada(): boolean {
   );
 }
 
+// Compu (mouse) vs celular/tablet (táctil). En la compu no se "instala una app": lo que la gente
+// quiere es un acceso directo en el escritorio -> cambia el texto del cartel.
+function esEscritorio(): boolean {
+  if (typeof navigator === "undefined" || typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const esMovil =
+    /android|iphone|ipad|ipod|mobile/i.test(ua) || window.matchMedia?.("(pointer: coarse)").matches === true;
+  return !esMovil;
+}
+
 export default function InstalarApp() {
   const [vista, setVista] = useState<"oculto" | "cartel" | "pasos">("oculto");
+  const [escritorio, setEscritorio] = useState(false);
   const [promptNativo, setPromptNativo] = useState<PromptInstalacion | null>(null);
 
   useEffect(() => {
@@ -67,6 +78,8 @@ export default function InstalarApp() {
     // no se renderiza nada, evitando un mismatch de hidratacion.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVista("cartel");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setEscritorio(esEscritorio());
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
 
@@ -149,14 +162,20 @@ export default function InstalarApp() {
               'Elegí "Instalar aplicación" (o "Agregar a pantalla principal").',
               "Listo: te queda el ícono de EnJuego en la pantalla del celular.",
             ]
-          : [
-              'Abrí el menú de tu navegador y buscá "Instalar" o "Agregar a pantalla de inicio".',
-              "Confirmá y listo: te queda el ícono de EnJuego.",
-            ];
+          : escritorio
+            ? [
+                'Abrí el menú del navegador (⋮ arriba a la derecha) y elegí "Instalar EnJuego…" o "Crear acceso directo".',
+                'Si te lo ofrece, marcá "Abrir como ventana" y confirmá.',
+                "Listo: te queda el ícono de EnJuego en el escritorio.",
+              ]
+            : [
+                'Abrí el menú de tu navegador y buscá "Instalar" o "Agregar a pantalla de inicio".',
+                "Confirmá y listo: te queda el ícono de EnJuego.",
+              ];
     return (
       <div style={marco}>
         <div style={{ fontWeight: 700, color: DORADO, textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.85rem", marginBottom: 12 }}>
-          Instalar app EnJuego
+          {escritorio ? "Guardar ícono de EnJuego" : "Instalar app EnJuego"}
         </div>
         <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, fontSize: "0.85rem", lineHeight: 1.35 }}>
           {pasos.map((p, i) => (
@@ -175,12 +194,12 @@ export default function InstalarApp() {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
         <FlechaDescarga />
         <span style={{ fontWeight: 700, fontSize: "0.95rem", lineHeight: 1.25 }}>
-          Instalar app EnJuego en mi dispositivo
+          {escritorio ? "Guardar el ícono de EnJuego en el escritorio" : "Instalar app EnJuego en mi dispositivo"}
         </span>
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
         <button type="button" onClick={instalar} style={botonPrimario}>
-          Instalar
+          {escritorio ? "Guardar ícono" : "Instalar"}
         </button>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
