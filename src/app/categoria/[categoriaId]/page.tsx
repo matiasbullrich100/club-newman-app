@@ -106,7 +106,7 @@ export default async function CategoriaPage({
           <PartidoLive partidoId={resumenPropio.id} inicial={partidoParaCliente} session={session} plantel={plantel} plantelCompleto={plantelCompleto} />
         );
       } else {
-        titulo = "Última Fecha Jugada";
+        titulo = "U. Fecha Jugada";
         const datos = await datosPartidoTerminado(resumenPropio.id, partido, session);
         panel = <PartidoTerminadoPanel partidoId={resumenPropio.id} partido={partido} datos={datos} />;
       }

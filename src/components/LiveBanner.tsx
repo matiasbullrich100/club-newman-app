@@ -140,7 +140,7 @@ export default function LiveBanner({
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
           {ultimaFechaHref && (
             <Link href={ultimaFechaHref} style={botonChico}>
-              Última Fecha
+              U. Fecha
             </Link>
           )}
           {posicionesHref && (

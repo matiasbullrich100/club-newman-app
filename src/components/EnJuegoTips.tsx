@@ -93,7 +93,7 @@ const TIPS: { numero: number; id: string; texto: React.ReactNode; visual?: React
   {
     numero: 4,
     id: "resumen-ultima-fecha",
-    texto: 'En el resumen de la fecha, el botón "Última Fecha" tira TODOS los resultados de la fecha.',
+    texto: 'En el resumen de la fecha, el botón "U. Fecha" tira TODOS los resultados de la fecha.',
   },
   {
     numero: 5,
