@@ -136,7 +136,9 @@ export default function TablaPosiciones({
                 <tr
                   key={f.posicion}
                   style={{
-                    background: esNewman ? bgPropio : zona?.fondo ?? (clasifica ? bgPlayoff : undefined),
+                    // El color de la ZONA (ej. descenso) SIEMPRE gana -> los 2 últimos se ven
+                    // idénticos aunque uno sea Newman (que igual se distingue por negrita/acento).
+                    background: zona?.fondo ?? (esNewman ? bgPropio : clasifica ? bgPlayoff : undefined),
                     ...(zona?.marca ? { outline: `2px solid ${zona.borde}`, outlineOffset: "-2px" } : {}),
                   }}
                 >
