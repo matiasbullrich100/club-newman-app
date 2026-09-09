@@ -108,7 +108,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
               gap: 2,
               padding: "8px 0",
               borderRadius: 8,
-              border: `1px solid ${yaPaso ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.25)"}`,
+              border: `1px solid ${yaPaso ? "rgba(255,255,255,.06)" : "rgba(240,203,134,.75)"}`,
               background: yaPaso ? NEGRO_JUGADA : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
               color: DORADO_SUAVE,
               fontWeight: 700,

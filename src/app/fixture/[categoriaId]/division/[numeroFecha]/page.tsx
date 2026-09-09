@@ -66,7 +66,7 @@ export default async function FixtureDivisionFechaPage({
             gap: 8,
             padding: "10px 12px",
             borderRadius: 10,
-            border: `1px solid ${p.esNewman ? DORADO : p.jugado || fechaYaPaso ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.2)"}`,
+            border: `1px solid ${p.esNewman ? DORADO : p.jugado || fechaYaPaso ? "rgba(255,255,255,.06)" : "rgba(240,203,134,.7)"}`,
             background: p.jugado || fechaYaPaso ? NEGRO_JUGADA : p.esNewman ? "rgba(226,197,120,.08)" : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
             fontSize: "0.85rem",
             fontWeight: p.esNewman ? 700 : 400,

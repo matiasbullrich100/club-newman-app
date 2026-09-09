@@ -135,11 +135,16 @@ export default function TablaPosiciones({
               return (
                 <tr
                   key={f.posicion}
-                  style={{ background: esNewman ? bgPropio : zona?.fondo ?? (clasifica ? bgPlayoff : undefined) }}
+                  style={{
+                    background: esNewman ? bgPropio : zona?.fondo ?? (clasifica ? bgPlayoff : undefined),
+                    ...(zona?.marca ? { outline: `2px solid ${zona.borde}`, outlineOffset: "-2px" } : {}),
+                  }}
                 >
-                  <td style={{ ...tdStyle, ...izq }}>
+                  <td style={{ ...tdStyle, ...izq, ...(zona?.marca ? { borderLeft: `3px solid ${zona.borde}` } : {}) }}>
                     {f.posicion}
-                    {zona?.marca && <sup style={{ fontSize: "0.7em", opacity: 0.85 }}>{zona.marca}</sup>}
+                    {zona?.marca && (
+                      <sup style={{ fontSize: "0.85em", fontWeight: 700, color: zona.borde }}>{zona.marca}</sup>
+                    )}
                   </td>
                   <td style={{ ...tdEquipoStyle, ...izq, color: esNewman ? DORADO : DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
                   <td style={tdStyle}>{f.jugados}</td>
@@ -175,10 +180,10 @@ export default function TablaPosiciones({
         </p>
       )}
       {zonas?.map((z) => (
-        <p key={z.nota} style={{ fontSize: "0.7rem", opacity: 0.8, margin: "8px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
+        <p key={z.nota} style={{ fontSize: "0.7rem", opacity: 0.85, margin: "8px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
           <span
             aria-hidden
-            style={{ display: "inline-block", width: 14, height: 12, background: z.fondo, border: `1px solid ${z.borde}`, flexShrink: 0 }}
+            style={{ display: "inline-block", width: 14, height: 12, background: z.fondo, border: `2px solid ${z.borde}`, flexShrink: 0 }}
           />
           {z.nota}
         </p>

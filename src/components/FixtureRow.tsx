@@ -82,7 +82,8 @@ export default function FixtureRow({
         justifyContent: "center",
         gap: 2,
         background: jugada ? NEGRO_JUGADA : "linear-gradient(155deg, rgba(255,255,255,.05), rgba(0,0,0,.15))",
-        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : "rgba(226,197,120,.25)"}`,
+        // Por jugar: contorno dorado bien visible (antes rgba .25, casi no se notaba).
+        border: `1px solid ${jugada ? "rgba(255,255,255,.06)" : "rgba(240,203,134,.75)"}`,
         borderRadius: 10,
         padding: "9px 12px",
         minHeight: 40,
