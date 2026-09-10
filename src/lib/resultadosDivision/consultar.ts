@@ -1,6 +1,6 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
-import { fixtureDivisionDe, type CategoriaConFixtureDivision, type FechaDivision } from "@/lib/fixtureDivision";
+import { fixtureDivisionDe, numeroFechasDivisionDe, type CategoriaConFixtureDivision, type FechaDivision } from "@/lib/fixtureDivision";
 import type { FechaResultadosDivisionUrba } from "@/lib/urba";
 
 // Igual que fixtureDivisionDe pero, si hay resultados frescos de URBA para esa fecha en
@@ -23,4 +23,28 @@ export async function fixtureDivisionConResultados(
     override = undefined; // sin Firestore o error de red: se usa el JSON
   }
   return fixtureDivisionDe(categoriaId, numeroFecha, override);
+}
+
+export interface FechaDivisionNumerada extends FechaDivision {
+  numeroFecha: number;
+}
+
+// Todas las fechas de la zona (calendario completo), cada una con sus resultados frescos de URBA
+// si ya se bajaron (una sola lectura del doc resultadosDivision/{categoriaId}, no una por fecha).
+// Para la vista de Cruces, que necesita cruzar todo el fixture de la division de un saque.
+export async function fixtureDivisionCompleto(categoriaId: CategoriaConFixtureDivision): Promise<FechaDivisionNumerada[]> {
+  let fechasOverride: Record<string, FechaResultadosDivisionUrba> | undefined;
+  try {
+    const snap = await adminDb.collection("resultadosDivision").doc(categoriaId).get();
+    fechasOverride = snap.exists ? (snap.data()?.fechas as Record<string, FechaResultadosDivisionUrba> | undefined) : undefined;
+  } catch {
+    fechasOverride = undefined;
+  }
+  const total = numeroFechasDivisionDe(categoriaId);
+  const salida: FechaDivisionNumerada[] = [];
+  for (let n = 1; n <= total; n++) {
+    const datos = fixtureDivisionDe(categoriaId, n, fechasOverride?.[String(n)]);
+    if (datos) salida.push({ ...datos, numeroFecha: n });
+  }
+  return salida;
 }

@@ -72,7 +72,7 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
       {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
-      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
         {tienePosiciones && (
           <Link href={`/posiciones/${categoriaId}`} replace style={botonEstilo}>
             Tabla
@@ -81,6 +81,11 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
         <Link href={fixtureNewmanHref} replace style={botonEstilo}>
           Fixt. Newm.
         </Link>
+        {grupo.grupo === "superior" && (
+          <Link href={`/fixture/${categoriaId}/cruces`} replace style={botonEstilo}>
+            Cruces
+          </Link>
+        )}
       </div>
 
       {posiciones && (

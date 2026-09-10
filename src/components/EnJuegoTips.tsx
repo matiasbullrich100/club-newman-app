@@ -74,39 +74,45 @@ function TelefonoGirar() {
 const TIPS: { numero: number; id: string; texto: React.ReactNode; visual?: React.ReactNode }[] = [
   {
     numero: 1,
+    id: "tabla-cruces",
+    texto:
+      'NUEVO: en Plantel Superior, el botón "Cruces" muestra la tabla de doble entrada (quién jugó contra quién y cómo salió) y lo que le queda a cada equipo, en orden.',
+  },
+  {
+    numero: 2,
     id: "tamano-letra",
     texto: "Agrandá y achicá la letra con los botones de abajo a la derecha.",
     visual: <BotonesLetraMini />,
   },
   {
-    numero: 2,
+    numero: 3,
     id: "telefono-horizontal",
     texto: "Con el teléfono horizontal, la info se ve MUCHO mejor !!!",
     visual: <TelefonoGirar />,
   },
   {
-    numero: 3,
+    numero: 4,
     id: "barra-equipos",
     texto:
       "En cada equipo podés usar la barra para navegar por los equipos: Primera a Pre A y a Pre E y a Inter. M19 B a M19 D y a M19 A.",
   },
   {
-    numero: 4,
+    numero: 5,
     id: "resumen-ultima-fecha",
     texto: 'En el resumen de la fecha, el botón "U. Fecha" tira TODOS los resultados de la fecha.',
   },
   {
-    numero: 5,
+    numero: 6,
     id: "fixt-newman",
     texto: "Fixture Newman tiene TODOS los resultados pasados del torneo.",
   },
   {
-    numero: 6,
+    numero: 7,
     id: "fixt-division",
     texto: "Fixture División tiene los resultados de todas las fechas !!!!",
   },
   {
-    numero: 7,
+    numero: 8,
     id: "fixt-flechas",
     texto: "En Fixture podés adelantar o atrasar de una fecha a la otra con las flechas.",
     visual: <FlechasFecha />,

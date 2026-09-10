@@ -57,6 +57,7 @@ export default async function PosicionesPage({
   const backHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
   const fixtureDivisionHref = tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/division` : undefined;
+  const crucesHref = tieneFixtureDivision(categoriaId) && !esJuveniles ? `/fixture/${categoriaId}/cruces` : undefined;
   const tiraEquipos = equiposParaTira(categoriaId, (id) => `/posiciones/${id}`, (id) => TORNEOS_URBA[id] !== undefined);
 
   const [snap, session] = await Promise.all([adminDb.collection("posiciones").doc(categoriaId).get(), getSession()]);
@@ -77,13 +78,18 @@ export default async function PosicionesPage({
           nivel (no una mas adentro de la otra), asi que saltar entre ellas no debe apilar
           historial: "Atras" desde cualquiera vuelve a la pantalla de la que se entro a esta
           terna, no a la anterior de la terna. */}
-      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
         <Link href={fixtureNewmanHref} replace style={botonEstilo}>
           Fixt. Newm.
         </Link>
         {fixtureDivisionHref && (
           <Link href={fixtureDivisionHref} replace style={botonEstilo}>
             Fixt Divis.
+          </Link>
+        )}
+        {crucesHref && (
+          <Link href={crucesHref} replace style={botonEstilo}>
+            Cruces
           </Link>
         )}
       </div>

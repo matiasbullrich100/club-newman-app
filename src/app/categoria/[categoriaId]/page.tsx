@@ -135,7 +135,7 @@ export default async function CategoriaPage({
 
       {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={categoriaId} />}
 
-      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
         {TORNEOS_URBA[categoriaId] !== undefined && (
           <Link href={`/posiciones/${categoriaId}`} style={botonEstilo}>
             Tabla
@@ -145,9 +145,14 @@ export default async function CategoriaPage({
           Fixt. Newm.
         </Link>
         {tieneFixtureDivision(categoriaId) && (
-          <Link href={`/fixture/${categoriaId}/division`} style={botonEstilo}>
-            Fixt Divis.
-          </Link>
+          <>
+            <Link href={`/fixture/${categoriaId}/division`} style={botonEstilo}>
+              Fixt Divis.
+            </Link>
+            <Link href={`/fixture/${categoriaId}/cruces`} style={botonEstilo}>
+              Cruces
+            </Link>
+          </>
         )}
       </div>
 
