@@ -4,7 +4,7 @@ import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, mananaIsoEnArgentina, DIAS_RESULTADO_FRESCO } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, mananaIsoEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -44,7 +44,7 @@ export default async function PlantelSuperiorPage() {
   // pasado la semana de Champa).
   const modoResultados =
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
-    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= DIAS_RESULTADO_FRESCO) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha)) ||
     !debeMostrarProximaFechaEnArgentina();
 
   // "Fresco" = en vivo, o (grupo en modo resultados y ESTA categoria puntual tiene un resultado/
@@ -62,8 +62,7 @@ export default async function PlantelSuperiorPage() {
       (modoResultados &&
         (p.estado === "terminado" || !!p.notaEspecial) &&
         !!p.fecha &&
-        diasDesdeEnArgentina(p.fecha) >= 0 &&
-        diasDesdeEnArgentina(p.fecha) <= DIAS_RESULTADO_FRESCO));
+        resultadoSigueFresco(p.fecha)));
 
   // Banda "P. Ganados / P. Perdidos" arriba de todo en /superior. Cuenta TODOS los partidos
   // terminados de la fecha, incluidos los internos Newman vs Newman (ej. Pre F vs Pre G): cada

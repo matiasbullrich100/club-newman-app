@@ -74,9 +74,10 @@ export function diasDesdeEnArgentina(fechaIso: string): number {
 }
 
 // Cuantos dias sigue "fresco" un resultado en los resumenes (/superior, /juveniles, /categoria):
-// se muestra desde que se juega hasta DIAS_RESULTADO_FRESCO dias despues. Con 5, un resultado del
-// sabado/domingo se ve toda la semana y recien desaparece el viernes, justo antes de la fecha
-// siguiente.
+// se muestra desde que se juega hasta DIAS_RESULTADO_FRESCO dias despues -- salvo en la ventana
+// previa (jueves 06:00 -> viernes), donde se acorta (ver resultadoSigueFresco, mas abajo) para que
+// el jueves el resumen pase a la Proxima Fecha. Fuera de esa ventana, con 5, un resultado del
+// sabado/domingo se ve de domingo a miercoles.
 export const DIAS_RESULTADO_FRESCO = 5;
 
 // Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 06:00 (pedido
@@ -109,4 +110,44 @@ export function debeMostrarProximaFechaEnArgentina(): boolean {
 export function fechaIsoEsHoyEnArgentina(fechaIso: string): boolean {
   const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
   return fechaIso === hoy;
+}
+
+// Ventana "previa": jueves desde las 06:00 ART y todo el viernes -- cuando el club empieza a armar
+// el fin de semana. En esta franja los resumenes (/superior, /juveniles, /categoria,
+// /juveniles/[edad]) dejan de mostrar el resultado de la fecha pasada y pasan a la Proxima Fecha,
+// aunque el resultado tenga menos de DIAS_RESULTADO_FRESCO dias. Sabado y domingo NO entran: ahi
+// manda el partido en vivo / recien jugado.
+export function esVentanaPreviaProximaFecha(): boolean {
+  const partes = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+      .formatToParts(new Date())
+      .map((p) => [p.type, p.value])
+  );
+  if (partes.weekday === "Fri") return true;
+  if (partes.weekday === "Thu") {
+    const horas = (Number(partes.hour) % 24) + Number(partes.minute) / 60;
+    return horas >= 6;
+  }
+  return false;
+}
+
+// Cuantos dias sigue "fresco" un resultado terminado en los resumenes. Normalmente
+// DIAS_RESULTADO_FRESCO (5) -- un resultado del sabado/domingo se ve toda la semana. En la ventana
+// previa (jueves 06:00 -> viernes) se acorta a 2, para que el jueves el resumen ya muestre la
+// Proxima Fecha; un partido reprogramado al jueves/viernes (0-1 dias) igual se sigue mostrando.
+const DIAS_RESULTADO_FRESCO_EN_PREVIA = 2;
+
+// True si un resultado terminado con esta fecha ISO ("YYYY-MM-DD") todavia debe mostrarse en los
+// resumenes. Unifica el chequeo que antes estaba repetido inline en /superior, /juveniles,
+// /categoria y /juveniles/[edad].
+export function resultadoSigueFresco(fechaIso: string): boolean {
+  const dias = diasDesdeEnArgentina(fechaIso);
+  if (dias < 0) return false;
+  return dias <= (esVentanaPreviaProximaFecha() ? DIAS_RESULTADO_FRESCO_EN_PREVIA : DIAS_RESULTADO_FRESCO);
 }

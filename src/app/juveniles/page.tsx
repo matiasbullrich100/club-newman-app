@@ -4,7 +4,7 @@ import { CATEGORIAS, CATEGORIAS_JUVENILES, nombreNewmanDe, partidoId as partidoI
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, DIAS_RESULTADO_FRESCO } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -37,14 +37,14 @@ export default async function JuvenilesPage() {
   const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
   const modoResultados =
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
-    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= DIAS_RESULTADO_FRESCO) ||
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha)) ||
     !debeMostrarProximaFechaEnArgentina();
   // El chequeo de fecha propio (no solo "modoResultados") evita que una categoria SIN nada
   // reciente muestre su ultimo resultado viejo solo porque OTRA categoria del grupo disparo el
   // modo (ver el mismo comentario en /superior/page.tsx).
   const fresco = (p: (typeof resumen)[number]) =>
     ESTADOS_EN_VIVO.has(p.estado) ||
-    (modoResultados && (p.estado === "terminado" || !!p.notaEspecial) && !!p.fecha && diasDesdeEnArgentina(p.fecha) >= 0 && diasDesdeEnArgentina(p.fecha) <= DIAS_RESULTADO_FRESCO);
+    (modoResultados && (p.estado === "terminado" || !!p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha));
   const idsSinResumenFresco = equiposOrdenados
     .map((e) => e.id)
     .filter((id) => !resumen.some((p) => p.categoriaId === id && fresco(p)));
