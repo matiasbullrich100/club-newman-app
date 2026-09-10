@@ -99,7 +99,7 @@ const TIPS: { numero: number; id: string; texto: React.ReactNode; visual?: React
   {
     numero: 5,
     id: "resumen-ultima-fecha",
-    texto: 'En el resumen de la fecha, el botón "U. Fecha" tira TODOS los resultados de la fecha.',
+    texto: 'Para ver TODOS los resultados de una fecha, entrá a "Fixt División" (o al fixture del equipo) y elegí la fecha.',
   },
   {
     numero: 6,
@@ -118,6 +118,14 @@ const TIPS: { numero: number; id: string; texto: React.ReactNode; visual?: React
     visual: <FlechasFecha />,
   },
 ];
+
+// Hasta el lunes 2026-09-14 06:00 ART mostramos SOLO 2 tips: la tabla nueva de Cruces y "acostá el
+// teléfono". Así el anuncio de Cruces no queda tapado por el resto. Desde el lunes vuelven todos.
+const TIPS_REDUCIDOS_HASTA = Date.parse("2026-09-14T06:00:00-03:00");
+const TIPS_ACTIVOS =
+  Date.now() < TIPS_REDUCIDOS_HASTA
+    ? TIPS.filter((t) => t.id === "tabla-cruces" || t.id === "telefono-horizontal")
+    : TIPS;
 
 export default function EnJuegoTips() {
   const [cola, setCola] = useState<typeof TIPS>([]); // tips elegibles, en orden
@@ -148,7 +156,7 @@ export default function EnJuegoTips() {
     }
 
     const ahora = Date.now();
-    const elegibles = TIPS.filter((t) => {
+    const elegibles = TIPS_ACTIVOS.filter((t) => {
       const visto = vistos[t.id];
       return !visto || ahora - visto > COOLDOWN_TIP_MS;
     });

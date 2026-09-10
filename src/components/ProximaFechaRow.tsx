@@ -36,7 +36,7 @@ export default function ProximaFechaRow({
   categoriaNombre,
   proxima,
   nombreNewman,
-  ultimaFechaHref,
+  crucesHref,
   posicionesHref,
   fixtureHref,
   fixtureDivisionHref,
@@ -45,11 +45,9 @@ export default function ProximaFechaRow({
   categoriaNombre: string;
   proxima: ProximaFecha;
   nombreNewman?: string;
-  // Fixture Division de la ULTIMA fecha jugada por esta categoria (ej. /fixture/pre-a/division/21)
-  // -- mismo botón "U. Fecha" que LiveBanner, para no perder el resultado de la fecha pasada
-  // cuando el resumen ya rotó a "Proxima Fecha" (jue 06:00 en adelante). Solo si la categoria
-  // tiene Fixture Division.
-  ultimaFechaHref?: string;
+  // Vista "Cruces" de la categoria (grilla de doble entrada + lo que le queda a cada uno) -- mismo
+  // botón que LiveBanner. Solo Plantel Superior.
+  crucesHref?: string;
   posicionesHref?: string;
   fixtureHref?: string;
   // Solo si la categoria tiene Fixture Division cargado (ver tieneFixtureDivision en
@@ -115,11 +113,11 @@ export default function ProximaFechaRow({
           </span>
         </div>
       </Link>
-      {(ultimaFechaHref || posicionesHref || fixtureHref || fixtureDivisionHref) && (
+      {(crucesHref || posicionesHref || fixtureHref || fixtureDivisionHref) && (
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
-          {ultimaFechaHref && (
-            <Link href={ultimaFechaHref} style={botonChico}>
-              U. Fecha
+          {crucesHref && (
+            <Link href={crucesHref} style={botonChico}>
+              Cruces
             </Link>
           )}
           {posicionesHref && (

@@ -78,11 +78,6 @@ export default async function JuvenilesPage() {
                   inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
                   nombreNewman={nombreNewmanDe(p.categoriaId)}
                   esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
-                  ultimaFechaHref={
-                    tieneFixtureDivision(p.categoriaId) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
-                      ? `/fixture/${p.categoriaId}/division/${p.numeroFecha}`
-                      : undefined
-                  }
                   posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
                   fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
                   fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
@@ -91,10 +86,6 @@ export default async function JuvenilesPage() {
             };
           }
           if (!proxima) return null;
-          const ultimaFechaHref =
-            p && tieneFixtureDivision(equipo.id) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
-              ? `/fixture/${equipo.id}/division/${p.numeroFecha}`
-              : undefined;
           return {
             esVivo: false,
             node: (
@@ -104,7 +95,6 @@ export default async function JuvenilesPage() {
                 categoriaNombre={equipo.nombre}
                 proxima={proxima}
                 nombreNewman={nombreNewmanDe(equipo.id)}
-                ultimaFechaHref={ultimaFechaHref}
                 posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
                 fixtureHref={`/juveniles/${equipo.edadId}/equipo/${equipo.id}`}
                 fixtureDivisionHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/division` : undefined}

@@ -37,7 +37,7 @@ export default function LiveBanner({
   inicial,
   nombreNewman,
   esPrueba,
-  ultimaFechaHref,
+  crucesHref,
   posicionesHref,
   fixtureNewmanHref,
   fixtureDivisionHref,
@@ -50,9 +50,10 @@ export default function LiveBanner({
   // con categorias reales, asi que sin esta marca un partido de prueba en vivo podria confundirse
   // con uno real en este mismo banner.
   esPrueba?: boolean;
-  // Fixture Division de la ULTIMA fecha jugada por esta categoria (ej. /fixture/pre-a/division/21)
-  // -- para ver de un toque como salio toda la zona. Solo si la categoria tiene Fixture Division.
-  ultimaFechaHref?: string;
+  // Vista "Cruces" de la categoria (/fixture/pre-a/cruces) -- grilla de doble entrada + lo que le
+  // queda a cada uno. Solo Plantel Superior. La ultima fecha jugada se ve desde Fixt. Division /
+  // Fixt. Newm., no desde aca.
+  crucesHref?: string;
   // Solo si la categoria tiene torneo de URBA asignado (ver TORNEOS_URBA) -- si no hay, no hay
   // tabla de posiciones para mostrar.
   posicionesHref?: string;
@@ -136,11 +137,11 @@ export default function LiveBanner({
           </div>
         )}
       </Link>
-      {(ultimaFechaHref || posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
+      {(crucesHref || posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
-          {ultimaFechaHref && (
-            <Link href={ultimaFechaHref} style={botonChico}>
-              U. Fecha
+          {crucesHref && (
+            <Link href={crucesHref} style={botonChico}>
+              Cruces
             </Link>
           )}
           {posicionesHref && (
