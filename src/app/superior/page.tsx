@@ -149,6 +149,13 @@ export default async function PlantelSuperiorPage() {
       if (idsJuegaManana.has(cat.id)) return null; // ya sale en PartidosMananaBanner
       const proxima = proximasPorCategoria.get(cat.id);
       if (!proxima) return null;
+      // "U. Fecha" -- ultima fecha jugada por esta categoria (mismo boton que LiveBanner): en la
+      // ventana previa el resumen muestra la Proxima Fecha, pero el resultado de la fecha pasada
+      // se sigue pudiendo ver de un toque.
+      const ultimaFechaHref =
+        p && tieneFixtureDivision(cat.id) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
+          ? `/fixture/${cat.id}/division/${p.numeroFecha}`
+          : undefined;
       return {
         esVivo: false,
         node: (
@@ -158,6 +165,7 @@ export default async function PlantelSuperiorPage() {
             categoriaNombre={cat.nombre}
             proxima={proxima}
             nombreNewman={propioSi(proxima.rival, cat.id)}
+            ultimaFechaHref={ultimaFechaHref}
             posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
             fixtureHref={`/categoria/${cat.id}/fixture`}
             fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}

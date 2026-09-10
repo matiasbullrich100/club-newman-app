@@ -23,6 +23,7 @@ pero algunos son destructivos — están marcados abajo.
 | `actualizar-resultados-division` | Baja de URBA los resultados de todos los cruces de cada zona con Fixt. División a `resultadosDivision/{categoriaId}` | Lo hace solo un cron propio *después* de cada jornada (sáb/dom noche + lunes); a mano para forzar. Acepta `superior`\|`juveniles` |
 | `programar-juveniles-desde-jugados` | Pone en cada categoría de Juveniles el `hora` más repetido de sus partidos jugados, sobre todos los `programado` que vienen (horario base; se corrige después desde `/programar`) | Una vez al arrancar; re-correr si se cargan fechas nuevas de Juveniles |
 | `programar-superior-desde-jugados` | Igual pero para Plantel Superior, separando local/visitante: usa el `hora` del último jugado de local y el del último de visitante (+ nº de cancha del último de local). Horario base — los de Superior cambian fecha a fecha, se corrigen desde `/programar` | Una vez; re-correr si hace falta refrescar la base |
+| `borrar-canchas` | Borra `numeroCancha` ("Cancha 3") de TODOS los partidos — deja `hora` y `cancha` (predio) intactos. Dry-run por defecto; `--aplicar` para borrar de verdad | Cuando el club quiere sacar las canchas cargadas hasta confirmar las nuevas (la app no muestra "Cancha" sin `numeroCancha`) |
 | `deploy-rules` | Sube `firestore.rules` | Después de tocar ese archivo |
 
 ## Antes de correr algo destructivo

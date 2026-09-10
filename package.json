@@ -20,6 +20,7 @@
     "recontar-tries-partido": "tsx src/scripts/recontar-tries-partido.ts",
     "programar-juveniles-desde-jugados": "tsx src/scripts/programar-juveniles-desde-jugados.ts",
     "programar-superior-desde-jugados": "tsx src/scripts/programar-superior-desde-jugados.ts",
+    "borrar-canchas": "tsx src/scripts/borrar-canchas.ts",
     "seed-test-cambio": "tsx src/scripts/seed-test-cambio.ts",
     "seed-test-cambio-juveniles": "tsx src/scripts/seed-test-cambio-juveniles.ts",
     "seed-test-beromama": "tsx src/scripts/seed-test-beromama.ts",
