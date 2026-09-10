@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { EDADES, equiposDeEdad, nombreNewmanDe } from "@/lib/categorias";
+import { EDADES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { partidosEnVivoOUltimoTerminado } from "@/lib/match/resumenSeccion";
-import { resultadoSigueFresco } from "@/lib/fecha";
+import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria, type ProximaFecha } from "@/lib/match/resumenSeccion";
+import { debeMostrarProximaFechaEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
 import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
+import ProximaFechaRow from "@/components/ProximaFechaRow";
 import { DORADO_SUAVE } from "@/lib/colors";
 import { Seuo } from "@/components/PieNota";
 
@@ -53,6 +54,59 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
       ESTADOS_EN_VIVO.has(p.estado) ||
       ((p.estado === "terminado" || !!p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha))
   );
+  const idsFrescos = new Set(frescos.map((p) => p.categoriaId));
+
+  // Para los equipos SIN resultado fresco, en la ventana de Proxima Fecha (jue 06:00 -> finde) se
+  // muestra la fila de la fecha que viene, con la pastilla "U. Fecha" hacia la ultima jugada --
+  // mismo criterio que la lista principal /juveniles.
+  const idsSinFresco = equipos.map((e) => e.id).filter((id) => !idsFrescos.has(id));
+  const proximasPorCategoria: Map<string, ProximaFecha> = debeMostrarProximaFechaEnArgentina()
+    ? await proximaFechaPorCategoria(idsSinFresco)
+    : new Map();
+
+  const filas = equipos
+    .map((equipo) => {
+      const p = resumen.find((r) => r.categoriaId === equipo.id);
+      if (p && idsFrescos.has(equipo.id)) {
+        return (
+          <LiveBanner
+            key={p.id}
+            partidoId={p.id}
+            categoriaNombre={equipo.nombre}
+            inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
+            nombreNewman={nombreNewmanDe(p.categoriaId)}
+            esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+            ultimaFechaHref={
+              tieneFixtureDivision(p.categoriaId) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
+                ? `/fixture/${p.categoriaId}/division/${p.numeroFecha}`
+                : undefined
+            }
+            posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
+            fixtureNewmanHref={`/juveniles/${edadId}/equipo/${p.categoriaId}`}
+            fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
+          />
+        );
+      }
+      const proxima = proximasPorCategoria.get(equipo.id);
+      if (!proxima) return null;
+      const ultimaFechaHref =
+        p && tieneFixtureDivision(equipo.id) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
+          ? `/fixture/${equipo.id}/division/${p.numeroFecha}`
+          : undefined;
+      return (
+        <ProximaFechaRow
+          key={equipo.id}
+          partidoId={partidoId(equipo.id, proxima.numeroFecha)}
+          categoriaNombre={equipo.nombre}
+          proxima={proxima}
+          nombreNewman={nombreNewmanDe(equipo.id)}
+          ultimaFechaHref={ultimaFechaHref}
+          posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
+          fixtureHref={`/juveniles/${edadId}/equipo/${equipo.id}`}
+          fixtureDivisionHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/division` : undefined}
+        />
+      );
+    });
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -60,24 +114,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
       <SessionBar session={session} />
       <Header rightLabel={edad.nombre} logo="urba" />
 
-      {frescos.map((p) => (
-        <LiveBanner
-          key={p.id}
-          partidoId={p.id}
-          categoriaNombre={equipos.find((e) => e.id === p.categoriaId)?.nombre ?? p.categoriaId}
-          inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
-          nombreNewman={nombreNewmanDe(p.categoriaId)}
-          esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
-          ultimaFechaHref={
-            tieneFixtureDivision(p.categoriaId) && !PARTIDOS_DEMO_IDS.includes(p.id) && Number.isInteger(p.numeroFecha) && p.numeroFecha > 0
-              ? `/fixture/${p.categoriaId}/division/${p.numeroFecha}`
-              : undefined
-          }
-          posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
-          fixtureNewmanHref={`/juveniles/${edadId}/equipo/${p.categoriaId}`}
-          fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
-        />
-      ))}
+      {filas}
 
       <p style={{ textAlign: "center", marginTop: 16 }}>
         <Link
