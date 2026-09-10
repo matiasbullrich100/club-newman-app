@@ -111,11 +111,6 @@ const TIPS: { numero: number; id: string; texto: React.ReactNode; visual?: React
     texto: "En Fixture podés adelantar o atrasar de una fecha a la otra con las flechas.",
     visual: <FlechasFecha />,
   },
-  {
-    numero: 8,
-    id: "tabla-playoff",
-    texto: "En la TABLA Plantel Superior tenés marcado quiénes están clasificando a playoff.",
-  },
 ];
 
 export default function EnJuegoTips() {
