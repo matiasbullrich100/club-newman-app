@@ -1,0 +1,23 @@
+name: Limpiar practicas demo vencidas
+
+# Borra (doc + subcolecciones) las instancias privadas de partido de prueba de la cuenta "demo"
+# que ya vencieron (2hs, ver src/lib/match/practicaInstancias.ts), pegandole a
+# src/app/api/cron/limpiar-practicas-demo/route.ts.
+#
+# Pura limpieza de almacenamiento -- no hace falta para que la app funcione bien: una instancia
+# vencida que nadie borro todavia se recrea fresca sola la proxima vez que alguien entra a
+# /pruebas. Por eso alcanza con una corrida por dia, sin apuro.
+on:
+  schedule:
+    - cron: "0 9 * * *" # 06:00 ART todos los dias
+  workflow_dispatch: # correr a mano desde GitHub para probar, cualquier dia
+
+jobs:
+  limpiar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pegarle al endpoint de limpieza
+        run: |
+          curl --fail --silent --show-error --max-time 60 \
+            "${{ vars.APP_URL }}/api/cron/limpiar-practicas-demo" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

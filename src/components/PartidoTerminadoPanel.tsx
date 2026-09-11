@@ -4,7 +4,7 @@ import CargaIncidencia from "./panel-designado/CargaIncidencia";
 import CargaCambio from "./panel-designado/CargaCambio";
 import ResetDemoButton from "./ResetDemoButton";
 import ReiniciarPartidoButton from "./ReiniciarPartidoButton";
-import { DORADO } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import type { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
 
 // Todo lo que se ve para un partido "terminado": formacion + incidencias (PartidoHistorico) y, si
@@ -76,6 +76,23 @@ export default function PartidoTerminadoPanel({
             enCanchaIds={partido.enCanchaIds}
             soloEnCancha={false}
           />
+        </div>
+      )}
+      {mostrarReset && (
+        <div
+          style={{
+            background: "linear-gradient(160deg, rgba(226,197,120,.14), rgba(0,0,0,.15))",
+            border: `1px solid ${DORADO}`,
+            borderRadius: 12,
+            padding: "12px 16px",
+            marginBottom: 10,
+            textAlign: "center",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "0.82rem", color: DORADO_SUAVE, lineHeight: 1.4 }}>
+            🎓 Para recibir el diploma de <b style={{ color: DORADO }}>Designado Aprobado</b>, reseteá el partido al final de la
+            página.
+          </p>
         </div>
       )}
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}

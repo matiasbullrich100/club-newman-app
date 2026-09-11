@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { adminDb } from "@/lib/firebase-admin";
 import type { Cuenta } from "@/types/firestore";
 import { verifyPassword } from "./passwords";
@@ -34,12 +35,19 @@ export async function login(formData: FormData): Promise<LoginResult> {
     return { ok: false, error: "Usuario o contraseña incorrectos" };
   }
 
+  // Cuenta de practica dedicada: cada login se lleva un id al azar propio, para que esta sesion
+  // opere SU PROPIA copia de los partidos de prueba (ver lib/match/practicaInstancias.ts) y no la
+  // de otra persona que tambien entro con "demo" en simultaneo -- la copia en si se crea recien
+  // al entrar a /pruebas, no aca (login queda liviano, sin escrituras extra a Firestore).
+  const demoInstanceId = cuenta.rol === "designado" && cuenta.categoriaId === "demo" ? randomUUID().replace(/-/g, "").slice(0, 10) : undefined;
+
   await createSession({
     cuentaId,
     rol: cuenta.rol,
     username: cuenta.username,
     categoriaId: cuenta.categoriaId,
     alcance: cuenta.alcance,
+    demoInstanceId,
   });
 
   return { ok: true };

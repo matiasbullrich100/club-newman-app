@@ -13,7 +13,6 @@ import type { SessionPayload } from "@/lib/auth/session";
 import type { JugadorBusqueda, RosterJugador } from "./panel-designado/types";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { puedeOperarCategoria } from "@/lib/auth/scope";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
 import { CREMA, DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // "(4T)" chico debajo del marcador grande -- misma info que aparece al lado del resultado cuando
@@ -95,7 +94,7 @@ export default function PartidoLive({
     });
   }, [partidoId]);
 
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, PARTIDOS_DEMO_IDS.includes(partidoId));
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, partidoId);
   const badge = ESTADO_BADGE[partido.estado];
   const motivoLabel =
     motivoInterrupcion === "medico"

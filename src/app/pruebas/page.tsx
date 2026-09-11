@@ -3,22 +3,27 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
+import { asegurarInstanciaPractica } from "@/lib/match/practicaInstancias";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import { DORADO_SUAVE } from "@/lib/colors";
 
-// Partidos de prueba (Fase 1), uno por categoria -- fuera del esquema real a proposito, asi
-// que necesitan su propio link (nunca aparecen en /fecha ni /categoria).
-const PARTIDOS_DEMO = [
-  { id: "pre-a-test-beromama", label: "Pre A · Beromama", categoriaId: "pre-a" },
-  { id: "m15-c-test-cambio", label: "M15 C · Cambios", categoriaId: "m15-c" },
-];
-
 export default async function PruebasPage() {
   const session = await getSession();
   if (!pruebasVisiblesPara(session)) redirect("/");
+
+  // La cuenta "demo" opera su PROPIA copia privada, creada (o renovada si ya vencio) al toque --
+  // asi 5 personas que entran a la vez con "demo" caen cada una en su partido, sin pisarse. El
+  // administrador sigue usando los 2 ids fijos de siempre, permanentes, sin vencimiento.
+  const esDemo = session!.rol === "designado" && session!.categoriaId === "demo";
+  const instancia = esDemo && session!.demoInstanceId ? await asegurarInstanciaPractica(session!.demoInstanceId) : null;
+
+  const PARTIDOS_DEMO = [
+    { id: instancia?.preAId ?? "pre-a-test-beromama", label: "Pre A · Beromama", categoriaId: "pre-a" },
+    { id: instancia?.m15Id ?? "m15-c-test-cambio", label: "M15 C · Cambios", categoriaId: "m15-c" },
+  ];
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
@@ -51,7 +56,7 @@ export default async function PruebasPage() {
             >
               {p.label}
             </Link>
-            {puedeResetearPartidoDePrueba(session, p.categoriaId) && (
+            {puedeResetearPartidoDePrueba(session, p.categoriaId, p.id) && (
               <ResetDemoButton partidoId={p.id} label={p.label} />
             )}
           </div>

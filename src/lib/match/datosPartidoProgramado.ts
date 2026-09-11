@@ -2,7 +2,7 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import { ordenarPorDorsal } from "@/lib/players";
 import { sugerirPateador } from "@/lib/match/pateador";
 import type { JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
@@ -45,8 +45,8 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
     pateadorHabitualId: partido.pateadorHabitualId,
   };
 
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, partidoId);
 
   // Sugerencia del pateador habitual -- para poder elegirlo YA, antes de arrancar el partido, sin
   // perder el 1er minuto de juego. Solo hace falta calcularla mientras nadie contesto (una vez
@@ -56,7 +56,7 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
       ? await sugerirPateador(partido.categoriaId, plantel.map((j) => j.jugadorId))
       : null;
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
-  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId);
+  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId, partidoId);
 
   // Formacion cargada como borrador (ver formacionPublicada en types/firestore.ts) -- quien no
   // puede operar esta categoria no ve la formacion real hasta que se publique.

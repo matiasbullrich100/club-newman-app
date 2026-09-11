@@ -3,7 +3,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import { puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "@/lib/auth/scope";
 import { grupoDeCategoria } from "@/lib/categorias";
 import { FAMILIA_TARJETA } from "@/lib/incidentes";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import { apellidosAmbiguos, ordenarPorDorsal } from "@/lib/players";
 import type { Incidente, JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
@@ -70,9 +70,9 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     ? todasLasIncidencias
     : todasLasIncidencias.filter((inc) => !FAMILIA_TARJETA.includes(inc.tipo) && !esCierreDeSancion(inc));
 
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
-  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, partidoId);
+  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId, partidoId);
   const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
 
   return { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos: ambiguos };

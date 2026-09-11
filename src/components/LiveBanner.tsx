@@ -46,7 +46,7 @@ export default function LiveBanner({
   categoriaNombre: string;
   inicial: EstadoPartidoLive;
   nombreNewman?: string;
-  // Partido de PARTIDOS_DEMO_IDS -- algunas categorias de prueba (ej. "pre-a", "m-22") coinciden
+  // Partido de PARTIDO_PRUEBA_BASES -- algunas categorias de prueba (ej. "pre-a", "m-22") coinciden
   // con categorias reales, asi que sin esta marca un partido de prueba en vivo podria confundirse
   // con uno real en este mismo banner.
   esPrueba?: boolean;

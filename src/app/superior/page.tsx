@@ -5,7 +5,7 @@ import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, mananaIsoEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -26,7 +26,7 @@ const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 export default async function PlantelSuperiorPage() {
   const session = await getSession();
   // Algunas categorias de prueba (ej. "pre-a", "m-22") coinciden con categorias reales, asi que
-  // un partido de PARTIDOS_DEMO_IDS puede aparecer en este mismo banner -- partidosEnVivoOUltimo
+  // un partido de PARTIDO_PRUEBA_BASES puede aparecer en este mismo banner -- partidosEnVivoOUltimo
   // Terminado ya lo filtra para quien no puede ver partidos de prueba (ver partidosPrueba.ts); acá
   // solo queda marcarlo "PRUEBA" para quien sí los ve (administrador o la cuenta de práctica).
   const resumen = await partidosEnVivoOUltimoTerminado(CATEGORIAS_SUPERIOR.map((c) => c.id), session);
@@ -133,7 +133,7 @@ export default async function PlantelSuperiorPage() {
               categoriaNombre={cat.nombre}
               inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
               nombreNewman={propioSi(p.rival, cat.id)}
-              esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+              esPrueba={esIdDePartidoPrueba(p.id)}
               crucesHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/cruces` : undefined}
               posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
               fixtureNewmanHref={`/categoria/${cat.id}/fixture`}

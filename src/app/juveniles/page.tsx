@@ -5,7 +5,7 @@ import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { debeMostrarProximaFechaEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
@@ -77,7 +77,7 @@ export default async function JuvenilesPage() {
                   categoriaNombre={CATEGORIAS.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
                   inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
                   nombreNewman={nombreNewmanDe(p.categoriaId)}
-                  esPrueba={PARTIDOS_DEMO_IDS.includes(p.id)}
+                  esPrueba={esIdDePartidoPrueba(p.id)}
                   posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
                   fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
                   fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}

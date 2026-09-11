@@ -1,10 +1,20 @@
 import type { SessionPayload } from "@/lib/auth/session";
 
-// Lista blanca de partidos de prueba -- fuera del fixture real, asi que ni resetearPartidoDemo
-// puede tocar un partido real, ni sus tarjetas/minutos contaminan jugadores/. Compartida entre
+// Los 2 nombres BASE de partido de prueba. El administrador opera estos ids tal cual (fijos,
+// permanentes). La cuenta "demo" en cambio opera una COPIA privada por sesion, con sufijo
+// "-<instanceId>" (ver lib/match/practicaInstancias.ts) -- asi 5 personas que entran a la vez con
+// "demo" juegan 5 partidos independientes en vez de pisarse el mismo.
+export const PARTIDO_PRUEBA_BASES = ["pre-a-test-beromama", "m15-c-test-cambio"];
+
+// True si `partidoId` es CUALQUIER partido de prueba -- el fijo del admin o una copia de la
+// cuenta "demo" (que lleva el mismo nombre base + "-<instanceId>"). Compartida entre
 // match/actions.ts, partido/[partidoId]/page.tsx y las paginas que arman el banner de "en vivo"
-// (superior, juveniles) para no duplicarla en varios lugares.
-export const PARTIDOS_DEMO_IDS = ["pre-a-test-beromama", "m15-c-test-cambio"];
+// (superior, juveniles) para no duplicarla en varios lugares. NO alcanza para saber si esta
+// sesion puede OPERARLO -- para eso, puedeOperarCategoria ya recibe el partidoId y chequea
+// ademas que sea la instancia de ESTA sesion (ver lib/auth/scope.ts).
+export function esIdDePartidoPrueba(partidoId: string): boolean {
+  return PARTIDO_PRUEBA_BASES.some((base) => partidoId === base || partidoId.startsWith(`${base}-`));
+}
 
 // Los partidos de prueba son para el administrador (manager sin alcance, acceso total) y para la
 // cuenta de practica dedicada ("demo", designado atado a categoriaId "demo") -- pensada para que

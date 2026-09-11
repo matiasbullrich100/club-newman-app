@@ -27,6 +27,10 @@ export interface SessionPayload {
   username: string;
   categoriaId?: string; // solo rol "designado"
   alcance?: string; // solo rol "manager" -- edadId de Juveniles; ausente = sin restriccion
+  // Solo la cuenta "demo" (designado, categoriaId "demo") -- id al azar generado UNA VEZ por
+  // login, para que esta sesion opere su PROPIA copia de los partidos de prueba (ver
+  // lib/match/practicaInstancias.ts) en vez de la de otra sesion que tambien entro con "demo".
+  demoInstanceId?: string;
 }
 
 export async function createSession(payload: SessionPayload): Promise<void> {

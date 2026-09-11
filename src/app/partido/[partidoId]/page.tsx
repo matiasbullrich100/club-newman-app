@@ -5,7 +5,7 @@ import { puedeOperarCategoria, esManagerDeCategoria, puedeResetearPartidoDePrueb
 import { CATEGORIAS, grupoDeCategoria, partesPartidoId } from "@/lib/categorias";
 import { equiposParaTira } from "@/lib/tiraEquipos";
 import TiraEquipos from "@/components/TiraEquipos";
-import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import type { JugadorAgregado, JugadorPartido, Partido, PosicionesTorneo } from "@/types/firestore";
@@ -38,23 +38,23 @@ export default async function PartidoPage({
   const partido = partidoSnap.data() as Partido;
   const categoria = CATEGORIAS.find((c) => c.id === partido.categoriaId);
   const categoriaNombre = categoria?.nombre ?? partido.categoriaId;
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
   // Solo el administrador y la cuenta de practica dedicada pueden ver un partido de prueba -- ni
   // un designado real de esa categoria ni el publico general, aunque conozcan la URL directa (ver
   // partidosPrueba.ts).
   if (esPartidoDePrueba && !pruebasVisiblesPara(session)) notFound();
-  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId);
+  const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId, partidoId);
   // Un nivel arriba: el resumen en vivo del grupo (mismo que trajo aca via un boton "Fixt. Newm."
   // o tocando la fila en LiveBanner/ProximaFechaRow), no la vieja vista /fecha/[n] (huerfana --
   // nada mas en la app linkeaba ahi).
-  const backHref = PARTIDOS_DEMO_IDS.includes(partidoId)
+  const backHref = esPartidoDePrueba
     ? "/pruebas"
     : !categoria
       ? "/"
       : categoria.grupo === "juveniles"
         ? `/juveniles/${categoria.edadId}`
         : "/superior";
-  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba);
+  const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, partidoId);
   const puedeReiniciar = esManagerDeCategoria(session, partido.categoriaId);
 
   // Boton "Tabla de posiciones al [fecha]" en PartidoHistorico -- la fecha es la de la ULTIMA

@@ -82,6 +82,13 @@ export interface Partido {
   // se preguntó; null = el designado eligió explícitamente "sin pateador fijo" para no volver a
   // preguntar. Habilita el atajo "¿Fue [fulano]?" en CargaIncidencia en vez de buscarlo en la lista.
   pateadorHabitualId?: string | null;
+  // true si este partido es una instancia de PRACTICA privada creada para una sesion de la cuenta
+  // "demo" (id con sufijo "-<instanceId>", ver lib/match/practicaInstancias.ts) -- distinto de los
+  // 2 partidos de prueba fijos que usa el administrador (esos no llevan este campo). expiraEn
+  // marca cuando deja de considerarse vigente: se recrea fresca en la proxima visita a /pruebas,
+  // y un cron de limpieza la borra de Firestore mas tarde (no hace falta que quede guardada).
+  esInstanciaPractica?: boolean;
+  expiraEn?: Timestamp | Date;
   createdAt?: Timestamp | Date;
   updatedAt?: Timestamp | Date;
 }

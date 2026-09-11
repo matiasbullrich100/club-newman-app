@@ -16,7 +16,7 @@ import {
   TARJETAS_SACAN_DE_CANCHA,
 } from "@/lib/incidentes";
 import { EDADES, grupoDeCategoria, partidoIdsDeGrupo } from "@/lib/categorias";
-import { PARTIDOS_DEMO_IDS } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import {
   PUNTOS_POR_TIPO,
   type Equipo,
@@ -77,13 +77,12 @@ const CAMPO_HISTORIAL_TARJETA: Partial<Record<TipoIncidente, string>> = {
 export async function iniciarPartido(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const partidoSnap = await tx.get(partidoRef);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "programado") throw new Error("El partido ya fue iniciado");
 
     // Salvaguarda: si quien cargo el plantel (ej. una carga masiva desde Excel) se olvido de
@@ -117,13 +116,12 @@ export async function iniciarPartido(partidoId: string): Promise<void> {
 export async function adelantarReloj(partidoId: string, segundos: 30 | 60): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
     if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Datos del partido incompletos");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "en_juego" && partido.estado !== "entretiempo") {
       throw new Error("El partido no está en juego");
     }
@@ -143,13 +141,12 @@ export async function adelantarReloj(partidoId: string, segundos: 30 | 60): Prom
 export async function setPateadorHabitual(partidoId: string, jugadorId: string | null): Promise<void> {
   const session = await getSession();
   const { partidoRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const partidoSnap = await tx.get(partidoRef);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     tx.update(partidoRef, { pateadorHabitualId: jugadorId, updatedAt: FieldValue.serverTimestamp() });
   });
 
@@ -160,14 +157,13 @@ export async function cortar1T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
     if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "en_juego" || liveState.periodo !== "1T") {
       throw new Error("El partido no está en el 1er tiempo");
     }
@@ -207,7 +203,6 @@ export async function cortar1T(partidoId: string): Promise<void> {
 export async function retomar1T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap, fin1tSnap] = await Promise.all([
@@ -218,7 +213,7 @@ export async function retomar1T(partidoId: string): Promise<void> {
     if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "entretiempo" || liveState.periodo !== "1T") {
       throw new Error("Solo se puede volver al 1er tiempo desde el entretiempo, antes de arrancar el 2do");
     }
@@ -246,13 +241,12 @@ export async function retomar1T(partidoId: string): Promise<void> {
 export async function iniciar2T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const partidoSnap = await tx.get(partidoRef);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "entretiempo") throw new Error("El partido no está en el entretiempo");
 
     tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
@@ -271,14 +265,13 @@ export async function suspender(partidoId: string, motivo: "medico" | "clima" | 
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
     if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "en_juego") throw new Error("Solo se puede interrumpir un partido en juego");
     if (!liveState.periodo) throw new Error("El partido no está en juego");
 
@@ -304,13 +297,12 @@ export async function suspender(partidoId: string, motivo: "medico" | "clima" | 
 export async function reanudar(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const partidoSnap = await tx.get(partidoRef);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "suspendido") throw new Error("El partido no está suspendido");
 
     tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
@@ -323,7 +315,7 @@ export async function reanudar(partidoId: string): Promise<void> {
 export async function terminarPartido(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
   const finPartidoRef = partidoRef.collection("incidentes").doc();
 
   // Todo adentro de una transacción: el chequeo de estado + la escritura tienen que ser atómicos.
@@ -340,7 +332,7 @@ export async function terminarPartido(partidoId: string): Promise<void> {
     ]);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "en_juego" && partido.estado !== "entretiempo") {
       throw new Error("El partido no se puede terminar desde este estado");
     }
@@ -436,13 +428,12 @@ export async function registrarWalkover(partidoId: string, equipoSinPrimeraLinea
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado === "terminado") throw new Error("El partido ya está terminado");
 
     const resultado = equipoSinPrimeraLinea === "newman" ? { newman: 0, rival: 8 } : { newman: 8, rival: 0 };
@@ -498,14 +489,14 @@ export async function publicarIncidente(partidoId: string, input: PublicarIncide
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef)]);
     if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     // Correccion post-partido: el Designado/Manager puede agregar una jugada que se olvido
     // cargar en su momento (ej. un try que el arbitro convalido y no se anoto). El minuto queda
     // como aproximado (el reloj ya esta congelado) y no exige que el jugador siga "en cancha".
@@ -696,7 +687,7 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
   const session = await getSession();
   const { partidoRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, incSnap, incidentesSnap] = await Promise.all([
@@ -707,7 +698,7 @@ export async function corregirTipoIncidente(partidoId: string, incidenteId: stri
     if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     // Cualquier estado despues del arranque (en juego, entretiempo, suspendido, terminado). Una
     // correccion no toca el reloj, asi que es segura en todos -- ver comentario del jsdoc.
     if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
@@ -796,7 +787,7 @@ export async function corregirJugadorIncidente(partidoId: string, incidenteId: s
   const session = await getSession();
   const { partidoRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, incSnap, nuevoJugadorSnap] = await Promise.all([
@@ -809,7 +800,7 @@ export async function corregirJugadorIncidente(partidoId: string, incidenteId: s
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
     const nuevoJugador = nuevoJugadorSnap.data() as JugadorPartido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     // Igual que corregirTipoIncidente: cualquier estado menos "programado" (el entretiempo incluido).
     if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
     if (inc.equipo !== "newman" || !requierePlayerSelection(inc.tipo)) {
@@ -859,7 +850,7 @@ export async function corregirJugadorCambio(partidoId: string, incidenteId: stri
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, incSnap, nuevoSnap, liveSnap, incidentesSnap] = await Promise.all([
@@ -874,7 +865,7 @@ export async function corregirJugadorCambio(partidoId: string, incidenteId: stri
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
     const nuevo = nuevoSnap.data() as JugadorPartido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (inc.tipo !== "cambio") throw new Error("Esta incidencia no es un cambio");
     if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
     const viejoId = lado === "sale" ? inc.jugadorSaleId : inc.jugadorEntraId;
@@ -948,7 +939,7 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const incidenteRef = partidoRef.collection("incidentes").doc(incidenteId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, incSnap, incidentesSnap] = await Promise.all([
@@ -959,7 +950,7 @@ export async function eliminarIncidente(partidoId: string, incidenteId: string):
     if (!partidoSnap.exists || !incSnap.exists) throw new Error("No encontrado");
     const partido = partidoSnap.data() as Partido;
     const inc = incSnap.data() as Incidente;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     // Igual que corregir*: se puede eliminar una jugada mal cargada en cualquier estado menos
     // "programado" (el entretiempo incluido -- es cuando el Designado revisa el 1er tiempo).
     if (partido.estado === "programado") throw new Error("El partido todavía no arrancó");
@@ -1109,7 +1100,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
   const saleRef = partidoRef.collection("plantel").doc(input.jugadorSaleId);
   const entraRef = partidoRef.collection("plantel").doc(input.jugadorEntraId);
   const incidenteRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap, saleSnap, entraSnap, cambiosPreviosSnap] = await Promise.all([
@@ -1133,7 +1124,7 @@ export async function publicarCambio(partidoId: string, input: PublicarCambioInp
       ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false, agregadoEnVivo: true }
       : (entraSnap.data() as JugadorPartido);
 
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
 
     // Correccion post-partido: el Designado/Manager puede agregar un cambio que se olvido cargar
     // en su momento (mismo patron que publicarIncidente). El minuto queda aproximado (el reloj ya
@@ -1256,7 +1247,6 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
   const entraRef = partidoRef.collection("plantel").doc(input.jugadorEntraId);
   const sancionRef = partidoRef.collection("incidentes").doc(incidenteId);
   const cambioRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap, entraSnap, sancionSnap] = await Promise.all([
@@ -1276,7 +1266,7 @@ export async function reingresarSancion(partidoId: string, incidenteId: string, 
       ? { nombre: input.jugadorEntraNombre!, dorsal: "-", titular: false, enCancha: false, agregadoEnVivo: true }
       : (entraSnap.data() as JugadorPartido);
 
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (sancion.equipo !== "newman") throw new Error("Esta acción es solo para sanciones de Newman");
     if (DURACION_SANCION_SEGUNDOS[sancion.tipo] === undefined) {
       throw new Error("Esta tarjeta es expulsión definitiva -- no hay reingreso");
@@ -1337,7 +1327,6 @@ export async function resolverSancionRival(partidoId: string, incidenteId: strin
   const { partidoRef, liveStateRef } = refs(partidoId);
   const sancionRef = partidoRef.collection("incidentes").doc(incidenteId);
   const cambioRef = partidoRef.collection("incidentes").doc();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, liveSnap, sancionSnap] = await Promise.all([tx.get(partidoRef), tx.get(liveStateRef), tx.get(sancionRef)]);
@@ -1347,7 +1336,7 @@ export async function resolverSancionRival(partidoId: string, incidenteId: strin
     const liveState = liveSnap.data() as LiveState;
     const sancion = sancionSnap.data() as Incidente;
 
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (sancion.equipo !== "rival") throw new Error("Esta acción es solo para sanciones del rival");
     if ((partido.estado !== "en_juego" && partido.estado !== "entretiempo") || !liveState.periodo) {
       throw new Error("El partido no está en juego");
@@ -1433,13 +1422,12 @@ export async function reemplazarJugadorFormacion(
   const { partidoRef } = refs(partidoId);
   const viejoRef = partidoRef.collection("plantel").doc(viejoJugadorId);
   const nuevoRef = partidoRef.collection("plantel").doc(nuevoJugadorId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const [partidoSnap, viejoSnap, nuevoSnap] = await Promise.all([tx.get(partidoRef), tx.get(viejoRef), tx.get(nuevoRef)]);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "programado") throw new Error("Solo se puede editar la formación antes de que arranque el partido");
     if (!viejoSnap.exists) throw new Error("Ese jugador no está en la formación");
     if (viejoJugadorId === nuevoJugadorId) throw new Error("Elegí un jugador distinto");
@@ -1483,13 +1471,12 @@ export async function reemplazarJugadorFormacion(
 export async function publicarFormacion(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef } = refs(partidoId);
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
 
   await adminDb.runTransaction(async (tx) => {
     const partidoSnap = await tx.get(partidoRef);
     if (!partidoSnap.exists) throw new Error("Partido no encontrado");
     const partido = partidoSnap.data() as Partido;
-    if (!puedeOperarCategoria(session, partido.categoriaId, esPartidoDePrueba)) throw new Error("No autorizado");
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
     if (partido.estado !== "programado") throw new Error("Solo se puede publicar la formación de un partido que no arrancó");
     tx.update(partidoRef, { formacionPublicada: true, updatedAt: FieldValue.serverTimestamp() });
   });
@@ -1539,7 +1526,7 @@ export async function registrarPresencia(partidoId: string): Promise<void> {
   const { partidoRef } = refs(partidoId);
   const snap = await partidoRef.get();
   if (!snap.exists) return;
-  if (!puedeOperarCategoria(session, (snap.data() as Partido).categoriaId, PARTIDOS_DEMO_IDS.includes(partidoId))) return;
+  if (!puedeOperarCategoria(session, (snap.data() as Partido).categoriaId, partidoId)) return;
   await partidoRef.collection("presencia").doc(session.cuentaId).set({
     username: session.username,
     actualizadoEn: FieldValue.serverTimestamp(),
@@ -1565,13 +1552,13 @@ export async function borrarPresencia(partidoId: string): Promise<void> {
  */
 export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> {
   const session = await getSession();
-  if (!PARTIDOS_DEMO_IDS.includes(partidoDemoId)) throw new Error("Ese partido no se puede resetear");
+  if (!esIdDePartidoPrueba(partidoDemoId)) throw new Error("Ese partido no se puede resetear");
 
   const partidoRef = adminDb.collection("partidos").doc(partidoDemoId);
   const partidoSnap = await partidoRef.get();
   if (!partidoSnap.exists) throw new Error("El partido de prueba no existe");
   const partido = partidoSnap.data() as Partido;
-  if (!puedeResetearPartidoDePrueba(session, partido.categoriaId)) throw new Error("No autorizado");
+  if (!puedeResetearPartidoDePrueba(session, partido.categoriaId, partidoDemoId)) throw new Error("No autorizado");
 
   const [plantelSnap, incidentesSnap] = await Promise.all([
     partidoRef.collection("plantel").get(),
@@ -1644,7 +1631,7 @@ export async function reiniciarPartido(partidoId: string): Promise<void> {
   ]);
 
   const batch = adminDb.batch();
-  const esPartidoDePrueba = PARTIDOS_DEMO_IDS.includes(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
 
   const originales = plantelSnap.docs.filter((d) => !d.data().agregadoEnVivo);
   const agregados = plantelSnap.docs.filter((d) => d.data().agregadoEnVivo);

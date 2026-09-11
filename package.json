@@ -24,6 +24,8 @@
     "seed-test-cambio": "tsx src/scripts/seed-test-cambio.ts",
     "seed-test-cambio-juveniles": "tsx src/scripts/seed-test-cambio-juveniles.ts",
     "seed-test-beromama": "tsx src/scripts/seed-test-beromama.ts",
+    "seed-cuenta-demo": "tsx src/scripts/seed-cuenta-demo.ts",
+    "limpiar-practicas-demo": "tsx src/scripts/limpiar-practicas-demo.ts",
     "migrate-historical": "tsx src/scripts/migrate-historical.ts",
     "migrate-m15-fecha1": "tsx src/scripts/migrate-juveniles-m15-fecha1.ts",
     "migrate-m15-fecha2": "tsx src/scripts/migrate-juveniles-m15-fecha2.ts",

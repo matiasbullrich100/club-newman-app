@@ -2,7 +2,7 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { esHoyEnArgentina, fechaIsoEsHoyEnArgentina, hoyIsoEnArgentina } from "@/lib/fecha";
 import { CATEGORIAS, NUMERO_FECHAS_SUPERIOR, NUMERO_FECHAS_JUVENILES, grupoDeCategoria, partidoId } from "@/lib/categorias";
-import { PARTIDOS_DEMO_IDS, pruebasVisiblesPara } from "@/lib/partidosPrueba";
+import { esIdDePartidoPrueba, pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import type { Partido, Resultado } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 
@@ -43,7 +43,7 @@ function comoNumero(numeroFecha: Partido["numeroFecha"]): number {
  * compuesto: se trae "estado==terminado" y "notaEspecial==Fecha libre" enteros (el volumen de
  * partidos de este club es chico) y se filtra/agrupa en memoria.
  *
- * `session`: los partidos de prueba (PARTIDOS_DEMO_IDS) reusan a proposito el categoriaId de una
+ * `session`: los partidos de prueba (PARTIDO_PRUEBA_BASES) reusan a proposito el categoriaId de una
  * division real, para poder practicar/probar colisiones -- pero este resumen lo ve CUALQUIERA que
  * entre a /categoria, /superior o /juveniles, sin login. Si alguien esta practicando un partido de
  * prueba mientras el resto mira el sitio (ej. un sabado de Primera), nadie que no sea quien
@@ -63,7 +63,7 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ses
 
   const enVivo = enVivoSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
-    .filter((p) => idsSet.has(p.categoriaId) && (puedeVerPruebas || !PARTIDOS_DEMO_IDS.includes(p.id)));
+    .filter((p) => idsSet.has(p.categoriaId) && (puedeVerPruebas || !esIdDePartidoPrueba(p.id)));
 
   const terminados = terminadosSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
