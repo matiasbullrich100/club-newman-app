@@ -35,6 +35,36 @@ export default function PartidoTerminadoPanel({
 
   return (
     <>
+      {mostrarReset && (
+        <div
+          style={{
+            background: "linear-gradient(160deg, rgba(226,197,120,.25), rgba(0,0,0,.2))",
+            border: `2px solid ${DORADO}`,
+            borderRadius: 16,
+            padding: "22px 18px",
+            marginBottom: 16,
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: "2.6rem", lineHeight: 1 }}>🎓</div>
+          <p
+            style={{
+              margin: "12px 0 0",
+              fontSize: "1.15rem",
+              fontWeight: 800,
+              color: DORADO,
+              lineHeight: 1.3,
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+            }}
+          >
+            Para recibir el diploma de
+            <br />
+            Designado Aprobado
+          </p>
+          <p style={{ margin: "8px 0 0", fontSize: "0.95rem", color: DORADO_SUAVE }}>Reseteá el partido al final de la página</p>
+        </div>
+      )}
       <PartidoHistorico
         partido={partido}
         plantel={plantel}
@@ -76,23 +106,6 @@ export default function PartidoTerminadoPanel({
             enCanchaIds={partido.enCanchaIds}
             soloEnCancha={false}
           />
-        </div>
-      )}
-      {mostrarReset && (
-        <div
-          style={{
-            background: "linear-gradient(160deg, rgba(226,197,120,.14), rgba(0,0,0,.15))",
-            border: `1px solid ${DORADO}`,
-            borderRadius: 12,
-            padding: "12px 16px",
-            marginBottom: 10,
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: 0, fontSize: "0.82rem", color: DORADO_SUAVE, lineHeight: 1.4 }}>
-            🎓 Para recibir el diploma de <b style={{ color: DORADO }}>Designado Aprobado</b>, reseteá el partido al final de la
-            página.
-          </p>
         </div>
       )}
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
