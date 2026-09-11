@@ -19,6 +19,7 @@ interface PartidoManana {
   categoriaId: string;
   categoriaNombre: string;
   partido: PartidoDeFecha;
+  crucesHref?: string;
   posicionesHref?: string;
   fixtureNewmanHref: string;
   fixtureDivisionHref?: string;
@@ -31,7 +32,7 @@ interface PartidoManana {
 export default function PartidosMananaBanner({ partidos }: { partidos: PartidoManana[] }) {
   return (
     <>
-      {partidos.map(({ categoriaId, categoriaNombre, partido, posicionesHref, fixtureNewmanHref, fixtureDivisionHref }) => (
+      {partidos.map(({ categoriaId, categoriaNombre, partido, crucesHref, posicionesHref, fixtureNewmanHref, fixtureDivisionHref }) => (
         <div
           key={categoriaId}
           style={{
@@ -73,7 +74,12 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
               {partido.notaEspecial ? "" : partido.jugado ? "Final" : partido.hora}
             </span>
           </Link>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 6, marginTop: 6 }}>
+            {crucesHref && (
+              <Link href={crucesHref} style={botonChico}>
+                Cruces
+              </Link>
+            )}
             {posicionesHref && (
               <Link href={posicionesHref} style={botonChico}>
                 Tabla

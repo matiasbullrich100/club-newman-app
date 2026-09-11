@@ -88,6 +88,56 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
+      {fpOrden.length > 0 && (
+        <div>
+          <h3 style={subtitulo}>Lo que le queda a cada uno</h3>
+          <p style={ayuda}>
+            Cada fila es un equipo; las columnas son las fechas que faltan, en orden. <b>L</b> = de local, <b>V</b> = de
+            visitante. Se lee de izquierda a derecha = el fixture que le queda a ese equipo.
+          </p>
+          <div style={{ overflowX: "auto", border: `1px solid ${BORDE}`, borderRadius: 8 }}>
+            <table style={{ borderCollapse: "collapse", whiteSpace: "nowrap" }}>
+              <thead>
+                <tr>
+                  <th style={{ ...th, zIndex: 3 }}>Equipo</th>
+                  {fpOrden.map((nf) => (
+                    <th key={nf} style={{ fontSize: "0.62rem", fontWeight: 700, color: DORADO, background: NEGRO_JUGADA, padding: "4px 6px", border: "1px solid rgba(255,255,255,.12)" }}>
+                      F{nf}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {equipos.map((eq) => (
+                  <tr key={eq}>
+                    <th style={{ ...th, color: esPropio(eq) ? DORADO : DORADO_SUAVE }}>{eq}</th>
+                    {fpOrden.map((nf) => {
+                      const g = runin.get(eq)?.get(nf);
+                      const base: React.CSSProperties = {
+                        minWidth: 78,
+                        height: 28,
+                        fontSize: "0.66rem",
+                        textAlign: "center",
+                        border: "1px solid rgba(255,255,255,.12)",
+                        outline: esPropio(eq) ? `2px solid ${DORADO}` : undefined,
+                        outlineOffset: -2,
+                      };
+                      if (!g) return <td key={nf} style={{ ...base, color: "rgba(255,255,255,.35)" }}>—</td>;
+                      if (g.libre) return <td key={nf} style={{ ...base, color: DORADO_SUAVE, fontStyle: "italic" }}>Libre</td>;
+                      return (
+                        <td key={nf} style={{ ...base, background: g.local ? FONDO_PROPIO : "rgba(255,255,255,.04)", fontStyle: g.local ? "normal" : "italic" }}>
+                          {g.opp} {g.local ? "(L)" : "(V)"}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div>
         <h3 style={subtitulo}>Cruces</h3>
         <p style={ayuda}>
@@ -162,56 +212,6 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
           </table>
         </div>
       </div>
-
-      {fpOrden.length > 0 && (
-        <div>
-          <h3 style={subtitulo}>Lo que le queda a cada uno</h3>
-          <p style={ayuda}>
-            Cada fila es un equipo; las columnas son las fechas que faltan, en orden. <b>L</b> = de local, <b>V</b> = de
-            visitante. Se lee de izquierda a derecha = el fixture que le queda a ese equipo.
-          </p>
-          <div style={{ overflowX: "auto", border: `1px solid ${BORDE}`, borderRadius: 8 }}>
-            <table style={{ borderCollapse: "collapse", whiteSpace: "nowrap" }}>
-              <thead>
-                <tr>
-                  <th style={{ ...th, zIndex: 3 }}>Equipo</th>
-                  {fpOrden.map((nf) => (
-                    <th key={nf} style={{ fontSize: "0.62rem", fontWeight: 700, color: DORADO, background: NEGRO_JUGADA, padding: "4px 6px", border: "1px solid rgba(255,255,255,.12)" }}>
-                      F{nf}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {equipos.map((eq) => (
-                  <tr key={eq}>
-                    <th style={{ ...th, color: esPropio(eq) ? DORADO : DORADO_SUAVE }}>{eq}</th>
-                    {fpOrden.map((nf) => {
-                      const g = runin.get(eq)?.get(nf);
-                      const base: React.CSSProperties = {
-                        minWidth: 78,
-                        height: 28,
-                        fontSize: "0.66rem",
-                        textAlign: "center",
-                        border: "1px solid rgba(255,255,255,.12)",
-                        outline: esPropio(eq) ? `2px solid ${DORADO}` : undefined,
-                        outlineOffset: -2,
-                      };
-                      if (!g) return <td key={nf} style={{ ...base, color: "rgba(255,255,255,.35)" }}>—</td>;
-                      if (g.libre) return <td key={nf} style={{ ...base, color: DORADO_SUAVE, fontStyle: "italic" }}>Libre</td>;
-                      return (
-                        <td key={nf} style={{ ...base, background: g.local ? FONDO_PROPIO : "rgba(255,255,255,.04)", fontStyle: g.local ? "normal" : "italic" }}>
-                          {g.opp} {g.local ? "(L)" : "(V)"}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
 
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: "0.7rem", color: CREMA, alignItems: "center" }}>
         <Swatch color={VERDE} txt="Ganó de local" />

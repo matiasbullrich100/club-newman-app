@@ -176,6 +176,7 @@ export default async function PlantelSuperiorPage() {
     categoriaId: p.categoriaId,
     categoriaNombre: CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId,
     partido: p,
+    crucesHref: tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/cruces` : undefined,
     posicionesHref: TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined,
     fixtureNewmanHref: `/categoria/${p.categoriaId}/fixture`,
     fixtureDivisionHref: tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined,
