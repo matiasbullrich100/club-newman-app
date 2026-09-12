@@ -4,6 +4,7 @@ import CargaIncidencia from "./panel-designado/CargaIncidencia";
 import CargaCambio from "./panel-designado/CargaCambio";
 import ResetDemoButton from "./ResetDemoButton";
 import ReiniciarPartidoButton from "./ReiniciarPartidoButton";
+import Retomar2TButton from "./Retomar2TButton";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import type { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
 
@@ -31,7 +32,8 @@ export default function PartidoTerminadoPanel({
   fixtureNewmanHref?: string;
   fixtureDivisionHref?: string;
 }) {
-  const { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos } = datos;
+  const { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos, terminoEn2T } =
+    datos;
 
   return (
     <>
@@ -109,6 +111,7 @@ export default function PartidoTerminadoPanel({
         </div>
       )}
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
+      {puedeOperar && terminoEn2T && <Retomar2TButton partidoId={partidoId} />}
       {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
     </>
   );

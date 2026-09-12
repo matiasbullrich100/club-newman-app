@@ -419,6 +419,85 @@ export async function terminarPartido(partidoId: string): Promise<void> {
 }
 
 /**
+ * Deshace un "Terminar partido" que se apreto por error mientras todavia quedaba 2do tiempo por
+ * jugar -- vuelve de "terminado" a "en_juego" en el 2do tiempo, con el reloj retomando desde donde
+ * estaba al terminar (no cuenta el rato que estuvo frenado). Solo si el partido termino durante el
+ * 2do tiempo (si termino en el 1er tiempo o en el entretiempo antes de arrancar el 2do, esto no
+ * aplica). Borra el incidente "fin_partido" mas reciente para que el feed no muestre un final que
+ * no fue, y revierte el increment de minutosJugadosTotal que hizo terminarPartido (recalculado con
+ * los mismos cambios y duraciones que uso), para que no quede sumado doble cuando el partido se
+ * termine de verdad mas adelante.
+ */
+export async function retomar2T(partidoId: string): Promise<void> {
+  const session = await getSession();
+  const { partidoRef, liveStateRef } = refs(partidoId);
+  const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [partidoSnap, liveSnap, plantelSnap, incidentesSnap] = await Promise.all([
+      tx.get(partidoRef),
+      tx.get(liveStateRef),
+      tx.get(partidoRef.collection("plantel")),
+      tx.get(partidoRef.collection("incidentes")),
+    ]);
+    if (!partidoSnap.exists || !liveSnap.exists) throw new Error("Partido no encontrado");
+    const partido = partidoSnap.data() as Partido;
+    const liveState = liveSnap.data() as LiveState;
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
+    if (partido.estado !== "terminado" || liveState.periodo !== "2T") {
+      throw new Error("Solo se puede reiniciar el 2do tiempo de un partido que termino durante el 2do tiempo");
+    }
+
+    const incidentes = incidentesSnap.docs;
+    let ultimoFinPartido: FirebaseFirestore.QueryDocumentSnapshot | undefined;
+    for (const d of incidentes) {
+      if ((d.data() as Incidente).tipo !== "fin_partido") continue;
+      const t = (d.data().createdAt as Timestamp | undefined)?.toMillis?.() ?? 0;
+      const tUlt = (ultimoFinPartido?.data().createdAt as Timestamp | undefined)?.toMillis?.() ?? -1;
+      if (!ultimoFinPartido || t > tUlt) ultimoFinPartido = d;
+    }
+    if (ultimoFinPartido) tx.delete(ultimoFinPartido.ref);
+
+    if (!esPartidoDePrueba) {
+      const plantel: JugadorInput[] = plantelSnap.docs.map((d) => ({
+        jugadorId: d.id,
+        titular: (d.data() as JugadorPartido).titular,
+      }));
+      const cambios: CambioEvento[] = incidentes
+        .map((d) => d.data() as Incidente)
+        .filter((data) => data.tipo === "cambio")
+        .map((data) => ({
+          periodo: data.periodo,
+          minuto: data.minuto,
+          jugadorSaleId: data.jugadorSaleId,
+          jugadorEntraId: data.jugadorEntraId,
+        }));
+      const period1DurationMin = (liveState.period1DurationSeconds ?? 0) / 60;
+      const period2DurationMin = (liveState.period2DurationSeconds ?? 0) / 60;
+      const minutos = calcularMinutos(plantel, cambios, period1DurationMin, period2DurationMin);
+      for (const jugador of plantel) {
+        const m = minutos[jugador.jugadorId];
+        tx.set(
+          adminDb.collection("jugadores").doc(jugador.jugadorId),
+          { minutosJugadosTotal: FieldValue.increment(-(m.minutos1T + m.minutos2T)) },
+          { merge: true }
+        );
+      }
+    }
+
+    tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
+    tx.update(liveStateRef, {
+      clockRunning: true,
+      clockAnchor: Timestamp.now(),
+      period2DurationSeconds: FieldValue.delete(),
+    });
+  });
+
+  revalidatePath(`/partido/${partidoId}`);
+  revalidatePath("/");
+}
+
+/**
  * Walkover: el equipo indicado no presento primera linea (3 jugadores entrenados para el
  * scrum -- pilar, hooker, pilar) y pierde el partido por default 0-8. Termina el partido en el
  * acto, sea cual sea su estado previo (incluso "programado", si todavia no arranco). No calcula

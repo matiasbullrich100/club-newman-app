@@ -5,7 +5,7 @@ import { grupoDeCategoria } from "@/lib/categorias";
 import { FAMILIA_TARJETA } from "@/lib/incidentes";
 import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import { apellidosAmbiguos, ordenarPorDorsal } from "@/lib/players";
-import type { Incidente, JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
+import type { Incidente, JugadorAgregado, JugadorPartido, LiveState, Partido } from "@/types/firestore";
 import type { SessionPayload } from "@/lib/auth/session";
 
 // Todo lo que necesita PartidoTerminadoPanel para un partido "terminado" (formacion, incidencias
@@ -19,7 +19,7 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     grupo.grupo === "superior"
       ? adminDb.collection("jugadores").where("grupo", "==", "superior")
       : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
-  const [plantelSnap, incidentesSnap, jugadoresSnap, jugadoresClubSnap] = await Promise.all([
+  const [plantelSnap, incidentesSnap, jugadoresSnap, jugadoresClubSnap, liveStateSnap] = await Promise.all([
     partidoRef.collection("plantel").get(),
     partidoRef.collection("incidentes").orderBy("createdAt").get(),
     jugadoresQuery.get(),
@@ -27,6 +27,7 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     // uno en Plantel, otro en Juveniles) siguen siendo ambiguos para quien lee el feed. Ver
     // apellidosAmbiguos() en lib/players.ts.
     adminDb.collection("jugadores").get(),
+    partidoRef.collection("liveState").doc("state").get(),
   ]);
 
   const plantelCompleto = jugadoresSnap.docs.map((d) => ({
@@ -74,6 +75,19 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, partidoId);
   const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId, partidoId);
   const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
+  // Si termino durante el 2do tiempo (por "Terminar partido" apretado de mas antes de tiempo), se
+  // ofrece "Reiniciar 2do tiempo" -- ver retomar2T() en actions.ts.
+  const terminoEn2T = (liveStateSnap.data() as LiveState | undefined)?.periodo === "2T";
 
-  return { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos: ambiguos };
+  return {
+    plantel,
+    plantelCompleto,
+    incidentes,
+    puedeOperar,
+    puedeReiniciar,
+    esPartidoDePrueba,
+    mostrarReset,
+    apellidosAmbiguos: ambiguos,
+    terminoEn2T,
+  };
 }
