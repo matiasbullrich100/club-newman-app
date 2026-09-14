@@ -136,8 +136,8 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                     {fpOrden.map((nf) => {
                       const g = runin.get(eq)?.get(nf);
                       const base: React.CSSProperties = {
-                        minWidth: 78,
-                        height: 28,
+                        minWidth: todasLasFechas ? 84 : 78,
+                        height: todasLasFechas ? 40 : 28,
                         fontSize: "0.66rem",
                         textAlign: "center",
                         border: "1px solid rgba(255,255,255,.12)",
@@ -150,9 +150,12 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                       if (g.tipo === "jugado") {
                         const fondo = g.gf > g.gc ? VERDE : g.gf < g.gc ? ROJO : GRIS;
                         return (
-                          <td key={nf} style={{ ...base, background: fondo }}>
-                            {g.gf}-{g.gc}
-                            {g.bonus && <b style={{ color: DORADO }}>·</b>} <span style={{ opacity: 0.7 }}>{g.local ? "(L)" : "(V)"}</span>
+                          <td key={nf} style={{ ...base, background: fondo, padding: "3px 4px" }}>
+                            <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>{g.opp}</div>
+                            <div>
+                              {g.gf}-{g.gc}
+                              {g.bonus && <b style={{ color: DORADO }}>·</b>} <span style={{ opacity: 0.7 }}>{g.local ? "(L)" : "(V)"}</span>
+                            </div>
                           </td>
                         );
                       }
