@@ -69,16 +69,21 @@ export default async function EquipoJuvenilesPage({
       {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={equipoId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
-      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
         {tienePosiciones && (
           <Link href={`/posiciones/${equipoId}`} replace style={botonEstilo}>
             Tabla
           </Link>
         )}
         {tieneFixtureDivision(equipoId) && (
-          <Link href={`/fixture/${equipoId}/division`} replace style={botonEstilo}>
-            Fixt Divis.
-          </Link>
+          <>
+            <Link href={`/fixture/${equipoId}/division`} replace style={botonEstilo}>
+              Fixt Divis.
+            </Link>
+            <Link href={`/fixture/${equipoId}/cruces`} replace style={botonEstilo}>
+              Cruces
+            </Link>
+          </>
         )}
       </div>
 

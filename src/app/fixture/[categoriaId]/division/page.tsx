@@ -81,11 +81,9 @@ export default async function FixtureDivisionPickerPage({ params }: { params: Pr
         <Link href={fixtureNewmanHref} replace style={botonEstilo}>
           Fixt. Newm.
         </Link>
-        {grupo.grupo === "superior" && (
-          <Link href={`/fixture/${categoriaId}/cruces`} replace style={botonEstilo}>
-            Cruces
-          </Link>
-        )}
+        <Link href={`/fixture/${categoriaId}/cruces`} replace style={botonEstilo}>
+          Cruces
+        </Link>
       </div>
 
       {posiciones && (

@@ -28,23 +28,27 @@ const botonEstilo: React.CSSProperties = {
 };
 const botonActivo: React.CSSProperties = { ...botonEstilo, background: DORADO, color: TINTA, border: `1px solid ${DORADO}` };
 
-const esCrucesCat = (id: string) => tieneFixtureDivision(id) && grupoDeCategoria(id).grupo === "superior";
-
 // Vista "Cruces" -- grilla de doble entrada (quién jugó contra quién y cómo salió) + "lo que le
 // queda a cada uno, en orden". 4ª vista alternativa de la división, al lado de Tabla / Fixt. Newm.
-// / Fixt División. Solo Plantel Superior.
+// / Fixt División. Plantel Superior y Juveniles (cada letra tiene su propia zona en URBA -- ver
+// CATEGORIAS_CON_FIXTURE_DIVISION en lib/fixtureDivision.ts).
 export default async function CrucesPage({ params }: { params: Promise<{ categoriaId: string }> }) {
   const { categoriaId } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
-  if (!categoria || !tieneFixtureDivision(categoriaId) || grupoDeCategoria(categoriaId).grupo !== "superior") notFound();
+  if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
 
   const [session, fechas] = await Promise.all([getSession(), fixtureDivisionCompleto(categoriaId)]);
   const tienePosiciones = TORNEOS_URBA[categoriaId] !== undefined;
-  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/cruces`, esCrucesCat);
+  const tiraEquipos = equiposParaTira(categoriaId, (id) => `/fixture/${id}/cruces`, tieneFixtureDivision);
+  const grupo = grupoDeCategoria(categoriaId);
+  // "Resumen del partido" -- mismo hub del que se llega aca, tanto de vuelta (BackLink) como para
+  // el boton de "Fixt. Newm." en si -- ver mismo comentario en /fixture/[categoriaId]/division.
+  const hubHref = grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
+  const fixtureNewmanHref = grupo.grupo === "juveniles" ? hubHref : `/categoria/${categoriaId}/fixture`;
 
   return (
     <main style={{ maxWidth: 640, margin: "0 auto", padding: "54px 16px 40px" }}>
-      <BackLink href={`/categoria/${categoriaId}`} />
+      <BackLink href={hubHref} />
       <SessionBar session={session} />
       <Header />
 
@@ -62,7 +66,7 @@ export default async function CrucesPage({ params }: { params: Promise<{ categor
             Tabla
           </Link>
         )}
-        <Link href={`/categoria/${categoriaId}/fixture`} replace style={botonEstilo}>
+        <Link href={fixtureNewmanHref} replace style={botonEstilo}>
           Fixt. Newm.
         </Link>
         <Link href={`/fixture/${categoriaId}/division`} replace style={botonEstilo}>
