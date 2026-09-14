@@ -53,7 +53,10 @@ const pastilla: React.CSSProperties = {
   borderRadius: 20,
 };
 
-export default function Buscador() {
+// `flotante`: la pastilla se posiciona sola (fixed, mismo lugar que el stack Inicio/Atrás) --
+// para paginas sin BackLink (ej. Home). En el resto, va apilada adentro del `<div position:fixed>`
+// que ya arma BackLink, asi que no necesita posicionarse por su cuenta.
+export default function Buscador({ flotante = false }: { flotante?: boolean }) {
   const [abierto, setAbierto] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -79,9 +82,17 @@ export default function Buscador() {
 
   return (
     <>
-      <button onClick={abrir} style={pastilla} aria-label="Buscar">
-        🔍 Buscar
-      </button>
+      {flotante ? (
+        <div style={{ position: "fixed", top: 12, left: 12, zIndex: 100 }}>
+          <button onClick={abrir} style={pastilla} aria-label="Buscar">
+            🔍 Buscar
+          </button>
+        </div>
+      ) : (
+        <button onClick={abrir} style={pastilla} aria-label="Buscar">
+          🔍 Buscar
+        </button>
+      )}
 
       {abierto && (
         <div

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
+import Buscador from "@/components/Buscador";
 import InstalarApp from "@/components/InstalarApp";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
@@ -30,6 +31,7 @@ export default async function Home() {
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
+      <Buscador flotante />
       <Header tituloHome />
       <SessionBar session={session} />
 
