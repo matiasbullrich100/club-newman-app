@@ -64,10 +64,8 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
           bonus: !!p.bonusLocal,
           nf: f.numeroFecha,
         });
-        if (todasLasFechas) {
-          setRun(p.local, f.numeroFecha, { tipo: "jugado", opp: p.visitante, local: true, gf: p.golesLocal, gc: p.golesVisitante, bonus: !!p.bonusLocal });
-          setRun(p.visitante, f.numeroFecha, { tipo: "jugado", opp: p.local, local: false, gf: p.golesVisitante, gc: p.golesLocal, bonus: !!p.bonusVisitante });
-        }
+        setRun(p.local, f.numeroFecha, { tipo: "jugado", opp: p.visitante, local: true, gf: p.golesLocal, gc: p.golesVisitante, bonus: !!p.bonusLocal });
+        setRun(p.visitante, f.numeroFecha, { tipo: "jugado", opp: p.local, local: false, gf: p.golesVisitante, gc: p.golesLocal, bonus: !!p.bonusVisitante });
       } else {
         pendientes.set(key(p.local, p.visitante), f.numeroFecha);
         fechasPendientes.add(f.numeroFecha);
@@ -76,7 +74,13 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
       }
     }
   }
-  const fpOrden = [...(todasLasFechas ? fechasTodas : fechasPendientes)].sort((a, b) => a - b);
+  // En Plantel Superior (no todasLasFechas) se suma la ULTIMA fecha ya jugada antes de la primera
+  // pendiente -- no solo "lo que falta", tambien de donde viene cada equipo, para ver la evolucion
+  // de un vistazo (pedido explicito: "que la f22 sea con los resultados").
+  const minPendiente = fechasPendientes.size > 0 ? Math.min(...fechasPendientes) : undefined;
+  const fechaAnterior = minPendiente && minPendiente > 1 && fechasTodas.has(minPendiente - 1) ? minPendiente - 1 : undefined;
+  const columnasSuperior = fechaAnterior !== undefined ? [fechaAnterior, ...fechasPendientes] : [...fechasPendientes];
+  const fpOrden = (todasLasFechas ? [...fechasTodas] : columnasSuperior).sort((a, b) => a - b);
 
   const th: React.CSSProperties = {
     position: "sticky",
@@ -100,18 +104,21 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
     position: "relative",
   };
 
+  const hayJugadas = todasLasFechas || fechaAnterior !== undefined;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
       {fpOrden.length > 0 && (
         <div>
           <h3 style={subtitulo}>{todasLasFechas ? "Fixture de cada equipo" : "Lo que le queda a cada uno"}</h3>
           <p style={ayuda}>
-            Cada fila es un equipo; las columnas son {todasLasFechas ? "todas las fechas, en orden" : "las fechas que faltan, en orden"}.{" "}
+            Cada fila es un equipo; las columnas son{" "}
+            {todasLasFechas ? "todas las fechas, en orden" : fechaAnterior !== undefined ? "la última fecha jugada más las que faltan, en orden" : "las fechas que faltan, en orden"}.{" "}
             <b>L</b> = de local, <b>V</b> = de visitante.
-            {todasLasFechas ? (
+            {hayJugadas ? (
               <>
                 {" "}
-                Las ya jugadas muestran el resultado (<b style={{ color: DORADO }}>·</b> = punto bonus).
+                Las ya jugadas muestran el resultado (<b style={{ color: DORADO }}>·</b> = punto bonus){todasLasFechas ? "." : ", para ver la evolución."}
               </>
             ) : (
               " Se lee de izquierda a derecha = el fixture que le queda a ese equipo."
@@ -136,8 +143,8 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                     {fpOrden.map((nf) => {
                       const g = runin.get(eq)?.get(nf);
                       const base: React.CSSProperties = {
-                        minWidth: todasLasFechas ? 84 : 78,
-                        height: todasLasFechas ? 40 : 28,
+                        minWidth: hayJugadas ? 84 : 78,
+                        height: hayJugadas ? 40 : 28,
                         fontSize: "0.66rem",
                         textAlign: "center",
                         border: "1px solid rgba(255,255,255,.12)",
