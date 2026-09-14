@@ -43,6 +43,36 @@ function BotonesLetraMini() {
   );
 }
 
+function BarraEquiposMini() {
+  const equipos = ["PRIMERA", "INTER", "PRE A", "PRE B", "M-22"];
+  const activo = "INTER";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }} aria-hidden="true">
+      <div style={{ display: "flex", gap: 5 }}>
+        {equipos.map((eq) => (
+          <span
+            key={eq}
+            style={{
+              padding: "6px 10px",
+              borderRadius: 999,
+              fontSize: "0.6rem",
+              fontWeight: 700,
+              letterSpacing: 0.5,
+              whiteSpace: "nowrap",
+              border: `1px solid ${eq === activo ? DORADO : "rgba(226,197,120,.4)"}`,
+              background: eq === activo ? DORADO : "transparent",
+              color: eq === activo ? TINTA : DORADO_SUAVE,
+            }}
+          >
+            {eq}
+          </span>
+        ))}
+      </div>
+      <span style={{ fontSize: "1.3rem", color: DORADO_SUAVE }}>↔</span>
+    </div>
+  );
+}
+
 function FlechasFecha() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }} aria-hidden="true">
@@ -71,64 +101,60 @@ function TelefonoGirar() {
   );
 }
 
-const TIPS: { numero: number; id: string; texto: React.ReactNode; visual?: React.ReactNode }[] = [
+// `activo: false` = queda en el codigo pero no se muestra (por si se quiere reactivar despues,
+// sin tener que volver a escribirlo). El numero visible (#1, #2...) sale del orden entre los
+// ACTIVOS, no de esta lista completa -- asi no quedan huecos cuando algunos estan apagados.
+const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; activo?: boolean }[] = [
   {
-    numero: 1,
     id: "tabla-cruces",
-    texto:
-      'NUEVO: en Plantel Superior, el botón "Cruces" muestra la tabla de doble entrada (quién jugó contra quién y cómo salió) y lo que le queda a cada equipo, en orden.',
+    texto: "CRUCES: qué le queda a cada uno !",
   },
   {
-    numero: 2,
     id: "tamano-letra",
-    texto: "Agrandá y achicá la letra con los botones de abajo a la derecha.",
+    texto: "Agrandá y achicá la letra.",
     visual: <BotonesLetraMini />,
   },
   {
-    numero: 3,
     id: "telefono-horizontal",
-    texto: "Con el teléfono horizontal, la info se ve MUCHO mejor !!!",
+    texto: "Acostá el teléfono y la tabla se ve MUCHO mejor !!!",
     visual: <TelefonoGirar />,
   },
   {
-    numero: 4,
     id: "barra-equipos",
-    texto:
-      "En cada equipo podés usar la barra para navegar por los equipos: Primera a Pre A y a Pre E y a Inter. M19 B a M19 D y a M19 A.",
+    texto: "Pasá de equipo en equipo.",
+    visual: <BarraEquiposMini />,
   },
   {
-    numero: 5,
     id: "resumen-ultima-fecha",
     texto: 'Para ver TODOS los resultados de una fecha, entrá a "Fixt División" (o al fixture del equipo) y elegí la fecha.',
+    activo: false,
   },
   {
-    numero: 6,
     id: "fixt-newman",
     texto: "Fixture Newman tiene TODOS los resultados pasados del torneo.",
+    activo: false,
   },
   {
-    numero: 7,
     id: "fixt-division",
     texto: "Fixture División tiene los resultados de todas las fechas !!!!",
+    activo: false,
   },
   {
-    numero: 8,
     id: "fixt-flechas",
     texto: "En Fixture podés adelantar o atrasar de una fecha a la otra con las flechas.",
     visual: <FlechasFecha />,
+    activo: false,
+  },
+  {
+    id: "buscador",
+    texto: 'Nuevo botón "Buscar" para ir directo a lo que querés ver.',
   },
 ];
 
-// Hasta el lunes 2026-09-14 06:00 ART mostramos SOLO 2 tips: la tabla nueva de Cruces y "acostá el
-// teléfono". Así el anuncio de Cruces no queda tapado por el resto. Desde el lunes vuelven todos.
-const TIPS_REDUCIDOS_HASTA = Date.parse("2026-09-14T06:00:00-03:00");
-const TIPS_ACTIVOS =
-  Date.now() < TIPS_REDUCIDOS_HASTA
-    ? TIPS.filter((t) => t.id === "tabla-cruces" || t.id === "telefono-horizontal")
-    : TIPS;
+const TIPS_ACTIVOS = TIPS.filter((t) => t.activo !== false).map((t, i) => ({ ...t, numero: i + 1 }));
 
 export default function EnJuegoTips() {
-  const [cola, setCola] = useState<typeof TIPS>([]); // tips elegibles, en orden
+  const [cola, setCola] = useState<typeof TIPS_ACTIVOS>([]); // tips elegibles, en orden
   const [idx, setIdx] = useState(0);
   const yaCorrio = useRef(false); // React StrictMode invoca el effect 2 veces en dev: no consumir 2 tips
 
