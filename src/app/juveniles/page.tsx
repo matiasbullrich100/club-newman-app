@@ -78,9 +78,9 @@ export default async function JuvenilesPage() {
                   inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
                   nombreNewman={nombreNewmanDe(p.categoriaId)}
                   esPrueba={esIdDePartidoPrueba(p.id)}
+                  crucesHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/cruces` : undefined}
                   posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
                   fixtureNewmanHref={`/juveniles/${equipo.edadId}/equipo/${p.categoriaId}`}
-                  fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
                 />
               ),
             };
@@ -95,9 +95,9 @@ export default async function JuvenilesPage() {
                 categoriaNombre={equipo.nombre}
                 proxima={proxima}
                 nombreNewman={nombreNewmanDe(equipo.id)}
+                crucesHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/cruces` : undefined}
                 posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
                 fixtureHref={`/juveniles/${equipo.edadId}/equipo/${equipo.id}`}
-                fixtureDivisionHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/division` : undefined}
               />
             ),
           };
