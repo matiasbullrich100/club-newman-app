@@ -65,7 +65,7 @@ export default async function EquipoJuvenilesPage({
       </div>
 
       {/* Barra para saltar entre equipos de la edad sin volver atrás (ver equiposParaTira), en
-          todas las vistas hermanas (esta, Tabla, Fixt Divis. y el partido). */}
+          todas las vistas hermanas (esta, Tabla, Cruces y el partido). */}
       {tiraEquipos && <TiraEquipos equipos={tiraEquipos} actualId={equipoId} />}
 
       {/* replace, no push -- ver mismo comentario en /posiciones/[categoriaId] */}
@@ -76,14 +76,9 @@ export default async function EquipoJuvenilesPage({
           </Link>
         )}
         {tieneFixtureDivision(equipoId) && (
-          <>
-            <Link href={`/fixture/${equipoId}/division`} replace style={botonEstilo}>
-              Fixt Divis.
-            </Link>
-            <Link href={`/fixture/${equipoId}/cruces`} replace style={botonEstilo}>
-              Cruces
-            </Link>
-          </>
+          <Link href={`/fixture/${equipoId}/cruces`} replace style={botonEstilo}>
+            Cruces
+          </Link>
         )}
       </div>
 

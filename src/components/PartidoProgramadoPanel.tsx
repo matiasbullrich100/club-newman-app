@@ -21,6 +21,7 @@ export default function PartidoProgramadoPanel({
   posicionesActualizado,
   fixtureNewmanHref,
   fixtureDivisionHref,
+  crucesHref,
 }: {
   partidoId: string;
   partido: Partido;
@@ -30,6 +31,7 @@ export default function PartidoProgramadoPanel({
   // Solo se pasan en /partido/[id] -- ver mismo comentario en PartidoTerminadoPanel.
   fixtureNewmanHref?: string;
   fixtureDivisionHref?: string;
+  crucesHref?: string;
 }) {
   const {
     plantel,
@@ -58,6 +60,7 @@ export default function PartidoProgramadoPanel({
         posicionesActualizado={posicionesActualizado}
         fixtureNewmanHref={fixtureNewmanHref}
         fixtureDivisionHref={fixtureDivisionHref}
+        crucesHref={crucesHref}
         formacionPendientePublicar={ocultarFormacion}
       />
       {puedeOperar && !formacionPublicada && plantel.length > 0 && <PublicarFormacionButton partidoId={partidoId} />}

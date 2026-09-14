@@ -67,13 +67,18 @@ export default async function PartidoPage({
     : null;
   const posicionesHref = tienePosiciones ? `/posiciones/${partido.categoriaId}` : undefined;
 
-  // Mismos "Fixt. Newm." / "Fixt Divis." que ya aparecen en el resumen (LiveBanner/ProximaFechaRow)
-  // y en /categoria/[id] -- aca tambien hacen falta porque esta pagina (formacion + incidencias)
-  // es a la que se llega tocando un partido puntual, y antes solo tenia el boton de Tabla.
+  // Mismos "Fixt. Newm." / "Fixt Divis." / "Cruces" que ya aparecen en el resumen (LiveBanner/
+  // ProximaFechaRow) y en /categoria/[id] -- aca tambien hacen falta porque esta pagina (formacion
+  // + incidencias) es a la que se llega tocando un partido puntual, y antes solo tenia el boton de
+  // Tabla. Fixt Divis. solo en Plantel Superior; Juveniles tiene Cruces en su lugar (ver mismo
+  // criterio que /categoria/[id] y /juveniles/[edad]/equipo/[id]).
   const grupo = grupoDeCategoria(partido.categoriaId);
   const fixtureNewmanHref =
     grupo.grupo === "juveniles" ? `/juveniles/${grupo.edadId}/equipo/${partido.categoriaId}` : `/categoria/${partido.categoriaId}/fixture`;
-  const fixtureDivisionHref = tieneFixtureDivision(partido.categoriaId) ? `/fixture/${partido.categoriaId}/division` : undefined;
+  const fixtureDivisionHref =
+    grupo.grupo === "superior" && tieneFixtureDivision(partido.categoriaId) ? `/fixture/${partido.categoriaId}/division` : undefined;
+  const crucesHref =
+    grupo.grupo === "juveniles" && tieneFixtureDivision(partido.categoriaId) ? `/fixture/${partido.categoriaId}/cruces` : undefined;
 
   // Barra para saltar al MISMO partido (misma fecha) del equipo hermano. partesPartidoId da null
   // en partidos de prueba, así que ahí no aparece. Se filtran los hermanos cuyo partido de esa
@@ -120,6 +125,7 @@ export default async function PartidoPage({
           posicionesActualizado={posicionesActualizado}
           fixtureNewmanHref={fixtureNewmanHref}
           fixtureDivisionHref={fixtureDivisionHref}
+          crucesHref={crucesHref}
         />
         <FooterChip />
         <Seuo />
@@ -142,6 +148,7 @@ export default async function PartidoPage({
           posicionesActualizado={posicionesActualizado}
           fixtureNewmanHref={fixtureNewmanHref}
           fixtureDivisionHref={fixtureDivisionHref}
+          crucesHref={crucesHref}
         />
         <FooterChip />
         <Seuo />

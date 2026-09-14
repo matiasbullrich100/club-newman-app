@@ -20,6 +20,7 @@ export default function PartidoTerminadoPanel({
   posicionesActualizado,
   fixtureNewmanHref,
   fixtureDivisionHref,
+  crucesHref,
 }: {
   partidoId: string;
   partido: Partido;
@@ -31,6 +32,7 @@ export default function PartidoTerminadoPanel({
   // arriba del panel.
   fixtureNewmanHref?: string;
   fixtureDivisionHref?: string;
+  crucesHref?: string;
 }) {
   const { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos, terminoEn2T } =
     datos;
@@ -77,6 +79,7 @@ export default function PartidoTerminadoPanel({
         posicionesActualizado={posicionesActualizado}
         fixtureNewmanHref={fixtureNewmanHref}
         fixtureDivisionHref={fixtureDivisionHref}
+        crucesHref={crucesHref}
         apellidosAmbiguos={apellidosAmbiguos}
       />
       {puedeOperar && (

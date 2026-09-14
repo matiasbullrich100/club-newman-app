@@ -55,6 +55,7 @@ export default function PartidoHistorico({
   posicionesActualizado,
   fixtureNewmanHref,
   fixtureDivisionHref,
+  crucesHref,
   formacionPendientePublicar,
   apellidosAmbiguos,
 }: {
@@ -68,11 +69,13 @@ export default function PartidoHistorico({
   // claro que no es "la tabla como estaba ese dia".
   posicionesHref?: string;
   posicionesActualizado?: Date | null;
-  // Mismos "Fixt. Newm." / "Fixt Divis." que ya aparecen en el resumen -- solo se pasan desde
-  // /partido/[id] (que no tenia otro lugar con estos botones); en /categoria/[id] quedan sin
-  // definir a proposito porque esa pagina ya los muestra aparte, arriba del panel.
+  // Mismos "Fixt. Newm." / "Fixt Divis." / "Cruces" que ya aparecen en el resumen -- solo se pasan
+  // desde /partido/[id] (que no tenia otro lugar con estos botones); en /categoria/[id] quedan sin
+  // definir a proposito porque esa pagina ya los muestra aparte, arriba del panel. Fixt Divis. solo
+  // en Plantel Superior; Juveniles tiene Cruces en su lugar (ver /partido/[id]/page.tsx).
   fixtureNewmanHref?: string;
   fixtureDivisionHref?: string;
+  crucesHref?: string;
   // true cuando `plantel` viene vacio A PROPOSITO porque hay una formacion cargada pero todavia
   // sin publicar (ver formacionPublicada en types/firestore.ts) y quien mira esta pagina no
   // puede operar esta categoria -- distingue ese caso de "todavia no se cargo nada".
@@ -85,7 +88,7 @@ export default function PartidoHistorico({
 
   return (
     <div>
-      {(posicionesHref || fixtureNewmanHref || fixtureDivisionHref) && (
+      {(posicionesHref || fixtureNewmanHref || fixtureDivisionHref || crucesHref) && (
         <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
           {posicionesHref && (
             <Link href={posicionesHref} style={botonEstilo}>
@@ -106,6 +109,11 @@ export default function PartidoHistorico({
           {fixtureDivisionHref && (
             <Link href={fixtureDivisionHref} style={botonEstilo}>
               Fixt Divis.
+            </Link>
+          )}
+          {crucesHref && (
+            <Link href={crucesHref} style={botonEstilo}>
+              Cruces
             </Link>
           )}
         </div>

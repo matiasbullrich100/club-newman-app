@@ -69,9 +69,11 @@ export default async function CrucesPage({ params }: { params: Promise<{ categor
         <Link href={fixtureNewmanHref} replace style={botonEstilo}>
           Fixt. Newm.
         </Link>
-        <Link href={`/fixture/${categoriaId}/division`} replace style={botonEstilo}>
-          Fixt Divis.
-        </Link>
+        {grupo.grupo === "superior" && (
+          <Link href={`/fixture/${categoriaId}/division`} replace style={botonEstilo}>
+            Fixt Divis.
+          </Link>
+        )}
         <span style={botonActivo}>Cruces</span>
       </div>
 

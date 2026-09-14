@@ -15,7 +15,8 @@ import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
 
 // Fixture completo de la fecha para TODA la division (los 7 partidos), no solo el de Newman --
 // datos cargados a mano desde el PDF de URBA (ver src/lib/fixtureDivision.ts). Resalta la fila de
-// Newman y deja navegar fecha a fecha con Anterior/Siguiente.
+// Newman y deja navegar fecha a fecha con Anterior/Siguiente. Solo Plantel Superior -- ver mismo
+// comentario en /fixture/[categoriaId]/division/page.tsx.
 export default async function FixtureDivisionFechaPage({
   params,
 }: {
@@ -23,7 +24,7 @@ export default async function FixtureDivisionFechaPage({
 }) {
   const { categoriaId, numeroFecha: numeroFechaParam } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
-  if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
+  if (!categoria || !tieneFixtureDivision(categoriaId) || grupoDeCategoria(categoriaId).grupo !== "superior") notFound();
 
   const numeroFecha = Number(numeroFechaParam);
   const numeroFechas = numeroFechasDivisionDe(categoriaId);

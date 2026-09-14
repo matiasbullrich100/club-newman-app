@@ -28,13 +28,15 @@ const botonEstilo: React.CSSProperties = {
   color: DORADO_SUAVE,
 };
 
-// Picker de fecha para el fixture completo de la division (26 fechas en Plantel Superior, 11 en
-// Juveniles -- ver numeroFechasDivisionDe) -- de aca se entra a
-// /fixture/[categoriaId]/division/[numeroFecha], que muestra los partidos de esa fecha.
+// Picker de fecha para el fixture completo de la division (26 fechas), con el detalle de cada
+// fecha en /fixture/[categoriaId]/division/[numeroFecha]. Solo Plantel Superior -- en Juveniles
+// (1 sola rueda, pocas fechas) esto queda redundante con Cruces (que ya muestra el resultado de
+// cada fecha) y no esta linkeado desde ningun lado, pero la ruta es compartida asi que se corta
+// aca explicitamente en vez de dejarla huerfana-pero-viva.
 export default async function FixtureDivisionPickerPage({ params }: { params: Promise<{ categoriaId: string }> }) {
   const { categoriaId } = await params;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
-  if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
+  if (!categoria || !tieneFixtureDivision(categoriaId) || grupoDeCategoria(categoriaId).grupo !== "superior") notFound();
 
   const tienePosiciones = TORNEOS_URBA[categoriaId] !== undefined;
   const [session, posicionesSnap] = await Promise.all([

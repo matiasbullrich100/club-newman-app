@@ -56,8 +56,8 @@ export default async function PosicionesPage({
   const esJuveniles = categoria.grupo === "juveniles";
   const backHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}`;
   const fixtureNewmanHref = esJuveniles ? `/juveniles/${categoria.edadId}/equipo/${categoriaId}` : `/categoria/${categoriaId}/fixture`;
-  const fixtureDivisionHref = tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/division` : undefined;
-  const crucesHref = tieneFixtureDivision(categoriaId) && !esJuveniles ? `/fixture/${categoriaId}/cruces` : undefined;
+  const fixtureDivisionHref = !esJuveniles && tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/division` : undefined;
+  const crucesHref = tieneFixtureDivision(categoriaId) ? `/fixture/${categoriaId}/cruces` : undefined;
   const tiraEquipos = equiposParaTira(categoriaId, (id) => `/posiciones/${id}`, (id) => TORNEOS_URBA[id] !== undefined);
 
   const [snap, session] = await Promise.all([adminDb.collection("posiciones").doc(categoriaId).get(), getSession()]);
