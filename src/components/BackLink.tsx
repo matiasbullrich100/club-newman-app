@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { vieneDelPortal } from "@/components/PastillaPortal";
+import Buscador from "@/components/Buscador";
 import { DORADO } from "@/lib/colors";
 
 const pastilla: React.CSSProperties = {
@@ -54,6 +55,7 @@ export default function BackLink({ href }: { href: string }) {
       >
         ← Atrás
       </button>
+      <Buscador />
     </div>
   );
 }
