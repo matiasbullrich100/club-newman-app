@@ -13,7 +13,8 @@ type Cruce = { gf: number; gc: number; bonus: boolean; nf: number };
 type CeldaRunIn =
   | { tipo: "libre" }
   | { tipo: "pendiente"; opp: string; local: boolean }
-  | { tipo: "jugado"; opp: string; local: boolean; gf: number; gc: number; bonus: boolean };
+  | { tipo: "jugado"; opp: string; local: boolean; gf: number; gc: number; bonus: boolean }
+  | { tipo: "especial"; opp: string; local: boolean; motivo: "postergado" | "sin_info" };
 
 // A partir del fixture completo de la división arma:
 //  1. "lo que le queda a cada uno, en orden" (fila = equipo, columnas = fechas que faltan) -- o,
@@ -66,6 +67,13 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
         });
         setRun(p.local, f.numeroFecha, { tipo: "jugado", opp: p.visitante, local: true, gf: p.golesLocal, gc: p.golesVisitante, bonus: !!p.bonusLocal });
         setRun(p.visitante, f.numeroFecha, { tipo: "jugado", opp: p.local, local: false, gf: p.golesVisitante, gc: p.golesLocal, bonus: !!p.bonusVisitante });
+      } else if (p.especial === "postergado" || p.especial === "sin_info") {
+        // Partido sin resultado que URBA marco como postergado/sin info (ej. el club arreglo un
+        // amistoso aparte para esa fecha, o el rival no presento equipo) -- no es un pendiente
+        // normal, no tiene sentido mostrarlo como si todavia se fuera a jugar tal cual estaba.
+        fechasPendientes.add(f.numeroFecha);
+        setRun(p.local, f.numeroFecha, { tipo: "especial", opp: p.visitante, local: true, motivo: p.especial });
+        setRun(p.visitante, f.numeroFecha, { tipo: "especial", opp: p.local, local: false, motivo: p.especial });
       } else {
         pendientes.set(key(p.local, p.visitante), f.numeroFecha);
         fechasPendientes.add(f.numeroFecha);
@@ -143,8 +151,8 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                     {fpOrden.map((nf) => {
                       const g = runin.get(eq)?.get(nf);
                       const base: React.CSSProperties = {
-                        minWidth: hayJugadas ? 84 : 78,
-                        height: hayJugadas ? 40 : 28,
+                        minWidth: 84,
+                        height: 40,
                         fontSize: "0.66rem",
                         textAlign: "center",
                         border: "1px solid rgba(255,255,255,.12)",
@@ -163,6 +171,14 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                               {g.gf}-{g.gc}
                               {g.bonus && <b style={{ color: DORADO }}>·</b>} <span style={{ opacity: 0.7 }}>{g.local ? "(L)" : "(V)"}</span>
                             </div>
+                          </td>
+                        );
+                      }
+                      if (g.tipo === "especial") {
+                        return (
+                          <td key={nf} style={{ ...base, color: "rgba(255,255,255,.5)", fontStyle: "italic", padding: "3px 4px" }}>
+                            <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>{g.opp}</div>
+                            <div>{g.motivo === "postergado" ? "Postergado" : "Sin info"}</div>
                           </td>
                         );
                       }
