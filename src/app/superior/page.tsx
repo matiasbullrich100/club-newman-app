@@ -137,7 +137,6 @@ export default async function PlantelSuperiorPage() {
               crucesHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/cruces` : undefined}
               posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
               fixtureNewmanHref={`/categoria/${cat.id}/fixture`}
-              fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}
             />
           ),
         };
@@ -157,7 +156,6 @@ export default async function PlantelSuperiorPage() {
             crucesHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/cruces` : undefined}
             posicionesHref={TORNEOS_URBA[cat.id] !== undefined ? `/posiciones/${cat.id}` : undefined}
             fixtureHref={`/categoria/${cat.id}/fixture`}
-            fixtureDivisionHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/division` : undefined}
           />
         ),
       };
@@ -179,7 +177,6 @@ export default async function PlantelSuperiorPage() {
     crucesHref: tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/cruces` : undefined,
     posicionesHref: TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined,
     fixtureNewmanHref: `/categoria/${p.categoriaId}/fixture`,
-    fixtureDivisionHref: tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined,
   }));
 
   return (

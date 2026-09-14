@@ -79,7 +79,6 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
             crucesHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/cruces` : undefined}
             posicionesHref={TORNEOS_URBA[p.categoriaId] !== undefined ? `/posiciones/${p.categoriaId}` : undefined}
             fixtureNewmanHref={`/juveniles/${edadId}/equipo/${p.categoriaId}`}
-            fixtureDivisionHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/division` : undefined}
           />
         );
       }
@@ -95,7 +94,6 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           crucesHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/cruces` : undefined}
           posicionesHref={TORNEOS_URBA[equipo.id] !== undefined ? `/posiciones/${equipo.id}` : undefined}
           fixtureHref={`/juveniles/${edadId}/equipo/${equipo.id}`}
-          fixtureDivisionHref={tieneFixtureDivision(equipo.id) ? `/fixture/${equipo.id}/division` : undefined}
         />
       );
     });

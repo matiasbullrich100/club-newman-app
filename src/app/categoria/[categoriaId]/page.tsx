@@ -38,7 +38,9 @@ const botonEstilo: React.CSSProperties = {
   color: DORADO_SUAVE,
 };
 
-// Landing de un equipo de Plantel Superior: los 3 botones (Tabla / Fixt. Newm. / Fixt Divis.) y, en
+// Landing de un equipo de Plantel Superior: los botones (Tabla / Fixt. Newm. / Cruces -- Fixt
+// Divis. queda un paso mas adentro, detras de "Fixt. Newm.", no hace falta aca porque Cruces ya
+// muestra todos los resultados de la division) y, en
 // la MISMA pantalla, el partido mas relevante ahora mismo -- si esta en vivo o se acaba de
 // resolver (terminado o walkover, "fresco" = dentro de los ultimos 3 dias, mismo criterio que
 // /superior), ese; si no, el proximo programado. Sin un link aparte a "ver partido completo": un
@@ -145,14 +147,9 @@ export default async function CategoriaPage({
           Fixt. Newm.
         </Link>
         {tieneFixtureDivision(categoriaId) && (
-          <>
-            <Link href={`/fixture/${categoriaId}/division`} style={botonEstilo}>
-              Fixt Divis.
-            </Link>
-            <Link href={`/fixture/${categoriaId}/cruces`} style={botonEstilo}>
-              Cruces
-            </Link>
-          </>
+          <Link href={`/fixture/${categoriaId}/cruces`} style={botonEstilo}>
+            Cruces
+          </Link>
         )}
       </div>
 
