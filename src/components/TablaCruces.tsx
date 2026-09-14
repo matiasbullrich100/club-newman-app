@@ -10,11 +10,19 @@ const ROJO = "rgba(165,42,42,.42)"; // perdió de local
 const GRIS = "rgba(122,106,58,.42)"; // empató
 
 type Cruce = { gf: number; gc: number; bonus: boolean; nf: number };
+type CeldaRunIn =
+  | { tipo: "libre" }
+  | { tipo: "pendiente"; opp: string; local: boolean }
+  | { tipo: "jugado"; opp: string; local: boolean; gf: number; gc: number; bonus: boolean };
 
-// A partir del fixture completo de la división arma dos cosas:
-//  1. la grilla de cruces (fila = local, columna = visitante, celda = resultado para el local)
-//  2. "lo que le queda a cada uno, en orden" (fila = equipo, columnas = fechas que faltan)
-export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[] }) {
+// A partir del fixture completo de la división arma:
+//  1. "lo que le queda a cada uno, en orden" (fila = equipo, columnas = fechas que faltan) -- o,
+//     con `todasLasFechas` (Juveniles: pocas fechas, 1 sola rueda), TODAS las fechas jugadas y por
+//     jugar en una sola tabla, sin el cuadro de cruces de abajo (que con tan pocos partidos por
+//     equipo queda redundante con esta).
+//  2. la grilla de cruces (fila = local, columna = visitante, celda = resultado para el local) --
+//     solo si NO `todasLasFechas`.
+export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas: FechaDivisionNumerada[]; todasLasFechas?: boolean }) {
   const esPropio = (n: string) => n === "Newman";
 
   const set = new Set<string>();
@@ -30,18 +38,20 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
   const key = (l: string, v: string) => `${l} ${v}`;
   const jugados = new Map<string, Cruce>();
   const pendientes = new Map<string, number>();
-  const runin = new Map<string, Map<number, { opp: string; local: boolean; libre: boolean }>>();
-  const setRun = (eq: string, nf: number, v: { opp: string; local: boolean; libre: boolean }) => {
+  const runin = new Map<string, Map<number, CeldaRunIn>>();
+  const setRun = (eq: string, nf: number, v: CeldaRunIn) => {
     if (!runin.has(eq)) runin.set(eq, new Map());
     runin.get(eq)!.set(nf, v);
   };
   const fechasPendientes = new Set<number>();
+  const fechasTodas = new Set<number>();
 
   for (const f of fechas) {
+    fechasTodas.add(f.numeroFecha);
     for (const p of f.partidos) {
       if (p.especial === "libre") {
         if (!p.jugado) {
-          setRun(p.local, f.numeroFecha, { opp: "", local: true, libre: true });
+          setRun(p.local, f.numeroFecha, { tipo: "libre" });
           fechasPendientes.add(f.numeroFecha);
         }
         continue;
@@ -54,15 +64,19 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
           bonus: !!p.bonusLocal,
           nf: f.numeroFecha,
         });
+        if (todasLasFechas) {
+          setRun(p.local, f.numeroFecha, { tipo: "jugado", opp: p.visitante, local: true, gf: p.golesLocal, gc: p.golesVisitante, bonus: !!p.bonusLocal });
+          setRun(p.visitante, f.numeroFecha, { tipo: "jugado", opp: p.local, local: false, gf: p.golesVisitante, gc: p.golesLocal, bonus: !!p.bonusVisitante });
+        }
       } else {
         pendientes.set(key(p.local, p.visitante), f.numeroFecha);
         fechasPendientes.add(f.numeroFecha);
-        setRun(p.local, f.numeroFecha, { opp: p.visitante, local: true, libre: false });
-        setRun(p.visitante, f.numeroFecha, { opp: p.local, local: false, libre: false });
+        setRun(p.local, f.numeroFecha, { tipo: "pendiente", opp: p.visitante, local: true });
+        setRun(p.visitante, f.numeroFecha, { tipo: "pendiente", opp: p.local, local: false });
       }
     }
   }
-  const fpOrden = [...fechasPendientes].sort((a, b) => a - b);
+  const fpOrden = [...(todasLasFechas ? fechasTodas : fechasPendientes)].sort((a, b) => a - b);
 
   const th: React.CSSProperties = {
     position: "sticky",
@@ -90,10 +104,18 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
     <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
       {fpOrden.length > 0 && (
         <div>
-          <h3 style={subtitulo}>Lo que le queda a cada uno</h3>
+          <h3 style={subtitulo}>{todasLasFechas ? "Fixture de cada equipo" : "Lo que le queda a cada uno"}</h3>
           <p style={ayuda}>
-            Cada fila es un equipo; las columnas son las fechas que faltan, en orden. <b>L</b> = de local, <b>V</b> = de
-            visitante. Se lee de izquierda a derecha = el fixture que le queda a ese equipo.
+            Cada fila es un equipo; las columnas son {todasLasFechas ? "todas las fechas, en orden" : "las fechas que faltan, en orden"}.{" "}
+            <b>L</b> = de local, <b>V</b> = de visitante.
+            {todasLasFechas ? (
+              <>
+                {" "}
+                Las ya jugadas muestran el resultado (<b style={{ color: DORADO }}>·</b> = punto bonus).
+              </>
+            ) : (
+              " Se lee de izquierda a derecha = el fixture que le queda a ese equipo."
+            )}
           </p>
           <div style={{ overflowX: "auto", border: `1px solid ${BORDE}`, borderRadius: 8 }}>
             <table style={{ borderCollapse: "collapse", whiteSpace: "nowrap" }}>
@@ -121,9 +143,19 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
                         border: "1px solid rgba(255,255,255,.12)",
                         outline: esPropio(eq) ? `2px solid ${DORADO}` : undefined,
                         outlineOffset: -2,
+                        position: "relative",
                       };
                       if (!g) return <td key={nf} style={{ ...base, color: "rgba(255,255,255,.35)" }}>—</td>;
-                      if (g.libre) return <td key={nf} style={{ ...base, color: DORADO_SUAVE, fontStyle: "italic" }}>Libre</td>;
+                      if (g.tipo === "libre") return <td key={nf} style={{ ...base, color: DORADO_SUAVE, fontStyle: "italic" }}>Libre</td>;
+                      if (g.tipo === "jugado") {
+                        const fondo = g.gf > g.gc ? VERDE : g.gf < g.gc ? ROJO : GRIS;
+                        return (
+                          <td key={nf} style={{ ...base, background: fondo }}>
+                            {g.gf}-{g.gc}
+                            {g.bonus && <b style={{ color: DORADO }}>·</b>} <span style={{ opacity: 0.7 }}>{g.local ? "(L)" : "(V)"}</span>
+                          </td>
+                        );
+                      }
                       return (
                         <td key={nf} style={{ ...base, background: g.local ? FONDO_PROPIO : "rgba(255,255,255,.04)", fontStyle: g.local ? "normal" : "italic" }}>
                           {g.opp} {g.local ? "(L)" : "(V)"}
@@ -138,7 +170,7 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
         </div>
       )}
 
-      <div>
+      {!todasLasFechas && <div>
         <h3 style={subtitulo}>Cruces</h3>
         <p style={ayuda}>
           Fila = local, columna = visitante. Cada celda: cómo salió ESE partido para el equipo de la fila (a favor–en
@@ -211,7 +243,7 @@ export default function TablaCruces({ fechas }: { fechas: FechaDivisionNumerada[
             </tbody>
           </table>
         </div>
-      </div>
+      </div>}
 
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: "0.7rem", color: CREMA, alignItems: "center" }}>
         <Swatch color={VERDE} txt="Ganó de local" />
