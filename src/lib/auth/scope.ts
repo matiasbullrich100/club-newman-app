@@ -57,11 +57,16 @@ export function puedeResetearPartidoDePrueba(session: SessionPayload | null, cat
   return !!partidoId && !!session.demoInstanceId && partidoId.endsWith(`-${session.demoInstanceId}`);
 }
 
-/** Mismo alcance que puedeOperarCategoria, pero para entrar a /estadisticas/[grupoId]. */
+/**
+ * Mismo alcance que puedeOperarCategoria, pero para entrar a /estadisticas/[grupoId]. Manager y
+ * Entrenador comparten la misma logica de `alcance` -- `alcance` ausente = ve todo (Plantel
+ * Superior + las 4 de Juveniles); seteado a "superior" o a un edadId, queda acotado a esa sola
+ * division. Newman mantiene su cuenta historica "coach"/"pelu" sin `alcance` (sin restriccion);
+ * los clubes nuevos siembran una cuenta de Entrenador por division (ver seed-entrenador.ts).
+ */
 export function puedeVerEstadisticas(session: SessionPayload | null, grupoId: string): boolean {
   if (!session) return false;
-  if (session.rol === "entrenador") return true;
-  if (session.rol !== "manager") return false;
+  if (session.rol !== "manager" && session.rol !== "entrenador") return false;
   if (!session.alcance) return true;
   return session.alcance === grupoId;
 }

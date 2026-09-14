@@ -25,8 +25,8 @@ export default async function EstadisticasPage() {
   const session = await getSession();
   const autorizado = session?.rol === "manager" || session?.rol === "entrenador";
 
-  // Manager de una division puntual: entra directo a la suya, no ve el selector.
-  if (session?.rol === "manager" && session.alcance) {
+  // Manager o Entrenador de una division puntual: entra directo a la suya, no ve el selector.
+  if ((session?.rol === "manager" || session?.rol === "entrenador") && session.alcance) {
     redirect(`/estadisticas/${session.alcance}`);
   }
 

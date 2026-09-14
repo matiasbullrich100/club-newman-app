@@ -19,7 +19,7 @@ export interface Cuenta {
   username: string;
   passwordHash: string;
   categoriaId?: string; // only rol === "designado"
-  alcance?: string; // only rol === "manager" -- edadId de Juveniles; ausente = sin restriccion
+  alcance?: string; // only rol === "manager" | "entrenador" -- "superior" o edadId de Juveniles; ausente = sin restriccion
   createdAt: Timestamp | Date;
 }
 

@@ -8,7 +8,10 @@ Detalle de archivos: [`src/lib/auth/CLAUDE.md`](../src/lib/auth/CLAUDE.md). Esto
    nada.
 2. **`designado`** — cuenta con `categoriaId` fijo (ej. `"m15-b"`). Solo puede operar partidos de
    esa categoría puntual.
-3. **`entrenador`** — solo lectura de `/estadisticas` (todas las divisiones), no opera partidos.
+3. **`entrenador`** — solo lectura de `/estadisticas`, no opera partidos. Mismo `alcance` que
+   `manager` (ver abajo): ausente = ve todo (Plantel Superior + las 4 de Juveniles); seteado a
+   `"superior"` o a un `edadId`, queda acotado a esa sola división. Cuenta: `coach`/`pelu` (sin
+   alcance, ve todo).
 4. **`manager`** — el rol con más poder. Con `alcance` **ausente**, sin restricción: opera
    cualquier categoría (Plantel Superior + las 4 divisiones de Juveniles) y ve `/estadisticas`
    completo. Con `alcance` seteado a `"superior"` o a un `edadId` (`"m15"|"m16"|"m17"|"m19"`),
