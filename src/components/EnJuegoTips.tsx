@@ -2,12 +2,15 @@
 
 // "EnJuego tips": pantalla completa que aparece al entrar a /superior o /juveniles, con un tip
 // de uso de la app (numerado).
-// - Cada tip se muestra UNA sola vez y no vuelve a aparecer por al menos 1 semana.
-// - Cada visita muestra el siguiente tip sin ver (entrar 7 veces => tips 1..7, de a uno).
-// - "+ Tips" muestra el siguiente ahi mismo (y tambien lo marca como visto).
-// - "Entendido" cierra: los que falten aparecen en las proximas visitas.
+// - Sin pedirlo, cada visita muestra COMO MUCHO 1 tip: el primero sin ver (o vencido de cooldown
+//   de 1 semana) -- entrar 5 veces => tips 1..5, de a uno, sin repetir.
+// - "+ EnJuego Tips" es una decision explicita de seguir mirando: ahi SI recorre TODOS los tips
+//   activos en orden (Buscador, Cruces, ...) hasta el final, sin importar el cooldown de cada uno
+//   -- si no, alguien al que le toca ver un solo tip (los demas en cooldown) no tendria forma de
+//   repasar el resto. Cierra solo al llegar al final de la lista.
+// - "Entendido" cierra en cualquier momento: lo que falte aparece en las proximas visitas.
 // - El telefono se acuerda: el estado vive en localStorage del navegador del socio.
-// Sumar un tip = agregar un objeto a TIPS (numero visible + id interno estable + texto + visual).
+// Sumar un tip = agregar un objeto a TIPS (id interno estable + texto + visual opcional).
 
 import { useEffect, useRef, useState } from "react";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
@@ -106,6 +109,10 @@ function TelefonoGirar() {
 // ACTIVOS, no de esta lista completa -- asi no quedan huecos cuando algunos estan apagados.
 const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; activo?: boolean }[] = [
   {
+    id: "buscador",
+    texto: 'Nuevo botón "Buscar" para ir directo a lo que querés ver.',
+  },
+  {
     id: "tabla-cruces",
     texto: "CRUCES: qué le queda a cada uno !",
   },
@@ -145,10 +152,6 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
     visual: <FlechasFecha />,
     activo: false,
   },
-  {
-    id: "buscador",
-    texto: 'Nuevo botón "Buscar" para ir directo a lo que querés ver.',
-  },
 ];
 
 const TIPS_ACTIVOS = TIPS.filter((t) => t.activo !== false).map((t, i) => ({ ...t, numero: i + 1 }));
@@ -181,18 +184,23 @@ export default function EnJuegoTips() {
       /* storage bloqueado / json roto: arranca de cero */
     }
 
+    // El primero que aparece SOLO (sin pedirlo) es el primero no visto o vencido de cooldown -- pero
+    // la cola completa es TODOS los activos en orden: una vez que alguien decide seguir mirando
+    // ("+ EnJuego Tips"), recorre el resto sin importar el cooldown de cada uno (fue una decision
+    // explicita de seguir viendo, no un popup que se le impone).
     const ahora = Date.now();
-    const elegibles = TIPS_ACTIVOS.filter((t) => {
+    const inicio = TIPS_ACTIVOS.findIndex((t) => {
       const visto = vistos[t.id];
       return !visto || ahora - visto > COOLDOWN_TIP_MS;
     });
-    if (elegibles.length === 0) return;
+    if (inicio === -1) return;
 
-    marcar(elegibles[0].id); // el que se muestra ahora ya cuenta como visto
+    marcar(TIPS_ACTIVOS[inicio].id); // el que se muestra ahora ya cuenta como visto
     // Depende de localStorage (solo cliente): aparece despues del montaje a proposito, en SSR no
     // se renderiza nada y no hay mismatch de hidratacion.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCola(elegibles);
+    setIdx(inicio);
+    setCola(TIPS_ACTIVOS);
   }, []);
 
   useEffect(() => {
@@ -209,8 +217,8 @@ export default function EnJuegoTips() {
 
   const cerrar = () => setCola([]);
   const masTips = () => {
-    // Si no quedan mas tips por ver ahora, "+ Tips" simplemente cierra (los que falten apareceran
-    // en las proximas visitas, de a uno).
+    // Recorre TODOS los tips activos en orden (ver comentario en el effect de arriba) -- cuando
+    // no queda ninguno mas, simplemente cierra.
     const siguiente = idx + 1;
     if (siguiente >= cola.length) {
       cerrar();
