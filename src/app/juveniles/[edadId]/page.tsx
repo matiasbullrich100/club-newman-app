@@ -5,7 +5,7 @@ import { EDADES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categori
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria, type ProximaFecha } from "@/lib/match/resumenSeccion";
-import { debeMostrarProximaFechaEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
+import { resultadoSigueFresco } from "@/lib/fecha";
 import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -56,13 +56,14 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
   );
   const idsFrescos = new Set(frescos.map((p) => p.categoriaId));
 
-  // Para los equipos SIN resultado fresco, en la ventana de Proxima Fecha (jue 06:00 -> finde) se
-  // muestra la fila de la fecha que viene, con la pastilla "U. Fecha" hacia la ultima jugada --
-  // mismo criterio que la lista principal /juveniles.
+  // Para los equipos SIN resultado fresco se muestra la fila de la fecha que viene, con la
+  // pastilla "U. Fecha" hacia la ultima jugada -- mismo criterio que la lista principal /juveniles.
+  // Se busca SIEMPRE (no solo jue 06:00 -> finde): si hubiera fecha libre entre partidos (bye), el
+  // ultimo resultado se pasa de los DIAS_RESULTADO_FRESCO igual mientras estamos fuera de esa
+  // ventana, y sin esto se quedaba pegado mostrando el resultado viejo hasta el proximo jueves
+  // (mismo bug ya resuelto en /superior/page.tsx -- ver ese comentario).
   const idsSinFresco = equipos.map((e) => e.id).filter((id) => !idsFrescos.has(id));
-  const proximasPorCategoria: Map<string, ProximaFecha> = debeMostrarProximaFechaEnArgentina()
-    ? await proximaFechaPorCategoria(idsSinFresco)
-    : new Map();
+  const proximasPorCategoria: Map<string, ProximaFecha> = await proximaFechaPorCategoria(idsSinFresco);
 
   const filas = equipos
     .map((equipo) => {

@@ -48,9 +48,11 @@ export default async function JuvenilesPage() {
   const idsSinResumenFresco = equiposOrdenados
     .map((e) => e.id)
     .filter((id) => !resumen.some((p) => p.categoriaId === id && fresco(p)));
-  const proximasPorCategoria = debeMostrarProximaFechaEnArgentina()
-    ? await proximaFechaPorCategoria(idsSinResumenFresco)
-    : new Map();
+  // Se busca SIEMPRE (no solo jue 06:00 -> finde): si hubiera fecha libre entre partidos (bye), el
+  // ultimo resultado se pasa de los DIAS_RESULTADO_FRESCO igual mientras estamos fuera de esa
+  // ventana, y sin esto se quedaba pegado mostrando el resultado viejo hasta el proximo jueves
+  // (mismo bug ya resuelto en /superior/page.tsx -- ver ese comentario).
+  const proximasPorCategoria = await proximaFechaPorCategoria(idsSinResumenFresco);
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
