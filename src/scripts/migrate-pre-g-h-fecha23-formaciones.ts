@@ -64,7 +64,7 @@ const EQUIPOS: { categoriaId: string; titulares: string[]; suplentes: string[] }
       "Sackmann Miguel",
       "Saenz Valiente, Iñaki",
       "Busquet, Santiago",
-      "Lozada Juan Pablo",
+      "Lozada, Juan Pablo",
       "Norman Archibald",
     ],
   },

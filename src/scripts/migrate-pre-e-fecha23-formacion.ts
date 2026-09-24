@@ -31,7 +31,7 @@ const TITULARES = [
 const SUPLENTES: [string, string][] = [
   ["16", "Deane, Santiago"],
   ["18", "Muñoz Tomás"],
-  ["19", "Pavlovsky José María"],
+  ["19", "Pavlovsky, José María"],
   ["20", "Ibañez Joaquín"],
   ["21", "Lopez Saubidet Martín"],
   ["22", "Pernisek Federico"],
