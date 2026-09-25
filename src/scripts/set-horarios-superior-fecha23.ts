@@ -10,7 +10,7 @@ const HORAS: Record<string, string> = {
   "pre-a": "12:00",
   intermedia: "13:45",
   primera: "15:30",
-  "pre-c": "10:00",
+  "pre-c": "10:15",
   "pre-d": "12:00",
 };
 
