@@ -59,6 +59,7 @@ export default async function PlantelSuperiorPage() {
   const fresco = (p: (typeof resumen)[number] | undefined) =>
     !!p &&
     (ESTADOS_EN_VIVO.has(p.estado) ||
+      esResultadoCargadoPorAdelantado(p) ||
       (modoResultados &&
         (p.estado === "terminado" || !!p.notaEspecial) &&
         !!p.fecha &&
@@ -72,9 +73,7 @@ export default async function PlantelSuperiorPage() {
   // (jue 06:00→dom) solo cuenta los resultados FRESCOS (en vivo / recién jugados) -- si no, un
   // amistoso suelto entre semana reactivaba la banda con los resultados viejos de la fecha pasada.
   const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
-  const paraLaBanda = debeMostrarProximaFechaEnArgentina()
-    ? jugadosSemana.filter((p) => fresco(p) || esResultadoCargadoPorAdelantado(p))
-    : jugadosSemana;
+  const paraLaBanda = debeMostrarProximaFechaEnArgentina() ? jugadosSemana.filter(fresco) : jugadosSemana;
   const ganadosSemana = paraLaBanda.filter((p) => p.resultado.newman > p.resultado.rival).length;
   const empatadosSemana = paraLaBanda.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidosSemana = paraLaBanda.filter((p) => p.resultado.newman < p.resultado.rival).length;
@@ -172,7 +171,11 @@ export default async function PlantelSuperiorPage() {
   // Resumen "Partidos de Mañana" -- todas las categorias de Plantel Superior que juegan manana,
   // con horario, para verlas de un vistazo sin entrar categoria por categoria (partidosManana se
   // calculo mas arriba, tambien se usa para no duplicar la fila de "Proxima Fecha").
-  const partidosMananaConNombre = partidosManana.map((p) => ({
+  // Un partido de mañana ya resuelto (W.O. cargado por adelantado) sale arriba como resultado
+  // (LiveBanner, igual que los ya jugados) -- no se repite en el banner de mañana.
+  const partidosMananaConNombre = partidosManana
+    .filter((p) => !fresco(resumen.find((r) => r.id === p.id)))
+    .map((p) => ({
     categoriaId: p.categoriaId,
     categoriaNombre: CATEGORIAS_SUPERIOR.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId,
     partido: p,
