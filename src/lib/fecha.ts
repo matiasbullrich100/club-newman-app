@@ -151,3 +151,11 @@ export function resultadoSigueFresco(fechaIso: string): boolean {
   if (dias < 0) return false;
   return dias <= (esVentanaPreviaProximaFecha() ? DIAS_RESULTADO_FRESCO_EN_PREVIA : DIAS_RESULTADO_FRESCO);
 }
+
+// Un walkover se carga ANTES del dia del partido: queda "terminado" con `fecha` en el futuro.
+// resultadoSigueFresco() lo descarta a proposito (si no, un solo walkover dejaba a todo el grupo
+// en modo resultados, ver /superior), asi que para mostrarlo en la pantalla de SU categoria y
+// contarlo en el resumen se chequea aparte con esto -- nunca para decidir el modo del grupo.
+export function esResultadoCargadoPorAdelantado(p: { estado: string; fecha?: string }): boolean {
+  return p.estado === "terminado" && !!p.fecha && diasDesdeEnArgentina(p.fecha) < 0;
+}

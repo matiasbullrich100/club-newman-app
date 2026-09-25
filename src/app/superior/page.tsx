@@ -4,7 +4,7 @@ import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, mananaIsoEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, esResultadoCargadoPorAdelantado, mananaIsoEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
 import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -72,7 +72,9 @@ export default async function PlantelSuperiorPage() {
   // (jue 06:00→dom) solo cuenta los resultados FRESCOS (en vivo / recién jugados) -- si no, un
   // amistoso suelto entre semana reactivaba la banda con los resultados viejos de la fecha pasada.
   const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
-  const paraLaBanda = debeMostrarProximaFechaEnArgentina() ? jugadosSemana.filter(fresco) : jugadosSemana;
+  const paraLaBanda = debeMostrarProximaFechaEnArgentina()
+    ? jugadosSemana.filter((p) => fresco(p) || esResultadoCargadoPorAdelantado(p))
+    : jugadosSemana;
   const ganadosSemana = paraLaBanda.filter((p) => p.resultado.newman > p.resultado.rival).length;
   const empatadosSemana = paraLaBanda.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidosSemana = paraLaBanda.filter((p) => p.resultado.newman < p.resultado.rival).length;

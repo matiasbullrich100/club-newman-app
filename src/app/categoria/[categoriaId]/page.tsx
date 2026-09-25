@@ -8,7 +8,7 @@ import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { partidosEnVivoOUltimoTerminado, proximasFechasDe } from "@/lib/match/resumenSeccion";
 import { datosPartidoProgramado } from "@/lib/match/datosPartidoProgramado";
 import { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
-import { resultadoSigueFresco } from "@/lib/fecha";
+import { esResultadoCargadoPorAdelantado, resultadoSigueFresco } from "@/lib/fecha";
 import type { JugadorAgregado, JugadorPartido, Partido } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -64,6 +64,7 @@ export default async function CategoriaPage({
   const esFresco =
     !!resumenPropio &&
     (esVivo ||
+      esResultadoCargadoPorAdelantado(resumenPropio) ||
       ((resumenPropio.estado === "terminado" || resumenPropio.notaEspecial) &&
         !!resumenPropio.fecha &&
         resultadoSigueFresco(resumenPropio.fecha)));
