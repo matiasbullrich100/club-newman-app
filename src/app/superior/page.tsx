@@ -127,6 +127,7 @@ export default async function PlantelSuperiorPage() {
       if (p && fresco(p)) {
         return {
           esVivo: ESTADOS_EN_VIVO.has(p.estado),
+          esResultado: true,
           node: (
             <LiveBanner
               key={p.id}
@@ -147,6 +148,7 @@ export default async function PlantelSuperiorPage() {
       if (!proxima) return null;
       return {
         esVivo: false,
+        esResultado: false,
         node: (
           <ProximaFechaRow
             key={cat.id}
@@ -163,10 +165,12 @@ export default async function PlantelSuperiorPage() {
     })
     .filter((f): f is NonNullable<typeof f> => f !== null);
 
-  // Los partidos EN VIVO van siempre arriba del todo (cualquier categoria) -- el cartel de las 3
-  // proximas fechas de Primera y el resto de las filas van despues.
+  // Los partidos EN VIVO van siempre arriba del todo (cualquier categoria), y justo despues los ya
+  // jugados (resultado / fecha libre) -- el cartel de las 3 proximas fechas de Primera y las filas
+  // de partidos por jugar van despues.
   const filasVivo = filas.filter((f) => f.esVivo);
-  const filasResto = filas.filter((f) => !f.esVivo);
+  const filasJugados = filas.filter((f) => !f.esVivo && f.esResultado);
+  const filasResto = filas.filter((f) => !f.esVivo && !f.esResultado);
 
   // Resumen "Partidos de Mañana" -- todas las categorias de Plantel Superior que juegan manana,
   // con horario, para verlas de un vistazo sin entrar categoria por categoria (partidosManana se
@@ -220,6 +224,8 @@ export default async function PlantelSuperiorPage() {
       )}
 
       {filasVivo.map((f) => f.node)}
+
+      {filasJugados.map((f) => f.node)}
 
       {mostrarProximaFechaPrimera && proximasFechasPrimera.length > 0 && <ProximaFechaBanner proximas={proximasFechasPrimera} />}
 
