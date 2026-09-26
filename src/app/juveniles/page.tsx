@@ -4,7 +4,7 @@ import { CATEGORIAS, CATEGORIAS_JUVENILES, nombreNewmanDe, partidoId as partidoI
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, esResultadoCargadoPorAdelantado, resultadoSigueFresco } from "@/lib/fecha";
 import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -44,6 +44,7 @@ export default async function JuvenilesPage() {
   // modo (ver el mismo comentario en /superior/page.tsx).
   const fresco = (p: (typeof resumen)[number]) =>
     ESTADOS_EN_VIVO.has(p.estado) ||
+    esResultadoCargadoPorAdelantado(p) ||
     (modoResultados && (p.estado === "terminado" || !!p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha));
   const idsSinResumenFresco = equiposOrdenados
     .map((e) => e.id)

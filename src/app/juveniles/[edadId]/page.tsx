@@ -5,7 +5,7 @@ import { EDADES, equiposDeEdad, nombreNewmanDe, partidoId } from "@/lib/categori
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { partidosEnVivoOUltimoTerminado, proximaFechaPorCategoria, type ProximaFecha } from "@/lib/match/resumenSeccion";
-import { resultadoSigueFresco } from "@/lib/fecha";
+import { esResultadoCargadoPorAdelantado, resultadoSigueFresco } from "@/lib/fecha";
 import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -52,6 +52,7 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
   const frescos = resumen.filter(
     (p) =>
       ESTADOS_EN_VIVO.has(p.estado) ||
+      esResultadoCargadoPorAdelantado(p) ||
       ((p.estado === "terminado" || !!p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha))
   );
   const idsFrescos = new Set(frescos.map((p) => p.categoriaId));
