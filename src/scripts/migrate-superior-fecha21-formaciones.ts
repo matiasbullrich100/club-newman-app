@@ -209,7 +209,7 @@ const EQUIPOS: EquipoFormacion[] = [
       "Von Wuthenau Facundo",
       "Pommer, Felipe",
       "Pujato Francisco",
-      "Sluzewski Monto, Santiago",
+      "Sluzewski, Santiago",
       "García Zavaleta, Fermín",
       "Massone Ramiro",
     ],

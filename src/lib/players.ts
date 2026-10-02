@@ -123,7 +123,6 @@ const APELLIDO_CORTO_MANUAL: Record<string, string> = Object.fromEntries(
       ["Santamarina Bergadá, Jerónimo", "Santamarina"],
       ["Serra Gallo, Gonzalo", "Serra"],
       ["Sluzewski Monti, Ramon", "Sluzewski"],
-      ["Sluzewski Monto, Santiago", "Sluzewski"],
       ["Tezanos Pinto, Segundo", "T. Pinto S."],
       ["Trigo de la Balze, Honorio", "Trigo"],
       ["Vazquez Caputo, Agustin", "V. Caputo"],

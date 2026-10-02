@@ -13,7 +13,7 @@
 // Los suplentes "no directos" de la planilla (Deane en Pre B; Shaw Santiago y Naveiro Joaquin en
 // Pre C) van como suplentes con el dorsal de la planilla (24/25).
 // Correcciones sobre el texto crudo: Pre F #3 decia "Muñoz Tomás x" -> sin la "x" suelta; los
-// nombres con nombre compuesto van con coma ("Dewey, Juan Pablo", "Autillio, Juan Cruz") para que
+// nombres con nombre compuesto van con coma ("Dewey, Juan Pablo", "Autilio, Juan Cruz") para que
 // se lean bien en la app.
 //
 // Idempotente: pisa el plantel si ya existe y borra jugadores que hayan quedado de una corrida
@@ -199,7 +199,7 @@ const EQUIPOS: EquipoFormacion[] = [
       "Santurio Pedro",
       "Adrogué Santiago",
     ],
-    suplentes: ["Renati, Mateo", "Cáceres, Wenceslao", "Monpelat Pedro", "Gibelli, Cruz", "Autillio, Juan Cruz", "Daireaux, Marcos"],
+    suplentes: ["Renati, Mateo", "Cáceres, Wenceslao", "Monpelat Pedro", "Gibelli, Cruz", "Autilio, Juan Cruz", "Daireaux, Marcos"],
   },
 ];
 

@@ -23,7 +23,7 @@ const TITULARES = [
   "Otero, Benjamín",
   "Pommer, Felipe",
   "Busto, José",
-  "Sluzewski Monto, Santiago",
+  "Sluzewski, Santiago",
   "García Zavaleta, Fermín",
   "Massone Ramiro",
 ];
