@@ -104,6 +104,38 @@ function TelefonoGirar() {
   );
 }
 
+// Mini tabla del tip "clasificados": una fila con el playoff asegurado (verde intenso, barra verde y *)
+// y otra solo en zona (verde suave) -- mismos colores que TablaPosiciones.
+function TablaClasificadosMini() {
+  const filas = [
+    { pos: 1, equipo: "CASI *", fondo: "rgba(70,196,106,.62)", barra: true },
+    { pos: 2, equipo: "HINDU *", fondo: "rgba(70,196,106,.62)", barra: true },
+    { pos: 3, equipo: "NEWMAN", fondo: "rgba(70,196,106,.30)", barra: false },
+  ];
+  return (
+    <div style={{ width: 230, borderRadius: 8, overflow: "hidden", border: `1px solid ${DORADO}`, textAlign: "left" }} aria-hidden="true">
+      {filas.map((f) => (
+        <div
+          key={f.pos}
+          style={{
+            display: "flex",
+            gap: 14,
+            padding: "7px 12px",
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            color: CREMA,
+            background: f.fondo,
+            boxShadow: f.barra ? "inset 5px 0 0 #46e07a" : undefined,
+          }}
+        >
+          <span style={{ width: 14 }}>{f.pos}</span>
+          <span>{f.equipo}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // `activo: false` = queda en el codigo pero no se muestra (por si se quiere reactivar despues,
 // sin tener que volver a escribirlo). El numero visible (#1, #2...) sale del orden entre los
 // ACTIVOS, no de esta lista completa -- asi no quedan huecos cuando algunos estan apagados.
@@ -130,6 +162,11 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
     id: "barra-equipos",
     texto: "Pasá de equipo en equipo.",
     visual: <BarraEquiposMini />,
+  },
+  {
+    id: "tabla-clasificados",
+    texto: "Mirá en las tablas los equipos ya clasificados.",
+    visual: <TablaClasificadosMini />,
   },
   {
     id: "resumen-ultima-fecha",
