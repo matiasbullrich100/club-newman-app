@@ -89,7 +89,7 @@ async function sembrarBeromama(partidoId: string): Promise<void> {
     numeroFecha: "test",
     rival: "Beromama",
     esLocal: true,
-    cancha: "Cancha 1",
+    cancha: "Newman",
     estado: "programado",
     resultado: { newman: 0, rival: 0 },
     enCanchaIds: PLANTEL_BEROMAMA.filter((j) => j.titular).map((j) => playerId(j.nombre)),
