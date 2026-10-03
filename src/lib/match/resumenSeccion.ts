@@ -129,6 +129,7 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ses
     fecha: p.fecha,
     numeroFecha: comoNumero(p.numeroFecha),
     notaEspecial: p.notaEspecial,
+    numeroCancha: p.numeroCancha,
   }));
 }
 
