@@ -25,6 +25,8 @@ export interface PartidoResumen {
   numeroFecha: number;
   // "Fecha libre" si esta fecha fue un bye -- LiveBanner muestra esto en vez del resultado.
   notaEspecial?: string;
+  // Cancha puntual ("4") -- LiveBanner la muestra siempre: antes, durante y despues del partido.
+  numeroCancha?: string;
 }
 
 function comoNumero(numeroFecha: Partido["numeroFecha"]): number {

@@ -146,6 +146,11 @@ export default function PartidoLive({
               {badgeLabel}
             </span>
           </div>
+          {partido.numeroCancha && (
+            <div style={{ marginTop: 6, fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, color: DORADO_SUAVE }}>
+              Cancha {partido.numeroCancha}
+            </div>
+          )}
         </div>
         <div style={{ flex: 1, textAlign: "center" }}>
           <div style={{ textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: 1, color: DORADO_SUAVE }}>{partido.rival}</div>

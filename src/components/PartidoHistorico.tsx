@@ -134,9 +134,14 @@ export default function PartidoHistorico({
             {partido.notaEspecial}
           </p>
         ) : jugado ? (
-          <p style={{ fontSize: "1.1rem", textAlign: "center" }}>
-            <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
-          </p>
+          <>
+            <p style={{ fontSize: "1.1rem", textAlign: "center" }}>
+              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
+            </p>
+            {partido.numeroCancha && (
+              <p style={{ opacity: 0.7, fontSize: "0.82rem", margin: "-8px 0 0", textAlign: "center" }}>Cancha {partido.numeroCancha}</p>
+            )}
+          </>
         ) : (
           <div style={{ textAlign: "center" }}>
             <p style={{ fontSize: "1.05rem", margin: 0 }}>

@@ -29,6 +29,7 @@ interface EstadoPartidoLive {
   estado: EstadoPartido;
   resultado: Resultado;
   notaEspecial?: string;
+  numeroCancha?: string;
 }
 
 export default function LiveBanner({
@@ -134,6 +135,11 @@ export default function LiveBanner({
               {enVivo ? "● En juego" : "Final"}
             </span>
             {enVivo && <Cronometro partidoId={partidoId} estado={partido.estado} compact />}
+            {partido.numeroCancha && (
+              <span style={{ textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO_SUAVE }}>
+                Cancha {partido.numeroCancha}
+              </span>
+            )}
           </div>
         )}
       </Link>

@@ -133,7 +133,7 @@ export default async function PlantelSuperiorPage() {
               key={p.id}
               partidoId={p.id}
               categoriaNombre={cat.nombre}
-              inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
+              inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial, numeroCancha: p.numeroCancha }}
               nombreNewman={propioSi(p.rival, cat.id)}
               esPrueba={esIdDePartidoPrueba(p.id)}
               crucesHref={tieneFixtureDivision(cat.id) ? `/fixture/${cat.id}/cruces` : undefined}

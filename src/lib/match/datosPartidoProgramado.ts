@@ -39,6 +39,7 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
     rival: partido.rival,
     esLocal: partido.esLocal,
     cancha: partido.cancha,
+    numeroCancha: partido.numeroCancha,
     estado: partido.estado,
     resultado: partido.resultado,
     enCanchaIds: partido.enCanchaIds,

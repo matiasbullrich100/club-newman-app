@@ -100,6 +100,7 @@ export default async function CategoriaPage({
           rival: partido.rival,
           esLocal: partido.esLocal,
           cancha: partido.cancha,
+    numeroCancha: partido.numeroCancha,
           estado: partido.estado,
           resultado: partido.resultado,
           enCanchaIds: partido.enCanchaIds,

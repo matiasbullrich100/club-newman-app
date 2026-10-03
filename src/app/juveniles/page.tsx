@@ -78,7 +78,7 @@ export default async function JuvenilesPage() {
                   key={p.id}
                   partidoId={p.id}
                   categoriaNombre={CATEGORIAS.find((c) => c.id === p.categoriaId)?.nombre ?? p.categoriaId}
-                  inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial }}
+                  inicial={{ esLocal: p.esLocal, rival: p.rival, estado: p.estado, resultado: p.resultado, notaEspecial: p.notaEspecial, numeroCancha: p.numeroCancha }}
                   nombreNewman={nombreNewmanDe(p.categoriaId)}
                   esPrueba={esIdDePartidoPrueba(p.id)}
                   crucesHref={tieneFixtureDivision(p.categoriaId) ? `/fixture/${p.categoriaId}/cruces` : undefined}
