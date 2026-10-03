@@ -12,7 +12,8 @@ export const CANTIDAD_CANCHAS = 5;
 // `numeroCancha` del partido (el mismo dato que carga el manager desde /programar) y de ahi sale
 // en el resumen de la fecha y en el detalle del partido. `actual` = lo que ya hay guardado (lo
 // carga el club con anticipacion, ej. Primera = 1): viene marcada pero igual hay que tocarla para
-// confirmar. "Todavia no se" deja el dato como esta y no frena el partido.
+// confirmar. "Todavia no se" BORRA la cancha (si habia una cargada, deja de mostrarse en todos lados)
+// y no frena el partido.
 export default function ElegirCancha({
   partidoId,
   actual,
@@ -26,7 +27,7 @@ export default function ElegirCancha({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  function elegir(numero: string) {
+  function elegir(numero: string | null) {
     setError(null);
     startTransition(async () => {
       try {
@@ -73,7 +74,7 @@ export default function ElegirCancha({
       <button
         style={{ ...botonSecundario, fontSize: "0.78rem", marginTop: 12 }}
         disabled={isPending}
-        onClick={onElegida}
+        onClick={() => elegir(null)}
       >
         Todavía no sé
       </button>

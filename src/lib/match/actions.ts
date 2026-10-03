@@ -1690,6 +1690,8 @@ export async function resetearPartidoDemo(partidoDemoId: string): Promise<void> 
     enCanchaIds: titularesIds,
     // Vuelve a preguntar el pateador habitual al arrancar de nuevo -- ver PateadorHabitual.tsx.
     pateadorHabitualId: FieldValue.delete(),
+    // Y la cancha (se elige en el mismo paso previo, ver ElegirCancha.tsx).
+    numeroCancha: FieldValue.delete(),
     updatedAt: FieldValue.serverTimestamp(),
   });
 
