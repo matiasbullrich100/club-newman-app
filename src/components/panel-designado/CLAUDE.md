@@ -48,3 +48,6 @@ Panel de control del Designado durante un partido en vivo. Motor/acciones que ll
   dato que carga el manager desde `/programar`), y de ahí sale en el resumen de la fecha
   (`ProximaFechaRow`/`ProximaFechaBanner`) y en el detalle del partido (`PartidoHistorico`). La
   cancha ya cargada viene marcada pero hay que tocarla para confirmar; "Todavía no sé" no frena.
+- **`CanchaEnVivo.tsx`** — desplegable de la pastilla "Cancha" del menú de jugadas (`CargaIncidencia`,
+  al lado de +30"/+60"; también en el entretiempo): 5 pastillas + "Quitar cancha", para elegir/corregir
+  `numeroCancha` con el partido empezado (`setNumeroCancha` vale en cualquier estado menos terminado).

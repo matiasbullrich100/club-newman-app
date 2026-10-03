@@ -302,6 +302,7 @@ export default function PanelDesignado({
             enCanchaIds={partido.enCanchaIds}
             pateadorHabitualId={partido.pateadorHabitualId}
             enJuego={partido.estado === "en_juego"}
+            numeroCancha={partido.numeroCancha}
             onBloqueoChange={setBloqueoTry}
           />
           {/* Pateador preseleccionado: abajo de "Cargar jugada", a la vista con "Cambiar". */}

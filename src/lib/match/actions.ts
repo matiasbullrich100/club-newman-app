@@ -157,7 +157,9 @@ export async function setPateadorHabitual(partidoId: string, jugadorId: string |
  * El Designado elige la cancha puntual (1-5) del partido en la pantalla "Antes de arrancar"
  * (PateadorGate, paso posterior al pateador). Escribe el mismo `numeroCancha` que carga el manager
  * desde /programar, asi que el resumen de la fecha y el detalle del partido ya lo muestran sin
- * cambios. `null` borra el dato (vuelve a "sin confirmar"). Solo antes de que arranque el partido.
+ * cambios. `null` borra el dato (vuelve a "sin confirmar"). Tambien se puede elegir/corregir con el
+ * partido empezado (pastilla "Cancha" del menu de jugadas, junto al +60"): vale en cualquier estado menos
+ * terminado.
  */
 export async function setNumeroCancha(partidoId: string, numeroCancha: string | null): Promise<void> {
   const session = await getSession();
@@ -170,7 +172,7 @@ export async function setNumeroCancha(partidoId: string, numeroCancha: string | 
     if (!snap.exists) throw new Error("Partido no encontrado");
     const partido = snap.data() as Partido;
     if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
-    if (partido.estado !== "programado") throw new Error("Solo se puede elegir la cancha antes de que arranque el partido");
+    if (partido.estado === "terminado") throw new Error("El partido ya terminó");
     tx.update(partidoRef, {
       numeroCancha: valor ?? FieldValue.delete(),
       updatedAt: FieldValue.serverTimestamp(),

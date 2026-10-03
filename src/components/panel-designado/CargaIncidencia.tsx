@@ -6,6 +6,7 @@ import type { Equipo, Periodo, TipoIncidente } from "@/types/firestore";
 import { FAMILIA_PUNTOS, requierePlayerSelection } from "@/lib/incidentes";
 import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaCambio from "./CargaCambio";
+import CanchaEnVivo from "./CanchaEnVivo";
 import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
 import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -45,6 +46,7 @@ export default function CargaIncidencia({
   pateadorHabitualId,
   soloEnCancha = true,
   enJuego = true,
+  numeroCancha,
   onBloqueoChange,
 }: {
   partidoId: string;
@@ -61,6 +63,9 @@ export default function CargaIncidencia({
   /** false en el entretiempo (reloj parado): solo se ofrece el Cambio, no jugadas de puntos ni
    * tarjetas ni correccion de reloj. En vivo y en correccion post-partido va true. */
   enJuego?: boolean;
+  /** Cancha elegida hasta ahora (Partido.numeroCancha) -- la pastilla "Cancha" del menu la muestra y
+   * permite elegirla/corregirla con el partido empezado. */
+  numeroCancha?: string | null;
   /** Se avisa al panel cuando hay un try de Newman EN VIVO esperando que se elija el jugador que
    * lo hizo -- el panel bloquea el resto de las acciones hasta que se elige (o se cancela), asi
    * el try no se queda sin publicar por olvido. */
@@ -79,6 +84,7 @@ export default function CargaIncidencia({
   const [errorReloj, setErrorReloj] = useState<string | null>(null);
   const [isPendingReloj, startTransitionReloj] = useTransition();
   const [confirmandoReloj, setConfirmandoReloj] = useState<30 | 60 | null>(null);
+  const [eligiendoCancha, setEligiendoCancha] = useState(false);
 
   // En correcciones post-partido el reloj ya esta congelado -- hay que preguntar en que
   // momento paso la jugada para que quede ordenada cronologicamente entre las demas.
@@ -388,16 +394,30 @@ export default function CargaIncidencia({
               </button>
             ))}
           {/* Correccion de reloj -- no hay reloj corriendo en una correccion post-partido ni en el entretiempo. */}
-          {!esCorreccion && enJuego && (
-            <>
-              <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(30)}>
-                +30&quot;
+          {/* Correccion de reloj (+30"/+60") y la pastilla desplegable "Cancha" al lado: para elegirla o
+              corregirla con el partido empezado. La cancha tambien va en el entretiempo (reloj parado). */}
+          {!esCorreccion && (
+            <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: enJuego ? "1fr 1fr 1fr" : "1fr", gap: 8 }}>
+              {enJuego && (
+                <>
+                  <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(30)}>
+                    +30&quot;
+                  </button>
+                  <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(60)}>
+                    +60&quot;
+                  </button>
+                </>
+              )}
+              <button
+                style={{ ...botonOpcion, textAlign: "center", ...(eligiendoCancha ? { borderColor: DORADO } : {}) }}
+                aria-expanded={eligiendoCancha}
+                onClick={() => setEligiendoCancha((v) => !v)}
+              >
+                {numeroCancha ? `Cancha ${numeroCancha}` : "Cancha"} {eligiendoCancha ? "▴" : "▾"}
               </button>
-              <button style={{ ...botonOpcion, textAlign: "center" }} onClick={() => setConfirmandoReloj(60)}>
-                +60&quot;
-              </button>
-            </>
+            </div>
           )}
+
         </div>
       )}
 
@@ -411,6 +431,10 @@ export default function CargaIncidencia({
           arrancarAbierto
           onCerrar={() => setPaso("tipo")}
         />
+      )}
+
+      {paso === "tipo" && eligiendoCancha && !esCorreccion && (
+        <CanchaEnVivo partidoId={partidoId} actual={numeroCancha} onListo={() => setEligiendoCancha(false)} />
       )}
 
       {paso === "tipo" && confirmandoReloj !== null && (
