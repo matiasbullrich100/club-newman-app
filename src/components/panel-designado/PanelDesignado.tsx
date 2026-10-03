@@ -282,6 +282,22 @@ export default function PanelDesignado({
         />
       )}
 
+      {/* Partido interrumpido (medico / clima / referee): las incidencias siguen a la vista y se pueden
+          corregir (Corregir -> Cambiar jugador, Cambiar por, Eliminar) -- el servidor ya lo permite en
+          cualquier estado menos "programado". Antes, mientras duraba la interrupcion el panel solo
+          mostraba "Reanudar" y no habia forma de corregir un try mal cargado hasta despues del partido. */}
+      {partido.estado === "suspendido" && (
+        <IncidentesFeed
+          partidoId={partidoId}
+          rivalNombre={partido.rival}
+          puedeEditar
+          nombreNewman={nombreNewman}
+          esLocal={partido.esLocal}
+          plantel={plantel}
+          apellidosAmbiguos={apellidosAmbiguos}
+        />
+      )}
+
       {(partido.estado === "en_juego" || partido.estado === "entretiempo") && (
         <div style={{ display: "grid", gap: "1rem" }}>
           {/* Los relojes de las tarjetas (sancion en curso) van arriba de todo -- hay que estar
