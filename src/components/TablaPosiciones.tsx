@@ -71,10 +71,14 @@ export default function TablaPosiciones({
   data,
   conPlayoff = true,
   zonas,
+  resaltarPropio = true,
 }: {
   data: PosicionesTorneo;
   conPlayoff?: boolean;
   zonas?: ZonaTabla[];
+  /** false en Plantel Superior: la tabla no resalta el equipo de quien es la pagina (solo los 4 que
+   * clasifican / ya clasificados). En Juveniles queda true -- es la unica marca de la tabla. */
+  resaltarPropio?: boolean;
 }) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
   const marcarTop4 = conPlayoff && data.filas.length > 4;
@@ -135,7 +139,7 @@ export default function TablaPosiciones({
             {data.filas.map((f, idx) => {
               // No alcanza con "empieza con Newman" -- algunas zonas juntan a mas de un equipo del
               // club (ver Pre F/G/H en torneos-urba.ts), asi que hay que resaltar el equipo exacto.
-              const esNewman = f.equipo === data.nuestroEquipo;
+              const esNewman = resaltarPropio && f.equipo === data.nuestroEquipo;
               const clasifica = marcarTop4 && idx < 4;
               const asegurado = clasificadas.has(f.posicion);
               const zona = zonaDe(f.posicion);

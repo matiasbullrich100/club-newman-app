@@ -104,6 +104,7 @@ export default async function PosicionesPage({
             data={snap.data() as PosicionesTorneo}
             conPlayoff={grupoDeCategoria(categoriaId).grupo === "superior"}
             zonas={zonasDe(categoriaId, (snap.data() as PosicionesTorneo).filas.length)}
+            resaltarPropio={grupoDeCategoria(categoriaId).grupo !== "superior"}
           />
         )}
       </div>
