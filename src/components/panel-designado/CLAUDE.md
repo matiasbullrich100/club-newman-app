@@ -42,3 +42,9 @@ Panel de control del Designado durante un partido en vivo. Motor/acciones que ll
   del plantel completo, solo para el buscador).
 - **`estilos.ts`** — botones grandes a propósito: el público que carga esto en vivo (Designados,
   muchos mayores de 50) usa el celular con el pulgar y con poca luz de cancha.
+- **`PateadorGate.tsx` + `ElegirCancha.tsx`** — pantalla "Antes de arrancar" (partido `programado`,
+  cada vez que se entra): paso 1 pateador (`PateadorHabitual`), paso 2 cancha (5 pastillas 1-5,
+  `CANTIDAD_CANCHAS`). La cancha elegida se guarda con `setNumeroCancha` en `numeroCancha` (el mismo
+  dato que carga el manager desde `/programar`), y de ahí sale en el resumen de la fecha
+  (`ProximaFechaRow`/`ProximaFechaBanner`) y en el detalle del partido (`PartidoHistorico`). La
+  cancha ya cargada viene marcada pero hay que tocarla para confirmar; "Todavía no sé" no frena.

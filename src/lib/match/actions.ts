@@ -153,6 +153,36 @@ export async function setPateadorHabitual(partidoId: string, jugadorId: string |
   revalidatePath(`/partido/${partidoId}`);
 }
 
+/**
+ * El Designado elige la cancha puntual (1-5) del partido en la pantalla "Antes de arrancar"
+ * (PateadorGate, paso posterior al pateador). Escribe el mismo `numeroCancha` que carga el manager
+ * desde /programar, asi que el resumen de la fecha y el detalle del partido ya lo muestran sin
+ * cambios. `null` borra el dato (vuelve a "sin confirmar"). Solo antes de que arranque el partido.
+ */
+export async function setNumeroCancha(partidoId: string, numeroCancha: string | null): Promise<void> {
+  const session = await getSession();
+  const { partidoRef } = refs(partidoId);
+  const valor = numeroCancha?.trim() || null;
+  if (valor !== null && !/^[1-9]$/.test(valor)) throw new Error("Cancha inválida");
+
+  await adminDb.runTransaction(async (tx) => {
+    const snap = await tx.get(partidoRef);
+    if (!snap.exists) throw new Error("Partido no encontrado");
+    const partido = snap.data() as Partido;
+    if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
+    if (partido.estado !== "programado") throw new Error("Solo se puede elegir la cancha antes de que arranque el partido");
+    tx.update(partidoRef, {
+      numeroCancha: valor ?? FieldValue.delete(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  });
+
+  revalidatePath("/superior");
+  revalidatePath("/juveniles");
+  revalidatePath("/");
+  revalidatePath(`/partido/${partidoId}`);
+}
+
 export async function cortar1T(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);

@@ -88,7 +88,7 @@ export default function PartidoProgramadoPanel({
   if (!puedeOperar || plantel.length === 0) return panel;
 
   return (
-    <PateadorGate partidoId={partidoId} plantel={plantelRoster} sugeridoId={sugeridoPateadorId}>
+    <PateadorGate partidoId={partidoId} plantel={plantelRoster} sugeridoId={sugeridoPateadorId} numeroCancha={partido.numeroCancha}>
       {panel}
     </PateadorGate>
   );
