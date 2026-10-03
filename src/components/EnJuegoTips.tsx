@@ -143,25 +143,30 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
   {
     id: "buscador",
     texto: 'Nuevo botón "Buscar" para ir directo a lo que querés ver.',
+    activo: false,
   },
   {
     id: "tabla-cruces",
     texto: "CRUCES: qué le queda a cada uno !",
+    activo: false,
   },
   {
     id: "tamano-letra",
     texto: "Agrandá y achicá la letra.",
     visual: <BotonesLetraMini />,
+    activo: false,
   },
   {
     id: "telefono-horizontal",
     texto: "Acostá el teléfono y la tabla se ve MUCHO mejor !!!",
     visual: <TelefonoGirar />,
+    activo: false,
   },
   {
     id: "barra-equipos",
     texto: "Pasá de equipo en equipo.",
     visual: <BarraEquiposMini />,
+    activo: false,
   },
   {
     id: "tabla-clasificados",
@@ -287,9 +292,11 @@ export default function EnJuegoTips() {
         <FocoIcono />
         EnJuego tips
       </span>
-      <span style={{ marginTop: 8, fontSize: "0.8rem", fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1 }}>
-        #{actual.numero}
-      </span>
+      {TIPS_ACTIVOS.length > 1 && (
+        <span style={{ marginTop: 8, fontSize: "0.8rem", fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1 }}>
+          #{actual.numero}
+        </span>
+      )}
       <p style={{ margin: "14px 0 0", fontSize: "1.05rem", lineHeight: 1.5, maxWidth: 340 }}>{actual.texto}</p>
       {actual.visual && <div style={{ marginTop: 22, display: "flex", justifyContent: "center" }}>{actual.visual}</div>}
       <div style={{ marginTop: 34, display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 300 }}>
@@ -311,6 +318,7 @@ export default function EnJuegoTips() {
         >
           Entendido
         </button>
+        {idx < cola.length - 1 && (
         <button
           type="button"
           onClick={masTips}
@@ -327,6 +335,7 @@ export default function EnJuegoTips() {
         >
           + EnJuego Tips
         </button>
+        )}
       </div>
     </div>
   );
