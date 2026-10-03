@@ -7,10 +7,15 @@ function nombreEquipo(nombre: string) {
   return <span style={{ fontSize: chico ? "0.78em" : "1em", letterSpacing: chico ? 0 : undefined }}>{nombre}</span>;
 }
 
-function golesDe(equipo: Equipo, resultado: Resultado) {
+// `enVivo`: el bonus guardado (resultado.bonus*) recien se calcula al terminar el partido, asi que en vivo
+// se muestra el OFENSIVO (3 tries o mas de diferencia) calculado con los tries -- el mismo criterio que
+// el marcador de PartidoLive. El defensivo (perder por <= 7) solo tiene sentido con el partido cerrado.
+function golesDe(equipo: Equipo, resultado: Resultado, enVivo = false) {
   const goles = equipo === "newman" ? resultado.newman : resultado.rival;
-  const bonus = equipo === "newman" ? resultado.bonusNewman : resultado.bonusRival;
   const tries = equipo === "newman" ? resultado.triesNewman : resultado.triesRival;
+  const triesOtro = equipo === "newman" ? resultado.triesRival : resultado.triesNewman;
+  const bonusEnVivo = enVivo && (typeof tries === "number" ? tries : 0) - (typeof triesOtro === "number" ? triesOtro : 0) >= 3;
+  const bonus = (equipo === "newman" ? resultado.bonusNewman : resultado.bonusRival) || bonusEnVivo;
   return (
     <>
       {goles}
@@ -31,12 +36,15 @@ export function MatchupText({
   rival,
   jugado,
   resultado,
+  enVivo = false,
   nombreNewman = "Newman",
 }: {
   esLocal: boolean;
   rival: string;
   jugado: boolean;
   resultado: Resultado;
+  /** Partido en curso: muestra el bonus ofensivo calculado con los tries (ver golesDe). */
+  enVivo?: boolean;
   nombreNewman?: string;
 }) {
   const local = esLocal ? nombreNewman : rival;
@@ -47,8 +55,8 @@ export function MatchupText({
   if (jugado) {
     return (
       <>
-        {nombreEquipo(local)} <b style={{ margin: "0 6px" }}>{golesDe(equipoLocal, resultado)}</b> -{" "}
-        <b style={{ margin: "0 6px" }}>{golesDe(equipoVisitante, resultado)}</b>{" "}
+        {nombreEquipo(local)} <b style={{ margin: "0 6px" }}>{golesDe(equipoLocal, resultado, enVivo)}</b> -{" "}
+        <b style={{ margin: "0 6px" }}>{golesDe(equipoVisitante, resultado, enVivo)}</b>{" "}
         {nombreEquipo(visitante)}
       </>
     );

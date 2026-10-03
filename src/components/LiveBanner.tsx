@@ -115,7 +115,7 @@ export default function LiveBanner({
           <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", lineHeight: 1.2 }}>
             {esPrueba && <b style={{ color: DORADO }}>PRUEBA </b>}
             {partido.notaEspecial ?? (
-              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} nombreNewman={nombreNewman} />
+              <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado resultado={partido.resultado} enVivo={enVivo} nombreNewman={nombreNewman} />
             )}
           </span>
         </div>
