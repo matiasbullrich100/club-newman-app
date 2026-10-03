@@ -51,7 +51,7 @@ const EQUIPOS: EquipoFecha1[] = [
       "Valverde, Manuel",
       "Llavallol, Marcos",
       "Rodriguez Ribas, Hilario",
-      "Reynal, Abbott Juan",
+      "Reynal, Abbott",
       "Aramburu, Iñaki",
       "Lopez Aufranc, Hilario",
     ]),

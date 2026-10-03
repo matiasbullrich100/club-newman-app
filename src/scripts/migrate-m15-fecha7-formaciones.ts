@@ -37,7 +37,7 @@ const EQUIPOS: EquipoFormacion[] = [
       "Bullrich, José",
       "Llavallol, Marcos",
       "García Igarza, Joaquín",
-      "Reynal, Abbott Juan",
+      "Reynal, Abbott",
       "Tiscornia, Félix",
       "Lopez Aufranc, Hilario",
     ],

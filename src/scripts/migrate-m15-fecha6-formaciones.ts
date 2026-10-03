@@ -43,7 +43,7 @@ const EQUIPOS: EquipoFormacion[] = [
       "Valverde, Manuel",
       "Llavallol, Marcos",
       "García Igarza, Joaquín",
-      "Reynal, Abbott Juan",
+      "Reynal, Abbott",
       "Tiscornia, Félix",
       "Lopez Aufranc, Hilario",
     ],
