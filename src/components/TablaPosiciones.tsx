@@ -1,5 +1,6 @@
 import type { PosicionesTorneo } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { posicionesClasificadas } from "@/lib/clasificacion";
 
 // Columnas numéricas: alineadas a la derecha (como cualquier tabla de estadísticas). Además evita
 // que un Dif de 4 caracteres ("-186") toque el valor de la columna de al lado.
@@ -30,6 +31,10 @@ const izq: React.CSSProperties = { textAlign: "left" };
 // muestra las dos.
 const bgPlayoff = "rgba(70,196,106,.30)";
 const bgPropio = "rgba(226,197,120,.26)";
+// Equipo que ya tiene asegurado el playoff (ver posicionesClasificadas): verde mas intenso, barra verde
+// en el borde izquierdo (se ve tambien en la fila dorada del equipo propio) y "*" junto al nombre.
+const bgAsegurado = "rgba(70,196,106,.62)";
+const barraAsegurado = "#46e07a";
 
 // Nombres largos ("Atletico del Rosario B", "Buenos Aires C&RC B") empujaban la tabla entera mas
 // alla del ancho de la pantalla -- esta columna especificamente puede envolver en 2 lineas en vez
@@ -73,6 +78,7 @@ export default function TablaPosiciones({
 }) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
   const marcarTop4 = conPlayoff && data.filas.length > 4;
+  const clasificadas = marcarTop4 ? posicionesClasificadas(data.filas) : new Set<number>();
   const zonaDe = (pos: number) => zonas?.find((z) => pos >= z.desde && pos <= z.hasta);
 
   return (
@@ -93,7 +99,7 @@ export default function TablaPosiciones({
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", minWidth: 330, borderCollapse: "collapse", tableLayout: "fixed" }}>
           <colgroup>
-            <col style={{ width: zonas ? 26 : 20 }} />
+            <col style={{ width: clasificadas.size > 0 ? 32 : zonas ? 26 : 20 }} />
             <col style={{ width: colEquipoWidth }} />
             {/* PJ · G · E · P (1 dígito) */}
             {Array.from({ length: 4 }, (_, i) => (
@@ -131,6 +137,7 @@ export default function TablaPosiciones({
               // club (ver Pre F/G/H en torneos-urba.ts), asi que hay que resaltar el equipo exacto.
               const esNewman = f.equipo === data.nuestroEquipo;
               const clasifica = marcarTop4 && idx < 4;
+              const asegurado = clasificadas.has(f.posicion);
               const zona = zonaDe(f.posicion);
               return (
                 <tr
@@ -139,16 +146,16 @@ export default function TablaPosiciones({
                     // El color de la ZONA (ej. descenso) SIEMPRE gana -> los 2 últimos se ven
                     // idénticos aunque uno sea Newman (que igual se distingue por negrita/acento).
                     // Sin contorno por fila: las 2 filas forman UN bloque (la barra del puesto lo enmarca).
-                    background: zona?.fondo ?? (esNewman ? bgPropio : clasifica ? bgPlayoff : undefined),
+                    background: zona?.fondo ?? (esNewman ? bgPropio : asegurado ? bgAsegurado : clasifica ? bgPlayoff : undefined),
                   }}
                 >
-                  <td style={{ ...tdStyle, ...izq, ...(zona?.marca ? { borderLeft: `3px solid ${zona.borde}` } : {}) }}>
+                  <td style={{ ...tdStyle, ...izq, ...(zona?.marca ? { borderLeft: `3px solid ${zona.borde}` } : {}), ...(asegurado ? { boxShadow: `inset 5px 0 0 ${barraAsegurado}`, paddingLeft: 10 } : {}) }}>
                     {f.posicion}
                     {zona?.marca && (
                       <sup style={{ fontSize: "0.85em", fontWeight: 700, color: zona.borde }}>{zona.marca}</sup>
                     )}
                   </td>
-                  <td style={{ ...tdEquipoStyle, ...izq, color: esNewman ? DORADO : DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}</td>
+                  <td style={{ ...tdEquipoStyle, ...izq, color: esNewman ? DORADO : DORADO_SUAVE, fontWeight: esNewman ? 700 : 400 }}>{f.equipo}{asegurado && " *"}</td>
                   <td style={tdStyle}>{f.jugados}</td>
                   <td style={tdStyle}>{f.ganados}</td>
                   <td style={tdStyle}>{f.empatados}</td>
@@ -179,6 +186,15 @@ export default function TablaPosiciones({
             }}
           />
           Los primeros 4 clasifican a playoff
+        </p>
+      )}
+      {clasificadas.size > 0 && (
+        <p style={{ fontSize: "0.7rem", opacity: 0.85, margin: "8px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
+          <span
+            aria-hidden
+            style={{ display: "inline-block", width: 14, height: 12, background: bgAsegurado, boxShadow: `inset 4px 0 0 ${barraAsegurado}`, flexShrink: 0 }}
+          />
+          * Clasificado: ya no lo pueden alcanzar
         </p>
       )}
       {zonas?.map((z) => (
