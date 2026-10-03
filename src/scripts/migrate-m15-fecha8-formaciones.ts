@@ -54,7 +54,7 @@ const EQUIPOS: EquipoFormacion[] = [
       "VALVERDE, MANUEL",
       "LLAVALLOL, MARCOS",
       "GARCÍA IGARZA, JOAQUÍN",
-      "REYNAL ABBOTT, JUAN", // la placa dice "REYNAL, ABBOTT JUAN"
+      "REYNAL, ABBOTT", // la placa dice "REYNAL, ABBOTT JUAN" pero el nombre es Reynal Abbott (sin Juan)
       "TISCORNIA, FÉLIX",
       "LOPEZ AUFRANC, HILARIO",
     ],
