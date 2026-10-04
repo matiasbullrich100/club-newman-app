@@ -65,7 +65,10 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ses
 
   const enVivo = enVivoSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
-    .filter((p) => idsSet.has(p.categoriaId) && (puedeVerPruebas || !esIdDePartidoPrueba(p.id)));
+    // Un partido que quedo "en vivo" / interrumpido de una fecha ANTERIOR (ej. suspendido por clima y
+    // nunca cerrado) no es lo que se esta jugando hoy: no se muestra en el resumen -- esa categoria
+    // pasa a mostrar su proxima fecha. Sin fecha (partidos de prueba) se mantiene.
+    .filter((p) => idsSet.has(p.categoriaId) && (puedeVerPruebas || !esIdDePartidoPrueba(p.id)) && (!p.fecha || p.fecha >= hoy));
 
   const terminados = terminadosSnap.docs
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
