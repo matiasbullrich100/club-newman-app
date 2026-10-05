@@ -394,6 +394,17 @@ export async function terminarPartido(partidoId: string): Promise<void> {
     // asi cualquier desvio queda corregido al terminar.
     const { triesNewman, triesRival } = contarTriesLocal(incidentes);
 
+    // Un suplente que no jugo ningun minuto no cambia de categoria: su ficha en jugadores/ ya tiene
+    // grupo/edadId de otro lado (ej. un M17 en el banco de M19 E) y pisarlos lo sacaba del buscador
+    // de su categoria real. Solo se le pone la categoria de este partido si todavia no tiene ficha.
+    // (Las lecturas van antes de cualquier escritura de la transaccion.)
+    const sinMinutos = plantel.filter((j) => minutos[j.jugadorId].minutos1T + minutos[j.jugadorId].minutos2T === 0);
+    const fichasExistentes = new Set<string>();
+    if (!esPartidoDePrueba && sinMinutos.length > 0) {
+      const snaps = await tx.getAll(...sinMinutos.map((j) => adminDb.collection("jugadores").doc(j.jugadorId)));
+      for (const s of snaps) if (s.exists) fichasExistentes.add(s.id);
+    }
+
     tx.update(partidoRef, {
       estado: "terminado",
       "resultado.bonusNewman": bonusNewman,
@@ -437,9 +448,14 @@ export async function terminarPartido(partidoId: string): Promise<void> {
       });
       if (!esPartidoDePrueba) {
         const nombre = plantelSnap.docs.find((d) => d.id === jugador.jugadorId)?.data().nombre ?? "";
+        const noJugoYaTieneFicha = m.minutos1T + m.minutos2T === 0 && fichasExistentes.has(jugador.jugadorId);
         tx.set(
           adminDb.collection("jugadores").doc(jugador.jugadorId),
-          { nombre, ...grupoDeCategoria(partido.categoriaId), minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T) },
+          {
+            nombre,
+            ...(noJugoYaTieneFicha ? {} : grupoDeCategoria(partido.categoriaId)),
+            minutosJugadosTotal: FieldValue.increment(m.minutos1T + m.minutos2T),
+          },
           { merge: true }
         );
       }
