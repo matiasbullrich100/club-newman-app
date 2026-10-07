@@ -100,9 +100,9 @@ export default async function PlayoffPage() {
             ) : (
               <div style={{ display: "grid", gap: 12 }}>
                 {cfg.semis.map((s) => (
-                  <div key={`${s.fecha}-${s.cruce.join("v")}`} style={{ display: "grid", gap: 4 }}>
+                  <div key={`${s.fecha ?? "sin-fecha"}-${s.cruce.join("v")}`} style={{ display: "grid", gap: 4 }}>
                     <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.8 }}>
-                      Semifinal · {fechaCorta(s.fecha)}
+                      Semifinal · {s.fecha ? fechaCorta(s.fecha) : "fecha a confirmar"}
                     </div>
                     {s.cruce.map((pos) => (
                       <Equipo key={pos} fila={filaDe(pos)} segura={seguras.has(pos)} propio={filaDe(pos)?.equipo === data.nuestroEquipo} />

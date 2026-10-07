@@ -3,7 +3,7 @@
 // Los primeros 4 de cada tabla clasifican: semifinales 1° vs 4° y 2° vs 3°.
 
 export interface SemifinalPlayoff {
-  fecha: string; // ISO yyyy-mm-dd
+  fecha?: string; // ISO yyyy-mm-dd; ausente = todavia no informada
   cruce: [number, number]; // posiciones de la tabla que se enfrentan
 }
 
@@ -22,6 +22,11 @@ const INTERMEDIA_Y_PRE: PlayoffCategoria = {
   sede: "CUBA (Villa de Mayo)",
 };
 
+// M-22: la prensa de URBA no informo fechas ni sede todavia -- se muestran solo los cruces.
+const SIN_FECHAS: PlayoffCategoria = {
+  semis: [{ cruce: [1, 4] }, { cruce: [2, 3] }],
+};
+
 export const PLAYOFF: Record<string, PlayoffCategoria> = {
   primera: {
     semis: [
@@ -37,6 +42,7 @@ export const PLAYOFF: Record<string, PlayoffCategoria> = {
   "pre-d": INTERMEDIA_Y_PRE,
   "pre-e": INTERMEDIA_Y_PRE,
   "pre-f": INTERMEDIA_Y_PRE,
+  "m-22": SIN_FECHAS,
 };
 
 // "vie 30/10" a partir de un ISO yyyy-mm-dd (sin depender de la zona horaria del servidor).
