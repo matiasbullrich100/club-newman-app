@@ -136,6 +136,29 @@ function TablaClasificadosMini() {
   );
 }
 
+// Mini pastilla del tip "playoff": la misma pastilla amarilla de la pantalla de Inicio.
+function PastillaPlayoffMini() {
+  return (
+    <div
+      style={{
+        width: 230,
+        textAlign: "center",
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        fontSize: "0.8rem",
+        fontWeight: 700,
+        padding: "12px 10px",
+        borderRadius: 10,
+        background: "rgba(245,196,40,.95)",
+        color: "#2a1b02",
+      }}
+      aria-hidden="true"
+    >
+      Playoff Plantel Superior
+    </div>
+  );
+}
+
 // `activo: false` = queda en el codigo pero no se muestra (por si se quiere reactivar despues,
 // sin tener que volver a escribirlo). El numero visible (#1, #2...) sale del orden entre los
 // ACTIVOS, no de esta lista completa -- asi no quedan huecos cuando algunos estan apagados.
@@ -172,6 +195,12 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
     id: "tabla-clasificados",
     texto: "Mirá en las tablas los equipos ya clasificados.",
     visual: <TablaClasificadosMini />,
+    activo: false,
+  },
+  {
+    id: "playoff",
+    texto: "Nueva sección: PLAY OFF !!",
+    visual: <PastillaPlayoffMini />,
   },
   {
     id: "resumen-ultima-fecha",
