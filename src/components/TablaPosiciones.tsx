@@ -1,6 +1,7 @@
 import type { PosicionesTorneo } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { posicionesClasificadas } from "@/lib/clasificacion";
+import type { PartidoDivision } from "@/lib/fixtureDivision";
 
 // Columnas numéricas: alineadas a la derecha (como cualquier tabla de estadísticas). Además evita
 // que un Dif de 4 caracteres ("-186") toque el valor de la columna de al lado.
@@ -72,6 +73,7 @@ export default function TablaPosiciones({
   conPlayoff = true,
   zonas,
   resaltarPropio = true,
+  partidosDivision,
 }: {
   data: PosicionesTorneo;
   conPlayoff?: boolean;
@@ -79,10 +81,13 @@ export default function TablaPosiciones({
   /** false en Plantel Superior: la tabla no resalta el equipo de quien es la pagina (solo los 4 que
    * clasifican / ya clasificados). En Juveniles queda true -- es la unica marca de la tabla. */
   resaltarPropio?: boolean;
+  /** Partidos de la zona (todas las fechas): permiten el desempate por el cruce directo al marcar
+   * clasificados (ver posicionesClasificadas). */
+  partidosDivision?: PartidoDivision[];
 }) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
   const marcarTop4 = conPlayoff && data.filas.length > 4;
-  const clasificadas = marcarTop4 ? posicionesClasificadas(data.filas) : new Set<number>();
+  const clasificadas = marcarTop4 ? posicionesClasificadas(data.filas, 4, partidosDivision) : new Set<number>();
   const zonaDe = (pos: number) => zonas?.find((z) => pos >= z.desde && pos <= z.hasta);
 
   return (

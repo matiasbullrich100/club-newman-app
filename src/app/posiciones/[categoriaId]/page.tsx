@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS, grupoDeCategoria } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { fixtureDivisionCompleto } from "@/lib/resultadosDivision/consultar";
 import type { PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -62,6 +63,13 @@ export default async function PosicionesPage({
 
   const [snap, session] = await Promise.all([adminDb.collection("posiciones").doc(categoriaId).get(), getSession()]);
 
+  // Partidos de la zona: solo Plantel Superior (es donde se marcan clasificados) -- sirven para el
+  // desempate por el cruce directo entre dos equipos que pueden terminar igualados en puntos.
+  const partidosDivision =
+    !esJuveniles && tieneFixtureDivision(categoriaId)
+      ? (await fixtureDivisionCompleto(categoriaId)).flatMap((f) => f.partidos)
+      : undefined;
+
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "54px 16px 40px" }}>
       <BackLink href={backHref} />
@@ -105,6 +113,7 @@ export default async function PosicionesPage({
             conPlayoff={grupoDeCategoria(categoriaId).grupo === "superior"}
             zonas={zonasDe(categoriaId, (snap.data() as PosicionesTorneo).filas.length)}
             resaltarPropio={grupoDeCategoria(categoriaId).grupo !== "superior"}
+            partidosDivision={partidosDivision}
           />
         )}
       </div>
