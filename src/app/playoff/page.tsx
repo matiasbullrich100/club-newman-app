@@ -12,9 +12,9 @@ import SessionBar from "@/components/SessionBar";
 import { FuenteUrba, Seuo } from "@/components/PieNota";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
-// Mismos verdes que la Tabla de Posiciones: suave = esta entre los 4 hoy, intenso con barra =
-// ya clasificado (los demas no lo pueden alcanzar).
-const bgHoy = "rgba(70,196,106,.30)";
+// Verde intenso con barra = ya clasificado (los demas no lo pueden alcanzar, mismo que la Tabla de
+// Posiciones); amarillo = esta entre los 4 hoy pero todavia puede cambiar.
+const bgHoy = "rgba(245,196,40,.95)";
 const bgAsegurado = "rgba(70,196,106,.62)";
 const barraAsegurado = "#46e07a";
 
@@ -31,6 +31,7 @@ function Equipo({ fila, segura, propio }: { fila: FilaPosicion | undefined; segu
         boxShadow: segura ? `inset 4px 0 0 ${barraAsegurado}` : undefined,
         borderRadius: 8,
         padding: "8px 10px",
+        color: segura ? undefined : "#2a1b02",
         fontWeight: propio ? 700 : 500,
         fontSize: "0.9rem",
       }}
@@ -69,7 +70,7 @@ export default async function PlayoffPage() {
         Los primeros 4 de cada tabla juegan las semifinales: 1° vs 4° y 2° vs 3°.
       </p>
       <p style={{ fontSize: "0.72rem", opacity: 0.7, textAlign: "center", margin: "0 0 14px" }}>
-        Fechas informadas, a confirmar por URBA. Sede: a confirmar.
+        Fechas y sedes informadas, a confirmar por URBA.
       </p>
 
       <div style={{ display: "grid", gap: 6, margin: "0 0 18px", fontSize: "0.7rem" }}>
@@ -91,6 +92,9 @@ export default async function PlayoffPage() {
             <h2 style={{ fontSize: "1.05rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>
               {cat.nombre}
             </h2>
+            {cfg.sede && (
+              <p style={{ fontSize: "0.76rem", opacity: 0.85, margin: "-4px 0 8px" }}>Sede: {cfg.sede}</p>
+            )}
             {!data || data.filas.length < 4 ? (
               <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.82rem" }}>Todavía no hay tabla cargada.</p>
             ) : (
@@ -107,7 +111,6 @@ export default async function PlayoffPage() {
                 ))}
                 <div style={{ fontSize: "0.78rem", opacity: 0.85 }}>
                   Final: {cfg.final ? fechaCorta(cfg.final) : "fecha a confirmar"}
-                  {cfg.sede ? ` · ${cfg.sede}` : ""}
                 </div>
               </div>
             )}

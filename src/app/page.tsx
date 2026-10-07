@@ -45,7 +45,7 @@ export default async function Home() {
           Juveniles
         </Link>
         <Link href="/playoff" style={botonStyle}>
-          Playoff
+          Playoff Plantel Superior
         </Link>
         {(puedeSuperior || puedeJuveniles) && (
           <Link href="/formaciones" style={botonStyle}>

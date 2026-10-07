@@ -1,6 +1,5 @@
 // Fechas del playoff del TOP 14 (temporada 2026), segun lo que informo la prensa de URBA: son
-// tentativas hasta que URBA las confirme oficialmente, y todavia no se informo la sede. Cuando haya
-// sede, se carga en `sede` (por categoria) y la pantalla /playoff la muestra.
+// tentativas hasta que URBA las confirme oficialmente. `sede` (por categoria) la muestra /playoff.
 // Los primeros 4 de cada tabla clasifican: semifinales 1° vs 4° y 2° vs 3°.
 
 export interface SemifinalPlayoff {
@@ -20,6 +19,7 @@ const INTERMEDIA_Y_PRE: PlayoffCategoria = {
     { fecha: "2026-10-24", cruce: [2, 3] },
   ],
   final: "2026-11-14",
+  sede: "CUBA (Villa de Mayo)",
 };
 
 export const PLAYOFF: Record<string, PlayoffCategoria> = {
@@ -28,6 +28,7 @@ export const PLAYOFF: Record<string, PlayoffCategoria> = {
       { fecha: "2026-10-30", cruce: [1, 4] },
       { fecha: "2026-10-31", cruce: [2, 3] },
     ],
+    sede: "Cancha de CASI",
   },
   intermedia: INTERMEDIA_Y_PRE,
   "pre-a": INTERMEDIA_Y_PRE,
