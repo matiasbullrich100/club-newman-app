@@ -9,7 +9,7 @@ import type { FilaPosicion, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
-import { FuenteUrba, Seuo } from "@/components/PieNota";
+import { FuenteUrba } from "@/components/PieNota";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 // Verde intenso con barra = ya clasificado (los demas no lo pueden alcanzar, mismo que la Tabla de
@@ -119,7 +119,6 @@ export default async function PlayoffPage() {
       })}
 
       <FuenteUrba />
-      <Seuo />
     </main>
   );
 }

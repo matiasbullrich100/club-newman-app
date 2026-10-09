@@ -15,7 +15,6 @@ import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
 import EnJuegoTips from "@/components/EnJuegoTips";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
-import { Seuo } from "@/components/PieNota";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 
@@ -255,7 +254,6 @@ export default async function PlantelSuperiorPage() {
           </Link>
         ))}
       </div>
-      <Seuo />
     </main>
   );
 }

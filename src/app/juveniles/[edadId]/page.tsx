@@ -13,7 +13,6 @@ import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
 import { DORADO_SUAVE } from "@/lib/colors";
-import { Seuo } from "@/components/PieNota";
 
 // Primera pantalla de la edad: solo lo que se esta jugando/se jugo hoy + el selector de equipo --
 // el fixture completo (jugado y por jugar) de cada equipo vive en /juveniles/[edadId]/equipo/[equipoId],
@@ -125,7 +124,6 @@ export default async function EdadPage({ params }: { params: Promise<{ edadId: s
           Ver por equipo
         </Link>
       </p>
-      <Seuo />
     </main>
   );
 }
