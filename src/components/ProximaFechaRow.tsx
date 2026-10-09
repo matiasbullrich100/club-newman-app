@@ -9,9 +9,11 @@ import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 // no se muestra nada, ni el rotulo "Cancha"). Fecha libre no lleva nada.
 function textoHorarioCancha(proxima: ProximaFecha): string | null {
   if (proxima.notaEspecial) return null;
+  // Sede (La Boya, CASI Central...) solo de visitante, y no si es solo el nombre del propio rival.
+  const sede = !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
-  if (proxima.hora) return cancha ? `${proxima.hora} hs · ${cancha}` : `${proxima.hora} hs`;
-  return cancha;
+  const partes = [proxima.hora ? `${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  return partes.length > 0 ? partes.join(" · ") : null;
 }
 
 const botonChico: React.CSSProperties = {
@@ -94,7 +96,7 @@ export default function ProximaFechaRow({
               )}
             </span>
             {textoHorarioCancha(proxima) && (
-              <span style={{ fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
+              <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
                 {textoHorarioCancha(proxima)}
               </span>
             )}

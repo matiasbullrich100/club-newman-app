@@ -1,6 +1,6 @@
 // Horarios y sedes de la Fecha 25 de Plantel Superior (fin de semana del 9-10/10/2026), pasados por
 // el club. Todo de visitante: Pre G el viernes en SIC (vs SIC G, segun el fixture de la zona Pre F/G/H);
-// el resto el sabado en CASI, en dos sedes: "La Boya" (Pre D/E/F) y "Casi Central" (Primera, Inter, Pre A/B/C, M-22).
+// el resto el sabado en CASI, en dos sedes: "La Boya" (Pre D/E/F) y "CASI Central" (Primera, Inter, Pre A/B/C, M-22).
 // Pre H tiene Fecha libre.
 // Correr con: npx tsx src/scripts/set-horarios-superior-fecha25.ts
 
@@ -14,12 +14,12 @@ const DATOS: Record<string, { hora: string; cancha: string; fecha?: string; riva
   "pre-f": { hora: "12:00", cancha: "La Boya" },
   "pre-d": { hora: "12:00", cancha: "La Boya" },
   "pre-e": { hora: "13:45", cancha: "La Boya" },
-  "pre-b": { hora: "10:15", cancha: "Casi Central" },
-  "pre-a": { hora: "12:00", cancha: "Casi Central" },
-  "m-22": { hora: "12:00", cancha: "Casi Central" },
-  "pre-c": { hora: "13:45", cancha: "Casi Central" },
-  intermedia: { hora: "13:45", cancha: "Casi Central" },
-  primera: { hora: "15:30", cancha: "Casi Central" },
+  "pre-b": { hora: "10:15", cancha: "CASI Central" },
+  "pre-a": { hora: "12:00", cancha: "CASI Central" },
+  "m-22": { hora: "12:00", cancha: "CASI Central" },
+  "pre-c": { hora: "13:45", cancha: "CASI Central" },
+  intermedia: { hora: "13:45", cancha: "CASI Central" },
+  primera: { hora: "15:30", cancha: "CASI Central" },
 };
 
 const LIBRES = ["pre-h"];

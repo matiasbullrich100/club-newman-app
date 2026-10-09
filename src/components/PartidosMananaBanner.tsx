@@ -65,9 +65,16 @@ export default function PartidosMananaBanner({ partidos }: { partidos: PartidoMa
                 </span>
               )}
             </span>
-            <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {partido.notaEspecial ?? (
-                <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.jugado} resultado={partido.resultado} />
+            <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+              <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {partido.notaEspecial ?? (
+                  <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.jugado} resultado={partido.resultado} />
+                )}
+              </span>
+              {!partido.notaEspecial && !partido.jugado && !partido.esLocal && partido.cancha && partido.cancha.trim().toLowerCase() !== partido.rival.trim().toLowerCase() && (
+                <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
+                  {partido.cancha}
+                </span>
               )}
             </span>
             <span style={{ flex: "0 0 auto", textTransform: "uppercase", letterSpacing: 0.5, fontSize: "0.6rem", color: DORADO, textAlign: "right" }}>
