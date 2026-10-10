@@ -27,8 +27,8 @@ async function main() {
     throw new Error(`Estado inesperado: ${JSON.stringify(partido.resultado)} / ${partido.estado}`);
   }
   const incSnap = await partidoRef.collection("incidentes").orderBy("createdAt").get();
-  type Inc = Record<string, any> & { id: string };
-  const incs: Inc[] = incSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Record<string, any>) }));
+  type Inc = { id: string; tipo?: string; equipo?: string; jugadorId?: string; jugadorNombre?: string; dorsal?: string; createdAt: FirebaseFirestore.Timestamp };
+  const incs: Inc[] = incSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Inc, "id">) }));
   const tryBase = incs.find((i) => i.tipo === "try" && i.equipo === "newman");
   const convBase = incs.find((i) => i.tipo === "conversion" && i.equipo === "newman");
   const fin = incs.find((i) => i.tipo === "fin_partido");
@@ -37,12 +37,12 @@ async function main() {
   // El feed se ordena por createdAt. En este partido el fin_partido se cargo ANTES que los 3 tries/conversiones
   // (se agregaron despues, como correccion), asi que las nuevas siguen a la ultima cargada, de a 1 segundo.
   const N_NUEVAS = 14 + 10 + 3;
-  let t = (ultima.createdAt as FirebaseFirestore.Timestamp).toMillis();
+  let t = ultima.createdAt.toMillis();
   const sigCreatedAt = () => Timestamp.fromMillis((t += 1000));
 
   const base = { periodo: "1T", publicadoPorCuentaId: "script" };
   const nuevos: Record<string, unknown>[] = [];
-  const jug = (b: Record<string, any>) => ({ jugadorId: b.jugadorId, jugadorNombre: b.jugadorNombre, ...(b.dorsal ? { dorsal: b.dorsal } : {}) });
+  const jug = (b: Inc) => ({ jugadorId: b.jugadorId, jugadorNombre: b.jugadorNombre, ...(b.dorsal ? { dorsal: b.dorsal } : {}) });
   const seg = (m: number) => (m - 1) * 60 + 30;
 
   for (let i = 1; i <= TRIES_NUEVOS; i++) {
