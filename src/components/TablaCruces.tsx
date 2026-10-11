@@ -82,12 +82,25 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
       }
     }
   }
-  // En Plantel Superior (no todasLasFechas) se suma la ULTIMA fecha ya jugada antes de la primera
-  // pendiente -- no solo "lo que falta", tambien de donde viene cada equipo, para ver la evolucion
-  // de un vistazo (pedido explicito: "que la f22 sea con los resultados").
-  const minPendiente = fechasPendientes.size > 0 ? Math.min(...fechasPendientes) : undefined;
-  const fechaAnterior = minPendiente && minPendiente > 1 && fechasTodas.has(minPendiente - 1) ? minPendiente - 1 : undefined;
-  const columnasSuperior = fechaAnterior !== undefined ? [fechaAnterior, ...fechasPendientes] : [...fechasPendientes];
+  // En Plantel Superior (no todasLasFechas) se muestran las ULTIMAS 4 FECHAS del fixture como minimo:
+  // las que faltan y, si faltan menos de 4 (ej. solo la 26), se completan con las ya jugadas justo
+  // antes (con su resultado) -- no solo "lo que falta", tambien de donde viene cada equipo (pedido
+  // explicito: "que muestre los ultimos 4 partidos del fixture, no solo el que falta"). Con 4 o mas
+  // pendientes se muestran esas mas la ultima jugada, como siempre.
+  const COLUMNAS_MINIMAS = 4;
+  const pendOrden = [...fechasPendientes].sort((a, b) => a - b);
+  const todasOrden = [...fechasTodas].sort((a, b) => a - b);
+  let columnasSuperior: number[];
+  if (pendOrden.length >= COLUMNAS_MINIMAS) {
+    const minPend = pendOrden[0];
+    const anterior = minPend > 1 && fechasTodas.has(minPend - 1) ? [minPend - 1] : [];
+    columnasSuperior = [...anterior, ...pendOrden];
+  } else {
+    const limite = pendOrden.length > 0 ? pendOrden[0] : Infinity;
+    const previas = todasOrden.filter((n) => n < limite && !fechasPendientes.has(n)).slice(-(COLUMNAS_MINIMAS - pendOrden.length));
+    columnasSuperior = [...previas, ...pendOrden];
+  }
+  const hayFechasJugadas = columnasSuperior.some((n) => !fechasPendientes.has(n));
   const fpOrden = (todasLasFechas ? [...fechasTodas] : columnasSuperior).sort((a, b) => a - b);
 
   const th: React.CSSProperties = {
@@ -112,7 +125,7 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
     position: "relative",
   };
 
-  const hayJugadas = todasLasFechas || fechaAnterior !== undefined;
+  const hayJugadas = todasLasFechas || hayFechasJugadas;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
@@ -121,7 +134,7 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
           <h3 style={subtitulo}>{todasLasFechas ? "Fixture de cada equipo" : "Lo que le queda a cada uno"}</h3>
           <p style={ayuda}>
             Cada fila es un equipo; las columnas son{" "}
-            {todasLasFechas ? "todas las fechas, en orden" : fechaAnterior !== undefined ? "la última fecha jugada más las que faltan, en orden" : "las fechas que faltan, en orden"}.{" "}
+            {todasLasFechas ? "todas las fechas, en orden" : pendOrden.length >= COLUMNAS_MINIMAS ? (hayFechasJugadas ? "la última fecha jugada más las que faltan, en orden" : "las fechas que faltan, en orden") : "las últimas 4 fechas del fixture, en orden"}.{" "}
             <b>L</b> = de local, <b>V</b> = de visitante.
             {hayJugadas ? (
               <>
