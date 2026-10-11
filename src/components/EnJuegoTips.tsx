@@ -243,7 +243,7 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
   },
   {
     id: "cruces-a-tabla",
-    texto: "En CRUCES tocá el nombre de un equipo y te lleva a su lugar en la tabla.",
+    texto: "En CRUCES tocá el nombre de un equipo y te abre la tabla.",
     visual: <CrucesATablaMini />,
   },
   {
