@@ -159,6 +159,44 @@ function PastillaPlayoffMini() {
   );
 }
 
+// Mini del tip "cruces-a-tabla": el nombre tocable (subrayado punteado) -> la fila resaltada en la tabla.
+function CrucesATablaMini() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }} aria-hidden="true">
+      <span
+        style={{
+          fontSize: "0.8rem",
+          fontWeight: 700,
+          color: DORADO_SUAVE,
+          textDecoration: "underline dotted rgba(255,255,255,.55)",
+          textUnderlineOffset: 3,
+        }}
+      >
+        CUBA
+      </span>
+      <span style={{ fontSize: "1.3rem", color: DORADO_SUAVE }}>→</span>
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          padding: "4px 10px",
+          borderRadius: 4,
+          fontSize: "0.7rem",
+          fontWeight: 700,
+          color: DORADO_SUAVE,
+          background: "rgba(240,203,134,.34)",
+          outline: `2px solid ${DORADO}`,
+          outlineOffset: -2,
+        }}
+      >
+        <span>9</span>
+        <span>CUBA</span>
+        <span>49</span>
+      </div>
+    </div>
+  );
+}
+
 // `activo: false` = queda en el codigo pero no se muestra (por si se quiere reactivar despues,
 // sin tener que volver a escribirlo). El numero visible (#1, #2...) sale del orden entre los
 // ACTIVOS, no de esta lista completa -- asi no quedan huecos cuando algunos estan apagados.
@@ -201,6 +239,12 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
     id: "playoff",
     texto: "Nueva sección: PLAY OFF !!",
     visual: <PastillaPlayoffMini />,
+    activo: false,
+  },
+  {
+    id: "cruces-a-tabla",
+    texto: "En CRUCES tocá el nombre de un equipo y te lleva a su lugar en la tabla.",
+    visual: <CrucesATablaMini />,
   },
   {
     id: "resumen-ultima-fecha",
