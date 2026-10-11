@@ -78,7 +78,7 @@ export default async function CrucesPage({ params }: { params: Promise<{ categor
       </div>
 
       <div style={{ marginTop: 18 }}>
-        <TablaCruces fechas={fechas} todasLasFechas={grupo.grupo === "juveniles"} />
+        <TablaCruces fechas={fechas} categoriaId={categoriaId} todasLasFechas={grupo.grupo === "juveniles"} />
       </div>
 
       <FuenteUrba />

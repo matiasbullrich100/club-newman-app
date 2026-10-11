@@ -1,6 +1,7 @@
 import type { PosicionesTorneo } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { posicionesClasificadas } from "@/lib/clasificacion";
+import { slugEquipo } from "@/lib/equipoSlug";
 import type { PartidoDivision } from "@/lib/fixtureDivision";
 
 // Columnas numéricas: alineadas a la derecha (como cualquier tabla de estadísticas). Además evita
@@ -74,6 +75,7 @@ export default function TablaPosiciones({
   zonas,
   resaltarPropio = true,
   partidosDivision,
+  resaltarEquipo,
 }: {
   data: PosicionesTorneo;
   conPlayoff?: boolean;
@@ -84,6 +86,8 @@ export default function TablaPosiciones({
   /** Partidos de la zona (todas las fechas): permiten el desempate por el cruce directo al marcar
    * clasificados (ver posicionesClasificadas). */
   partidosDivision?: PartidoDivision[];
+  /** Equipo al que se llego desde Cruces (?equipo=): su fila se marca y la pagina baja hasta ella. */
+  resaltarEquipo?: string;
 }) {
   const actualizado = (data.updatedAt as unknown as FirebaseFirestore.Timestamp)?.toDate?.() ?? (data.updatedAt as Date);
   const marcarTop4 = conPlayoff && data.filas.length > 4;
@@ -148,14 +152,19 @@ export default function TablaPosiciones({
               const clasifica = marcarTop4 && idx < 4;
               const asegurado = clasificadas.has(f.posicion);
               const zona = zonaDe(f.posicion);
+              const elegido = !!resaltarEquipo && f.equipo === resaltarEquipo;
               return (
                 <tr
                   key={f.posicion}
+                  id={`eq-${slugEquipo(f.equipo)}`}
                   style={{
+                    scrollMarginTop: 80,
+                    outline: elegido ? `2px solid ${DORADO}` : undefined,
+                    outlineOffset: -2,
                     // El color de la ZONA (ej. descenso) SIEMPRE gana -> los 2 últimos se ven
                     // idénticos aunque uno sea Newman (que igual se distingue por negrita/acento).
                     // Sin contorno por fila: las 2 filas forman UN bloque (la barra del puesto lo enmarca).
-                    background: zona?.fondo ?? (esNewman ? bgPropio : asegurado ? bgAsegurado : clasifica ? bgPlayoff : undefined),
+                    background: elegido ? "rgba(240,203,134,.34)" : zona?.fondo ?? (esNewman ? bgPropio : asegurado ? bgAsegurado : clasifica ? bgPlayoff : undefined),
                   }}
                 >
                   <td style={{ ...tdStyle, ...izq, ...(zona?.marca ? { borderLeft: `3px solid ${zona.borde}` } : {}), ...(asegurado ? { boxShadow: `inset 5px 0 0 ${barraAsegurado}`, paddingLeft: 10 } : {}) }}>

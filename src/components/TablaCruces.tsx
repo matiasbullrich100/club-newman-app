@@ -1,5 +1,7 @@
 import { CREMA, DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
+import Link from "next/link";
 import type { FechaDivisionNumerada } from "@/lib/resultadosDivision/consultar";
+import { slugEquipo } from "@/lib/equipoSlug";
 
 const BORDE = "rgba(240,203,134,.4)";
 const FONDO_PROPIO = "rgba(245,168,0,.12)";
@@ -23,7 +25,7 @@ type CeldaRunIn =
 //     equipo queda redundante con esta).
 //  2. la grilla de cruces (fila = local, columna = visitante, celda = resultado para el local) --
 //     solo si NO `todasLasFechas`.
-export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas: FechaDivisionNumerada[]; todasLasFechas?: boolean }) {
+export default function TablaCruces({ fechas, categoriaId, todasLasFechas = false }: { fechas: FechaDivisionNumerada[]; categoriaId: string; todasLasFechas?: boolean }) {
   const esPropio = (n: string) => n === "Newman";
 
   const set = new Set<string>();
@@ -35,6 +37,16 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
     if (esPropio(a) !== esPropio(b)) return esPropio(a) ? -1 : 1; // Newman primero
     return a.localeCompare(b, "es");
   });
+
+  // Tocar un equipo lleva a la Tabla de Posiciones parado en su fila (resaltada).
+  const eqLink = (nombre: string) => (
+    <Link
+      href={`/posiciones/${categoriaId}?equipo=${encodeURIComponent(nombre)}#eq-${slugEquipo(nombre)}`}
+      style={{ color: "inherit", textDecoration: "underline dotted rgba(255,255,255,.4)", textUnderlineOffset: 2 }}
+    >
+      {nombre}
+    </Link>
+  );
 
   const key = (l: string, v: string) => `${l} ${v}`;
   const jugados = new Map<string, Cruce>();
@@ -160,7 +172,7 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
               <tbody>
                 {equipos.map((eq) => (
                   <tr key={eq}>
-                    <th style={{ ...th, color: esPropio(eq) ? DORADO : DORADO_SUAVE }}>{eq}</th>
+                    <th style={{ ...th, color: esPropio(eq) ? DORADO : DORADO_SUAVE }}>{eqLink(eq)}</th>
                     {fpOrden.map((nf) => {
                       const g = runin.get(eq)?.get(nf);
                       const base: React.CSSProperties = {
@@ -179,7 +191,7 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                         const fondo = g.gf > g.gc ? VERDE : g.gf < g.gc ? ROJO : GRIS;
                         return (
                           <td key={nf} style={{ ...base, background: fondo, padding: "3px 4px" }}>
-                            <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>{g.opp}</div>
+                            <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>{eqLink(g.opp)}</div>
                             <div>
                               {g.gf}-{g.gc}
                               {g.bonus && <b style={{ color: DORADO }}>·</b>} <span style={{ opacity: 0.7 }}>{g.local ? "(L)" : "(V)"}</span>
@@ -190,14 +202,14 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                       if (g.tipo === "especial") {
                         return (
                           <td key={nf} style={{ ...base, color: "rgba(255,255,255,.5)", fontStyle: "italic", padding: "3px 4px" }}>
-                            <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>{g.opp}</div>
+                            <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>{eqLink(g.opp)}</div>
                             <div>{g.motivo === "postergado" ? "Postergado" : "Sin info"}</div>
                           </td>
                         );
                       }
                       return (
                         <td key={nf} style={{ ...base, background: g.local ? FONDO_PROPIO : "rgba(255,255,255,.04)", fontStyle: g.local ? "normal" : "italic" }}>
-                          {g.opp} {g.local ? "(L)" : "(V)"}
+                          {eqLink(g.opp)} {g.local ? "(L)" : "(V)"}
                         </td>
                       );
                     })}
@@ -235,7 +247,7 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
                       border: "1px solid rgba(255,255,255,.12)",
                     }}
                   >
-                    {e}
+                    {eqLink(e)}
                   </th>
                 ))}
               </tr>
@@ -243,7 +255,7 @@ export default function TablaCruces({ fechas, todasLasFechas = false }: { fechas
             <tbody>
               {equipos.map((fila) => (
                 <tr key={fila}>
-                  <th style={{ ...th, color: esPropio(fila) ? DORADO : DORADO_SUAVE }}>{fila}</th>
+                  <th style={{ ...th, color: esPropio(fila) ? DORADO : DORADO_SUAVE }}>{eqLink(fila)}</th>
                   {equipos.map((col) => {
                     const propio = esPropio(fila) || esPropio(col);
                     if (fila === col)

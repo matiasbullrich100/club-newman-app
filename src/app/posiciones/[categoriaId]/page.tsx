@@ -47,10 +47,13 @@ const botonEstilo: React.CSSProperties = {
 
 export default async function PosicionesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ categoriaId: string }>;
+  searchParams: Promise<{ equipo?: string }>;
 }) {
   const { categoriaId } = await params;
+  const { equipo: resaltarEquipo } = await searchParams;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
   if (!categoria) notFound();
 
@@ -114,6 +117,7 @@ export default async function PosicionesPage({
             zonas={zonasDe(categoriaId, (snap.data() as PosicionesTorneo).filas.length)}
             resaltarPropio={grupoDeCategoria(categoriaId).grupo !== "superior"}
             partidosDivision={partidosDivision}
+            resaltarEquipo={resaltarEquipo}
           />
         )}
       </div>
