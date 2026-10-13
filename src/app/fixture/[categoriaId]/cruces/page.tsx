@@ -32,8 +32,15 @@ const botonActivo: React.CSSProperties = { ...botonEstilo, background: DORADO, c
 // queda a cada uno, en orden". 4ª vista alternativa de la división, al lado de Tabla / Fixt. Newm.
 // / Fixt División. Plantel Superior y Juveniles (cada letra tiene su propia zona en URBA -- ver
 // CATEGORIAS_CON_FIXTURE_DIVISION en lib/fixtureDivision.ts).
-export default async function CrucesPage({ params }: { params: Promise<{ categoriaId: string }> }) {
+export default async function CrucesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ categoriaId: string }>;
+  searchParams: Promise<{ equipo?: string }>;
+}) {
   const { categoriaId } = await params;
+  const { equipo: resaltarEquipo } = await searchParams;
   const categoria = CATEGORIAS.find((c) => c.id === categoriaId);
   if (!categoria || !tieneFixtureDivision(categoriaId)) notFound();
 
@@ -78,7 +85,7 @@ export default async function CrucesPage({ params }: { params: Promise<{ categor
       </div>
 
       <div style={{ marginTop: 18 }}>
-        <TablaCruces fechas={fechas} categoriaId={categoriaId} todasLasFechas={grupo.grupo === "juveniles"} />
+        <TablaCruces fechas={fechas} categoriaId={categoriaId} resaltarEquipo={resaltarEquipo} todasLasFechas={grupo.grupo === "juveniles"} />
       </div>
 
       <FuenteUrba />

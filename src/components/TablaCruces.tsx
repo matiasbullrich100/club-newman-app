@@ -25,7 +25,7 @@ type CeldaRunIn =
 //     equipo queda redundante con esta).
 //  2. la grilla de cruces (fila = local, columna = visitante, celda = resultado para el local) --
 //     solo si NO `todasLasFechas`.
-export default function TablaCruces({ fechas, categoriaId, todasLasFechas = false }: { fechas: FechaDivisionNumerada[]; categoriaId: string; todasLasFechas?: boolean }) {
+export default function TablaCruces({ fechas, categoriaId, resaltarEquipo, todasLasFechas = false }: { fechas: FechaDivisionNumerada[]; categoriaId: string; resaltarEquipo?: string; todasLasFechas?: boolean }) {
   const esPropio = (n: string) => n === "Newman";
 
   const set = new Set<string>();
@@ -171,8 +171,8 @@ export default function TablaCruces({ fechas, categoriaId, todasLasFechas = fals
               </thead>
               <tbody>
                 {equipos.map((eq) => (
-                  <tr key={eq}>
-                    <th style={{ ...th, color: esPropio(eq) ? DORADO : DORADO_SUAVE }}>{eqLink(eq)}</th>
+                  <tr key={eq} id={`eq-${slugEquipo(eq)}`} style={{ scrollMarginTop: 80 }}>
+                    <th style={{ ...th, color: esPropio(eq) ? DORADO : DORADO_SUAVE, background: eq === resaltarEquipo ? "rgba(240,203,134,.34)" : th.background }}>{eqLink(eq)}</th>
                     {fpOrden.map((nf) => {
                       const g = runin.get(eq)?.get(nf);
                       const base: React.CSSProperties = {
@@ -181,7 +181,7 @@ export default function TablaCruces({ fechas, categoriaId, todasLasFechas = fals
                         fontSize: "0.66rem",
                         textAlign: "center",
                         border: "1px solid rgba(255,255,255,.12)",
-                        outline: esPropio(eq) ? `2px solid ${DORADO}` : undefined,
+                        outline: esPropio(eq) || eq === resaltarEquipo ? `2px solid ${DORADO}` : undefined,
                         outlineOffset: -2,
                         position: "relative",
                       };

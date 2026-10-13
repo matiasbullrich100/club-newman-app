@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { adminDb } from "@/lib/firebase-admin";
 import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
@@ -11,6 +12,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import { FuenteUrba } from "@/components/PieNota";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { slugEquipo } from "@/lib/equipoSlug";
 
 // Verde intenso con barra = ya clasificado (los demas no lo pueden alcanzar, mismo que la Tabla de
 // Posiciones); amarillo = esta entre los 4 hoy pero todavia puede cambiar.
@@ -18,14 +20,26 @@ const bgHoy = "rgba(245,196,40,.95)";
 const bgAsegurado = "rgba(70,196,106,.62)";
 const barraAsegurado = "#46e07a";
 
-function Equipo({ fila, segura, propio }: { fila: FilaPosicion | undefined; segura: boolean; propio: boolean }) {
+function Equipo({ fila, categoriaId, alDia, segura, propio }: { fila: FilaPosicion | undefined; categoriaId: string; alDia: string | null; segura: boolean; propio: boolean }) {
   if (!fila) return null;
+  const ancla = `?equipo=${encodeURIComponent(fila.equipo)}#eq-${slugEquipo(fila.equipo)}`;
+  // Pastillas chicas dentro del recuadro: borde oscuro sobre el amarillo, claro sobre el verde.
+  const pastilla: React.CSSProperties = {
+    fontSize: "0.66rem",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    fontWeight: 700,
+    padding: "4px 10px",
+    borderRadius: 999,
+    border: `1px solid ${segura ? "rgba(255,255,255,.7)" : "rgba(42,27,2,.6)"}`,
+    color: "inherit",
+    whiteSpace: "nowrap",
+  };
   return (
     <div
       style={{
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+        flexDirection: "column",
         gap: 8,
         background: segura ? bgAsegurado : bgHoy,
         boxShadow: segura ? `inset 4px 0 0 ${barraAsegurado}` : undefined,
@@ -39,9 +53,19 @@ function Equipo({ fila, segura, propio }: { fila: FilaPosicion | undefined; segu
       <span>
         {fila.posicion}° {fila.equipo}
       </span>
-      <span style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.9, whiteSpace: "nowrap" }}>
-        {segura ? "Clasificado" : "Clasificado hoy"}
-      </span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <Link href={`/posiciones/${categoriaId}${ancla}`} style={pastilla}>
+            Tabla
+          </Link>
+          <Link href={`/fixture/${categoriaId}/cruces${ancla}`} style={pastilla}>
+            Próx. fecha
+          </Link>
+        </div>
+        <span style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.9, whiteSpace: "nowrap" }}>
+          {segura || !alDia ? "Clasificado" : `Clasificado al ${alDia}`}
+        </span>
+      </div>
     </div>
   );
 }
@@ -53,10 +77,14 @@ export default async function PlayoffPage() {
   const datos = await Promise.all(
     categorias.map(async (cat) => {
       const snap = await adminDb.collection("posiciones").doc(cat.id).get();
-      if (!snap.exists) return { cat, data: null, seguras: new Set<number>() };
+      if (!snap.exists) return { cat, data: null, seguras: new Set<number>(), alDia: null as string | null };
       const data = snap.data() as PosicionesTorneo;
-      const partidos = tieneFixtureDivision(cat.id) ? (await fixtureDivisionCompleto(cat.id)).flatMap((f) => f.partidos) : undefined;
-      return { cat, data, seguras: posicionesClasificadas(data.filas, 4, partidos) };
+      const fechasDiv = tieneFixtureDivision(cat.id) ? await fixtureDivisionCompleto(cat.id) : undefined;
+      const partidos = fechasDiv?.flatMap((f) => f.partidos);
+      // "Clasificado al d/m": dia de la ultima fecha con algun resultado -- hasta ahi llega la tabla.
+      const ultima = fechasDiv?.filter((f) => f.fecha && f.partidos.some((p) => p.jugado)).map((f) => f.fecha).sort().pop();
+      const alDia = ultima ? `${Number(ultima.split("-")[2])}/${Number(ultima.split("-")[1])}` : null;
+      return { cat, data, seguras: posicionesClasificadas(data.filas, 4, partidos), alDia };
     })
   );
 
@@ -84,7 +112,7 @@ export default async function PlayoffPage() {
         </span>
       </div>
 
-      {datos.map(({ cat, data, seguras }) => {
+      {datos.map(({ cat, data, seguras, alDia }) => {
         const cfg = PLAYOFF[cat.id];
         const filaDe = (pos: number) => data?.filas.find((f) => f.posicion === pos);
         return (
@@ -105,7 +133,7 @@ export default async function PlayoffPage() {
                       Semifinal · {s.fecha ? fechaCorta(s.fecha) : "fecha a confirmar"}
                     </div>
                     {s.cruce.map((pos) => (
-                      <Equipo key={pos} fila={filaDe(pos)} segura={seguras.has(pos)} propio={filaDe(pos)?.equipo === data.nuestroEquipo} />
+                      <Equipo key={pos} fila={filaDe(pos)} categoriaId={cat.id} alDia={alDia} segura={seguras.has(pos)} propio={filaDe(pos)?.equipo === data.nuestroEquipo} />
                     ))}
                   </div>
                 ))}
