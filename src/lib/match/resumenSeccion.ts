@@ -150,6 +150,8 @@ export interface ProximaFecha {
   // (Primera de local en Newman ya se sabe: Cancha 1). Ver Partido.numeroCancha en firestore.ts.
   numeroCancha?: string;
   notaEspecial?: string;
+  // Amistoso arreglado por el club (no es del fixture oficial) -- la fila de Proxima Fecha lo aclara.
+  amistoso?: boolean;
 }
 
 /**
@@ -182,6 +184,7 @@ export async function proximasFechasDe(categoriaId: string, cantidad: number): P
     cancha: p.cancha,
     numeroCancha: p.numeroCancha,
     notaEspecial: p.notaEspecial,
+    amistoso: p.amistoso,
   }));
 }
 
@@ -271,5 +274,6 @@ async function proximaFechaJuvenilDe(categoriaId: string): Promise<ProximaFecha 
     cancha: proxima.cancha,
     numeroCancha: proxima.numeroCancha,
     notaEspecial: proxima.notaEspecial,
+    amistoso: proxima.amistoso,
   };
 }
