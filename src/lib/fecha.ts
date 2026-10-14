@@ -80,12 +80,20 @@ export function diasDesdeEnArgentina(fechaIso: string): number {
 // sabado/domingo se ve de domingo a miercoles.
 export const DIAS_RESULTADO_FRESCO = 5;
 
+// Pedido puntual: dia en que la ventana de "Proxima Fecha" arranca ANTES (miercoles 14/10/2026, en
+// vez del jueves 06:00). Se vence sola: desde el jueves 06:00 la ventana normal ya la cubre.
+const DIA_ADELANTADO_PROXIMA_FECHA = "2026-10-14";
+function esDiaAdelantadoProximaFecha(): boolean {
+  return hoyIsoEnArgentina() === DIA_ADELANTADO_PROXIMA_FECHA;
+}
+
 // Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 06:00 (pedido
 // explicito, es cuando el club arranca a armar la previa del fin de semana) hasta el domingo, el
 // resumen de /superior y /juveniles deja de mostrar el resultado de la fecha pasada (ya viejo a esa
 // altura) y muestra la Proxima Fecha en su lugar, hasta que haya un partido en vivo o recien
 // terminado que lo reemplace (ver el chequeo de "terminados" en cada pagina, no solo esta funcion).
 export function debeMostrarProximaFechaEnArgentina(): boolean {
+  if (esDiaAdelantadoProximaFecha()) return true;
   const partes = Object.fromEntries(
     new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Argentina/Buenos_Aires",
@@ -118,6 +126,7 @@ export function fechaIsoEsHoyEnArgentina(fechaIso: string): boolean {
 // aunque el resultado tenga menos de DIAS_RESULTADO_FRESCO dias. Sabado y domingo NO entran: ahi
 // manda el partido en vivo / recien jugado.
 export function esVentanaPreviaProximaFecha(): boolean {
+  if (esDiaAdelantadoProximaFecha()) return true;
   const partes = Object.fromEntries(
     new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Argentina/Buenos_Aires",
