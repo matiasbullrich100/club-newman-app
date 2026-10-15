@@ -126,7 +126,7 @@ export default function PartidoHistorico({
         )}
         {partido.amistoso && (
           <p style={{ textAlign: "center", margin: "0 0 6px", fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 1, color: DORADO }}>
-            Amistoso
+            Amistoso{partido.formato ? ` · ${partido.formato}` : ""}
           </p>
         )}
         {partido.notaEspecial ? (

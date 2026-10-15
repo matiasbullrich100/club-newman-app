@@ -65,6 +65,8 @@ export interface Partido {
   // (no cuenta para la tabla de posiciones) -- se aclara junto al resultado/matchup, a diferencia
   // de notaEspecial que reemplaza el matchup entero.
   amistoso?: boolean;
+  // Aclaracion de formato del partido (ej. "3 tiempos de 40") -- se muestra junto a "Amistoso".
+  formato?: string;
   // Solo aplica a un partido "programado" -- ausente o true = la formacion es publica (default,
   // asi ningun partido historico/ya migrado se ve afectado). false = alguien ya cargo la
   // formacion pero el club todavia no la comunico; solo quien puede operar esta categoria la ve,

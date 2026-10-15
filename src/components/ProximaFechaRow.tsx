@@ -12,7 +12,7 @@ function textoHorarioCancha(proxima: ProximaFecha): string | null {
   // Sede (La Boya, CASI Central...) solo de visitante, y no si es solo el nombre del propio rival.
   const sede = !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
-  const partes = [proxima.amistoso ? "Amistoso" : null, proxima.hora ? `${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  const partes = [proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
 

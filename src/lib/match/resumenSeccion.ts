@@ -152,6 +152,7 @@ export interface ProximaFecha {
   notaEspecial?: string;
   // Amistoso arreglado por el club (no es del fixture oficial) -- la fila de Proxima Fecha lo aclara.
   amistoso?: boolean;
+  formato?: string;
 }
 
 /**
@@ -185,6 +186,7 @@ export async function proximasFechasDe(categoriaId: string, cantidad: number): P
     numeroCancha: p.numeroCancha,
     notaEspecial: p.notaEspecial,
     amistoso: p.amistoso,
+    formato: p.formato,
   }));
 }
 
@@ -275,5 +277,6 @@ async function proximaFechaJuvenilDe(categoriaId: string): Promise<ProximaFecha 
     numeroCancha: proxima.numeroCancha,
     notaEspecial: proxima.notaEspecial,
     amistoso: proxima.amistoso,
+    formato: proxima.formato,
   };
 }

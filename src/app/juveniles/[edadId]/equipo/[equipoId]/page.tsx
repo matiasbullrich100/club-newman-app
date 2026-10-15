@@ -129,7 +129,7 @@ export default async function EquipoJuvenilesPage({
                   </>
                 )
               }
-              notaSecundaria={partido.amistoso && "Amistoso"}
+              notaSecundaria={partido.amistoso && `Amistoso${partido.formato ? ` · ${partido.formato}` : ""}`}
             />
           ) : null
         )}
