@@ -1,6 +1,6 @@
 // M19 C y D: la Fecha 7 vs BACRC (del 2026-09-27) quedo sin jugar ("programado"); se juega el domingo
 // 2026-10-18 en Newman, C y D a las 11:00. Solo cambia fecha/hora; no toca formacion publicada.
-// (M19 A y B tienen su f7 SUSPENDIDA con juego a medias: no se tocan aca.)
+// (M19 A: fecha/hora cambiadas aparte a 12:30, sigue "suspendido"; M19 B no juega el domingo.)
 // Idempotente; solo toca partidos "programado". Correr con: npx tsx src/scripts/set-m19-c-d-f7-bacrc.ts
 import { config } from "dotenv";
 import { resolve } from "path";
