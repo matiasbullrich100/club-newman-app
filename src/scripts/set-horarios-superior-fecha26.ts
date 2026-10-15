@@ -1,7 +1,7 @@
 // Horarios y rivales de la Fecha 26 de Plantel Superior (sabado 2026-10-17), pasados por el club.
 // En Newman: Pre G y Pre F vs Los Tilos 10:15 (3 tiempos de 40 -- sin campo en el modelo, no se carga),
 // y vs CUBA: Pre D/B 10:15, Pre E/C/A 12:00, M-22/Inter 13:45, Primera 15:30.
-// Pre H de visitante en Pinazo (cancha de BACRC) 12:00 vs BACRC H.
+// Pre H de visitante en Pinazo (cancha de Belgrano Athletic) 12:00 vs Belgrano H.
 // Correr con: npx tsx src/scripts/set-horarios-superior-fecha26.ts   (DRY_RUN=1 para simular)
 
 import { config } from "dotenv";
@@ -21,7 +21,7 @@ const DATOS: Record<string, { hora: string; rival?: string; cancha: string; esLo
   "m-22": { hora: "13:45", cancha: "Newman", esLocal: true },
   intermedia: { hora: "13:45", cancha: "Newman", esLocal: true },
   primera: { hora: "15:30", cancha: "Newman", esLocal: true },
-  "pre-h": { hora: "12:00", rival: "BACRC H", cancha: "Pinazo", esLocal: false },
+  "pre-h": { hora: "12:00", rival: "Belgrano H", cancha: "Pinazo", esLocal: false },
 };
 
 async function main() {
