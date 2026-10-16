@@ -7,13 +7,17 @@ import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 // Sublinea del resumen de Proxima Fecha: horario (si el manager lo cargo desde /programar, sea
 // Newman local o visitante) + cancha ("Cancha 3" SOLO si ya se sabe -- hasta que el club confirme
 // no se muestra nada, ni el rotulo "Cancha"). Fecha libre no lleva nada.
+// La proxima fecha cae despues de este domingo: esta semana el equipo no juega.
+function noJuegaEstaSemana(proxima: ProximaFecha): boolean {
+  return !!proxima.fecha && proxima.fecha > domingoDeEstaSemanaIso();
+}
+
 function textoHorarioCancha(proxima: ProximaFecha): string | null {
   if (proxima.notaEspecial) return null;
   // Sede (La Boya, CASI Central...) solo de visitante, y no si es solo el nombre del propio rival.
   const sede = !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
-  // La proxima fecha cae despues de este domingo: esta semana el equipo no juega.
-  const libreEstaSemana = !!proxima.fecha && proxima.fecha > domingoDeEstaSemanaIso();
+  const libreEstaSemana = noJuegaEstaSemana(proxima);
   const partes = [libreEstaSemana ? "Libre esta semana" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
@@ -60,7 +64,8 @@ export default function ProximaFechaRow({
 }) {
   // Fecha libre (u otra nota especial) -- mismo fondo negro que un partido ya jugado, no hay nada
   // que "esperar" en esa fila.
-  const jugada = !!proxima.notaEspecial;
+  // Tambien "Libre esta semana": mismo fondo negro que una Fecha libre.
+  const jugada = !!proxima.notaEspecial || noJuegaEstaSemana(proxima);
 
   return (
     <div
