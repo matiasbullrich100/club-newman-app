@@ -69,6 +69,14 @@ export function mananaIsoEnArgentina(): string {
   return hoy.toISOString().slice(0, 10);
 }
 
+// "YYYY-MM-DD" del domingo de esta semana en Argentina (hoy mismo si es domingo) -- fin de la "semana de
+// partidos" (jueves a domingo). Una proxima fecha posterior a esto significa que no se juega esta semana.
+export function domingoDeEstaSemanaIso(): string {
+  const hoy = new Date(`${hoyIsoEnArgentina()}T12:00:00Z`);
+  hoy.setUTCDate(hoy.getUTCDate() + ((7 - hoy.getUTCDay()) % 7));
+  return hoy.toISOString().slice(0, 10);
+}
+
 // Dias de calendario (no horas) entre una fecha ISO "YYYY-MM-DD" y hoy en Argentina -- para saber
 // si el ultimo resultado terminado todavia es "de esta semana" o ya quedo viejo (ver
 // debeMostrarProximaFechaEnArgentina, mas abajo, y su uso en /superior y /juveniles).

@@ -78,13 +78,15 @@ export async function partidosEnVivoOUltimoTerminado(categoriaIds: string[], ses
     .map((d) => ({ id: d.id, ...(d.data() as Partido) }))
     .filter((p) => idsSet.has(p.categoriaId) && !!p.fecha && p.fecha <= hoy);
 
-  // Partidos reales (con fecha calendario, terminados o Fecha libre ya pasada): el de mayor
-  // numeroFecha por categoria.
+  // Partidos reales (con fecha calendario, terminados o Fecha libre ya pasada): el MAS RECIENTE por
+  // categoria, por dia calendario y recien despues por numeroFecha -- un partido postergado que se
+  // juega mas tarde (ej. la Fecha 3 jugada un miercoles, con la 9 ya jugada antes) tiene numeroFecha
+  // chico pero es el ultimo que se jugo.
   const masRecientePorCategoria = new Map<string, (typeof terminados)[number]>();
   for (const p of [...terminados, ...libresPasadas]) {
     if (!p.fecha) continue;
     const actual = masRecientePorCategoria.get(p.categoriaId);
-    if (!actual || comoNumero(p.numeroFecha) > comoNumero(actual.numeroFecha)) {
+    if (!actual || (p.fecha ?? "") > (actual.fecha ?? "") || (p.fecha === actual.fecha && comoNumero(p.numeroFecha) > comoNumero(actual.numeroFecha))) {
       masRecientePorCategoria.set(p.categoriaId, p);
     }
   }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DORADO, DORADO_SUAVE, NEGRO_JUGADA } from "@/lib/colors";
-import { diaSemanaCorto, formatFechaCorta } from "@/lib/fecha";
+import { diaSemanaCorto, domingoDeEstaSemanaIso, formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 
@@ -12,7 +12,9 @@ function textoHorarioCancha(proxima: ProximaFecha): string | null {
   // Sede (La Boya, CASI Central...) solo de visitante, y no si es solo el nombre del propio rival.
   const sede = !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
-  const partes = [proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  // La proxima fecha cae despues de este domingo: esta semana el equipo no juega.
+  const libreEstaSemana = !!proxima.fecha && proxima.fecha > domingoDeEstaSemanaIso();
+  const partes = [libreEstaSemana ? "Libre esta semana" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
 
