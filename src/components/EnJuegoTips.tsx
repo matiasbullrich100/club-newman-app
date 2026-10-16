@@ -17,6 +17,10 @@ import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
+// Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
+// los muestra TODOS, en orden, sin cooldown -- "Siguiente" avanza y el ultimo cierra con "Entendido".
+// Poner en false para volver al comportamiento normal (1 tip por visita, cooldown de 1 semana).
+const MOSTRAR_TODOS_SIEMPRE = true;
 
 interface EstadoTips {
   vistos: Record<string, number>; // id del tip -> timestamp de la ultima vez que se mostro
@@ -315,10 +319,12 @@ export default function EnJuegoTips() {
     // ("+ EnJuego Tips"), recorre el resto sin importar el cooldown de cada uno (fue una decision
     // explicita de seguir viendo, no un popup que se le impone).
     const ahora = Date.now();
-    const inicio = TIPS_ACTIVOS.findIndex((t) => {
-      const visto = vistos[t.id];
-      return !visto || ahora - visto > COOLDOWN_TIP_MS;
-    });
+    const inicio = MOSTRAR_TODOS_SIEMPRE
+      ? TIPS_ACTIVOS.length > 0 ? 0 : -1
+      : TIPS_ACTIVOS.findIndex((t) => {
+          const visto = vistos[t.id];
+          return !visto || ahora - visto > COOLDOWN_TIP_MS;
+        });
     if (inicio === -1) return;
 
     marcar(TIPS_ACTIVOS[inicio].id); // el que se muestra ahora ya cuenta como visto
@@ -386,7 +392,7 @@ export default function EnJuegoTips() {
       <div style={{ marginTop: 34, display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 300 }}>
         <button
           type="button"
-          onClick={cerrar}
+          onClick={MOSTRAR_TODOS_SIEMPRE && idx < cola.length - 1 ? masTips : cerrar}
           style={{
             background: DORADO,
             color: TINTA,
@@ -400,9 +406,9 @@ export default function EnJuegoTips() {
             cursor: "pointer",
           }}
         >
-          Entendido
+          {MOSTRAR_TODOS_SIEMPRE && idx < cola.length - 1 ? "Siguiente" : "Entendido"}
         </button>
-        {idx < cola.length - 1 && (
+        {!MOSTRAR_TODOS_SIEMPRE && idx < cola.length - 1 && (
         <button
           type="button"
           onClick={masTips}
