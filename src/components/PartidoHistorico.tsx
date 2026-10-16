@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Incidente, Partido } from "@/types/firestore";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
-import { formatFechaCorta } from "@/lib/fecha";
+import { diaSemanaCorto, formatFechaCorta } from "@/lib/fecha";
 import { nombreNewmanDe } from "@/lib/categorias";
 import { MatchupText } from "./FixtureRow";
 import Formaciones from "./Formaciones";
@@ -149,7 +149,7 @@ export default function PartidoHistorico({
             </p>
             {(partido.hora || partido.cancha) && (
               <p style={{ opacity: 0.7, fontSize: "0.82rem", marginTop: 6 }}>
-                {partido.hora && `${partido.hora} hs`}
+                {partido.hora && `${partido.fecha ? `${diaSemanaCorto(partido.fecha)} ` : ""}${partido.hora} hs`}
                 {partido.cancha && ` en ${partido.cancha}`}
                 {partido.numeroCancha && ` · Cancha ${partido.numeroCancha}`}
               </p>

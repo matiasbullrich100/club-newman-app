@@ -8,6 +8,12 @@ export function formatFecha(iso: string, weekday: "short" | "long" = "short"): s
   return `${diaSemana} ${dia}-${mes}`;
 }
 
+// "Vie", "Sáb"... del dia calendario de un ISO "YYYY-MM-DD" -- se pone antes del horario en las semanas con
+// partidos repartidos en varios dias (jueves a domingo). Mediodia UTC para que no se corra un dia.
+export function diaSemanaCorto(iso: string): string {
+  return ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][new Date(`${iso}T12:00:00Z`).getUTCDay()];
+}
+
 // "28/03", sin dia de la semana -- para la ficha de un partido puntual (ej. "Fecha #3 · 28/03"),
 // donde ya se sabe de que fecha del fixture se trata y el dia de la semana no aporta nada.
 export function formatFechaCorta(iso: string): string {

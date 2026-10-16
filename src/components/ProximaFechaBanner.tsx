@@ -1,5 +1,5 @@
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
-import { formatFechaCorta } from "@/lib/fecha";
+import { diaSemanaCorto, formatFechaCorta } from "@/lib/fecha";
 import { MatchupText } from "./FixtureRow";
 import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 
@@ -37,7 +37,7 @@ export default function ProximaFechaBanner({ proximas }: { proximas: ProximaFech
                     a diferencia de `cancha` que guarda el nombre completo del club. */}
                 {!proxima.esLocal && ` · en ${proxima.rival}`}
                 {/* Horario -- lo carga el manager desde /programar, sea Newman local o visitante. */}
-                {proxima.hora && ` · ${proxima.hora} hs`}
+                {proxima.hora && ` · ${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs`}
                 {/* Cancha -- solo cuando el club confirma el numero; hasta entonces no se muestra nada. */}
                 {proxima.numeroCancha && ` · Cancha ${proxima.numeroCancha}`}
               </span>
