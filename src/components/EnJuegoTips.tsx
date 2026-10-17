@@ -252,14 +252,17 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
     activo: false,
   },
   {
-    id: "clasificacion-pre-a",
-    texto:
-      "Pre A (3° 92 ptos): si ganan, clasifican. Si empatan o pierden, dependen de que CASI (2° 99) le gane a Alumni (4° 91) y SIC (5° 90) vs BACRC (8° 47)",
-  },
-  {
-    id: "clasificacion-pre-c",
-    texto:
-      "Pre C (4° 91): tiene que sacar 1 punto: ganar, empatar o perder con bonus defensivo. Si pierde sin bonus, depende de Belgrano (5° 86) que juega vs Matreros (14° 9)",
+    id: "clasificacion-pre-a-c",
+    texto: (
+      <>
+        <span style={{ display: "block", fontWeight: 700, color: DORADO }}>Pre A</span>
+        <span style={{ display: "block", marginTop: 4 }}>
+          Si gana, clasifica. Si empata o pierde, depende de que CASI le gane a Alumni.
+        </span>
+        <span style={{ display: "block", fontWeight: 700, color: DORADO, marginTop: 22 }}>Pre C</span>
+        <span style={{ display: "block", marginTop: 4 }}>Si saca 1 punto, clasifica.</span>
+      </>
+    ),
   },
   {
     id: "resumen-ultima-fecha",
