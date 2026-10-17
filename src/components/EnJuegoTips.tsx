@@ -426,10 +426,13 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
         color: CREMA,
       }}
     >
-      <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: DORADO, letterSpacing: 0.5, fontSize: "0.95rem" }}>
-        <FocoIcono />
-        EnJuego tips
-      </span>
+      {/* La pantalla de clasificados lleva su propio titulo: sin el rotulo "EnJuego tips". */}
+      {actual.id !== "clasificados-newman" && (
+        <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: DORADO, letterSpacing: 0.5, fontSize: "0.95rem" }}>
+          <FocoIcono />
+          EnJuego tips
+        </span>
+      )}
       {tips.length > 1 && (
         <span style={{ marginTop: 8, fontSize: "0.8rem", fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1 }}>
           #{actual.numero}
