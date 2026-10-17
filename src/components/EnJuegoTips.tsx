@@ -315,7 +315,7 @@ function TablaClasificados({ filas }: { filas: ClasificadoNewman[] }) {
           >
             <span>{f.categoria}</span>
             <span style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
-              <b style={{ fontSize: "0.9rem" }}>{f.posicion}°</b> · Clasificado
+              Clasificado · <b style={{ fontSize: "0.9rem" }}>{f.posicion}°</b>
             </span>
           </span>
         ))}
