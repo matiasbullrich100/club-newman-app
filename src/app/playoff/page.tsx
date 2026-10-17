@@ -26,6 +26,7 @@ const barraAsegurado = "#46e07a";
 function Cruce({
   categoriaId,
   fecha,
+  conFecha,
   a,
   b,
   seguro,
@@ -33,6 +34,7 @@ function Cruce({
 }: {
   categoriaId: string;
   fecha?: string;
+  conFecha: boolean;
   a: FilaPosicion | undefined;
   b: FilaPosicion | undefined;
   seguro: boolean;
@@ -51,20 +53,22 @@ function Cruce({
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "62px 1fr",
+        gridTemplateColumns: conFecha ? "54px 1fr" : "1fr",
         alignItems: "center",
-        gap: 8,
+        gap: 6,
         background: seguro ? bgAsegurado : bgHoy,
         boxShadow: seguro ? `inset 4px 0 0 ${barraAsegurado}` : undefined,
         color: seguro ? undefined : "#2a1b02",
         borderRadius: 6,
-        padding: "8px 10px",
-        fontSize: "0.88rem",
+        padding: "5px 9px",
+        fontSize: "0.84rem",
       }}
     >
-      <span style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.3, opacity: 0.85, lineHeight: 1.2 }}>
-        {fecha ? fechaCorta(fecha) : "a confirmar"}
-      </span>
+      {conFecha && (
+        <span style={{ fontSize: "0.64rem", textTransform: "uppercase", letterSpacing: 0.3, opacity: 0.85, lineHeight: 1.15 }}>
+          {fecha ? fechaCorta(fecha) : "a confirmar"}
+        </span>
+      )}
       <span style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
         {equipo(a)}
         <span style={{ fontSize: "0.68rem", opacity: 0.75, textTransform: "uppercase", flexShrink: 0 }}>vs</span>
@@ -99,44 +103,53 @@ export default async function PlayoffPage() {
       <SessionBar session={session} />
       <Header rightLabel="Playoff" />
 
-      <p style={{ fontSize: "0.82rem", color: DORADO_SUAVE, textAlign: "center", margin: "14px 0 4px", lineHeight: 1.4 }}>
+      <p style={{ fontSize: "0.78rem", color: DORADO_SUAVE, textAlign: "center", margin: "10px 0 2px", lineHeight: 1.35 }}>
         Los primeros 4 de cada tabla juegan las semifinales: 1° vs 4° y 2° vs 3°.
       </p>
-      <p style={{ fontSize: "0.72rem", opacity: 0.7, textAlign: "center", margin: "0 0 14px" }}>
+      <p style={{ fontSize: "0.68rem", opacity: 0.7, textAlign: "center", margin: "0 0 8px" }}>
         Fechas y sedes informadas, a confirmar por URBA.
       </p>
 
-      <div style={{ display: "grid", gap: 6, margin: "0 0 18px", fontSize: "0.7rem" }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span aria-hidden style={{ width: 14, height: 12, background: bgAsegurado, boxShadow: `inset 4px 0 0 ${barraAsegurado}`, flexShrink: 0 }} />
-          Clasificado: ya no lo pueden alcanzar
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", margin: "0 0 10px", fontSize: "0.66rem" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <span aria-hidden style={{ width: 12, height: 10, background: bgAsegurado, boxShadow: `inset 3px 0 0 ${barraAsegurado}`, flexShrink: 0 }} />
+          Clasificado definitivo
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span aria-hidden style={{ width: 14, height: 12, background: bgHoy, flexShrink: 0 }} />
-          Clasificado hoy: está entre los 4 primeros, todavía puede cambiar
+        <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <span aria-hidden style={{ width: 12, height: 10, background: bgHoy, flexShrink: 0 }} />
+          Provisorio: todavía puede cambiar
         </span>
       </div>
 
       {datos.map(({ cat, data, seguras, completa }) => {
         const cfg = PLAYOFF[cat.id];
+        const mismaFecha = cfg.semis.every((x) => x.fecha === cfg.semis[0].fecha);
         const filaDe = (pos: number) => data?.filas.find((f) => f.posicion === pos);
         return (
-          <section key={cat.id} style={{ marginBottom: 18 }}>
-            <h2 style={{ fontSize: "1.05rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>
-              {cat.nombre}
-            </h2>
-            <p style={{ fontSize: "0.72rem", opacity: 0.8, margin: "0 0 6px" }}>
-              {[cfg.sede && `Sede: ${cfg.sede}`, `Final: ${cfg.final ? fechaCorta(cfg.final) : "a confirmar"}`, !completa && data ? "tabla provisoria" : null].filter(Boolean).join(" · ")}
-            </p>
+          <section key={cat.id} style={{ marginBottom: 11 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: "0 10px", margin: "0 0 3px" }}>
+              <h2 style={{ fontSize: "0.95rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: 0 }}>{cat.nombre}</h2>
+              <span style={{ fontSize: "0.64rem", opacity: 0.8 }}>
+                {[
+                  mismaFecha ? (cfg.semis[0]?.fecha ? fechaCorta(cfg.semis[0].fecha) : "fecha a confirmar") : null,
+                  cfg.sede,
+                  cfg.final ? `Final ${fechaCorta(cfg.final)}` : null,
+                  !completa && data ? "provisoria" : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </div>
             {!data || data.filas.length < 4 ? (
               <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.82rem" }}>Todavía no hay tabla cargada.</p>
             ) : (
-              <div style={{ display: "grid", gap: 4 }}>
+              <div style={{ display: "grid", gap: 3 }}>
                 {cfg.semis.map((s) => (
                   <Cruce
                     key={`${s.fecha ?? "sin-fecha"}-${s.cruce.join("v")}`}
                     categoriaId={cat.id}
                     fecha={s.fecha}
+                    conFecha={!mismaFecha}
                     a={filaDe(s.cruce[0])}
                     b={filaDe(s.cruce[1])}
                     seguro={seguras.has(s.cruce[0]) && seguras.has(s.cruce[1])}
