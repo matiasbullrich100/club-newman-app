@@ -14,6 +14,7 @@ import ProximaFechaRow from "@/components/ProximaFechaRow";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
 import EnJuegoTips from "@/components/EnJuegoTips";
+import { clasificadosNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
@@ -24,6 +25,7 @@ const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
 // del proximo partido directo.
 export default async function PlantelSuperiorPage() {
   const session = await getSession();
+  const clasificados = await clasificadosNewman();
   // Algunas categorias de prueba (ej. "pre-a", "m-22") coinciden con categorias reales, asi que
   // un partido de PARTIDO_PRUEBA_BASES puede aparecer en este mismo banner -- partidosEnVivoOUltimo
   // Terminado ya lo filtra para quien no puede ver partidos de prueba (ver partidosPrueba.ts); acá
@@ -193,7 +195,7 @@ export default async function PlantelSuperiorPage() {
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
 
-      <EnJuegoTips />
+      <EnJuegoTips clasificados={clasificados} />
 
       {mostrarResumenSemana && (
         <div

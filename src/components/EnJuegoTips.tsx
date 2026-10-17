@@ -12,7 +12,8 @@
 // - El telefono se acuerda: el estado vive en localStorage del navegador del socio.
 // Sumar un tip = agregar un objeto a TIPS (id interno estable + texto + visual opcional).
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
@@ -253,6 +254,7 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
   },
   {
     id: "clasificacion-pre-a-c",
+    activo: false,
     texto: (
       <>
         <span style={{ display: "block", fontWeight: 700, color: DORADO }}>Pre A</span>
@@ -289,8 +291,50 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
 
 const TIPS_ACTIVOS = TIPS.filter((t) => t.activo !== false).map((t, i) => ({ ...t, numero: i + 1 }));
 
-export default function EnJuegoTips() {
-  const [cola, setCola] = useState<typeof TIPS_ACTIVOS>([]); // tips elegibles, en orden
+// Pantalla "Newman clasificado a playoff": un renglon verde (mismo que /playoff, "Clasificado") por
+// categoria de Newman que esta entre los 4 primeros, con la posicion de la ultima tabla de URBA.
+function TablaClasificados({ filas }: { filas: ClasificadoNewman[] }) {
+  return (
+    <span style={{ display: "block" }}>
+      <span style={{ display: "block", fontWeight: 700, color: DORADO }}>Newman clasificado a playoff</span>
+      <span style={{ display: "grid", gap: 5, marginTop: 12, textAlign: "left" }}>
+        {filas.map((f) => (
+          <span
+            key={f.categoriaId}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 8,
+              background: "rgba(70,196,106,.62)",
+              boxShadow: "inset 4px 0 0 #46e07a",
+              borderRadius: 6,
+              padding: "6px 10px",
+              fontSize: "0.9rem",
+            }}
+          >
+            <span>{f.categoria}</span>
+            <span style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+              <b style={{ fontSize: "0.9rem" }}>{f.posicion}°</b> · Clasificado
+            </span>
+          </span>
+        ))}
+      </span>
+      <span style={{ display: "block", marginTop: 10, fontSize: "0.68rem", opacity: 0.75 }}>Posición según la última tabla de URBA.</span>
+    </span>
+  );
+}
+
+export default function EnJuegoTips({ clasificados }: { clasificados?: ClasificadoNewman[] }) {
+  // Si llegan clasificados, esa pantalla va PRIMERO (y, con los demas tips apagados, sola).
+  const tips = useMemo<typeof TIPS_ACTIVOS>(
+    () =>
+      clasificados && clasificados.length > 0
+        ? [{ id: "clasificados-newman", texto: <TablaClasificados filas={clasificados} />, numero: 1 }, ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 1 }))]
+        : TIPS_ACTIVOS,
+    [clasificados]
+  );
+  const [cola, setCola] = useState<typeof tips>([]); // tips elegibles, en orden
   const [idx, setIdx] = useState(0);
   const yaCorrio = useRef(false); // React StrictMode invoca el effect 2 veces en dev: no consumir 2 tips
 
@@ -323,20 +367,20 @@ export default function EnJuegoTips() {
     // explicita de seguir viendo, no un popup que se le impone).
     const ahora = Date.now();
     const inicio = MOSTRAR_TODOS_SIEMPRE
-      ? TIPS_ACTIVOS.length > 0 ? 0 : -1
-      : TIPS_ACTIVOS.findIndex((t) => {
+      ? tips.length > 0 ? 0 : -1
+      : tips.findIndex((t) => {
           const visto = vistos[t.id];
           return !visto || ahora - visto > COOLDOWN_TIP_MS;
         });
     if (inicio === -1) return;
 
-    marcar(TIPS_ACTIVOS[inicio].id); // el que se muestra ahora ya cuenta como visto
+    marcar(tips[inicio].id); // el que se muestra ahora ya cuenta como visto
     // Depende de localStorage (solo cliente): aparece despues del montaje a proposito, en SSR no
     // se renderiza nada y no hay mismatch de hidratacion.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIdx(inicio);
-    setCola(TIPS_ACTIVOS);
-  }, []);
+    setCola(tips);
+  }, [tips]);
 
   useEffect(() => {
     if (cola.length === 0) return;
@@ -375,7 +419,8 @@ export default function EnJuegoTips() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "safe center",
+        overflowY: "auto",
         padding: 28,
         textAlign: "center",
         color: CREMA,
@@ -385,7 +430,7 @@ export default function EnJuegoTips() {
         <FocoIcono />
         EnJuego tips
       </span>
-      {TIPS_ACTIVOS.length > 1 && (
+      {tips.length > 1 && (
         <span style={{ marginTop: 8, fontSize: "0.8rem", fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1 }}>
           #{actual.numero}
         </span>
