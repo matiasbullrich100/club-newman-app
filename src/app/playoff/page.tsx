@@ -20,52 +20,56 @@ const bgHoy = "rgba(245,196,40,.95)";
 const bgAsegurado = "rgba(70,196,106,.62)";
 const barraAsegurado = "#46e07a";
 
-function Equipo({ fila, categoriaId, alDia, segura, propio }: { fila: FilaPosicion | undefined; categoriaId: string; alDia: string | null; segura: boolean; propio: boolean }) {
-  if (!fila) return null;
-  const ancla = `?equipo=${encodeURIComponent(fila.equipo)}#eq-${slugEquipo(fila.equipo)}`;
-  // Pastillas chicas dentro del recuadro: borde oscuro sobre el amarillo, claro sobre el verde.
-  const pastilla: React.CSSProperties = {
-    fontSize: "0.66rem",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    fontWeight: 700,
-    padding: "4px 10px",
-    borderRadius: 999,
-    border: `1px solid ${segura ? "rgba(255,255,255,.7)" : "rgba(42,27,2,.6)"}`,
-    color: "inherit",
-    whiteSpace: "nowrap",
-  };
+// Una semifinal en UNA linea: "vie 30/10 | 1° Newman vs 4° Alumni". Verde = los dos ya son clasificados
+// definitivos; amarillo = la tabla todavia es provisoria. El equipo del club va en negrita; cada nombre lleva a su
+// lugar en la Tabla de Posiciones.
+function Cruce({
+  categoriaId,
+  fecha,
+  a,
+  b,
+  seguro,
+  propio,
+}: {
+  categoriaId: string;
+  fecha?: string;
+  a: FilaPosicion | undefined;
+  b: FilaPosicion | undefined;
+  seguro: boolean;
+  propio?: string;
+}) {
+  if (!a || !b) return null;
+  const equipo = (f: FilaPosicion) => (
+    <Link
+      href={`/posiciones/${categoriaId}?equipo=${encodeURIComponent(f.equipo)}#eq-${slugEquipo(f.equipo)}`}
+      style={{ color: "inherit", fontWeight: f.equipo === propio ? 800 : 500, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+    >
+      {f.posicion}° {f.equipo}
+    </Link>
+  );
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
+        display: "grid",
+        gridTemplateColumns: "62px 1fr",
+        alignItems: "center",
         gap: 8,
-        background: segura ? bgAsegurado : bgHoy,
-        boxShadow: segura ? `inset 4px 0 0 ${barraAsegurado}` : undefined,
-        borderRadius: 8,
+        background: seguro ? bgAsegurado : bgHoy,
+        boxShadow: seguro ? `inset 4px 0 0 ${barraAsegurado}` : undefined,
+        color: seguro ? undefined : "#2a1b02",
+        borderRadius: 6,
         padding: "8px 10px",
-        color: segura ? undefined : "#2a1b02",
-        fontWeight: propio ? 700 : 500,
-        fontSize: "0.9rem",
+        fontSize: "0.88rem",
       }}
     >
-      <span>
-        {fila.posicion}° {fila.equipo}
+      <span style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.3, opacity: 0.85, lineHeight: 1.2 }}>
+        {fecha ? fechaCorta(fecha) : "a confirmar"}
       </span>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          <Link href={`/posiciones/${categoriaId}${ancla}`} style={pastilla}>
-            Tabla
-          </Link>
-          <Link href={`/fixture/${categoriaId}/cruces${ancla}`} style={pastilla}>
-            Próx. fecha
-          </Link>
-        </div>
-        <span style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.9, whiteSpace: "nowrap" }}>
-          {segura || !alDia ? "Clasificado" : `Clasificado al ${alDia}`}
-        </span>
-      </div>
+      <span style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+        {equipo(a)}
+        <span style={{ fontSize: "0.68rem", opacity: 0.75, textTransform: "uppercase", flexShrink: 0 }}>vs</span>
+        {equipo(b)}
+      </span>
     </div>
   );
 }
@@ -77,18 +81,15 @@ export default async function PlayoffPage() {
   const datos = await Promise.all(
     categorias.map(async (cat) => {
       const snap = await adminDb.collection("posiciones").doc(cat.id).get();
-      if (!snap.exists) return { cat, data: null, seguras: new Set<number>(), alDia: null as string | null, completa: false };
+      if (!snap.exists) return { cat, data: null, seguras: new Set<number>(), completa: false };
       const data = snap.data() as PosicionesTorneo;
       const fechasDiv = tieneFixtureDivision(cat.id) ? await fixtureDivisionCompleto(cat.id) : undefined;
       const partidos = fechasDiv?.flatMap((f) => f.partidos);
-      // "Clasificado al d/m": dia de la ultima fecha con algun resultado -- hasta ahi llega la tabla.
-      const ultima = fechasDiv?.filter((f) => f.fecha && f.partidos.some((p) => p.jugado)).map((f) => f.fecha).sort().pop();
-      const alDia = ultima ? `${Number(ultima.split("-")[2])}/${Number(ultima.split("-")[1])}` : null;
       // Fase regular terminada para toda la tabla (todos jugaron lo mismo): los 4 primeros ya son los
       // clasificados definitivos y los cruces son reales. Si faltan partidos, la tabla es provisoria.
       const completa = data.filas.length > 0 && data.filas.every((x) => x.jugados === data.filas[0].jugados);
       const seguras = completa ? new Set(data.filas.slice(0, 4).map((x) => x.posicion)) : posicionesClasificadas(data.filas, 4, partidos);
-      return { cat, data, seguras, alDia, completa };
+      return { cat, data, seguras, completa };
     })
   );
 
@@ -116,40 +117,32 @@ export default async function PlayoffPage() {
         </span>
       </div>
 
-      {datos.map(({ cat, data, seguras, alDia, completa }) => {
+      {datos.map(({ cat, data, seguras, completa }) => {
         const cfg = PLAYOFF[cat.id];
         const filaDe = (pos: number) => data?.filas.find((f) => f.posicion === pos);
         return (
-          <section key={cat.id} style={{ marginBottom: 22 }}>
-            <h2 style={{ fontSize: "1.05rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>
+          <section key={cat.id} style={{ marginBottom: 18 }}>
+            <h2 style={{ fontSize: "1.05rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>
               {cat.nombre}
             </h2>
-            {!completa && data && (
-              <p style={{ fontSize: "0.72rem", opacity: 0.75, margin: "-4px 0 8px", fontStyle: "italic" }}>Tabla provisoria: faltan partidos por jugar.</p>
-            )}
-            {cfg.sede && (
-              <p style={{ fontSize: "0.76rem", opacity: 0.85, margin: "-4px 0 8px" }}>Sede: {cfg.sede}</p>
-            )}
+            <p style={{ fontSize: "0.72rem", opacity: 0.8, margin: "0 0 6px" }}>
+              {[cfg.sede && `Sede: ${cfg.sede}`, `Final: ${cfg.final ? fechaCorta(cfg.final) : "a confirmar"}`, !completa && data ? "tabla provisoria" : null].filter(Boolean).join(" · ")}
+            </p>
             {!data || data.filas.length < 4 ? (
               <p style={{ opacity: 0.6, fontStyle: "italic", fontSize: "0.82rem" }}>Todavía no hay tabla cargada.</p>
             ) : (
-              <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "grid", gap: 4 }}>
                 {cfg.semis.map((s) => (
-                  <div key={`${s.fecha ?? "sin-fecha"}-${s.cruce.join("v")}`} style={{ display: "grid", gap: 4 }}>
-                    <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.8 }}>
-                      Semifinal · {s.fecha ? fechaCorta(s.fecha) : "fecha a confirmar"}
-                    </div>
-                    {s.cruce.map((pos, i) => (
-                      <div key={pos} style={{ display: "grid", gap: 4 }}>
-                        {i > 0 && <div style={{ textAlign: "center", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.7 }}>vs</div>}
-                        <Equipo fila={filaDe(pos)} categoriaId={cat.id} alDia={alDia} segura={seguras.has(pos)} propio={filaDe(pos)?.equipo === data.nuestroEquipo} />
-                      </div>
-                    ))}
-                  </div>
+                  <Cruce
+                    key={`${s.fecha ?? "sin-fecha"}-${s.cruce.join("v")}`}
+                    categoriaId={cat.id}
+                    fecha={s.fecha}
+                    a={filaDe(s.cruce[0])}
+                    b={filaDe(s.cruce[1])}
+                    seguro={seguras.has(s.cruce[0]) && seguras.has(s.cruce[1])}
+                    propio={data.nuestroEquipo}
+                  />
                 ))}
-                <div style={{ fontSize: "0.78rem", opacity: 0.85 }}>
-                  Final: {cfg.final ? fechaCorta(cfg.final) : "fecha a confirmar"}
-                </div>
               </div>
             )}
           </section>
