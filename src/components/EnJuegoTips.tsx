@@ -17,6 +17,7 @@ import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
+const LS_INICIO_DIA = "enjuegoTipsInicioDia"; // dia (YYYY-MM-DD) en que ya se mostro en Inicio
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
 // los muestra TODOS, en orden, sin cooldown -- "Siguiente" avanza y el ultimo cierra con "Entendido".
@@ -325,7 +326,7 @@ function TablaClasificados({ filas }: { filas: ClasificadoNewman[] }) {
   );
 }
 
-export default function EnJuegoTips({ clasificados }: { clasificados?: ClasificadoNewman[] }) {
+export default function EnJuegoTips({ clasificados, unaVezPorDia = false }: { clasificados?: ClasificadoNewman[]; unaVezPorDia?: boolean }) {
   // Si llegan clasificados, esa pantalla va PRIMERO (y, con los demas tips apagados, sola).
   const tips = useMemo<typeof TIPS_ACTIVOS>(
     () =>
@@ -352,6 +353,17 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
   useEffect(() => {
     if (yaCorrio.current) return;
     yaCorrio.current = true;
+
+    // En Inicio (unaVezPorDia) se muestra una sola vez por dia y por persona (dia calendario del telefono).
+    if (unaVezPorDia) {
+      try {
+        const hoy = new Date().toLocaleDateString("en-CA");
+        if (localStorage.getItem(LS_INICIO_DIA) === hoy) return;
+        localStorage.setItem(LS_INICIO_DIA, hoy);
+      } catch {
+        /* storage bloqueado: se muestra igual */
+      }
+    }
 
     let vistos: Record<string, number> = {};
     try {
@@ -380,7 +392,7 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIdx(inicio);
     setCola(tips);
-  }, [tips]);
+  }, [tips, unaVezPorDia]);
 
   useEffect(() => {
     if (cola.length === 0) return;
