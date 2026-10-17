@@ -1,11 +1,13 @@
 // Canchas puntuales (numeroCancha) de la Fecha 26 de Plantel Superior (sabado 2026-10-17 en Newman), leidas
 // del pizarron del club: Pre D 3, Pre B 2, Pre E 3, Pre C 2, Pre A 1, M-22 2, Inter 1, Primera 1.
-// Pre F/G (vs Tilos) NO se carga: el casillero del pizarron esta borroneado (se lee "4"), se confirma aparte.
+// Pre F y Pre G (vs Tilos): cancha 4 (el casillero del pizarron estaba borroneado; confirmado por el club).
 // Correr con: npx tsx src/scripts/set-canchas-superior-fecha26.ts
 import { config } from "dotenv";
 import { resolve } from "path";
 
 const CANCHAS: Record<string, string> = {
+  "pre-f": "4",
+  "pre-g": "4",
   "pre-d": "3",
   "pre-b": "2",
   "pre-e": "3",
