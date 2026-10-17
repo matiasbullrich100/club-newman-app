@@ -77,14 +77,18 @@ export default async function PlayoffPage() {
   const datos = await Promise.all(
     categorias.map(async (cat) => {
       const snap = await adminDb.collection("posiciones").doc(cat.id).get();
-      if (!snap.exists) return { cat, data: null, seguras: new Set<number>(), alDia: null as string | null };
+      if (!snap.exists) return { cat, data: null, seguras: new Set<number>(), alDia: null as string | null, completa: false };
       const data = snap.data() as PosicionesTorneo;
       const fechasDiv = tieneFixtureDivision(cat.id) ? await fixtureDivisionCompleto(cat.id) : undefined;
       const partidos = fechasDiv?.flatMap((f) => f.partidos);
       // "Clasificado al d/m": dia de la ultima fecha con algun resultado -- hasta ahi llega la tabla.
       const ultima = fechasDiv?.filter((f) => f.fecha && f.partidos.some((p) => p.jugado)).map((f) => f.fecha).sort().pop();
       const alDia = ultima ? `${Number(ultima.split("-")[2])}/${Number(ultima.split("-")[1])}` : null;
-      return { cat, data, seguras: posicionesClasificadas(data.filas, 4, partidos), alDia };
+      // Fase regular terminada para toda la tabla (todos jugaron lo mismo): los 4 primeros ya son los
+      // clasificados definitivos y los cruces son reales. Si faltan partidos, la tabla es provisoria.
+      const completa = data.filas.length > 0 && data.filas.every((x) => x.jugados === data.filas[0].jugados);
+      const seguras = completa ? new Set(data.filas.slice(0, 4).map((x) => x.posicion)) : posicionesClasificadas(data.filas, 4, partidos);
+      return { cat, data, seguras, alDia, completa };
     })
   );
 
@@ -112,7 +116,7 @@ export default async function PlayoffPage() {
         </span>
       </div>
 
-      {datos.map(({ cat, data, seguras, alDia }) => {
+      {datos.map(({ cat, data, seguras, alDia, completa }) => {
         const cfg = PLAYOFF[cat.id];
         const filaDe = (pos: number) => data?.filas.find((f) => f.posicion === pos);
         return (
@@ -120,6 +124,9 @@ export default async function PlayoffPage() {
             <h2 style={{ fontSize: "1.05rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 8px" }}>
               {cat.nombre}
             </h2>
+            {!completa && data && (
+              <p style={{ fontSize: "0.72rem", opacity: 0.75, margin: "-4px 0 8px", fontStyle: "italic" }}>Tabla provisoria: faltan partidos por jugar.</p>
+            )}
             {cfg.sede && (
               <p style={{ fontSize: "0.76rem", opacity: 0.85, margin: "-4px 0 8px" }}>Sede: {cfg.sede}</p>
             )}
@@ -132,8 +139,11 @@ export default async function PlayoffPage() {
                     <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.8 }}>
                       Semifinal · {s.fecha ? fechaCorta(s.fecha) : "fecha a confirmar"}
                     </div>
-                    {s.cruce.map((pos) => (
-                      <Equipo key={pos} fila={filaDe(pos)} categoriaId={cat.id} alDia={alDia} segura={seguras.has(pos)} propio={filaDe(pos)?.equipo === data.nuestroEquipo} />
+                    {s.cruce.map((pos, i) => (
+                      <div key={pos} style={{ display: "grid", gap: 4 }}>
+                        {i > 0 && <div style={{ textAlign: "center", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: 1, opacity: 0.7 }}>vs</div>}
+                        <Equipo fila={filaDe(pos)} categoriaId={cat.id} alDia={alDia} segura={seguras.has(pos)} propio={filaDe(pos)?.equipo === data.nuestroEquipo} />
+                      </div>
                     ))}
                   </div>
                 ))}
