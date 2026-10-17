@@ -1,3 +1,6 @@
+// ACTUALIZADO con "Equipos M19 20261018 (1).xlsx" (correccion del club: A cambia el suplente #19 -- Bosch Emilio
+// en vez de Goti Enzo --, D intercambia titular #13 / suplente #22 -- Dominguez Roviralta entra, Erramuspe sale --
+// y reordena suplentes; C igual). Esta version deja las formaciones PUBLICADAS (ya lo estaban).
 // M19 A / C / D vs BACRC (Fecha 7, postergada: domingo 2026-10-18 en Newman; A 12:30, C y D 11:00), formaciones
 // pasadas por el club ("Equipos M19 20261018.xlsx", hoja ResumenEquipos: titulares dorsal 1-15 + suplentes con el
 // dorsal de la planilla, hay saltos). Se cargan como BORRADOR (formacionPublicada: false) -- se publican cuando el
@@ -63,7 +66,7 @@ const EQUIPOS: EquipoFormacion[] = [
       ],
       [
         "19",
-        "GOTI, Enzo"
+        "BOSCH, Emilio"
       ],
       [
         "20",
@@ -152,11 +155,15 @@ const EQUIPOS: EquipoFormacion[] = [
       "VIGANO, Martin",
       "ITHURALDE, Felix",
       "URANGA, Jeronimo",
-      "ERRAMUSPE, Bautista",
+      "DOMINGUEZ ROVIRALTA, Tobias",
       "MARINO, Sebastian",
       "GIMENEZ ZAPIOLA, Santos"
     ],
     "suplentes": [
+      [
+        "16",
+        "SANTAMARINA BERGADA, Eduardo"
+      ],
       [
         "17",
         "BROWNE, Ignacio"
@@ -179,15 +186,11 @@ const EQUIPOS: EquipoFormacion[] = [
       ],
       [
         "22",
-        "DOMINGUEZ ROVIRALTA, Tobias"
+        "ERRAMUSPE, Bautista"
       ],
       [
         "23",
         "MONTOVIO, Manuel"
-      ],
-      [
-        "24",
-        "SANTAMARINA BERGADA, Eduardo"
       ]
     ]
   }
@@ -232,7 +235,7 @@ async function main() {
     for (const x of aBorrar) batch.delete(x.ref);
     for (const j of jugadores) batch.set(partidoRef.collection("plantel").doc(playerId(j.nombre)), j);
     batch.update(partidoRef, {
-      formacionPublicada: false,
+      formacionPublicada: true,
       enCanchaIds: titularesIds,
       formacionActualizadaEn: new Date(),
       updatedAt: new Date(),
@@ -241,7 +244,7 @@ async function main() {
 
   if (dryRun) return console.log("(DRY RUN) nada escrito.");
   await batch.commit();
-  console.log("Listo. Formaciones cargadas como BORRADOR (sin publicar).");
+  console.log("Listo. Formaciones cargadas y PUBLICADAS.");
 }
 
 main()
