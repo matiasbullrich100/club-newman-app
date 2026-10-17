@@ -18,7 +18,9 @@ function textoHorarioCancha(proxima: ProximaFecha): string | null {
   const sede = !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
   const libreEstaSemana = noJuegaEstaSemana(proxima);
-  const partes = [libreEstaSemana ? "Libre esta semana" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  // Sin partido esta semana la fila dice solo "Fecha libre" (como una fecha libre del fixture): sin horario ni sede.
+  if (libreEstaSemana) return null;
+  const partes = [proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
 
@@ -98,9 +100,12 @@ export default function ProximaFechaRow({
           </span>
           <span style={{ flex: 1, minWidth: 0, fontSize: "0.85rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
             <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {proxima.notaEspecial ?? (
-                <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
-              )}
+              {proxima.notaEspecial ??
+                (noJuegaEstaSemana(proxima) ? (
+                  "Fecha libre"
+                ) : (
+                  <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
+                ))}
             </span>
             {textoHorarioCancha(proxima) && (
               <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
@@ -118,7 +123,7 @@ export default function ProximaFechaRow({
               textAlign: "right",
             }}
           >
-            {proxima.fecha && formatFechaCorta(proxima.fecha)}
+            {proxima.fecha && !noJuegaEstaSemana(proxima) && formatFechaCorta(proxima.fecha)}
           </span>
         </div>
       </Link>
