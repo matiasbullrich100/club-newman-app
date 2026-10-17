@@ -17,7 +17,8 @@ import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
-const LS_INICIO_DIA = "enjuegoTipsInicioDia"; // dia (YYYY-MM-DD) en que ya se mostro en Inicio
+const LS_CLASIFICADOS = "enjuegoClasificadosVisto"; // la pantalla de clasificados ya se mostro (una sola vez)
+const ID_CLASIFICADOS = "clasificados-newman";
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
 // los muestra TODOS, en orden, sin cooldown -- "Siguiente" avanza y el ultimo cierra con "Entendido".
@@ -326,12 +327,12 @@ function TablaClasificados({ filas }: { filas: ClasificadoNewman[] }) {
   );
 }
 
-export default function EnJuegoTips({ clasificados, unaVezPorDia = false }: { clasificados?: ClasificadoNewman[]; unaVezPorDia?: boolean }) {
+export default function EnJuegoTips({ clasificados }: { clasificados?: ClasificadoNewman[] }) {
   // Si llegan clasificados, esa pantalla va PRIMERO (y, con los demas tips apagados, sola).
   const tips = useMemo<typeof TIPS_ACTIVOS>(
     () =>
       clasificados && clasificados.length > 0
-        ? [{ id: "clasificados-newman", texto: <TablaClasificados filas={clasificados} />, numero: 1 }, ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 1 }))]
+        ? [{ id: ID_CLASIFICADOS, texto: <TablaClasificados filas={clasificados} />, numero: 1 }, ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 1 }))]
         : TIPS_ACTIVOS,
     [clasificados]
   );
@@ -354,16 +355,18 @@ export default function EnJuegoTips({ clasificados, unaVezPorDia = false }: { cl
     if (yaCorrio.current) return;
     yaCorrio.current = true;
 
-    // En Inicio (unaVezPorDia) se muestra una sola vez por dia y por persona (dia calendario del telefono).
-    if (unaVezPorDia) {
+    // La pantalla de clasificados se muestra UNA SOLA VEZ por telefono, en la primera pantalla donde
+    // entre (Inicio, Plantel Superior o Juveniles) -- despues se saltea en todas.
+    let lista = tips;
+    if (tips.some((t) => t.id === ID_CLASIFICADOS)) {
       try {
-        const hoy = new Date().toLocaleDateString("en-CA");
-        if (localStorage.getItem(LS_INICIO_DIA) === hoy) return;
-        localStorage.setItem(LS_INICIO_DIA, hoy);
+        if (localStorage.getItem(LS_CLASIFICADOS)) lista = tips.filter((t) => t.id !== ID_CLASIFICADOS);
+        else localStorage.setItem(LS_CLASIFICADOS, "1");
       } catch {
         /* storage bloqueado: se muestra igual */
       }
     }
+    if (lista.length === 0) return;
 
     let vistos: Record<string, number> = {};
     try {
@@ -379,20 +382,19 @@ export default function EnJuegoTips({ clasificados, unaVezPorDia = false }: { cl
     // explicita de seguir viendo, no un popup que se le impone).
     const ahora = Date.now();
     const inicio = MOSTRAR_TODOS_SIEMPRE
-      ? tips.length > 0 ? 0 : -1
-      : tips.findIndex((t) => {
+      ? 0
+      : lista.findIndex((t) => {
           const visto = vistos[t.id];
           return !visto || ahora - visto > COOLDOWN_TIP_MS;
         });
     if (inicio === -1) return;
 
-    marcar(tips[inicio].id); // el que se muestra ahora ya cuenta como visto
+    marcar(lista[inicio].id); // el que se muestra ahora ya cuenta como visto
     // Depende de localStorage (solo cliente): aparece despues del montaje a proposito, en SSR no
     // se renderiza nada y no hay mismatch de hidratacion.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIdx(inicio);
-    setCola(tips);
-  }, [tips, unaVezPorDia]);
+    setCola(lista);
+  }, [tips]);
 
   useEffect(() => {
     if (cola.length === 0) return;
@@ -439,7 +441,7 @@ export default function EnJuegoTips({ clasificados, unaVezPorDia = false }: { cl
       }}
     >
       {/* La pantalla de clasificados lleva su propio titulo: sin el rotulo "EnJuego tips". */}
-      {actual.id !== "clasificados-newman" && (
+      {actual.id !== ID_CLASIFICADOS && (
         <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: DORADO, letterSpacing: 0.5, fontSize: "0.95rem" }}>
           <FocoIcono />
           EnJuego tips
