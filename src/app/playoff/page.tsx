@@ -13,6 +13,8 @@ import SessionBar from "@/components/SessionBar";
 import { FuenteUrba } from "@/components/PieNota";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import { slugEquipo } from "@/lib/equipoSlug";
+import EnJuegoTips from "@/components/EnJuegoTips";
+import { clasificadosNewman } from "@/lib/clasificadosNewman";
 
 // Verde intenso con barra = ya clasificado (los demas no lo pueden alcanzar, mismo que la Tabla de
 // Posiciones); amarillo = esta entre los 4 hoy pero todavia puede cambiar.
@@ -80,6 +82,7 @@ function Cruce({
 
 export default async function PlayoffPage() {
   const session = await getSession();
+  const clasificados = await clasificadosNewman();
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => PLAYOFF[c.id]);
 
   const datos = await Promise.all(
@@ -163,6 +166,7 @@ export default async function PlayoffPage() {
       })}
 
       <FuenteUrba />
+      <EnJuegoTips clasificados={clasificados} />
     </main>
   );
 }

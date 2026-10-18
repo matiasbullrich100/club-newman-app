@@ -17,9 +17,11 @@ import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
-// La pantalla de clasificados ya se mostro (una sola vez por telefono). Sufijo "2" = version con las posiciones
-// finales corregidas (18/10/2026): la volvieron a ver quienes ya habian visto la primera version.
-const LS_CLASIFICADOS = "enjuegoClasificadosVisto2";
+// La pantalla de clasificados es lo PRIMERO que ve cada persona hoy y manana (18 y 19/10/2026), en la primera
+// pantalla donde entre ese dia (Inicio, Plantel Superior, Juveniles o Playoff); despues sigue normal. Se guarda
+// el dia en que ya se mostro, asi no se repite el mismo dia. Pasado el 19/10 deja de mostrarse sola.
+const LS_CLASIFICADOS = "enjuegoClasificadosDia";
+const DIAS_CLASIFICADOS = ["2026-10-18", "2026-10-19"];
 const ID_CLASIFICADOS = "clasificados-newman";
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
@@ -357,15 +359,19 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
     if (yaCorrio.current) return;
     yaCorrio.current = true;
 
-    // La pantalla de clasificados se muestra UNA SOLA VEZ por telefono, en la primera pantalla donde
-    // entre (Inicio, Plantel Superior o Juveniles) -- despues se saltea en todas.
+    // Clasificados: una vez por dia, solo en los dias de DIAS_CLASIFICADOS (dia calendario de Argentina).
     let lista = tips;
     if (tips.some((t) => t.id === ID_CLASIFICADOS)) {
-      try {
-        if (localStorage.getItem(LS_CLASIFICADOS)) lista = tips.filter((t) => t.id !== ID_CLASIFICADOS);
-        else localStorage.setItem(LS_CLASIFICADOS, "1");
-      } catch {
-        /* storage bloqueado: se muestra igual */
+      const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+      const sinClasificados = tips.filter((t) => t.id !== ID_CLASIFICADOS);
+      if (!DIAS_CLASIFICADOS.includes(hoy)) lista = sinClasificados;
+      else {
+        try {
+          if (localStorage.getItem(LS_CLASIFICADOS) === hoy) lista = sinClasificados;
+          else localStorage.setItem(LS_CLASIFICADOS, hoy);
+        } catch {
+          /* storage bloqueado: se muestra igual */
+        }
       }
     }
     if (lista.length === 0) return;
