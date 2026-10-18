@@ -17,7 +17,9 @@ import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
-const LS_CLASIFICADOS = "enjuegoClasificadosVisto"; // la pantalla de clasificados ya se mostro (una sola vez)
+// La pantalla de clasificados ya se mostro (una sola vez por telefono). Sufijo "2" = version con las posiciones
+// finales corregidas (18/10/2026): la volvieron a ver quienes ya habian visto la primera version.
+const LS_CLASIFICADOS = "enjuegoClasificadosVisto2";
 const ID_CLASIFICADOS = "clasificados-newman";
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
