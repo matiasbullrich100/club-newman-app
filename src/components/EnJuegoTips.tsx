@@ -17,9 +17,8 @@ import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
-const ID_CLASIFICADOS = "clasificados-newman";
 const ID_TOP4 = "clasificados-top4";
-const esPantallaClasificados = (id: string) => id === ID_CLASIFICADOS || id === ID_TOP4; // no son tips: sin rotulo ni numero
+const esPantallaClasificados = (id: string) => id === ID_TOP4; // no es un tip: sin rotulo ni numero
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
 // los muestra TODOS, en orden, sin cooldown -- "Siguiente" avanza y el ultimo cierra con "Entendido".
@@ -294,40 +293,6 @@ const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; acti
 
 const TIPS_ACTIVOS = TIPS.filter((t) => t.activo !== false).map((t, i) => ({ ...t, numero: i + 1 }));
 
-// Pantalla "Newman clasificado a playoff": un renglon verde (mismo que /playoff, "Clasificado") por
-// categoria de Newman que esta entre los 4 primeros, con la posicion de la ultima tabla de URBA.
-function TablaClasificados({ filas }: { filas: ClasificadoNewman[] }) {
-  return (
-    <span style={{ display: "block" }}>
-      <span style={{ display: "block", fontWeight: 700, color: DORADO }}>Newman clasificado a playoff</span>
-      <span style={{ display: "grid", gap: 5, marginTop: 12, textAlign: "left" }}>
-        {filas.map((f) => (
-          <span
-            key={f.categoriaId}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 8,
-              background: "rgba(70,196,106,.62)",
-              boxShadow: "inset 4px 0 0 #46e07a",
-              borderRadius: 6,
-              padding: "6px 10px",
-              fontSize: "0.9rem",
-            }}
-          >
-            <span>{f.categoria}</span>
-            <span style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
-              Clasificado · <b style={{ fontSize: "0.9rem" }}>{f.posicion}°</b>
-            </span>
-          </span>
-        ))}
-      </span>
-      <span style={{ display: "block", marginTop: 10, fontSize: "0.68rem", opacity: 0.75 }}>Posición según la última tabla de URBA.</span>
-    </span>
-  );
-}
-
 // Pantalla "Clasificados a playoff · Top 14": una tarjeta por division con los 4 que clasifican (el de Newman en
 // amarillo). Mismos colores verdes que /playoff.
 function TablaTop4({ filas }: { filas: ClasificadoNewman[] }) {
@@ -383,9 +348,8 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
     () =>
       clasificados && clasificados.length > 0
         ? [
-            { id: ID_CLASIFICADOS, texto: <TablaClasificados filas={clasificados} />, numero: 1 },
-            { id: ID_TOP4, texto: <TablaTop4 filas={clasificados} />, numero: 2, ancho: 440 },
-            ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 2 })),
+            { id: ID_TOP4, texto: <TablaTop4 filas={clasificados} />, numero: 1, ancho: 440 },
+            ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 1 })),
           ]
         : TIPS_ACTIVOS,
     [clasificados]
