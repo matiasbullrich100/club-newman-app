@@ -364,7 +364,10 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
     if (tips.some((t) => t.id === ID_CLASIFICADOS)) {
       const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
       const sinClasificados = tips.filter((t) => t.id !== ID_CLASIFICADOS);
-      if (!DIAS_CLASIFICADOS.includes(hoy)) lista = sinClasificados;
+      // ?clasificados=1 en la direccion la muestra siempre (para revisarla).
+      const forzada = new URLSearchParams(window.location.search).get("clasificados") === "1";
+      if (forzada) lista = tips;
+      else if (!DIAS_CLASIFICADOS.includes(hoy)) lista = sinClasificados;
       else {
         try {
           if (localStorage.getItem(LS_CLASIFICADOS) === hoy) lista = sinClasificados;

@@ -11,13 +11,10 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
-import EnJuegoTips from "@/components/EnJuegoTips";
-import { clasificadosNewman } from "@/lib/clasificadosNewman";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function JuvenilesPage() {
   const session = await getSession();
-  const clasificados = await clasificadosNewman();
 
   // Mismo patron que /superior y /juveniles/[edadId], pero con las 4 divisiones juntas -- para no
   // tener que entrar a cada edad para ver que se esta jugando/se jugo hoy (antes solo aparecia un
@@ -62,7 +59,6 @@ export default async function JuvenilesPage() {
       <SessionBar session={session} />
       <Header rightLabel="Juveniles" logo="urba" rightLabelShift={14} />
 
-      <EnJuegoTips clasificados={clasificados} />
 
       {equiposOrdenados
         .map((equipo) => {

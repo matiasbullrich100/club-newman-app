@@ -4,8 +4,6 @@ import Header from "@/components/Header";
 import SessionBar from "@/components/SessionBar";
 import Buscador from "@/components/Buscador";
 import InstalarApp from "@/components/InstalarApp";
-import EnJuegoTips from "@/components/EnJuegoTips";
-import { clasificadosNewman } from "@/lib/clasificadosNewman";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -25,7 +23,6 @@ const botonStyle: React.CSSProperties = {
 
 export default async function Home() {
   const session = await getSession();
-  const clasificados = await clasificadosNewman();
   // El boton "Formaciones" (pantalla /formaciones para cargar/publicar) lo ven el Administrador
   // (sin alcance) y cualquier Manager de division.
   const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
@@ -87,7 +84,6 @@ export default async function Home() {
         </p>
       )}
       {/* Pantalla "Newman clasificado a playoff": es la pantalla de inicio, cada vez que se entra. */}
-      <EnJuegoTips clasificados={clasificados} />
     </main>
   );
 }
