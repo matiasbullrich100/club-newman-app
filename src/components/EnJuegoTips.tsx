@@ -18,6 +18,8 @@ import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
 const ID_CLASIFICADOS = "clasificados-newman";
+const ID_TOP4 = "clasificados-top4";
+const esPantallaClasificados = (id: string) => id === ID_CLASIFICADOS || id === ID_TOP4; // no son tips: sin rotulo ni numero
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
 // los muestra TODOS, en orden, sin cooldown -- "Siguiente" avanza y el ultimo cierra con "Entendido".
@@ -206,7 +208,7 @@ function CrucesATablaMini() {
 // `activo: false` = queda en el codigo pero no se muestra (por si se quiere reactivar despues,
 // sin tener que volver a escribirlo). El numero visible (#1, #2...) sale del orden entre los
 // ACTIVOS, no de esta lista completa -- asi no quedan huecos cuando algunos estan apagados.
-const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; activo?: boolean }[] = [
+const TIPS: { id: string; texto: React.ReactNode; visual?: React.ReactNode; activo?: boolean; ancho?: number }[] = [
   {
     id: "buscador",
     texto: 'Nuevo botón "Buscar" para ir directo a lo que querés ver.',
@@ -326,12 +328,65 @@ function TablaClasificados({ filas }: { filas: ClasificadoNewman[] }) {
   );
 }
 
+// Pantalla "Clasificados a playoff · Top 14": una tarjeta por division con los 4 que clasifican (el de Newman en
+// amarillo). Mismos colores verdes que /playoff.
+function TablaTop4({ filas }: { filas: ClasificadoNewman[] }) {
+  return (
+    <span style={{ display: "block", textAlign: "left" }}>
+      <span style={{ display: "block", textAlign: "center", fontWeight: 800, color: DORADO, fontSize: "1.25rem", lineHeight: 1.2 }}>
+        Clasificados a playoff · Top 14
+      </span>
+      <span style={{ display: "block", textAlign: "center", marginTop: 4, fontSize: "0.68rem", letterSpacing: 1, textTransform: "uppercase", color: DORADO_SUAVE }}>
+        URBA · Torneo 2026 · Fase regular
+      </span>
+      <span style={{ display: "grid", gap: 6, marginTop: 12 }}>
+        {filas.map((f) => (
+          <span
+            key={f.categoriaId}
+            style={{ display: "block", background: "rgba(70,196,106,.62)", boxShadow: "inset 4px 0 0 #46e07a", borderRadius: 8, padding: "6px 8px 7px 12px" }}
+          >
+            <span style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>{f.categoria}</span>
+              <span style={{ fontSize: "0.56rem", letterSpacing: 1, textTransform: "uppercase", opacity: 0.8 }}>Clasificados</span>
+            </span>
+            <span style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4, marginTop: 4 }}>
+              {f.top4.map((e) => (
+                <span
+                  key={e.posicion}
+                  style={{
+                    background: e.propio ? "#f5a800" : "rgba(0,0,0,.2)",
+                    color: e.propio ? "#2a1b02" : undefined,
+                    fontWeight: e.propio ? 800 : 500,
+                    borderRadius: 5,
+                    padding: "4px 5px",
+                    fontSize: "0.72rem",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {e.posicion}° {e.equipo}
+                </span>
+              ))}
+            </span>
+          </span>
+        ))}
+      </span>
+      <span style={{ display: "block", textAlign: "center", marginTop: 10, fontSize: "0.68rem", opacity: 0.75 }}>Posición según la última tabla de URBA.</span>
+    </span>
+  );
+}
+
 export default function EnJuegoTips({ clasificados }: { clasificados?: ClasificadoNewman[] }) {
   // Si llegan clasificados, esa pantalla va PRIMERO (y, con los demas tips apagados, sola).
   const tips = useMemo<typeof TIPS_ACTIVOS>(
     () =>
       clasificados && clasificados.length > 0
-        ? [{ id: ID_CLASIFICADOS, texto: <TablaClasificados filas={clasificados} />, numero: 1 }, ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 1 }))]
+        ? [
+            { id: ID_CLASIFICADOS, texto: <TablaClasificados filas={clasificados} />, numero: 1 },
+            { id: ID_TOP4, texto: <TablaTop4 filas={clasificados} />, numero: 2, ancho: 440 },
+            ...TIPS_ACTIVOS.map((t) => ({ ...t, numero: t.numero + 2 })),
+          ]
         : TIPS_ACTIVOS,
     [clasificados]
   );
@@ -432,18 +487,18 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
       }}
     >
       {/* La pantalla de clasificados lleva su propio titulo: sin el rotulo "EnJuego tips". */}
-      {actual.id !== ID_CLASIFICADOS && (
+      {!esPantallaClasificados(actual.id) && (
         <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: DORADO, letterSpacing: 0.5, fontSize: "0.95rem" }}>
           <FocoIcono />
           EnJuego tips
         </span>
       )}
-      {tips.length > 1 && (
+      {tips.length > 1 && !esPantallaClasificados(actual.id) && (
         <span style={{ marginTop: 8, fontSize: "0.8rem", fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1 }}>
           #{actual.numero}
         </span>
       )}
-      <p style={{ margin: "14px 0 0", fontSize: "1.05rem", lineHeight: 1.5, maxWidth: 340 }}>{actual.texto}</p>
+      <p style={{ margin: "14px 0 0", fontSize: "1.05rem", lineHeight: 1.5, maxWidth: actual.ancho ?? 340, width: "100%" }}>{actual.texto}</p>
       {actual.visual && <div style={{ marginTop: 22, display: "flex", justifyContent: "center" }}>{actual.visual}</div>}
       <div style={{ marginTop: 34, display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 300 }}>
         <button
