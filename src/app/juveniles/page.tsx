@@ -11,6 +11,7 @@ import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
+import EnJuegoTips from "@/components/EnJuegoTips";
 import { DORADO_SUAVE } from "@/lib/colors";
 
 export default async function JuvenilesPage() {
@@ -59,6 +60,7 @@ export default async function JuvenilesPage() {
       <SessionBar session={session} />
       <Header rightLabel="Juveniles" logo="urba" rightLabelShift={14} />
 
+      <EnJuegoTips />
 
       {equiposOrdenados
         .map((equipo) => {

@@ -11,8 +11,22 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import { FuenteUrba } from "@/components/PieNota";
-import { DORADO, DORADO_SUAVE } from "@/lib/colors";
+import { DORADO, DORADO_SUAVE, TINTA } from "@/lib/colors";
 import { slugEquipo } from "@/lib/equipoSlug";
+
+const botonEstilo: React.CSSProperties = {
+  flex: 1,
+  textAlign: "center",
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  padding: "9px 4px",
+  borderRadius: 8,
+  border: "1px solid rgba(226,197,120,.4)",
+  color: DORADO_SUAVE,
+};
+const botonActivo: React.CSSProperties = { ...botonEstilo, background: DORADO, color: TINTA, border: `1px solid ${DORADO}` };
 
 // Verde intenso con barra = ya clasificado (los demas no lo pueden alcanzar, mismo que la Tabla de
 // Posiciones); amarillo = esta entre los 4 hoy pero todavia puede cambiar.
@@ -102,6 +116,14 @@ export default async function PlayoffPage() {
       <BackLink href="/" />
       <SessionBar session={session} />
       <Header rightLabel="Playoff" />
+
+      {/* 1ra pantalla: cruces de semifinales. 2da: los clasificados de cada division (/playoff/clasificados). */}
+      <div style={{ display: "flex", gap: 6, margin: "12px 0 2px" }}>
+        <span style={botonActivo}>Cruces</span>
+        <Link href="/playoff/clasificados" replace style={botonEstilo}>
+          Clasificados
+        </Link>
+      </div>
 
       <p style={{ fontSize: "0.78rem", color: DORADO_SUAVE, textAlign: "center", margin: "10px 0 2px", lineHeight: 1.35 }}>
         Los primeros 4 de cada tabla juegan las semifinales: 1° vs 4° y 2° vs 3°.

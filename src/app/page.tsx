@@ -83,7 +83,6 @@ export default async function Home() {
           </Link>
         </p>
       )}
-      {/* Pantalla "Newman clasificado a playoff": es la pantalla de inicio, cada vez que se entra. */}
     </main>
   );
 }

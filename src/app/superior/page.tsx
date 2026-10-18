@@ -13,6 +13,7 @@ import LiveBanner from "@/components/LiveBanner";
 import ProximaFechaRow from "@/components/ProximaFechaRow";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
+import EnJuegoTips from "@/components/EnJuegoTips";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
@@ -192,6 +193,7 @@ export default async function PlantelSuperiorPage() {
       <SessionBar session={session} />
       <Header rightLabel="Plantel Superior" />
 
+      <EnJuegoTips />
 
       {mostrarResumenSemana && (
         <div
