@@ -6,7 +6,7 @@ import "./globals.css";
 import FontSizeControl from "@/components/FontSizeControl";
 import PastillaPortal from "@/components/PastillaPortal";
 import { Seuo } from "@/components/PieNota";
-import EnJuegoTips from "@/components/EnJuegoTips";
+import ClasificadosPantalla from "@/components/ClasificadosPantalla";
 import { clasificadosNewman, type ClasificadoNewman } from "@/lib/clasificadosNewman";
 
 const lato = Lato({
@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Pantalla "Newman clasificado a playoff": va en el layout para que sea lo primero que ve cada persona al
-  // entrar, sea cual sea la pagina por la que llegue (ver EnJuegoTips). Si falla la lectura, la app sigue igual.
+  // entrar, sea cual sea la pagina por la que llegue (ver ClasificadosPantalla). Si falla la lectura, la app sigue igual.
   let clasificados: ClasificadoNewman[] = [];
   try {
     clasificados = await clasificadosNewman();
@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         {children}
-        <EnJuegoTips clasificados={clasificados} />
+        <ClasificadosPantalla clasificados={clasificados} />
         {/* Disclaimer global "salvo error u omision" -- alineado con la columna de contenido. */}
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 8px" }}>
           <Seuo />

@@ -17,11 +17,6 @@ import type { ClasificadoNewman } from "@/lib/clasificadosNewman";
 import { DORADO, DORADO_SUAVE, CREMA, TINTA, BORDO_OSC } from "@/lib/colors";
 
 const LS_KEY = "enjuegoTips";
-// La pantalla de clasificados es lo PRIMERO que ve cada persona hoy y manana (18 y 19/10/2026), en la primera
-// pantalla donde entre ese dia (Inicio, Plantel Superior, Juveniles o Playoff); despues sigue normal. Se guarda
-// el dia en que ya se mostro, asi no se repite el mismo dia. Pasado el 19/10 deja de mostrarse sola.
-const LS_CLASIFICADOS = "enjuegoClasificadosDia";
-const DIAS_CLASIFICADOS = ["2026-10-18", "2026-10-19"];
 const ID_CLASIFICADOS = "clasificados-newman";
 const COOLDOWN_TIP_MS = 7 * 24 * 60 * 60 * 1000; // 1 semana: un tip ya visto no reaparece antes
 // Pedido del club: mientras haya pocos tips y todos importantes (ej. los de clasificacion), cada visita
@@ -359,24 +354,8 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
     if (yaCorrio.current) return;
     yaCorrio.current = true;
 
-    // Clasificados: una vez por dia, solo en los dias de DIAS_CLASIFICADOS (dia calendario de Argentina).
-    let lista = tips;
-    if (tips.some((t) => t.id === ID_CLASIFICADOS)) {
-      const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
-      const sinClasificados = tips.filter((t) => t.id !== ID_CLASIFICADOS);
-      // ?clasificados=1 en la direccion la muestra siempre (para revisarla).
-      const forzada = new URLSearchParams(window.location.search).get("clasificados") === "1";
-      if (forzada) lista = tips;
-      else if (!DIAS_CLASIFICADOS.includes(hoy)) lista = sinClasificados;
-      else {
-        try {
-          if (localStorage.getItem(LS_CLASIFICADOS) === hoy) lista = sinClasificados;
-          else localStorage.setItem(LS_CLASIFICADOS, hoy);
-        } catch {
-          /* storage bloqueado: se muestra igual */
-        }
-      }
-    }
+    // La pantalla de clasificados la monta ClasificadosPantalla solo cuando corresponde (dias y secciones).
+    const lista = tips;
     if (lista.length === 0) return;
 
     let vistos: Record<string, number> = {};
@@ -403,6 +382,7 @@ export default function EnJuegoTips({ clasificados }: { clasificados?: Clasifica
     marcar(lista[inicio].id); // el que se muestra ahora ya cuenta como visto
     // Depende de localStorage (solo cliente): aparece despues del montaje a proposito, en SSR no
     // se renderiza nada y no hay mismatch de hidratacion.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIdx(inicio);
     setCola(lista);
   }, [tips]);
