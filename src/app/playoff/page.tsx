@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { fixtureDivisionCompleto } from "@/lib/resultadosDivision/consultar";
-import { posicionesClasificadas } from "@/lib/clasificacion";
+import { posicionesClasificadas, reordenarPorDesempateDirecto } from "@/lib/clasificacion";
 import { PLAYOFF, fechaCorta } from "@/lib/playoff";
 import type { FilaPosicion, PosicionesTorneo } from "@/types/firestore";
 import Header from "@/components/Header";
@@ -100,9 +100,11 @@ export default async function PlayoffPage() {
     categorias.map(async (cat) => {
       const snap = await adminDb.collection("posiciones").doc(cat.id).get();
       if (!snap.exists) return { cat, data: null, seguras: new Set<number>(), completa: false };
-      const data = snap.data() as PosicionesTorneo;
+      const dataUrba = snap.data() as PosicionesTorneo;
       const fechasDiv = tieneFixtureDivision(cat.id) ? await fixtureDivisionCompleto(cat.id) : undefined;
       const partidos = fechasDiv?.flatMap((f) => f.partidos);
+      // Empates en puntos: desempata el resultado directo (ej. Pre A: Newman le gano 2 veces a Alumni).
+      const data: PosicionesTorneo = { ...dataUrba, filas: reordenarPorDesempateDirecto(dataUrba.filas, partidos) };
       // Fase regular terminada para toda la tabla (todos jugaron lo mismo): los 4 primeros ya son los
       // clasificados definitivos y los cruces son reales. Si faltan partidos, la tabla es provisoria.
       const completa = data.filas.length > 0 && data.filas.every((x) => x.jugados === data.filas[0].jugados);

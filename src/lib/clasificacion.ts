@@ -63,6 +63,28 @@ export function ganaDesempateDirecto(a: string, b: string, partidos: PartidoDivi
  * Partidos que faltan = todos contra todos a doble vuelta: 2 * (equipos - 1) - jugados (Top 14: 26;
  * 12 equipos: 22; 13 equipos: 24).
  */
+// La tabla de la URBA a veces deja a un equipo ARRIBA de otro con los mismos puntos aunque el de abajo le gano
+// los dos partidos directos (ej. Pre A 2026: Newman y Alumni 96 pts, Newman le gano las 2 y la web los pone al
+// reves). El reglamento desempata primero por los partidos entre los igualados (ver ganaDesempateDirecto), asi
+// que para el playoff se reordenan los pares igualados en puntos segun ese criterio. Devuelve filas NUEVAS ya
+// renumeradas (posicion = lugar). Sin partidos, deja la tabla como esta.
+export function reordenarPorDesempateDirecto(filas: FilaPosicion[], partidos?: PartidoDivision[]): FilaPosicion[] {
+  const orden = [...filas].sort((a, b) => a.posicion - b.posicion);
+  if (partidos) {
+    for (let pasada = 0; pasada < orden.length; pasada++) {
+      let hubo = false;
+      for (let i = 0; i < orden.length - 1; i++) {
+        if (orden[i].puntos === orden[i + 1].puntos && ganaDesempateDirecto(orden[i + 1].equipo, orden[i].equipo, partidos)) {
+          [orden[i], orden[i + 1]] = [orden[i + 1], orden[i]];
+          hubo = true;
+        }
+      }
+      if (!hubo) break;
+    }
+  }
+  return orden.map((f, i) => ({ ...f, posicion: i + 1 }));
+}
+
 export function posicionesClasificadas(filas: FilaPosicion[], cupos = 4, partidos?: PartidoDivision[]): Set<number> {
   const clasificadas = new Set<number>();
   if (filas.length <= cupos) return clasificadas;

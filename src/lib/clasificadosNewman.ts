@@ -2,6 +2,9 @@ import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
 import { PLAYOFF } from "@/lib/playoff";
+import { tieneFixtureDivision } from "@/lib/fixtureDivision";
+import { fixtureDivisionCompleto } from "@/lib/resultadosDivision/consultar";
+import { reordenarPorDesempateDirecto } from "@/lib/clasificacion";
 import type { PosicionesTorneo } from "@/types/firestore";
 
 export interface ClasificadoNewman {
@@ -27,17 +30,20 @@ export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => PLAYOFF[c.id]);
   const snaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection("posiciones").doc(c.id)));
   const salida: ClasificadoNewman[] = [];
-  snaps.forEach((snap, i) => {
-    if (!snap.exists) return;
+  for (const [i, snap] of snaps.entries()) {
+    if (!snap.exists) continue;
     const t = snap.data() as PosicionesTorneo;
-    const fila = t.filas.find((f) => f.equipo === t.nuestroEquipo);
+    // Empates en puntos: desempata el resultado directo (ver reordenarPorDesempateDirecto).
+    const partidos = tieneFixtureDivision(categorias[i].id) ? (await fixtureDivisionCompleto(categorias[i].id)).flatMap((f) => f.partidos) : undefined;
+    const filas = reordenarPorDesempateDirecto(t.filas, partidos);
+    const fila = filas.find((f) => f.equipo === t.nuestroEquipo);
     if (fila && fila.posicion <= 4) {
-      const top4 = t.filas
+      const top4 = filas
         .filter((f) => f.posicion <= 4)
         .sort((a, b) => a.posicion - b.posicion)
         .map((f) => ({ posicion: f.posicion, equipo: nombreClub(f.equipo), propio: f.equipo === t.nuestroEquipo }));
       salida.push({ categoriaId: categorias[i].id, categoria: categorias[i].nombre, posicion: fila.posicion, top4 });
     }
-  });
+  }
   return salida;
 }
