@@ -12,15 +12,15 @@ function noJuegaEstaSemana(proxima: ProximaFecha): boolean {
   return !!proxima.fecha && proxima.fecha > domingoDeEstaSemanaIso();
 }
 
-function textoHorarioCancha(proxima: ProximaFecha): string | null {
+function textoHorarioCancha(proxima: ProximaFecha, sinSede = false): string | null {
   if (proxima.notaEspecial) return null;
   // Sede (La Boya, CASI Central...) solo de visitante, y no si es solo el nombre del propio rival.
-  const sede = !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
+  const sede = !sinSede && !proxima.esLocal && proxima.cancha && proxima.cancha.trim().toLowerCase() !== proxima.rival.trim().toLowerCase() ? proxima.cancha : null;
   const cancha = proxima.numeroCancha ? `Cancha ${proxima.numeroCancha}` : null;
   const libreEstaSemana = noJuegaEstaSemana(proxima);
   // Sin partido esta semana la fila dice solo "Fecha libre" (como una fecha libre del fixture): sin horario ni sede.
   if (libreEstaSemana) return null;
-  const partes = [proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  const partes = [proxima.fase === "semifinal" ? "Semifinal" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
 
@@ -50,6 +50,7 @@ export default function ProximaFechaRow({
   posicionesHref,
   fixtureHref,
   fixtureDivisionHref,
+  sinSede = false,
 }: {
   partidoId: string;
   categoriaNombre: string;
@@ -63,6 +64,8 @@ export default function ProximaFechaRow({
   // Solo si la categoria tiene Fixture Division cargado (ver tieneFixtureDivision en
   // lib/fixtureDivision.ts) -- mismo botón que ya tiene LiveBanner.
   fixtureDivisionHref?: string;
+  // La sede ya figura en el titulo del bloque (ProgramaSemifinales): no se repite en la sublinea.
+  sinSede?: boolean;
 }) {
   // Fecha libre (u otra nota especial) -- mismo fondo negro que un partido ya jugado, no hay nada
   // que "esperar" en esa fila.
@@ -107,9 +110,9 @@ export default function ProximaFechaRow({
                   <MatchupText esLocal={proxima.esLocal} rival={proxima.rival} jugado={false} resultado={{ newman: 0, rival: 0 }} nombreNewman={nombreNewman} />
                 ))}
             </span>
-            {textoHorarioCancha(proxima) && (
+            {textoHorarioCancha(proxima, sinSede) && (
               <span style={{ maxWidth: "100%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "0.58rem", letterSpacing: 0.4, color: DORADO_SUAVE, opacity: 0.75, textTransform: "uppercase" }}>
-                {textoHorarioCancha(proxima)}
+                {textoHorarioCancha(proxima, sinSede)}
               </span>
             )}
           </span>

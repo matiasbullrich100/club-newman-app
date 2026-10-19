@@ -82,7 +82,8 @@ export function grupoDeCategoria(categoriaId: string): { grupo: "superior" | "ju
   return { grupo: "superior" };
 }
 
-export const NUMERO_FECHAS_SUPERIOR = 26;
+// 26 fechas de fase regular + la 27 = semifinal de playoff (ver Partido.fase).
+export const NUMERO_FECHAS_SUPERIOR = 27;
 export const NUMERO_FECHAS_JUVENILES = 11;
 
 export function partidoId(categoriaId: string, numeroFecha: number | string): string {

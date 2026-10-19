@@ -13,6 +13,8 @@ import SessionBar from "@/components/SessionBar";
 import { FuenteUrba } from "@/components/PieNota";
 import { DORADO, DORADO_SUAVE, TINTA } from "@/lib/colors";
 import { slugEquipo } from "@/lib/equipoSlug";
+import ProgramaSemifinales from "@/components/ProgramaSemifinales";
+import { semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
 
 const botonEstilo: React.CSSProperties = {
   flex: 1,
@@ -94,6 +96,7 @@ function Cruce({
 
 export default async function PlayoffPage() {
   const session = await getSession();
+  const semis = await semifinalesProgramadasEstaSemana();
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => PLAYOFF[c.id]);
 
   const datos = await Promise.all(
@@ -125,6 +128,11 @@ export default async function PlayoffPage() {
         <Link href="/playoff/clasificados" replace style={botonEstilo}>
           Clasificados
         </Link>
+      </div>
+
+      {/* Mismo programa de semifinales (por dia y sede) que ve quien entra a Plantel Superior. */}
+      <div style={{ marginTop: 12 }}>
+        <ProgramaSemifinales semis={semis} />
       </div>
 
       <p style={{ fontSize: "0.78rem", color: DORADO_SUAVE, textAlign: "center", margin: "10px 0 2px", lineHeight: 1.35 }}>

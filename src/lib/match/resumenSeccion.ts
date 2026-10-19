@@ -155,6 +155,8 @@ export interface ProximaFecha {
   // Amistoso arreglado por el club (no es del fixture oficial) -- la fila de Proxima Fecha lo aclara.
   amistoso?: boolean;
   formato?: string;
+  // "semifinal": partido de playoff (se rotula "Semifinal").
+  fase?: "semifinal";
 }
 
 /**
@@ -189,6 +191,7 @@ export async function proximasFechasDe(categoriaId: string, cantidad: number): P
     notaEspecial: p.notaEspecial,
     amistoso: p.amistoso,
     formato: p.formato,
+    fase: p.fase,
   }));
 }
 
@@ -222,6 +225,7 @@ export interface PartidoDeFecha {
   cancha?: string;
   numeroCancha?: string;
   notaEspecial?: string;
+  fase?: "semifinal";
 }
 
 /**
@@ -251,6 +255,7 @@ export async function partidosDeFechaExacta(categoriaIds: string[], fechaIso: st
     cancha: p.cancha,
     numeroCancha: p.numeroCancha,
     notaEspecial: p.notaEspecial,
+    fase: p.fase,
   }));
 }
 

@@ -110,7 +110,7 @@ export default async function CategoriaFixturePage({
               tituloPrincipal={
                 partido.notaEspecial ? (
                   <>
-                    <span style={{ fontSize: "0.75em" }}>#{numeroFecha}.</span> {partido.notaEspecial}
+                    <span style={{ fontSize: "0.75em" }}>{partido.fase === "semifinal" ? "Semifinal" : `#${numeroFecha}.`}</span> {partido.notaEspecial}
                     {partido.fecha && (
                       <span style={{ fontSize: "0.7em", fontWeight: 400, opacity: 0.6, marginLeft: 4 }}>
                         {formatFechaCorta(partido.fecha)}
@@ -119,7 +119,7 @@ export default async function CategoriaFixturePage({
                   </>
                 ) : (
                   <>
-                    <span style={{ fontSize: "0.75em" }}>#{numeroFecha}.</span>{" "}
+                    <span style={{ fontSize: "0.75em" }}>{partido.fase === "semifinal" ? "Semifinal" : `#${numeroFecha}.`}</span>{" "}
                     <MatchupText esLocal={partido.esLocal} rival={partido.rival} jugado={partido.estado === "terminado"} resultado={partido.resultado} />
                     {partido.fecha && (
                       <span style={{ fontSize: "0.7em", fontWeight: 400, opacity: 0.6, marginLeft: 4 }}>

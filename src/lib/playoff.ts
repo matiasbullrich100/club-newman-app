@@ -22,9 +22,23 @@ const INTERMEDIA_Y_PRE: PlayoffCategoria = {
   sede: "CUBA (Villa de Mayo)",
 };
 
-// M-22: la prensa de URBA no informo fechas ni sede todavia -- se muestran solo los cruces.
-const SIN_FECHAS: PlayoffCategoria = {
-  semis: [{ cruce: [1, 4] }, { cruce: [2, 3] }],
+// Pre E y Pre F: el programa oficial de URBA las pone el VIERNES 23/10 (el resto, el sabado 24/10).
+const VIERNES_EN_CUBA: PlayoffCategoria = {
+  semis: [
+    { fecha: "2026-10-23", cruce: [1, 4] },
+    { fecha: "2026-10-23", cruce: [2, 3] },
+  ],
+  final: "2026-11-14",
+  sede: "CUBA (Villa de Mayo)",
+};
+
+// M-22: semifinales el viernes 23/10 en Hindu (programa oficial de URBA); final todavia sin fecha.
+const M22: PlayoffCategoria = {
+  semis: [
+    { fecha: "2026-10-23", cruce: [1, 4] },
+    { fecha: "2026-10-23", cruce: [2, 3] },
+  ],
+  sede: "Hindú",
 };
 
 export const PLAYOFF: Record<string, PlayoffCategoria> = {
@@ -40,9 +54,9 @@ export const PLAYOFF: Record<string, PlayoffCategoria> = {
   "pre-b": INTERMEDIA_Y_PRE,
   "pre-c": INTERMEDIA_Y_PRE,
   "pre-d": INTERMEDIA_Y_PRE,
-  "pre-e": INTERMEDIA_Y_PRE,
-  "pre-f": INTERMEDIA_Y_PRE,
-  "m-22": SIN_FECHAS,
+  "pre-e": VIERNES_EN_CUBA,
+  "pre-f": VIERNES_EN_CUBA,
+  "m-22": M22,
 };
 
 // "vie 30/10" a partir de un ISO yyyy-mm-dd (sin depender de la zona horaria del servidor).

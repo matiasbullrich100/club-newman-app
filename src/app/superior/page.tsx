@@ -14,6 +14,8 @@ import ProximaFechaRow from "@/components/ProximaFechaRow";
 import ProximaFechaBanner from "@/components/ProximaFechaBanner";
 import PartidosMananaBanner from "@/components/PartidosMananaBanner";
 import EnJuegoTips from "@/components/EnJuegoTips";
+import ProgramaSemifinales from "@/components/ProgramaSemifinales";
+import { semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const ESTADOS_EN_VIVO = new Set(["en_juego", "entretiempo", "suspendido"]);
@@ -117,7 +119,10 @@ export default async function PlantelSuperiorPage() {
   // mismos botones Tabla/Fixt.) -- si además armáramos su ProximaFechaRow, la misma categoría
   // aparecería dos veces. Así que la fila de "Próxima Fecha" es solo para las categorías cuyo
   // próximo partido NO es mañana.
-  const partidosManana = await partidosDeFechaExacta(CATEGORIAS_SUPERIOR.map((c) => c.id), mananaIsoEnArgentina());
+  // Las semifinales programadas salen en su propio programa por dia y sede (ProgramaSemifinales), no aca.
+  const semis = await semifinalesProgramadasEstaSemana();
+  const idsSemis = new Set(semis.map((s) => s.categoriaId));
+  const partidosManana = (await partidosDeFechaExacta(CATEGORIAS_SUPERIOR.map((c) => c.id), mananaIsoEnArgentina())).filter((p) => !p.fase);
   const idsJuegaManana = new Set(partidosManana.map((p) => p.categoriaId));
 
   const filas = categoriasEnFilas
@@ -143,6 +148,7 @@ export default async function PlantelSuperiorPage() {
         };
       }
       if (idsJuegaManana.has(cat.id)) return null; // ya sale en PartidosMananaBanner
+      if (idsSemis.has(cat.id)) return null; // ya sale en ProgramaSemifinales
       const proxima = proximasPorCategoria.get(cat.id);
       if (!proxima) return null;
       return {
@@ -225,6 +231,8 @@ export default async function PlantelSuperiorPage() {
       {filasVivo.map((f) => f.node)}
 
       {filasJugados.map((f) => f.node)}
+
+      <ProgramaSemifinales semis={semis} />
 
       {mostrarProximaFechaPrimera && proximasFechasPrimera.length > 0 && <ProximaFechaBanner proximas={proximasFechasPrimera} />}
 

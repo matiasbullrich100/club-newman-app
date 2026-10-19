@@ -121,7 +121,7 @@ export default function PartidoHistorico({
       <div style={cardStyle}>
         {partido.fecha && (
           <p style={{ textAlign: "center", margin: "0 0 4px", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: 0.5, color: DORADO_SUAVE }}>
-            Fecha #{partido.numeroFecha} · {formatFechaCorta(partido.fecha)}
+            {partido.fase === "semifinal" ? "Semifinal" : `Fecha #${partido.numeroFecha}`} · {formatFechaCorta(partido.fecha)}
           </p>
         )}
         {partido.amistoso && (

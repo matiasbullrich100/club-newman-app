@@ -65,6 +65,8 @@ export interface Partido {
   // (no cuenta para la tabla de posiciones) -- se aclara junto al resultado/matchup, a diferencia
   // de notaEspecial que reemplaza el matchup entero.
   amistoso?: boolean;
+  // Partido de playoff (hoy solo "semifinal"): se rotula asi en vez de "Fecha #N" (ver cargar-semifinales-plantel-superior).
+  fase?: "semifinal";
   // Aclaracion de formato del partido (ej. "3 tiempos de 40") -- se muestra junto a "Amistoso".
   formato?: string;
   // Solo aplica a un partido "programado" -- ausente o true = la formacion es publica (default,
