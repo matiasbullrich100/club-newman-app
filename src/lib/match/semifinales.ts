@@ -1,7 +1,7 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
-import { debeMostrarProximaFechaEnArgentina, domingoDeEstaSemanaIso, hoyIsoEnArgentina } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, domingoDeEstaSemanaIso, hoyIsoEnArgentina, plantelAdelantaSemifinales } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 import type { ProximaFecha } from "./resumenSeccion";
 
@@ -17,7 +17,7 @@ export interface SemifinalProgramada {
 // a las 06:00 (ver debeMostrarProximaFechaEnArgentina). Una semifinal ya en vivo / terminada sale en su fila de
 // resultado de siempre, no aca. Los partidos son la "Fecha 27" (fase "semifinal") de cada categoria.
 export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgramada[]> {
-  if (!debeMostrarProximaFechaEnArgentina()) return [];
+  if (!debeMostrarProximaFechaEnArgentina() && !plantelAdelantaSemifinales()) return [];
   const snaps = await adminDb.getAll(...CATEGORIAS_SUPERIOR.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, 27))));
   const hoy = hoyIsoEnArgentina();
   const domingo = domingoDeEstaSemanaIso();

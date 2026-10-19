@@ -101,6 +101,14 @@ function esDiaAdelantadoProximaFecha(): boolean {
   return hoyIsoEnArgentina() === DIA_ADELANTADO_PROXIMA_FECHA;
 }
 
+// Pedido del club: Plantel Superior pasa a mostrar las SEMIFINALES de playoff ya (lunes 19 a miercoles 21/10/2026),
+// sin esperar al jueves 06:00: no se muestran mas los resultados de la fecha pasada y se ve el programa de
+// semifinales. Se vence sola. Solo Plantel Superior -- Juveniles sigue con su horario normal.
+export function plantelAdelantaSemifinales(): boolean {
+  const hoy = hoyIsoEnArgentina();
+  return hoy >= "2026-10-19" && hoy <= "2026-10-21";
+}
+
 // Plantel Superior juega el sabado, Juveniles el domingo -- desde el jueves a las 06:00 (pedido
 // explicito, es cuando el club arranca a armar la previa del fin de semana) hasta el domingo, el
 // resumen de /superior y /juveniles deja de mostrar el resultado de la fecha pasada (ya viejo a esa

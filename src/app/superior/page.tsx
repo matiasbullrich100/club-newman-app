@@ -4,7 +4,7 @@ import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { partidosEnVivoOUltimoTerminado, partidosDeFechaExacta, proximasFechasDe, type ProximaFecha } from "@/lib/match/resumenSeccion";
 import { tieneFixtureDivision, nombrePropioDivision } from "@/lib/fixtureDivision";
-import { debeMostrarProximaFechaEnArgentina, esResultadoCargadoPorAdelantado, mananaIsoEnArgentina, resultadoSigueFresco } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, esResultadoCargadoPorAdelantado, mananaIsoEnArgentina, plantelAdelantaSemifinales, resultadoSigueFresco } from "@/lib/fecha";
 import { esIdDePartidoPrueba } from "@/lib/partidosPrueba";
 import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
@@ -32,6 +32,12 @@ export default async function PlantelSuperiorPage() {
   // solo queda marcarlo "PRUEBA" para quien sí los ve (administrador o la cuenta de práctica).
   const resumen = await partidosEnVivoOUltimoTerminado(CATEGORIAS_SUPERIOR.map((c) => c.id), session);
 
+  // Semifinales adelantadas (ver plantelAdelantaSemifinales): se comporta como la ventana de Proxima Fecha (jue 06:00 ->
+  // dom) y solo cuentan como "frescos" los resultados de HOY, no los de la fecha pasada.
+  const semiAdelantado = plantelAdelantaSemifinales();
+  const ventanaProxima = debeMostrarProximaFechaEnArgentina() || semiAdelantado;
+  const sigueFresco = (iso: string) => (semiAdelantado ? diasDesdeEnArgentina(iso) === 0 : resultadoSigueFresco(iso));
+
   // El bloque de resultados aparece/desaparece ENTERO, no categoria por categoria: si UNA
   // categoria jugo recien (ej. Pre F movida al jueves) o hay algo en vivo, TODO Plantel Superior
   // sigue mostrando su ultimo resultado -- no se rota a "Proxima Fecha" hasta que el grupo entero
@@ -45,8 +51,8 @@ export default async function PlantelSuperiorPage() {
   // pasado la semana de Champa).
   const modoResultados =
     resumen.some((p) => ESTADOS_EN_VIVO.has(p.estado)) ||
-    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && resultadoSigueFresco(p.fecha)) ||
-    !debeMostrarProximaFechaEnArgentina();
+    resumen.some((p) => (p.estado === "terminado" || p.notaEspecial) && !!p.fecha && sigueFresco(p.fecha)) ||
+    !ventanaProxima;
 
   // "Fresco" = en vivo, o (grupo en modo resultados y ESTA categoria puntual tiene un resultado/
   // Fecha libre de HOY o los ultimos 3 dias). El chequeo de fecha propio (no solo "modoResultados")
@@ -64,7 +70,7 @@ export default async function PlantelSuperiorPage() {
       (modoResultados &&
         (p.estado === "terminado" || !!p.notaEspecial) &&
         !!p.fecha &&
-        resultadoSigueFresco(p.fecha)));
+        sigueFresco(p.fecha)));
 
   // Banda "P. Ganados / P. Perdidos" arriba de todo en /superior. Cuenta TODOS los partidos
   // terminados de la fecha, incluidos los internos Newman vs Newman (ej. Pre F vs Pre G): cada
@@ -74,7 +80,7 @@ export default async function PlantelSuperiorPage() {
   // (jue 06:00→dom) solo cuenta los resultados FRESCOS (en vivo / recién jugados) -- si no, un
   // amistoso suelto entre semana reactivaba la banda con los resultados viejos de la fecha pasada.
   const jugadosSemana = resumen.filter((p) => p.estado === "terminado");
-  const paraLaBanda = debeMostrarProximaFechaEnArgentina() ? jugadosSemana.filter(fresco) : jugadosSemana;
+  const paraLaBanda = ventanaProxima ? jugadosSemana.filter(fresco) : jugadosSemana;
   const ganadosSemana = paraLaBanda.filter((p) => p.resultado.newman > p.resultado.rival).length;
   const empatadosSemana = paraLaBanda.filter((p) => p.resultado.newman === p.resultado.rival).length;
   const perdidosSemana = paraLaBanda.filter((p) => p.resultado.newman < p.resultado.rival).length;
@@ -93,7 +99,7 @@ export default async function PlantelSuperiorPage() {
         : `Fechas #${numerosFecha[0]}-${numerosFecha[numerosFecha.length - 1]}`;
 
   const primeraResumen = resumen.find((p) => p.categoriaId === "primera");
-  const mostrarProximaFechaPrimera = !fresco(primeraResumen) && debeMostrarProximaFechaEnArgentina();
+  const mostrarProximaFechaPrimera = !fresco(primeraResumen) && ventanaProxima;
   const proximasFechasPrimera = mostrarProximaFechaPrimera ? await proximasFechasDe("primera", 3) : [];
 
   // Todas las categorias arman su fila: fresca -> LiveBanner; si no, su proxima fecha ->
