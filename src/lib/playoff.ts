@@ -4,6 +4,7 @@
 
 export interface SemifinalPlayoff {
   fecha?: string; // ISO yyyy-mm-dd; ausente = todavia no informada
+  hora?: string; // "HH:MM"; ausente = todavia no informada
   cruce: [number, number]; // posiciones de la tabla que se enfrentan
 }
 
@@ -13,33 +14,17 @@ export interface PlayoffCategoria {
   sede?: string;
 }
 
-const INTERMEDIA_Y_PRE: PlayoffCategoria = {
+// Programa oficial de semifinales de URBA (Intermedia, Pre A-F y M22: viernes 23 y sabado 24/10/2026 en CUBA Villa de
+// Mayo, M22 en Hindu). Las dos semifinales de una categoria juegan a la misma hora salvo M22. Primera: fechas de la
+// prensa de URBA (vie 30 y sab 31/10, cancha de CASI), horario todavia sin informar.
+const cuba = (fecha: string, hora: string): PlayoffCategoria => ({
   semis: [
-    { fecha: "2026-10-24", cruce: [1, 4] },
-    { fecha: "2026-10-24", cruce: [2, 3] },
+    { fecha, hora, cruce: [1, 4] },
+    { fecha, hora, cruce: [2, 3] },
   ],
   final: "2026-11-14",
   sede: "CUBA (Villa de Mayo)",
-};
-
-// Pre E y Pre F: el programa oficial de URBA las pone el VIERNES 23/10 (el resto, el sabado 24/10).
-const VIERNES_EN_CUBA: PlayoffCategoria = {
-  semis: [
-    { fecha: "2026-10-23", cruce: [1, 4] },
-    { fecha: "2026-10-23", cruce: [2, 3] },
-  ],
-  final: "2026-11-14",
-  sede: "CUBA (Villa de Mayo)",
-};
-
-// M-22: semifinales el viernes 23/10 en Hindu (programa oficial de URBA); final todavia sin fecha.
-const M22: PlayoffCategoria = {
-  semis: [
-    { fecha: "2026-10-23", cruce: [1, 4] },
-    { fecha: "2026-10-23", cruce: [2, 3] },
-  ],
-  sede: "Hindú",
-};
+});
 
 export const PLAYOFF: Record<string, PlayoffCategoria> = {
   primera: {
@@ -49,14 +34,21 @@ export const PLAYOFF: Record<string, PlayoffCategoria> = {
     ],
     sede: "Cancha de CASI",
   },
-  intermedia: INTERMEDIA_Y_PRE,
-  "pre-a": INTERMEDIA_Y_PRE,
-  "pre-b": INTERMEDIA_Y_PRE,
-  "pre-c": INTERMEDIA_Y_PRE,
-  "pre-d": INTERMEDIA_Y_PRE,
-  "pre-e": VIERNES_EN_CUBA,
-  "pre-f": VIERNES_EN_CUBA,
-  "m-22": M22,
+  intermedia: cuba("2026-10-24", "18:00"),
+  "pre-a": cuba("2026-10-24", "16:00"),
+  "pre-b": cuba("2026-10-24", "14:00"),
+  "pre-c": cuba("2026-10-24", "12:00"),
+  "pre-d": cuba("2026-10-24", "10:00"),
+  "pre-e": cuba("2026-10-23", "21:00"),
+  "pre-f": cuba("2026-10-23", "19:00"),
+  // M-22: en Hindu; SIC vs Buenos Aires 21:00 y Newman vs Hindu 19:00. Final todavia sin fecha.
+  "m-22": {
+    semis: [
+      { fecha: "2026-10-23", hora: "21:00", cruce: [1, 4] },
+      { fecha: "2026-10-23", hora: "19:00", cruce: [2, 3] },
+    ],
+    sede: "Hindú",
+  },
 };
 
 // "vie 30/10" a partir de un ISO yyyy-mm-dd (sin depender de la zona horaria del servidor).
