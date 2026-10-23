@@ -54,7 +54,7 @@ const EQUIPOS: EquipoFormacion[] = [
   {
     categoriaId: "pre-c", // vs SIC, sab 12:00
     titulares: ["Ibarguren Tomás", "Iribarne Gonzalo", "Walker Bautista", "Browne, Benjamin", "Sporleder Benicio", "Terrado, Marcos", "Ferreccio, Tomas", "Ezcurra, Felipe", "Rauch, Facundo", "Vivequin, Cruz", "Uranga Félix", "Zirolli Santiago", "Bertón Moreno, Ignacio", "Zirolli Marcos", "Segura Bautista"],
-    suplentes: [["16", "Herrera, Segundo"], ["17", "De Los Heros, Miguel"], ["18", "Irrázaval, Bautista"], ["19", "Bollini Marcos"], ["20", "Torello Eduardo"]],
+    suplentes: [["16", "Herrera, Segundo"], ["17", "De Los Heros, Miguel"], ["18", "Irarrázaval, Bautista"], ["19", "Bollini Marcos"], ["20", "Torello Eduardo"]],
   },
   {
     categoriaId: "pre-d", // vs CUBA, sab 10:00
