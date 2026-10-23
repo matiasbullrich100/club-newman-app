@@ -48,7 +48,7 @@ const EQUIPOS: EquipoFormacion[] = [
   },
   {
     categoriaId: "m-22", // vs Hindu, vie 19:00 en Hindu
-    titulares: ["De Elizalde, Iñaki", "Olmos Zenon", "Angelino, Alfonso", "Carey, Lucas", "Lopez Fresco, Diego", "Sola. Agusto", "Espinosa Segundo", "Mendonça, Tomás", "Benitez Cruz Blas", "Samilian, Alex", "Ramos Facundo", "Keena Manuel", "Pujato, Matías", "Socas, Justo", "Molina Lucas"],
+    titulares: ["De Elizalde, Iñaki", "Olmos Zenon", "Angelino, Alfonso", "Carey, Lucas", "Lopez Fresco, Diego", "Sola, Augusto", "Espinosa Segundo", "Mendonça, Tomás", "Benitez Cruz Blas", "Samilian, Alex", "Ramos Facundo", "Keena Manuel", "Pujato, Matías", "Socas, Justo", "Molina Lucas"],
     suplentes: [["16", "Deane, Santiago"], ["17", "Garibaldi Santiago"], ["18", "Lanusse Bautista"], ["19", "Martinez Roberto"], ["20", "Dupont, Mateo"], ["22", "Herrera, Segundo"], ["23", "Walker Bautista"], ["24", "Martignone, Saturnino"]],
   },
   {

@@ -24,11 +24,11 @@ interface Semi {
 
 const SEMIS: Semi[] = [
   { cat: "m-22", fecha: "2026-10-23", hora: "19:00", rival: "Hindu", esLocal: true, cancha: "Hindu", numeroCancha: "5" },
-  { cat: "pre-f", fecha: "2026-10-23", hora: "19:00", rival: "Alumni F", esLocal: true, cancha: "CUBA", numeroCancha: "Dumas 3" },
-  { cat: "pre-e", fecha: "2026-10-23", hora: "21:00", rival: "CUBA E", esLocal: true, cancha: "CUBA", numeroCancha: "Miguens 2" },
-  { cat: "pre-d", fecha: "2026-10-24", hora: "10:00", rival: "CUBA D", esLocal: false, cancha: "CUBA", numeroCancha: "Miguens 2" },
-  { cat: "pre-c", fecha: "2026-10-24", hora: "12:00", rival: "SIC C", esLocal: false, cancha: "CUBA", numeroCancha: "Apraiz 1" },
-  { cat: "pre-b", fecha: "2026-10-24", hora: "14:00", rival: "SIC B", esLocal: false, cancha: "CUBA", numeroCancha: "Apraiz 1" },
+  { cat: "pre-f", fecha: "2026-10-23", hora: "19:00", rival: "Alumni", esLocal: true, cancha: "CUBA", numeroCancha: "Dumas 3" },
+  { cat: "pre-e", fecha: "2026-10-23", hora: "21:00", rival: "CUBA", esLocal: true, cancha: "CUBA", numeroCancha: "Miguens 2" },
+  { cat: "pre-d", fecha: "2026-10-24", hora: "10:00", rival: "CUBA", esLocal: false, cancha: "CUBA", numeroCancha: "Miguens 2" },
+  { cat: "pre-c", fecha: "2026-10-24", hora: "12:00", rival: "SIC", esLocal: false, cancha: "CUBA", numeroCancha: "Apraiz 1" },
+  { cat: "pre-b", fecha: "2026-10-24", hora: "14:00", rival: "SIC", esLocal: false, cancha: "CUBA", numeroCancha: "Apraiz 1" },
   { cat: "pre-a", fecha: "2026-10-24", hora: "16:00", rival: "CASI", esLocal: false, cancha: "CUBA", numeroCancha: "Miguens 2" },
   { cat: "intermedia", fecha: "2026-10-24", hora: "18:00", rival: "SIC", esLocal: true, cancha: "CUBA", numeroCancha: "Miguens 2" },
   { cat: "primera", fecha: "2026-10-30", rival: "Alumni", esLocal: true, cancha: "CASI" },
