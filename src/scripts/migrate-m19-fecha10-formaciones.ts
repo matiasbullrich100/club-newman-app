@@ -1,9 +1,9 @@
 // M19 A / B / C / D vs Hindu (Fecha 10, domingo 2026-10-25, de visitante), formaciones pasadas por el club
 // ("Equipos M19 20261025.xlsx", hoja ResumenEquipos: titulares dorsal 1-15 + suplentes con el dorsal de la planilla,
 // hay saltos). Se cargan como BORRADOR (formacionPublicada: false) -- se publican cuando el club lo pida.
-// NO se carga M19 E: la planilla trae solo 12 titulares (faltan los dorsales 8, 11 y 14) -- se espera la lista completa.
+// M19 E: la planilla del Excel venia incompleta (12 titulares); se cargo con la lista completa que paso el club (imagen).
 // M19 F no trae equipo (fecha libre).
-// Correcciones: en M19 A el jugador "ITURBE, Jeronimo" figura titular (#9) Y suplente (#21): se deja solo como titular.
+// M19 A: el suplente #21 es "BOSCH, Lucas" (en el Excel figuraba repetido ITURBE, Jeronimo).
 // Idempotente; solo actua sobre partidos "programado". Correr con: npx tsx src/scripts/migrate-m19-fecha10-formaciones.ts
 // (DRY_RUN=1 para solo mirar)
 
@@ -34,7 +34,12 @@ const EQUIPOS: EquipoFormacion[] = [
   {
     categoriaId: "m19-a",
     titulares: ["BOURDIEU, Carlos Maria", "WALKER, Cruz", "VON GROLMAN, Juan Pablo", "GALICE NAON, Rodrigo", "CHUTE, Benjamin", "DOMINGUEZ OLIVERA, Ramon", "CARDONI, Beltran", "LASCOMBES, Facundo", "ITURBE, Jeronimo", "ULLOA, Ramon", "BARISIC, Ivan", "ABERG COBO, Juan Jose", "LAGOS MARMOL, Maximo", "RIVAS, Jeronimo", "LANUSSE, Silvestre"],
-    suplentes: [["16", "BLAQUIER, Simon"], ["17", "SOLA, Geronimo"], ["18", "GONZALEZ CALDERON, Isidro"], ["19", "GOTI, Enzo"], ["20", "IBARBIA, Benito"], ["22", "URANGA, Felipe"], ["23", "GONZALEZ HUGHES, Marcos"]],
+    suplentes: [["16", "BLAQUIER, Simon"], ["17", "SOLA, Geronimo"], ["18", "GONZALEZ CALDERON, Isidro"], ["19", "GOTI, Enzo"], ["20", "IBARBIA, Benito"], ["21", "BOSCH, Lucas"], ["22", "URANGA, Felipe"], ["23", "GONZALEZ HUGHES, Marcos"]],
+  },
+  {
+    categoriaId: "m19-e", // vs M. Belgrano C, de visitante, 12:30. "BOSCH, Justo" de M19 es otro que el de M17: "Bosch Peluffo, Justo".
+    titulares: ["ARENAZA, Justo", "VILA ECHAGUE, Ramon", "CASARES, Juan Pablo", "SALESE, Silvestre Jose", "SANTAMARINA BERGADA, Eduardo", "LOUREIRO, Benjamin", "KAPLUN, Francisco", "ALVARADO, Santos", "LIMPENNY, Nicolas", "MARINO, Sebastian", "BOSCH PELUFFO, Justo", "SUNDBLAD, Simon", "LOPEZ SAUBIDET, Felipe", "PRENESTE, Americo", "GARAT NOLTING, Iñaki"],
+    suplentes: [["16", "RICHELET, Lucas"], ["17", "VELA, Marcial"], ["18", "MORESCO, Salvador"], ["19", "GOWLAND, Pedro"], ["20", "SEGURA, Indalecio"], ["21", "BERTON MORENO, Gonzalo"]],
   },
   {
     categoriaId: "m19-b",
