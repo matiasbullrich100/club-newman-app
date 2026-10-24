@@ -67,15 +67,16 @@ export default function TablaClasificadosTop14({ filas }: { filas: ClasificadoNe
                 {f.cruces.map((c) => (
                   <div key={`${c.a.posicion}v${c.b.posicion}`} style={{ display: "flex", alignItems: "center", gap: 5 }}>
                     <span style={{ width: 34, flexShrink: 0, fontSize: "0.7rem", fontWeight: 700, opacity: 0.95 }}>{c.resultado ? "Final" : (c.hora ?? "a conf.")}</span>
-                    {chip(f.categoriaId, c.a, !!c.resultado && c.resultado.golesA < c.resultado.golesB)}
+                    {chip(f.categoriaId, c.a, !!c.resultado && (c.resultado.sinMarcador ? !c.resultado.ganaA : c.resultado.golesA < c.resultado.golesB))}
                     {c.resultado ? (
                       <span style={{ fontSize: "0.74rem", fontWeight: 800, whiteSpace: "nowrap" }}>
-                        {c.resultado.golesA} - {c.resultado.golesB}
+                        {/* Sin marcador todavia: una flecha apunta al que gano. */}
+                        {c.resultado.sinMarcador ? (c.resultado.ganaA ? "◀" : "▶") : `${c.resultado.golesA} - ${c.resultado.golesB}`}
                       </span>
                     ) : (
                       <span style={{ fontSize: "0.6rem", opacity: 0.75, textTransform: "uppercase" }}>vs</span>
                     )}
-                    {chip(f.categoriaId, c.b, !!c.resultado && c.resultado.golesB < c.resultado.golesA)}
+                    {chip(f.categoriaId, c.b, !!c.resultado && (c.resultado.sinMarcador ? !!c.resultado.ganaA : c.resultado.golesB < c.resultado.golesA))}
                   </div>
                 ))}
               </div>

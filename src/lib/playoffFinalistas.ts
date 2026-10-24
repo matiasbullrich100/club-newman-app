@@ -25,6 +25,9 @@ export interface PartidoPlayoff {
   golesVisitante: number;
   jugado: boolean;
   fecha?: string;
+  // Resultado cargado a mano SIN marcador ("gano CASI", el marcador se completa despues): ganador explicito.
+  sinMarcador?: boolean;
+  ganador?: string;
 }
 
 export interface PlayoffDoc {
@@ -100,6 +103,7 @@ const finalista = (club: string): Finalista => ({ club, propio: club === "Newman
 // Ganador de un partido ya jugado, o null si todavia no se jugo (o URBA lo cargo empatado: sin ganador no hay
 // finalista hasta que lo corrijan).
 function ganador(p?: PartidoPlayoff): Finalista | null {
+  if (p?.sinMarcador && p.ganador) return finalista(p.ganador);
   if (!p || !p.jugado || p.golesLocal === p.golesVisitante) return null;
   return finalista(p.golesLocal > p.golesVisitante ? p.local : p.visitante);
 }

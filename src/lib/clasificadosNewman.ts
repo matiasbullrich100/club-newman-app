@@ -21,7 +21,7 @@ export interface CruceClasificados {
   fecha?: string; // ISO yyyy-mm-dd
   hora?: string; // "HH:MM"
   /** Resultado de la semifinal, si URBA ya la cargo como jugada: goles de `a` y de `b`. */
-  resultado?: { golesA: number; golesB: number };
+  resultado?: { golesA: number; golesB: number; sinMarcador?: boolean; ganaA?: boolean };
 }
 
 export interface ClasificadoNewman {
@@ -68,6 +68,8 @@ export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
       const semis = playoff?.semis ?? [];
       const semi = semis.find((x) => (x.local === a.equipo && x.visitante === b.equipo) || (x.local === b.equipo && x.visitante === a.equipo)) ?? semis[indice];
       if (!semi?.jugado) return undefined;
+      // Cargado a mano sin marcador: solo se sabe quien gano.
+      if (semi.sinMarcador) return { golesA: 0, golesB: 0, sinMarcador: true, ganaA: semi.ganador === a.equipo };
       return semi.local === a.equipo || semi.visitante !== a.equipo
         ? { golesA: semi.golesLocal, golesB: semi.golesVisitante }
         : { golesA: semi.golesVisitante, golesB: semi.golesLocal };
