@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "enjuego-hockey",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\Matias\\dev\\enjuego-hockey", "run", "dev", "--", "-p", "3001"],
+      "port": 3001
     }
   ]
 }

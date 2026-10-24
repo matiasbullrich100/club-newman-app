@@ -128,6 +128,7 @@ export interface FechaResultadosDivisionUrba {
 }
 
 interface MatchUrbaRaw {
+  playdate?: string;
   fulfilled: boolean;
   suspended: boolean;
   local_team_score: number;
@@ -142,6 +143,7 @@ interface MatchUrbaRaw {
 
 interface RoundUrbaRaw {
   name: string;
+  playoffs?: boolean;
   playdate: string;
   matches: MatchUrbaRaw[];
 }
@@ -186,4 +188,50 @@ export async function fetchResultadosDivisionUrba(
     };
   }
   return out;
+}
+
+
+// --- Playoff: rondas de semifinal / final de una zona ------------------------------------------
+// /championship/{id} trae, ademas de las 26 fechas, una ronda con `playoffs: true` por cada instancia
+// (hoy "PLAYOFF" o "SEMI FINAL" con las 2 semifinales; mas adelante, la final). Cada partido trae el
+// marcador y `fulfilled` (true cuando URBA ya lo cargo como jugado).
+
+export interface PartidoPlayoffUrba {
+  local: string;
+  visitante: string;
+  golesLocal: number;
+  golesVisitante: number;
+  jugado: boolean;
+  fecha?: string; // "yyyy-mm-dd"
+}
+
+export interface RondaPlayoffUrba {
+  nombre: string;
+  fecha: string; // "yyyy-mm-dd"
+  partidos: PartidoPlayoffUrba[];
+}
+
+export async function fetchPlayoffUrba(championshipId: number): Promise<RondaPlayoffUrba[]> {
+  const res = await fetch(`${URBA_API_BASE}/championship/${championshipId}`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) throw new Error(`URBA respondio ${res.status} para el torneo ${championshipId}`);
+  const json: { championship?: Record<string, { rounds?: RoundUrbaRaw[] }> } = await res.json();
+  const rounds = json.championship?.["0"]?.rounds ?? [];
+  return rounds
+    .filter((r) => r.playoffs)
+    .map((r) => ({
+      nombre: r.name,
+      fecha: r.playdate.slice(0, 10),
+      partidos: r.matches.map((m): PartidoPlayoffUrba => ({
+        local: normalizarNombreEquipo(m.local_team.name),
+        visitante: normalizarNombreEquipo(m.visit_team.name),
+        golesLocal: m.local_team_score,
+        golesVisitante: m.visit_team_score,
+        jugado: m.fulfilled && !m.suspended,
+        fecha: m.playdate?.slice(0, 10),
+      })),
+    }))
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
 }

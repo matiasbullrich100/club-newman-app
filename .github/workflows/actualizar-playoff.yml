@@ -1,0 +1,32 @@
+name: Actualizar playoff (finalistas)
+
+# Baja de URBA los resultados de las semifinales del playoff (Inter, Pre A a F y M-22) y completa la
+# instancia "Finalistas" de la pantalla Playoff, pegandole a
+# src/app/api/cron/actualizar-playoff/route.ts.
+#
+# Corre CADA 15 MINUTOS el sabado 24/10/2026 desde las 11:00 ART (las semifinales de Pre C a Inter son ese dia;
+# Pre E/F y M-22 jugaron el viernes) hasta las 23:45 ART, que es cuando termina la ultima.
+# Horarios en UTC (GitHub Actions no soporta zona horaria): ART = UTC - 3.
+#   14:00-23:45 UTC del 24/10  = 11:00-20:45 ART
+#   00:00-02:45 UTC del 25/10  = 21:00-23:45 ART
+# El chequeo del año evita que estas fechas vuelvan a disparar el 24/10 de 2027. Se puede correr a mano
+# cuando haga falta (por ejemplo cuando URBA cargue la final): Actions -> "Run workflow".
+on:
+  schedule:
+    - cron: "*/15 14-23 24 10 *"
+    - cron: "*/15 0-2 25 10 *"
+  workflow_dispatch:
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pegarle al endpoint de actualizacion
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(date -u +%Y)" != "2026" ]; then
+            echo "Fuera de temporada: no hace nada."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 120 \
+            "${{ vars.APP_URL }}/api/cron/actualizar-playoff" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

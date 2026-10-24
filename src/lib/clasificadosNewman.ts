@@ -5,6 +5,7 @@ import { PLAYOFF } from "@/lib/playoff";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { fixtureDivisionCompleto } from "@/lib/resultadosDivision/consultar";
 import { reordenarPorDesempateDirecto } from "@/lib/clasificacion";
+import { nombreClub } from "@/lib/nombreClub";
 import type { PosicionesTorneo } from "@/types/firestore";
 
 export interface EquipoClasificado {
@@ -30,12 +31,6 @@ export interface ClasificadoNewman {
   cruces: CruceClasificados[];
 }
 
-// "SIC B" -> "SIC", "Newman C" -> "Newman", "Hindu" -> "Hindú": en la pantalla de clasificados de una division
-// alcanza con el club (la letra del equipo es la de la division) y se usa la grafia del club.
-function nombreClub(equipo: string): string {
-  const sinLetra = equipo.replace(/ [A-H]$/, "");
-  return sinLetra === "Hindu" ? "Hindú" : sinLetra;
-}
 
 // "CUBA (Villa de Mayo)" -> "CUBA", "Cancha de CASI" -> "CASI"
 const sedeCorta = (sede?: string) => sede?.replace(/ \(.*\)$/, "").replace(/^Cancha de /, "");
