@@ -1,6 +1,7 @@
-// Carga A MANO el resultado de una semifinal de playoff mientras URBA todavia no lo publica. Se guarda en
-// playoff/{categoriaId}.manual (el cron de URBA no lo toca) y /playoff lo usa en Clasificados y Finalistas
-// hasta que URBA cargue ese partido como jugado: ahi manda el dato de URBA.
+// Carga A MANO el resultado de una semifinal de playoff (por ejemplo la de otro club, que no esta en nuestra app).
+// Se guarda en playoff/{categoriaId}.manual (el cron de URBA no lo toca) y /playoff lo usa en Clasificados y
+// Finalistas: manda sobre URBA. Los partidos de Newman no hace falta cargarlos: se toman solos del resultado
+// de nuestra app apenas el partido termina (ver playoffResuelto en src/lib/playoffFinalistas.ts).
 //
 // Uso (clubes como se ven en pantalla: Newman, SIC, CUBA, Alumni, Los Tilos, Hindú, BACRC, CASI...):
 //   npx tsx src/scripts/set-resultado-playoff.ts <categoriaId> "<club>" <goles> "<club>" <goles>
@@ -58,7 +59,7 @@ async function main() {
     golesVisitante: localEsA ? gb : ga,
     jugado: true,
   };
-  console.log(`${categoriaId}: ${partido.local} ${partido.golesLocal} - ${partido.golesVisitante} ${partido.visitante}${semi.jugado ? "  (OJO: URBA ya lo tiene cargado, manda el de URBA)" : ""}`);
+  console.log(`${categoriaId}: ${partido.local} ${partido.golesLocal} - ${partido.golesVisitante} ${partido.visitante}${semi.jugado ? "  (URBA ya lo tiene cargado; manda este)" : ""}`);
   if (partido.golesLocal === partido.golesVisitante) console.warn("OJO: empate -- sin ganador no se define el finalista.");
   if (!dryRun) await ref.set({ manual: { [clave]: partido } }, { merge: true });
 }

@@ -7,7 +7,7 @@ import { fixtureDivisionCompleto } from "@/lib/resultadosDivision/consultar";
 import { reordenarPorDesempateDirecto } from "@/lib/clasificacion";
 import { nombreClub } from "@/lib/nombreClub";
 import type { PosicionesTorneo } from "@/types/firestore";
-import { conResultadosManuales, type PlayoffDoc } from "@/lib/playoffFinalistas";
+import { playoffResuelto } from "@/lib/playoffFinalistas";
 
 export interface EquipoClasificado {
   posicion: number;
@@ -44,8 +44,8 @@ const sedeCorta = (sede?: string) => sede?.replace(/ \(.*\)$/, "").replace(/^Can
 export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => PLAYOFF[c.id]);
   const snaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection("posiciones").doc(c.id)));
-  // Resultados de las semifinales (los baja el cron de URBA, ver playoffFinalistas.ts).
-  const playoffSnaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection("playoff").doc(c.id)));
+  // Resultados de las semifinales: manual > resultado de nuestra app > URBA (ver playoffResuelto).
+  const playoffs = await playoffResuelto(categorias.map((c) => c.id));
   const salida: ClasificadoNewman[] = [];
   for (const [i, snap] of snaps.entries()) {
     if (!snap.exists) continue;
@@ -61,7 +61,7 @@ export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
       return { posicion: pos, equipo: nombreClub(f.equipo), propio: f.equipo === t.nuestroEquipo };
     };
     const cfg = PLAYOFF[cat.id];
-    const playoff = conResultadosManuales(playoffSnaps[i].exists ? (playoffSnaps[i].data() as PlayoffDoc) : undefined);
+    const playoff = playoffs.get(cat.id);
     // Resultado de un cruce: se busca la semifinal por los dos clubes (en cualquier orden de local/visitante) y,
     // si el nombre no coincide, por posicion (URBA las lista 1° vs 4° y 2° vs 3°, igual que PLAYOFF.semis).
     const resultadoDe = (a: EquipoClasificado, b: EquipoClasificado, indice: number): CruceClasificados["resultado"] => {

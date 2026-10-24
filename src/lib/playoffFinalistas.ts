@@ -1,10 +1,11 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase-admin";
-import { CATEGORIAS_SUPERIOR } from "@/lib/categorias";
+import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { PLAYOFF } from "@/lib/playoff";
 import { fetchPlayoffUrba, normalizarNombreEquipo, type PartidoPlayoffUrba, type RondaPlayoffUrba } from "@/lib/urba";
 import { nombreClub } from "@/lib/nombreClub";
+import type { Partido } from "@/types/firestore";
 
 // Instancia "Finalistas" del Playoff (pantalla /playoff): los dos equipos que juegan la final de cada
 // division, que salen de los GANADORES de las 2 semifinales. Se completa sola a medida que URBA carga los
@@ -30,8 +31,8 @@ export interface PlayoffDoc {
   categoriaId: string;
   semis: PartidoPlayoff[];
   final?: PartidoPlayoff;
-  // Resultados cargados a mano (src/scripts/set-resultado-playoff.ts) mientras URBA no los publica. Los pisa el
-  // dato de URBA apenas la semifinal figura como jugada. El cron NUNCA toca este campo (set con merge).
+  // Resultados cargados a mano (src/scripts/set-resultado-playoff.ts): mandan sobre el dato de URBA. El cron
+  // NUNCA toca este campo (set con merge).
   manual?: Record<string, PartidoPlayoff>;
 }
 
@@ -43,13 +44,12 @@ export function clavePartido(a: string, b: string): string {
     .join("_");
 }
 
-// Semifinales con los resultados manuales aplicados donde URBA todavia no cargo el partido como jugado. Es lo que
-// tienen que usar las pantallas (finalistas y clasificados) en vez del doc crudo.
+// Semifinales con los resultados manuales aplicados (mandan sobre lo que tenga URBA).
 export function conResultadosManuales(doc?: PlayoffDoc): PlayoffDoc | undefined {
   if (!doc?.manual) return doc;
   const semis = doc.semis.map((p) => {
     const manual = doc.manual![clavePartido(p.local, p.visitante)];
-    return !p.jugado && manual ? { ...manual, ...(p.fecha ? { fecha: p.fecha } : {}) } : p;
+    return manual ? { ...manual, ...(p.fecha ? { fecha: p.fecha } : {}) } : p;
   });
   return { ...doc, semis };
 }
@@ -154,11 +154,50 @@ export async function actualizarPlayoffFinalistas(): Promise<ResultadoActualizac
 }
 
 // Filas de la instancia "Finalistas" para la pantalla de Playoff, en el orden de las categorias.
+// Semifinal de Newman segun NUESTRA app (partido "Fecha 27", fase semifinal, ya terminado): su resultado manda sobre
+// URBA, que a veces tarda en cargarlo o lo carga distinto. Los partidos de otros clubes salen de URBA (o de un
+// resultado manual).
+async function conResultadosDeLaApp(docs: Map<string, PlayoffDoc | undefined>): Promise<Map<string, PlayoffDoc | undefined>> {
+  const ids = [...docs.keys()];
+  const snaps = await adminDb.getAll(...ids.map((id) => adminDb.collection("partidos").doc(partidoId(id, 27))));
+  const salida = new Map(docs);
+  snaps.forEach((snap, i) => {
+    const doc = docs.get(ids[i]);
+    if (!doc || !snap.exists) return;
+    const p = snap.data() as Partido;
+    if (p.fase !== "semifinal" || p.estado !== "terminado") return;
+    const rival = nombreClub(p.rival);
+    const clave = clavePartido("Newman", rival);
+    const semis = doc.semis.map((x) => {
+      if (clavePartido(x.local, x.visitante) !== clave) return x;
+      return {
+        local: p.esLocal ? "Newman" : rival,
+        visitante: p.esLocal ? rival : "Newman",
+        golesLocal: p.esLocal ? p.resultado.newman : p.resultado.rival,
+        golesVisitante: p.esLocal ? p.resultado.rival : p.resultado.newman,
+        jugado: true,
+        ...(x.fecha ? { fecha: x.fecha } : {}),
+      };
+    });
+    salida.set(ids[i], { ...doc, semis });
+  });
+  return salida;
+}
+
+// Playoff de cada division listo para mostrar, en orden de prioridad: resultado manual > resultado de nuestra app
+// (partidos de Newman) > URBA.
+export async function playoffResuelto(categoriaIds: string[]): Promise<Map<string, PlayoffDoc | undefined>> {
+  const snaps = await adminDb.getAll(...categoriaIds.map((id) => adminDb.collection(COLECCION).doc(id)));
+  const crudos = new Map<string, PlayoffDoc | undefined>(categoriaIds.map((id, i) => [id, snaps[i].exists ? (snaps[i].data() as PlayoffDoc) : undefined]));
+  const conApp = await conResultadosDeLaApp(crudos);
+  return new Map([...conApp].map(([id, doc]) => [id, conResultadosManuales(doc)]));
+}
+
 export async function finalistasPlayoff(): Promise<FilaFinalistas[]> {
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => CATEGORIAS_FINALISTAS.includes(c.id));
-  const snaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection(COLECCION).doc(c.id)));
-  return categorias.map((cat, i) => {
-    const doc = conResultadosManuales(snaps[i].exists ? (snaps[i].data() as PlayoffDoc) : undefined);
+  const docs = await playoffResuelto(categorias.map((c) => c.id));
+  return categorias.map((cat) => {
+    const doc = docs.get(cat.id);
     const cfg = PLAYOFF[cat.id];
     return {
       categoriaId: cat.id,
