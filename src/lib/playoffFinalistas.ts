@@ -30,6 +30,28 @@ export interface PlayoffDoc {
   categoriaId: string;
   semis: PartidoPlayoff[];
   final?: PartidoPlayoff;
+  // Resultados cargados a mano (src/scripts/set-resultado-playoff.ts) mientras URBA no los publica. Los pisa el
+  // dato de URBA apenas la semifinal figura como jugada. El cron NUNCA toca este campo (set con merge).
+  manual?: Record<string, PartidoPlayoff>;
+}
+
+// Clave de un partido sin importar quien es local: "cuba_newman".
+export function clavePartido(a: string, b: string): string {
+  return [a, b]
+    .map((x) => x.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/[^a-z0-9]+/g, "_"))
+    .sort()
+    .join("_");
+}
+
+// Semifinales con los resultados manuales aplicados donde URBA todavia no cargo el partido como jugado. Es lo que
+// tienen que usar las pantallas (finalistas y clasificados) en vez del doc crudo.
+export function conResultadosManuales(doc?: PlayoffDoc): PlayoffDoc | undefined {
+  if (!doc?.manual) return doc;
+  const semis = doc.semis.map((p) => {
+    const manual = doc.manual![clavePartido(p.local, p.visitante)];
+    return !p.jugado && manual ? { ...manual, ...(p.fecha ? { fecha: p.fecha } : {}) } : p;
+  });
+  return { ...doc, semis };
 }
 
 export interface Finalista {
@@ -118,7 +140,11 @@ export async function actualizarPlayoffFinalistas(): Promise<ResultadoActualizac
     }
     const doc = armarPlayoffDoc(categoriaId, datos);
     try {
-      await adminDb.collection(COLECCION).doc(categoriaId).set({ ...doc, championshipId, updatedAt: FieldValue.serverTimestamp() });
+      // merge: para no borrar los resultados cargados a mano (campo `manual`).
+      await adminDb
+        .collection(COLECCION)
+        .doc(categoriaId)
+        .set({ ...doc, championshipId, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
       resultados.push({ categoriaId, ok: true, finalistas: finalistasDe(doc).filter(Boolean).length });
     } catch (e) {
       resultados.push({ categoriaId, ok: false, error: e instanceof Error ? e.message : String(e) });
@@ -132,7 +158,7 @@ export async function finalistasPlayoff(): Promise<FilaFinalistas[]> {
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => CATEGORIAS_FINALISTAS.includes(c.id));
   const snaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection(COLECCION).doc(c.id)));
   return categorias.map((cat, i) => {
-    const doc = snaps[i].exists ? (snaps[i].data() as PlayoffDoc) : undefined;
+    const doc = conResultadosManuales(snaps[i].exists ? (snaps[i].data() as PlayoffDoc) : undefined);
     const cfg = PLAYOFF[cat.id];
     return {
       categoriaId: cat.id,
