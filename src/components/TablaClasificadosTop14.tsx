@@ -8,7 +8,8 @@ import type { ClasificadoNewman, EquipoClasificado } from "@/lib/clasificadosNew
 // dia y sede a la izquierda, y las dos semifinales (1° vs 4° y 2° vs 3°) con su horario. El equipo de Newman va en
 // amarillo y cada nombre lleva a su lugar en la Tabla de Posiciones. Primera: horarios a confirmar.
 export default function TablaClasificadosTop14({ filas }: { filas: ClasificadoNewman[] }) {
-  const chip = (categoriaId: string, e: EquipoClasificado) => (
+  const chip = (categoriaId: string, e: EquipoClasificado, perdio = false) => (
+    // perdio: la semifinal ya se jugo y este equipo quedo afuera -- se atenua.
     <Link
       href={`/posiciones/${categoriaId}?equipo=${encodeURIComponent(e.equipo)}#eq-${slugEquipo(e.equipo)}`}
       style={{
@@ -17,6 +18,7 @@ export default function TablaClasificadosTop14({ filas }: { filas: ClasificadoNe
         background: e.propio ? "#f5a800" : "rgba(0,0,0,.2)",
         color: e.propio ? "#2a1b02" : "inherit",
         fontWeight: e.propio ? 800 : 500,
+        opacity: perdio ? 0.6 : 1,
         borderRadius: 5,
         padding: "4px 5px",
         fontSize: "0.74rem",
@@ -64,10 +66,16 @@ export default function TablaClasificadosTop14({ filas }: { filas: ClasificadoNe
               <div style={{ display: "grid", gap: 4 }}>
                 {f.cruces.map((c) => (
                   <div key={`${c.a.posicion}v${c.b.posicion}`} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ width: 34, flexShrink: 0, fontSize: "0.7rem", fontWeight: 700, opacity: 0.95 }}>{c.hora ?? "a conf."}</span>
-                    {chip(f.categoriaId, c.a)}
-                    <span style={{ fontSize: "0.6rem", opacity: 0.75, textTransform: "uppercase" }}>vs</span>
-                    {chip(f.categoriaId, c.b)}
+                    <span style={{ width: 34, flexShrink: 0, fontSize: "0.7rem", fontWeight: 700, opacity: 0.95 }}>{c.resultado ? "Final" : (c.hora ?? "a conf.")}</span>
+                    {chip(f.categoriaId, c.a, !!c.resultado && c.resultado.golesA < c.resultado.golesB)}
+                    {c.resultado ? (
+                      <span style={{ fontSize: "0.74rem", fontWeight: 800, whiteSpace: "nowrap" }}>
+                        {c.resultado.golesA} - {c.resultado.golesB}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: "0.6rem", opacity: 0.75, textTransform: "uppercase" }}>vs</span>
+                    )}
+                    {chip(f.categoriaId, c.b, !!c.resultado && c.resultado.golesB < c.resultado.golesA)}
                   </div>
                 ))}
               </div>

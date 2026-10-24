@@ -7,6 +7,7 @@ import { fixtureDivisionCompleto } from "@/lib/resultadosDivision/consultar";
 import { reordenarPorDesempateDirecto } from "@/lib/clasificacion";
 import { nombreClub } from "@/lib/nombreClub";
 import type { PosicionesTorneo } from "@/types/firestore";
+import type { PlayoffDoc } from "@/lib/playoffFinalistas";
 
 export interface EquipoClasificado {
   posicion: number;
@@ -19,6 +20,8 @@ export interface CruceClasificados {
   b: EquipoClasificado;
   fecha?: string; // ISO yyyy-mm-dd
   hora?: string; // "HH:MM"
+  /** Resultado de la semifinal, si URBA ya la cargo como jugada: goles de `a` y de `b`. */
+  resultado?: { golesA: number; golesB: number };
 }
 
 export interface ClasificadoNewman {
@@ -41,6 +44,8 @@ const sedeCorta = (sede?: string) => sede?.replace(/ \(.*\)$/, "").replace(/^Can
 export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
   const categorias = CATEGORIAS_SUPERIOR.filter((c) => PLAYOFF[c.id]);
   const snaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection("posiciones").doc(c.id)));
+  // Resultados de las semifinales (los baja el cron de URBA, ver playoffFinalistas.ts).
+  const playoffSnaps = await adminDb.getAll(...categorias.map((c) => adminDb.collection("playoff").doc(c.id)));
   const salida: ClasificadoNewman[] = [];
   for (const [i, snap] of snaps.entries()) {
     if (!snap.exists) continue;
@@ -56,6 +61,17 @@ export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
       return { posicion: pos, equipo: nombreClub(f.equipo), propio: f.equipo === t.nuestroEquipo };
     };
     const cfg = PLAYOFF[cat.id];
+    const playoff = playoffSnaps[i].exists ? (playoffSnaps[i].data() as PlayoffDoc) : undefined;
+    // Resultado de un cruce: se busca la semifinal por los dos clubes (en cualquier orden de local/visitante) y,
+    // si el nombre no coincide, por posicion (URBA las lista 1° vs 4° y 2° vs 3°, igual que PLAYOFF.semis).
+    const resultadoDe = (a: EquipoClasificado, b: EquipoClasificado, indice: number): CruceClasificados["resultado"] => {
+      const semis = playoff?.semis ?? [];
+      const semi = semis.find((x) => (x.local === a.equipo && x.visitante === b.equipo) || (x.local === b.equipo && x.visitante === a.equipo)) ?? semis[indice];
+      if (!semi?.jugado) return undefined;
+      return semi.local === a.equipo || semi.visitante !== a.equipo
+        ? { golesA: semi.golesLocal, golesB: semi.golesVisitante }
+        : { golesA: semi.golesVisitante, golesB: semi.golesLocal };
+    };
     salida.push({
       categoriaId: cat.id,
       categoria: cat.nombre,
@@ -63,7 +79,11 @@ export async function clasificadosNewman(): Promise<ClasificadoNewman[]> {
       sede: sedeCorta(cfg.sede),
       provisoria: !filas.every((f) => f.jugados === filas[0].jugados),
       cruces: cfg.semis
-        .map((s) => ({ a: equipo(s.cruce[0]), b: equipo(s.cruce[1]), fecha: s.fecha, hora: s.hora }))
+        .map((s, idx) => {
+          const a = equipo(s.cruce[0]);
+          const b = equipo(s.cruce[1]);
+          return { a, b, fecha: s.fecha, hora: s.hora, resultado: resultadoDe(a, b, idx) };
+        })
         .sort((x, y) => `${x.fecha ?? "9999"} ${x.hora ?? "99:99"}`.localeCompare(`${y.fecha ?? "9999"} ${y.hora ?? "99:99"}`)),
     });
   }
