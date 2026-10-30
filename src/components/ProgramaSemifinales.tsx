@@ -47,7 +47,7 @@ export default function ProgramaSemifinales({ semis }: { semis: SemifinalProgram
 
   return (
     <section style={{ margin: "0 0 14px" }}>
-      <h2 style={{ fontSize: "1rem", color: DORADO, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 6px" }}>Semifinales</h2>
+      <h2 style={{ fontSize: "1.5rem", textAlign: "center", color: DORADO, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 8px" }}>Semifinales</h2>
       {ordenados.map((g) => {
         const sede = g[0].proxima.cancha ?? "";
         return (
