@@ -1,4 +1,5 @@
 import ProximaFechaRow from "./ProximaFechaRow";
+import Formaciones from "./Formaciones";
 import { TORNEOS_URBA } from "@/lib/torneos-urba";
 import { tieneFixtureDivision } from "@/lib/fixtureDivision";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -42,8 +43,8 @@ export default function ProgramaSemifinales({ semis }: { semis: SemifinalProgram
               {sede && ` · en ${SEDES[sede] ?? sede}`}
             </div>
             {g.map((s) => (
+              <div key={s.partidoId}>
               <ProximaFechaRow
-                key={s.partidoId}
                 partidoId={s.partidoId}
                 categoriaNombre={s.categoriaNombre}
                 proxima={s.proxima}
@@ -52,6 +53,17 @@ export default function ProgramaSemifinales({ semis }: { semis: SemifinalProgram
                 posicionesHref={TORNEOS_URBA[s.categoriaId] !== undefined ? `/posiciones/${s.categoriaId}` : undefined}
                 fixtureHref={`/categoria/${s.categoriaId}/fixture`}
               />
+              {s.formacion && (
+                <div style={{ margin: "-2px 0 10px", padding: "8px 12px 10px", border: "1px solid rgba(226,197,120,.35)", borderRadius: 10, background: "rgba(0,0,0,.18)" }}>
+                  <div style={{ textAlign: "center", fontSize: "0.78rem", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", color: DORADO }}>
+                    Cancha {SEDES[s.proxima.cancha ?? ""] ?? s.proxima.cancha}
+                    {s.proxima.numeroCancha && ` · ${s.proxima.numeroCancha}`}
+                    {s.proxima.hora && ` · ${s.proxima.hora} hs`}
+                  </div>
+                  <Formaciones plantel={s.formacion} />
+                </div>
+              )}
+              </div>
             ))}
           </div>
         );

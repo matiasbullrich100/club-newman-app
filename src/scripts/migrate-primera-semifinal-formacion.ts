@@ -1,7 +1,7 @@
 // Primera vs Alumni -- SEMIFINAL de playoff, viernes 2026-10-30 20:10 en CASI (partido Fecha 27, fase "semifinal").
-// Formacion de la placa del club: 15 titulares (capitan: Alejandro Urtubey). Regla de siempre: Primera va SOLO con
-// titulares -- las "Reservas" 16-23 de la placa (Perkins, Bosch Isidro, Lozano, Lascombes, Ureta, Nava, Llerena, Ulloa)
-// no se cargan. Se carga la hora (20:10) y se PUBLICA. Idempotente; solo "programado".
+// Formacion de la placa del club: 15 titulares (capitan: Alejandro Urtubey) + las "Reservas" 16-23 como suplentes
+// (pedido explicito del club para este partido; normalmente Primera va solo con titulares). Se carga la hora (20:10)
+// y se PUBLICA. Idempotente; solo "programado".
 // Correr con: npx tsx src/scripts/migrate-primera-semifinal-formacion.ts   (DRY_RUN=1 para solo mirar)
 
 import { config } from "dotenv";
@@ -29,6 +29,17 @@ const TITULARES: { nombre: string; capitan?: boolean }[] = [
   { nombre: "Daireaux, Juan Bautista" },
 ];
 
+const SUPLENTES: [string, string][] = [
+  ["16", "Perkins Fermín"],
+  ["17", "Bosch, Isidro"],
+  ["18", "Lozano Manuel"],
+  ["19", "Lascombes, Francisco"],
+  ["20", "Ureta Jerónimo"],
+  ["21", "Nava, Lucas"],
+  ["22", "Llerena Florencio"],
+  ["23", "Ulloa Jeronimo"],
+];
+
 async function main() {
   config({ path: resolve(__dirname, "../../.env.local") });
   const dryRun = process.env.DRY_RUN === "1";
@@ -46,7 +57,7 @@ async function main() {
     titular: true,
     enCancha: true,
     ...(t.capitan ? { capitan: true } : {}),
-  }));
+  })).concat(SUPLENTES.map(([dorsal, nombre]) => ({ nombre, dorsal, titular: false, enCancha: false })));
   const ids = new Set<string>();
   for (const j of jugadores) {
     const id = playerId(j.nombre);
@@ -55,7 +66,7 @@ async function main() {
   }
   const plantelSnap = await ref.collection("plantel").get();
   const aBorrar = plantelSnap.docs.filter((x) => !ids.has(x.id));
-  console.log(`${PARTIDO} vs ${d.rival} ${HORA}: ${jugadores.length} titulares` + (aBorrar.length ? `, borra ${aBorrar.length} viejos` : ""));
+  console.log(`${PARTIDO} vs ${d.rival} ${HORA}: ${jugadores.filter((j) => j.titular).length} titulares + ${jugadores.filter((j) => !j.titular).length} suplentes` + (aBorrar.length ? `, borra ${aBorrar.length} viejos` : ""));
   if (dryRun) return console.log("(DRY RUN) nada escrito.");
 
   const batch = adminDb.batch();
@@ -64,7 +75,7 @@ async function main() {
   batch.update(ref, {
     hora: HORA,
     formacionPublicada: true,
-    enCanchaIds: jugadores.map((j) => playerId(j.nombre)),
+    enCanchaIds: jugadores.filter((j) => j.titular).map((j) => playerId(j.nombre)),
     formacionActualizadaEn: new Date(),
     updatedAt: new Date(),
   });

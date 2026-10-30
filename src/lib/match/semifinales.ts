@@ -5,11 +5,21 @@ import { debeMostrarProximaFechaEnArgentina, domingoDeEstaSemanaIso, hoyIsoEnArg
 import type { Partido } from "@/types/firestore";
 import type { ProximaFecha } from "./resumenSeccion";
 
+export interface JugadorFormacion {
+  jugadorId: string;
+  nombre: string;
+  dorsal: string;
+  titular: boolean;
+  capitan?: boolean;
+}
+
 export interface SemifinalProgramada {
   categoriaId: string;
   categoriaNombre: string;
   partidoId: string;
   proxima: ProximaFecha;
+  // Solo si el partido es HOY y la formacion ya esta publicada: se muestra directo en el programa.
+  formacion?: JugadorFormacion[];
 }
 
 // Semifinales de playoff de Newman que todavia NO se jugaron y caen esta semana (hasta el domingo): se muestran
@@ -22,15 +32,22 @@ export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgr
   const hoy = hoyIsoEnArgentina();
   const domingo = domingoDeEstaSemanaIso();
   const salida: SemifinalProgramada[] = [];
-  snaps.forEach((snap, i) => {
-    if (!snap.exists) return;
+  for (const [i, snap] of snaps.entries()) {
+    if (!snap.exists) continue;
     const p = snap.data() as Partido;
-    if (p.fase !== "semifinal" || p.estado !== "programado" || !p.fecha || p.fecha < hoy || p.fecha > domingo) return;
+    if (p.fase !== "semifinal" || p.estado !== "programado" || !p.fecha || p.fecha < hoy || p.fecha > domingo) continue;
+    let formacion: JugadorFormacion[] | undefined;
+    if (p.fecha === hoy && p.formacionPublicada !== false) {
+      const plantel = await snap.ref.collection("plantel").get();
+      formacion = plantel.docs.map((d) => ({ jugadorId: d.id, ...(d.data() as Omit<JugadorFormacion, "jugadorId">) }));
+      if (formacion.length === 0) formacion = undefined;
+    }
     const cat = CATEGORIAS_SUPERIOR[i];
     salida.push({
       categoriaId: cat.id,
       categoriaNombre: cat.nombre,
       partidoId: snap.id,
+      formacion,
       proxima: {
         numeroFecha: 27,
         fecha: p.fecha,
@@ -45,6 +62,6 @@ export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgr
         fase: p.fase,
       },
     });
-  });
+  }
   return salida;
 }
