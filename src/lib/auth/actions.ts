@@ -5,6 +5,7 @@ import { adminDb } from "@/lib/firebase-admin";
 import type { Cuenta } from "@/types/firestore";
 import { verifyPassword } from "./passwords";
 import { createSession, destroySession } from "./session";
+import { CUENTA_ADMIN } from "./suspension";
 
 export interface LoginResult {
   ok: boolean;
@@ -33,6 +34,9 @@ export async function login(formData: FormData): Promise<LoginResult> {
   const valido = await verifyPassword(password, cuenta.passwordHash);
   if (!valido) {
     return { ok: false, error: "Usuario o contraseña incorrectos" };
+  }
+  if (cuenta.suspendida && cuentaId !== CUENTA_ADMIN) {
+    return { ok: false, error: "Cuenta suspendida por ahora. Consultá con el administrador." };
   }
 
   // Cuenta de practica dedicada: cada login se lleva un id al azar propio, para que esta sesion

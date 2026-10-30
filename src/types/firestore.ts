@@ -20,6 +20,7 @@ export interface Cuenta {
   passwordHash: string;
   categoriaId?: string; // only rol === "designado"
   alcance?: string; // only rol === "manager" | "entrenador" -- "superior" o edadId de Juveniles; ausente = sin restriccion
+  suspendida?: boolean; // true = no puede iniciar sesion y su sesion abierta deja de valer (ver lib/auth/suspension.ts)
   createdAt: Timestamp | Date;
 }
 

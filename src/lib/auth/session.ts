@@ -7,6 +7,7 @@ import type { Rol } from "@/types/firestore";
 // para no romper los imports server-side existentes de `puedeOperarCategoria`.
 export { puedeOperarCategoria, puedeVerEstadisticas, esManagerDeCategoria, puedeResetearPartidoDePrueba } from "./scope";
 import { puedeOperarCategoria } from "./scope";
+import { cuentaSuspendida } from "./suspension";
 
 const COOKIE_NAME = "cn_session";
 // 30 días: los Designados suelen loguearse días antes del partido (o "la noche anterior para
@@ -58,7 +59,10 @@ export async function getSession(): Promise<SessionPayload | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecretKey());
-    return payload as unknown as SessionPayload;
+    const session = payload as unknown as SessionPayload;
+    // Cuenta suspendida: la sesion abierta deja de valer (ver lib/auth/suspension.ts).
+    if (await cuentaSuspendida(session.cuentaId)) return null;
+    return session;
   } catch {
     return null;
   }
