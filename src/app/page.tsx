@@ -25,7 +25,7 @@ const botonStyle: React.CSSProperties = {
 };
 
 // Pastilla chica: tres en una fila (Plantel Superior / Juveniles / Playoff).
-const botonChico: React.CSSProperties = { ...botonStyle, fontSize: "0.62rem", letterSpacing: 0.3, padding: "8px 2px", borderRadius: 8, lineHeight: 1.2, whiteSpace: "nowrap" };
+const botonChico: React.CSSProperties = { ...botonStyle, fontSize: "0.52rem", letterSpacing: 0.2, padding: "5px 2px", borderRadius: 7, lineHeight: 1.2, whiteSpace: "nowrap" };
 
 export default async function Home() {
   const session = await getSession();
@@ -45,7 +45,7 @@ export default async function Home() {
 
       {/* Tres pastillas arriba (Plantel Superior / Juveniles / Playoff), y enseguida el programa de semifinales: el
           partido de HOY con formacion publicada muestra la formacion directo. */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginTop: 12 }}>
         <Link href="/superior" style={botonChico}>
           Plantel Superior
         </Link>
