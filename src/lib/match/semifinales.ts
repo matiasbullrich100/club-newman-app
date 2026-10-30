@@ -1,7 +1,7 @@
 import "server-only";
 import { adminDb } from "@/lib/firebase-admin";
 import { CATEGORIAS_SUPERIOR, partidoId } from "@/lib/categorias";
-import { debeMostrarProximaFechaEnArgentina, domingoDeEstaSemanaIso, hoyIsoEnArgentina, plantelAdelantaSemifinales } from "@/lib/fecha";
+import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, domingoDeEstaSemanaIso, hoyIsoEnArgentina, plantelAdelantaSemifinales } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 import type { ProximaFecha } from "./resumenSeccion";
 
@@ -64,4 +64,63 @@ export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgr
     });
   }
   return salida;
+}
+
+export interface SemifinalEnCurso {
+  categoriaId: string;
+  categoriaNombre: string;
+  partidoId: string;
+  estado: Partido["estado"];
+  esLocal: boolean;
+  rival: string;
+  resultado: Partido["resultado"];
+  cancha?: string;
+  numeroCancha?: string;
+  hora?: string;
+  fecha?: string;
+  // La formacion publicada se muestra mientras el partido es de hoy (en vivo o recien terminado).
+  formacion?: JugadorFormacion[];
+}
+
+// Cuantos dias (contando hoy) sigue visible en el inicio el resultado de una semifinal ya jugada.
+const DIAS_SEMIFINAL_JUGADA_VISIBLE = 2;
+
+// Semifinales de Newman EN VIVO o ya TERMINADAS (hoy y el dia anterior): el inicio las muestra con el marcador y el
+// reloj en vivo (LiveBanner), en el mismo lugar donde antes estaba el programa del partido. Mientras el partido es
+// de HOY se muestra tambien su formacion.
+export async function semifinalesEnCursoOTerminadas(): Promise<SemifinalEnCurso[]> {
+  const snaps = await adminDb.getAll(...CATEGORIAS_SUPERIOR.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, 27))));
+  const hoy = hoyIsoEnArgentina();
+  const salida: SemifinalEnCurso[] = [];
+  for (const [i, snap] of snaps.entries()) {
+    if (!snap.exists) continue;
+    const p = snap.data() as Partido;
+    if (p.fase !== "semifinal" || p.estado === "programado" || !p.fecha) continue;
+    const enVivo = p.estado === "en_juego" || p.estado === "entretiempo" || p.estado === "suspendido";
+    if (!enVivo && diasDesdeEnArgentina(p.fecha) >= DIAS_SEMIFINAL_JUGADA_VISIBLE) continue;
+    let formacion: JugadorFormacion[] | undefined;
+    if ((enVivo || p.fecha === hoy) && p.formacionPublicada !== false) {
+      const plantel = await snap.ref.collection("plantel").get();
+      formacion = plantel.docs.map((d) => ({ jugadorId: d.id, ...(d.data() as Omit<JugadorFormacion, "jugadorId">) }));
+      if (formacion.length === 0) formacion = undefined;
+    }
+    const cat = CATEGORIAS_SUPERIOR[i];
+    salida.push({
+      categoriaId: cat.id,
+      categoriaNombre: cat.nombre,
+      partidoId: snap.id,
+      estado: p.estado,
+      esLocal: p.esLocal,
+      rival: p.rival,
+      resultado: p.resultado,
+      cancha: p.cancha,
+      numeroCancha: p.numeroCancha,
+      hora: p.hora,
+      fecha: p.fecha,
+      formacion,
+    });
+  }
+  // En vivo primero, despues por dia y hora.
+  const orden = (s: SemifinalEnCurso) => `${s.estado === "terminado" ? "1" : "0"} ${s.fecha} ${s.hora ?? "99:99"}`;
+  return salida.sort((a, b) => orden(a).localeCompare(orden(b)));
 }

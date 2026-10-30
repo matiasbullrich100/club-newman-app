@@ -5,7 +5,8 @@ import SessionBar from "@/components/SessionBar";
 import Buscador from "@/components/Buscador";
 import InstalarApp from "@/components/InstalarApp";
 import ProgramaSemifinales from "@/components/ProgramaSemifinales";
-import { semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
+import SemifinalesEnCurso from "@/components/SemifinalesEnCurso";
+import { semifinalesEnCursoOTerminadas, semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
 
@@ -29,7 +30,7 @@ const botonChico: React.CSSProperties = { ...botonStyle, fontSize: "0.62rem", le
 export default async function Home() {
   const session = await getSession();
   // Semifinales de la semana (por dia y sede); el partido de HOY con formacion publicada muestra la formacion directo.
-  const semis = await semifinalesProgramadasEstaSemana();
+  const [semis, semisEnCurso] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas()]);
   // El boton "Formaciones" (pantalla /formaciones para cargar/publicar) lo ven el Administrador
   // (sin alcance) y cualquier Manager de division.
   const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
@@ -56,7 +57,9 @@ export default async function Home() {
         </Link>
       </div>
 
+      {/* Partido en curso (o recien terminado): marcador y reloj en vivo, con la formacion debajo. */}
       <div style={{ marginTop: 16 }}>
+        <SemifinalesEnCurso semis={semisEnCurso} />
         <ProgramaSemifinales semis={semis} />
       </div>
 

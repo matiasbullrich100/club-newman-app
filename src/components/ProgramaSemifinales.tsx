@@ -7,6 +7,20 @@ import type { SemifinalProgramada } from "@/lib/match/semifinales";
 
 const SEDES: Record<string, string> = { Hindu: "Hindú" };
 
+// Cuadro con la formacion de un partido (Cancha · horario arriba, titulares y suplentes abajo).
+export function PanelFormacion({ cancha, numeroCancha, hora, formacion }: { cancha?: string; numeroCancha?: string; hora?: string; formacion: SemifinalProgramada["formacion"] & object }) {
+  return (
+    <div style={{ margin: "-2px 0 10px", padding: "8px 12px 10px", border: "1px solid rgba(226,197,120,.35)", borderRadius: 10, background: "rgba(0,0,0,.18)" }}>
+      <div style={{ textAlign: "center", fontSize: "0.78rem", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", color: DORADO }}>
+        Cancha {SEDES[cancha ?? ""] ?? cancha}
+        {numeroCancha && ` · ${numeroCancha}`}
+        {hora && ` · ${hora} hs`}
+      </div>
+      <Formaciones plantel={formacion} />
+    </div>
+  );
+}
+
 // "Viernes 23/10" a partir de un ISO yyyy-mm-dd (sin depender de la zona horaria del servidor).
 function diaLargo(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -53,16 +67,7 @@ export default function ProgramaSemifinales({ semis }: { semis: SemifinalProgram
                 posicionesHref={TORNEOS_URBA[s.categoriaId] !== undefined ? `/posiciones/${s.categoriaId}` : undefined}
                 fixtureHref={`/categoria/${s.categoriaId}/fixture`}
               />
-              {s.formacion && (
-                <div style={{ margin: "-2px 0 10px", padding: "8px 12px 10px", border: "1px solid rgba(226,197,120,.35)", borderRadius: 10, background: "rgba(0,0,0,.18)" }}>
-                  <div style={{ textAlign: "center", fontSize: "0.78rem", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", color: DORADO }}>
-                    Cancha {SEDES[s.proxima.cancha ?? ""] ?? s.proxima.cancha}
-                    {s.proxima.numeroCancha && ` · ${s.proxima.numeroCancha}`}
-                    {s.proxima.hora && ` · ${s.proxima.hora} hs`}
-                  </div>
-                  <Formaciones plantel={s.formacion} />
-                </div>
-              )}
+              {s.formacion && <PanelFormacion cancha={s.proxima.cancha} numeroCancha={s.proxima.numeroCancha} hora={s.proxima.hora} formacion={s.formacion} />}
               </div>
             ))}
           </div>
