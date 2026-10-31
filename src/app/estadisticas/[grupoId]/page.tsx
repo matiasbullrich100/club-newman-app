@@ -138,9 +138,9 @@ async function Tablas({ grupoId }: { grupoId: string }) {
     };
   });
 
-  // Alfabetico por ahora (no hay todavia un criterio mejor que ordenar por minutos, ya que el
-  // historico no tiene ese detalle) -- pedido explicito del club.
-  const porMinutos = [...jugadores].sort(porApellido);
+  // De mas a menos minutos jugados; los empatados (p. ej. los historicos, que figuran en 0) van
+  // alfabeticos por apellido -- pedido explicito del manager.
+  const porMinutos = [...jugadores].sort((a, b) => (b.minutosJugadosTotal || 0) - (a.minutosJugadosTotal || 0) || porApellido(a, b));
 
   return (
     <>
@@ -167,8 +167,8 @@ async function Tablas({ grupoId }: { grupoId: string }) {
           <>
             <p style={{ opacity: 0.6, fontSize: "0.78rem", marginBottom: 8 }}>
               Los minutos se acumulan cuando un partido se marca como terminado, a partir de los cambios
-              cargados en vivo. Los partidos históricos no tienen ese detalle todavía, por eso figuran en 0
-              (orden alfabético mientras tanto).
+              cargados en vivo. Los partidos históricos no tienen ese detalle todavía, por eso figuran en 0.
+              Orden: de más a menos minutos.
             </p>
             {/* maxHeight + overflowY propios -- ver el comentario en TablaTarjetas.tsx sobre por
                 que position:sticky necesita que este div sea el que scrollea de verdad. */}
