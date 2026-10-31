@@ -1,6 +1,7 @@
 // M16 A / B / C / D del domingo 2026-11-01 (Fecha 11, de local, en Newman): A vs San Albano A 11:00, B vs San Albano B 09:30,
 // C vs C.U.Q. A 11:00. Formaciones de la hoja "M16 2026" del club (su encabezado dice "Domingo 11/10" por error, como otras
 // semanas): titulares 1-15 y suplentes con el dorsal de la hoja (casilleros vacios se saltean).
+// M16 B: el titular 12 era "Simon Padros, Juan" y el club lo corrigio a "Renteria, Marcos".
 // M16 C: la hoja repite a "Moyano, Santiago" como titular 11 y suplente 16 -> queda solo de titular (se avisa al club).
 // M16 D: la hoja dice "Los Tilos B (L)" a las 11:00 pero en la base el partido es vs C.U.Q. B 09:30 -> se carga como
 // BORRADOR (sin publicar) y sin tocar rival ni hora, hasta que el club aclare.
@@ -37,7 +38,7 @@ const EQUIPOS: EquipoFormacion[] = [
   {
     partidoId: "m16-b-f11",
     publicar: true,
-    titulares: ["SOLA, Juan", "SALESE, Ramon", "IRIBAS, Ramon", "GUILLANI, Juan Jose", "FABBRI, Santino", "CASTELLI, Felipe", "CASA, Felix", "RICHELET, Juan", "PUIG, Salvador", "SUAYA, Lorenzo", "HERRERA, Rufino", "SIMON PADROS, Juan", "NORMAN, Marcos", "URANGA, Mateo", "OLIVERA, Diogenes"],
+    titulares: ["SOLA, Juan", "SALESE, Ramon", "IRIBAS, Ramon", "GUILLANI, Juan Jose", "FABBRI, Santino", "CASTELLI, Felipe", "CASA, Felix", "RICHELET, Juan", "PUIG, Salvador", "SUAYA, Lorenzo", "HERRERA, Rufino", "RENTERIA, Marcos", "NORMAN, Marcos", "URANGA, Mateo", "OLIVERA, Diogenes"],
     suplentes: [["16", "BESTANI, Cruz"], ["17", "MIGUENS, Santiago"]],
   },
   {
