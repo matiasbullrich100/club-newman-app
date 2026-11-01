@@ -7,6 +7,7 @@ import { FAMILIA_PUNTOS, requierePlayerSelection } from "@/lib/incidentes";
 import type { JugadorBusqueda, RosterJugador } from "./types";
 import CargaCambio from "./CargaCambio";
 import CanchaEnVivo from "./CanchaEnVivo";
+import RetomarPartidoPastilla from "./RetomarPartidoPastilla";
 import { botonOpcion, botonPrimario, botonSecundario, grillaOpciones, listaOpciones } from "./estilos";
 import BarraAccionFija from "./BarraAccionFija";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
@@ -47,6 +48,7 @@ export default function CargaIncidencia({
   soloEnCancha = true,
   enJuego = true,
   numeroCancha,
+  puedeRetomar = false,
   onBloqueoChange,
 }: {
   partidoId: string;
@@ -66,6 +68,8 @@ export default function CargaIncidencia({
   /** Cancha elegida hasta ahora (Partido.numeroCancha) -- la pastilla "Cancha" del menu la muestra y
    * permite elegirla/corregirla con el partido empezado. */
   numeroCancha?: string | null;
+  /** Solo en la correccion post-partido: suma la pastilla "Reiniciar partido" (retomar un partido terminado por error). */
+  puedeRetomar?: boolean;
   /** Se avisa al panel cuando hay un try de Newman EN VIVO esperando que se elija el jugador que
    * lo hizo -- el panel bloquea el resto de las acciones hasta que se elige (o se cancela), asi
    * el try no se queda sin publicar por olvido. */
@@ -393,6 +397,8 @@ export default function CargaIncidencia({
                 {label}
               </button>
             ))}
+          {/* Pegada a la Tarjeta azul: retomar un partido que se termino por error. */}
+          {esCorreccion && puedeRetomar && <RetomarPartidoPastilla partidoId={partidoId} />}
           {/* Correccion de reloj -- no hay reloj corriendo en una correccion post-partido ni en el entretiempo. */}
           {/* Correccion de reloj (+30"/+60") y la pastilla desplegable "Cancha" al lado: para elegirla o
               corregirla con el partido empezado. La cancha tambien va en el entretiempo (reloj parado). */}

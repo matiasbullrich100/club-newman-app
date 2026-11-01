@@ -75,9 +75,9 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
   const puedeOperar = puedeOperarCategoria(session, partido.categoriaId, partidoId);
   const mostrarReset = esPartidoDePrueba && puedeResetearPartidoDePrueba(session, partido.categoriaId, partidoId);
   const ambiguos = apellidosAmbiguos(jugadoresClubSnap.docs.map((d) => (d.data() as JugadorAgregado).nombre));
-  // Si termino durante el 2do tiempo (por "Terminar partido" apretado de mas antes de tiempo), se
-  // ofrece "Reiniciar 2do tiempo" -- ver retomar2T() en actions.ts.
-  const terminoEn2T = (liveStateSnap.data() as LiveState | undefined)?.periodo === "2T";
+  // Si el partido se jugo con reloj (no fue un walkover), se ofrece la pastilla "Reiniciar partido" por si se
+  // apreto "Terminar partido" de mas -- ver retomarPartido() en actions.ts.
+  const puedeRetomar = puedeOperar && !!(liveStateSnap.data() as LiveState | undefined)?.periodo;
 
   return {
     plantel,
@@ -88,6 +88,6 @@ export async function datosPartidoTerminado(partidoId: string, partido: Partido,
     esPartidoDePrueba,
     mostrarReset,
     apellidosAmbiguos: ambiguos,
-    terminoEn2T,
+    puedeRetomar,
   };
 }

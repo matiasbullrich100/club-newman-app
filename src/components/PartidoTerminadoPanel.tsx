@@ -4,7 +4,6 @@ import CargaIncidencia from "./panel-designado/CargaIncidencia";
 import CargaCambio from "./panel-designado/CargaCambio";
 import ResetDemoButton from "./ResetDemoButton";
 import ReiniciarPartidoButton from "./ReiniciarPartidoButton";
-import Retomar2TButton from "./Retomar2TButton";
 import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 import type { datosPartidoTerminado } from "@/lib/match/datosPartidoTerminado";
 
@@ -34,7 +33,7 @@ export default function PartidoTerminadoPanel({
   fixtureDivisionHref?: string;
   crucesHref?: string;
 }) {
-  const { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos, terminoEn2T } =
+  const { plantel, plantelCompleto, incidentes, puedeOperar, puedeReiniciar, esPartidoDePrueba, mostrarReset, apellidosAmbiguos, puedeRetomar } =
     datos;
 
   return (
@@ -103,6 +102,7 @@ export default function PartidoTerminadoPanel({
             plantel={plantel.map((j) => ({ jugadorId: j.jugadorId, nombre: j.nombre, dorsal: j.dorsal, titular: j.titular }))}
             enCanchaIds={partido.enCanchaIds}
             soloEnCancha={false}
+            puedeRetomar={puedeRetomar}
           />
           <CargaCambio
             partidoId={partidoId}
@@ -114,7 +114,6 @@ export default function PartidoTerminadoPanel({
         </div>
       )}
       {mostrarReset && <ResetDemoButton partidoId={partidoId} />}
-      {puedeOperar && terminoEn2T && <Retomar2TButton partidoId={partidoId} />}
       {puedeReiniciar && !esPartidoDePrueba && <ReiniciarPartidoButton partidoId={partidoId} />}
     </>
   );

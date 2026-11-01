@@ -467,16 +467,17 @@ export async function terminarPartido(partidoId: string): Promise<void> {
 }
 
 /**
- * Deshace un "Terminar partido" que se apreto por error mientras todavia quedaba 2do tiempo por
- * jugar -- vuelve de "terminado" a "en_juego" en el 2do tiempo, con el reloj retomando desde donde
- * estaba al terminar (no cuenta el rato que estuvo frenado). Solo si el partido termino durante el
- * 2do tiempo (si termino en el 1er tiempo o en el entretiempo antes de arrancar el 2do, esto no
- * aplica). Borra el incidente "fin_partido" mas reciente para que el feed no muestre un final que
- * no fue, y revierte el increment de minutosJugadosTotal que hizo terminarPartido (recalculado con
- * los mismos cambios y duraciones que uso), para que no quede sumado doble cuando el partido se
- * termine de verdad mas adelante.
+ * Deshace un "Terminar partido" que se apreto por error -- el partido vuelve a donde estaba y el reloj
+ * retoma desde donde se corto (no cuenta el rato que estuvo frenado). Segun donde termino:
+ *  - en el 2do tiempo -> "en_juego" en el 2do tiempo;
+ *  - en el 1er tiempo, sin "Final 1er tiempo" cargado -> "en_juego" en el 1er tiempo;
+ *  - en el entretiempo (1T ya cerrado con fin_1t) -> de vuelta a "entretiempo".
+ * Borra el incidente "fin_partido" mas reciente para que el feed no muestre un final que no fue, y revierte
+ * el increment de minutosJugadosTotal que hizo terminarPartido (recalculado con los mismos cambios y
+ * duraciones que uso), para que no quede sumado doble cuando el partido se termine de verdad mas adelante.
+ * No aplica a un walkover (no tiene reloj ni minutos).
  */
-export async function retomar2T(partidoId: string): Promise<void> {
+export async function retomarPartido(partidoId: string): Promise<void> {
   const session = await getSession();
   const { partidoRef, liveStateRef } = refs(partidoId);
   const esPartidoDePrueba = esIdDePartidoPrueba(partidoId);
@@ -492,8 +493,8 @@ export async function retomar2T(partidoId: string): Promise<void> {
     const partido = partidoSnap.data() as Partido;
     const liveState = liveSnap.data() as LiveState;
     if (!puedeOperarCategoria(session, partido.categoriaId, partidoId)) throw new Error("No autorizado");
-    if (partido.estado !== "terminado" || liveState.periodo !== "2T") {
-      throw new Error("Solo se puede reiniciar el 2do tiempo de un partido que termino durante el 2do tiempo");
+    if (partido.estado !== "terminado" || !liveState.periodo) {
+      throw new Error("Solo se puede retomar un partido que se terminó con el reloj en marcha");
     }
 
     const incidentes = incidentesSnap.docs;
@@ -506,11 +507,11 @@ export async function retomar2T(partidoId: string): Promise<void> {
     }
     if (ultimoFinPartido) tx.delete(ultimoFinPartido.ref);
 
+    const plantel: JugadorInput[] = plantelSnap.docs.map((d) => ({
+      jugadorId: d.id,
+      titular: (d.data() as JugadorPartido).titular,
+    }));
     if (!esPartidoDePrueba) {
-      const plantel: JugadorInput[] = plantelSnap.docs.map((d) => ({
-        jugadorId: d.id,
-        titular: (d.data() as JugadorPartido).titular,
-      }));
       const cambios: CambioEvento[] = incidentes
         .map((d) => d.data() as Incidente)
         .filter((data) => data.tipo === "cambio")
@@ -532,13 +533,35 @@ export async function retomar2T(partidoId: string): Promise<void> {
         );
       }
     }
+    // Los minutos del partido se recalculan cuando se termine de verdad.
+    for (const jugador of plantel) {
+      tx.update(partidoRef.collection("plantel").doc(jugador.jugadorId), {
+        minutosJugados1T: FieldValue.delete(),
+        minutosJugados2T: FieldValue.delete(),
+      });
+    }
 
-    tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
-    tx.update(liveStateRef, {
-      clockRunning: true,
-      clockAnchor: Timestamp.now(),
-      period2DurationSeconds: FieldValue.delete(),
-    });
+    if (liveState.periodo === "2T") {
+      tx.update(partidoRef, { estado: "en_juego", updatedAt: FieldValue.serverTimestamp() });
+      tx.update(liveStateRef, {
+        clockRunning: true,
+        clockAnchor: Timestamp.now(),
+        period2DurationSeconds: FieldValue.delete(),
+      });
+    } else {
+      const cerroElPrimerTiempo = incidentes.some((d) => (d.data() as Incidente).tipo === "fin_1t");
+      tx.update(partidoRef, {
+        estado: cerroElPrimerTiempo ? "entretiempo" : "en_juego",
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      tx.update(liveStateRef, {
+        // En el 1T en juego el reloj sigue desde accumulatedSeconds (queda como lo dejo terminarPartido).
+        clockRunning: !cerroElPrimerTiempo,
+        clockAnchor: cerroElPrimerTiempo ? null : Timestamp.now(),
+        ...(cerroElPrimerTiempo ? {} : { period1DurationSeconds: FieldValue.delete() }),
+        period2DurationSeconds: FieldValue.delete(),
+      });
+    }
   });
 
   revalidatePath(`/partido/${partidoId}`);
