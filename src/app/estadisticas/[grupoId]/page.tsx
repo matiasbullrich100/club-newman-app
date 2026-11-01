@@ -10,7 +10,8 @@ import Header from "@/components/Header";
 import BackLink from "@/components/BackLink";
 import SessionBar from "@/components/SessionBar";
 import TablaTarjetas, { type JugadorTarjetasRow } from "@/components/TablaTarjetas";
-import { BORDO_OSC, DORADO, DORADO_SUAVE } from "@/lib/colors";
+import TablaMinutos, { type JugadorMinutosRow } from "@/components/TablaMinutos";
+import { DORADO, DORADO_SUAVE } from "@/lib/colors";
 
 const cardStyle: React.CSSProperties = {
   background: "rgba(255,255,255,.045)",
@@ -26,28 +27,6 @@ const cardTituloStyle: React.CSSProperties = {
   fontSize: "0.85rem",
   color: DORADO,
   marginBottom: 10,
-};
-
-const thStyle: React.CSSProperties = {
-  textAlign: "left",
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
-  fontSize: "0.65rem",
-  color: DORADO,
-  padding: "4px 6px",
-  borderBottom: "1px solid rgba(226,197,120,.3)",
-  // Fijo arriba al scrollear -- con la lista larga, al llegar a los ultimos jugadores se pierde
-  // de vista que columna es cada una.
-  position: "sticky",
-  top: 0,
-  background: BORDO_OSC,
-  zIndex: 1,
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: "6px 6px",
-  fontSize: "0.82rem",
-  borderBottom: "1px solid rgba(255,255,255,.06)",
 };
 
 function tieneTarjeta(j: JugadorAgregado): boolean {
@@ -138,9 +117,11 @@ async function Tablas({ grupoId }: { grupoId: string }) {
     };
   });
 
-  // De mas a menos minutos jugados; los empatados (p. ej. los historicos, que figuran en 0) van
-  // alfabeticos por apellido -- pedido explicito del manager.
-  const porMinutos = [...jugadores].sort((a, b) => (b.minutosJugadosTotal || 0) - (a.minutosJugadosTotal || 0) || porApellido(a, b));
+  // Orden de "Minutos jugados" a eleccion de quien mira (ver TablaMinutos): arranca de mas a menos minutos.
+  const filasMinutos: JugadorMinutosRow[] = jugadores.map((j) => {
+    const { apellido, nombre } = splitNombre(j.nombre);
+    return { id: j.id, nombre: j.nombre, minutos: j.minutosJugadosTotal || 0, apellido, nombrePila: nombre };
+  });
 
   return (
     <>
@@ -168,28 +149,8 @@ async function Tablas({ grupoId }: { grupoId: string }) {
             <p style={{ opacity: 0.6, fontSize: "0.78rem", marginBottom: 8 }}>
               Los minutos se acumulan cuando un partido se marca como terminado, a partir de los cambios
               cargados en vivo. Los partidos históricos no tienen ese detalle todavía, por eso figuran en 0.
-              Orden: de más a menos minutos.
             </p>
-            {/* maxHeight + overflowY propios -- ver el comentario en TablaTarjetas.tsx sobre por
-                que position:sticky necesita que este div sea el que scrollea de verdad. */}
-            <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "70vh" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={thStyle}>Jugador</th>
-                    <th style={thStyle}>Minutos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {porMinutos.map((j) => (
-                    <tr key={j.id}>
-                      <td style={{ ...tdStyle, color: DORADO_SUAVE }}>{j.nombre}</td>
-                      <td style={tdStyle}>{j.minutosJugadosTotal || 0}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TablaMinutos jugadores={filasMinutos} />
           </>
         )}
       </div>
