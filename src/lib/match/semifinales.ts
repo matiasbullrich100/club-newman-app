@@ -5,6 +5,9 @@ import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, domingoDeEsta
 import type { Partido } from "@/types/firestore";
 import type { ProximaFecha } from "./resumenSeccion";
 
+// Fechas de playoff de Plantel Superior: 27 = semifinal, 28 = final.
+const FECHAS_PLAYOFF = [27, 28];
+
 export interface JugadorFormacion {
   jugadorId: string;
   nombre: string;
@@ -28,28 +31,28 @@ export interface SemifinalProgramada {
 // resultado de siempre, no aca. Los partidos son la "Fecha 27" (fase "semifinal") de cada categoria.
 export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgramada[]> {
   if (!debeMostrarProximaFechaEnArgentina() && !plantelAdelantaSemifinales()) return [];
-  const snaps = await adminDb.getAll(...CATEGORIAS_SUPERIOR.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, 27))));
+  const snaps = await adminDb.getAll(...CATEGORIAS_SUPERIOR.flatMap((c) => FECHAS_PLAYOFF.map((n) => adminDb.collection("partidos").doc(partidoId(c.id, n)))));
   const hoy = hoyIsoEnArgentina();
   const domingo = domingoDeEstaSemanaIso();
   const salida: SemifinalProgramada[] = [];
   for (const [i, snap] of snaps.entries()) {
     if (!snap.exists) continue;
     const p = snap.data() as Partido;
-    if (p.fase !== "semifinal" || p.estado !== "programado" || !p.fecha || p.fecha < hoy || p.fecha > domingo) continue;
+    if (!p.fase || p.estado !== "programado" || !p.fecha || p.fecha < hoy || p.fecha > domingo) continue;
     let formacion: JugadorFormacion[] | undefined;
     if (p.fecha === hoy && p.formacionPublicada !== false) {
       const plantel = await snap.ref.collection("plantel").get();
       formacion = plantel.docs.map((d) => ({ jugadorId: d.id, ...(d.data() as Omit<JugadorFormacion, "jugadorId">) }));
       if (formacion.length === 0) formacion = undefined;
     }
-    const cat = CATEGORIAS_SUPERIOR[i];
+    const cat = CATEGORIAS_SUPERIOR[Math.floor(i / FECHAS_PLAYOFF.length)];
     salida.push({
       categoriaId: cat.id,
       categoriaNombre: cat.nombre,
       partidoId: snap.id,
       formacion,
       proxima: {
-        numeroFecha: 27,
+        numeroFecha: Number(p.numeroFecha),
         fecha: p.fecha,
         esLocal: p.esLocal,
         rival: p.rival,
@@ -89,13 +92,13 @@ const DIAS_SEMIFINAL_JUGADA_VISIBLE = 2;
 // reloj en vivo (LiveBanner), en el mismo lugar donde antes estaba el programa del partido. Mientras el partido es
 // de HOY se muestra tambien su formacion.
 export async function semifinalesEnCursoOTerminadas(): Promise<SemifinalEnCurso[]> {
-  const snaps = await adminDb.getAll(...CATEGORIAS_SUPERIOR.map((c) => adminDb.collection("partidos").doc(partidoId(c.id, 27))));
+  const snaps = await adminDb.getAll(...CATEGORIAS_SUPERIOR.flatMap((c) => FECHAS_PLAYOFF.map((n) => adminDb.collection("partidos").doc(partidoId(c.id, n)))));
   const hoy = hoyIsoEnArgentina();
   const salida: SemifinalEnCurso[] = [];
   for (const [i, snap] of snaps.entries()) {
     if (!snap.exists) continue;
     const p = snap.data() as Partido;
-    if (p.fase !== "semifinal" || p.estado === "programado" || !p.fecha) continue;
+    if (!p.fase || p.estado === "programado" || !p.fecha) continue;
     const enVivo = p.estado === "en_juego" || p.estado === "entretiempo" || p.estado === "suspendido";
     if (!enVivo && diasDesdeEnArgentina(p.fecha) >= DIAS_SEMIFINAL_JUGADA_VISIBLE) continue;
     let formacion: JugadorFormacion[] | undefined;
@@ -104,7 +107,7 @@ export async function semifinalesEnCursoOTerminadas(): Promise<SemifinalEnCurso[
       formacion = plantel.docs.map((d) => ({ jugadorId: d.id, ...(d.data() as Omit<JugadorFormacion, "jugadorId">) }));
       if (formacion.length === 0) formacion = undefined;
     }
-    const cat = CATEGORIAS_SUPERIOR[i];
+    const cat = CATEGORIAS_SUPERIOR[Math.floor(i / FECHAS_PLAYOFF.length)];
     salida.push({
       categoriaId: cat.id,
       categoriaNombre: cat.nombre,

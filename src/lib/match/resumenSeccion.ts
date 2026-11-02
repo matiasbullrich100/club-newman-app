@@ -155,8 +155,8 @@ export interface ProximaFecha {
   // Amistoso arreglado por el club (no es del fixture oficial) -- la fila de Proxima Fecha lo aclara.
   amistoso?: boolean;
   formato?: string;
-  // "semifinal": partido de playoff (se rotula "Semifinal").
-  fase?: "semifinal";
+  // "semifinal" / "final": partido de playoff (se rotula asi).
+  fase?: "semifinal" | "final";
 }
 
 /**
@@ -225,7 +225,7 @@ export interface PartidoDeFecha {
   cancha?: string;
   numeroCancha?: string;
   notaEspecial?: string;
-  fase?: "semifinal";
+  fase?: "semifinal" | "final";
 }
 
 /**

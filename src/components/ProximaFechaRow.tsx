@@ -9,7 +9,8 @@ import type { ProximaFecha } from "@/lib/match/resumenSeccion";
 // no se muestra nada, ni el rotulo "Cancha"). Fecha libre no lleva nada.
 // La proxima fecha cae despues de este domingo: esta semana el equipo no juega.
 function noJuegaEstaSemana(proxima: ProximaFecha): boolean {
-  return !!proxima.fecha && proxima.fecha > domingoDeEstaSemanaIso();
+  // Un partido de playoff (la final) cae en su fecha aunque sea la semana que viene: no es "fecha libre".
+  return !!proxima.fecha && proxima.fase !== "final" && proxima.fecha > domingoDeEstaSemanaIso();
 }
 
 function textoHorarioCancha(proxima: ProximaFecha, sinSede = false): string | null {
@@ -20,7 +21,7 @@ function textoHorarioCancha(proxima: ProximaFecha, sinSede = false): string | nu
   const libreEstaSemana = noJuegaEstaSemana(proxima);
   // Sin partido esta semana la fila dice solo "Fecha libre" (como una fecha libre del fixture): sin horario ni sede.
   if (libreEstaSemana) return null;
-  const partes = [proxima.fase === "semifinal" ? "Semifinal" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  const partes = [proxima.fase === "semifinal" ? "Semifinal" : proxima.fase === "final" ? "Final" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
 

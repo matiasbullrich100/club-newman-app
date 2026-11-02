@@ -12,6 +12,8 @@ export interface PlayoffCategoria {
   semis: SemifinalPlayoff[];
   final?: string; // ISO yyyy-mm-dd; ausente = todavia no informada
   sede?: string;
+  /** Sede de la final si es distinta de la de las semifinales; ausente = la misma `sede` (si hay `final`) o sin informar. */
+  sedeFinal?: string;
 }
 
 // Programa oficial de semifinales de URBA (Intermedia, Pre A-F y M22: viernes 23 y sabado 24/10/2026 en CUBA Villa de
@@ -33,6 +35,9 @@ export const PLAYOFF: Record<string, PlayoffCategoria> = {
       { fecha: "2026-10-31", cruce: [2, 3] },
     ],
     sede: "Cancha de CASI",
+    // Final: sabado 7/11 (Newman vs Hindu); sede todavia sin informar.
+    final: "2026-11-07",
+    sedeFinal: "",
   },
   intermedia: cuba("2026-10-24", "18:00"),
   "pre-a": cuba("2026-10-24", "16:00"),

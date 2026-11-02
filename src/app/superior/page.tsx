@@ -240,7 +240,8 @@ export default async function PlantelSuperiorPage() {
 
       <ProgramaSemifinales semis={semis} />
 
-      {mostrarProximaFechaPrimera && proximasFechasPrimera.length > 0 && <ProximaFechaBanner proximas={proximasFechasPrimera} />}
+      {/* Si Primera ya sale en el programa de playoff (semifinal / final de esta semana), no se repite en el cartel. */}
+      {mostrarProximaFechaPrimera && !idsSemis.has("primera") && proximasFechasPrimera.length > 0 && <ProximaFechaBanner proximas={proximasFechasPrimera} />}
 
       {filasResto.map((f) => f.node)}
 

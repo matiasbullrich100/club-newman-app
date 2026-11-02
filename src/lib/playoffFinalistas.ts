@@ -13,8 +13,8 @@ import type { Partido } from "@/types/firestore";
 // cada 15 minutos las rondas de playoff de cada zona y las guarda en Firestore (playoff/{categoriaId});
 // la pantalla lee de ahi. Si URBA ya publico la ronda de la final, los finalistas salen de esa ronda.
 
-// Inter, Pre A a F y M-22 (Primera juega sus semifinales el 30 y 31/10, queda afuera por ahora).
-export const CATEGORIAS_FINALISTAS = ["intermedia", "pre-a", "pre-b", "pre-c", "pre-d", "pre-e", "pre-f", "m-22"];
+// Primera (semifinales el 30 y 31/10), Inter, Pre A a F y M-22.
+export const CATEGORIAS_FINALISTAS = ["primera", "intermedia", "pre-a", "pre-b", "pre-c", "pre-d", "pre-e", "pre-f", "m-22"];
 
 const COLECCION = "playoff";
 
@@ -86,15 +86,26 @@ function aPartido(p: PartidoPlayoffUrba): PartidoPlayoff {
 
 // Semis = la ronda de playoff con 2 partidos (o la que se llame "semi"); final = la de 1 solo partido (o la
 // que se llame "final" a secas). No se asume el nombre exacto de la ronda: URBA la llama "PLAYOFF" en unas
-// divisiones y "SEMI FINAL" en otras.
+// divisiones y "SEMI FINAL" en otras. Primera (Top 14) las carga como UNA ronda "PLAYOFF" por dia, de un partido
+// cada una (vie 30 y sab 31/10): se toman las dos primeras como semifinales y una tercera como la final.
 export function armarPlayoffDoc(categoriaId: string, rondas: RondaPlayoffUrba[]): PlayoffDoc {
-  const semis = rondas.find((r) => /semi/i.test(r.nombre)) ?? rondas.find((r) => r.partidos.length === 2);
-  const final =
-    rondas.find((r) => /final/i.test(r.nombre) && !/semi/i.test(r.nombre)) ?? rondas.find((r) => r !== semis && r.partidos.length === 1);
+  const nombrada = rondas.find((r) => /semi/i.test(r.nombre)) ?? rondas.find((r) => r.partidos.length === 2);
+  const finalNombrada = rondas.find((r) => /final/i.test(r.nombre) && !/semi/i.test(r.nombre));
+  if (nombrada || finalNombrada) {
+    const semis = nombrada;
+    const final = finalNombrada ?? rondas.find((r) => r !== semis && r.partidos.length === 1);
+    return {
+      categoriaId,
+      semis: (semis?.partidos ?? []).map(aPartido),
+      ...(final?.partidos[0] ? { final: aPartido(final.partidos[0]) } : {}),
+    };
+  }
+  const sueltas = rondas.filter((r) => r.partidos.length === 1).sort((x, y) => (x.fecha ?? "").localeCompare(y.fecha ?? ""));
+  const final = sueltas[2];
   return {
     categoriaId,
-    semis: (semis?.partidos ?? []).map(aPartido),
-    ...(final?.partidos[0] ? { final: aPartido(final.partidos[0]) } : {}),
+    semis: sueltas.slice(0, 2).map((r) => aPartido(r.partidos[0])),
+    ...(final ? { final: aPartido(final.partidos[0]) } : {}),
   };
 }
 
@@ -208,7 +219,7 @@ export async function finalistasPlayoff(): Promise<FilaFinalistas[]> {
       categoria: cat.nombre,
       finalistas: finalistasDe(doc),
       fechaFinal: cfg?.final,
-      sede: cfg?.sede?.replace(/ \(.*\)$/, "").replace(/^Cancha de /, ""),
+      sede: (cfg?.sedeFinal ?? cfg?.sede)?.replace(/ \(.*\)$/, "").replace(/^Cancha de /, "") || undefined,
     };
   });
 }
