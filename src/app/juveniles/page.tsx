@@ -62,6 +62,27 @@ export default async function JuvenilesPage() {
 
       <EnJuegoTips />
 
+      {/* Cierre de la 2da fase: posicion de cada equipo de Newman (y quien salio campeon). */}
+      <Link
+        href="/posiciones-juveniles"
+        style={{
+          display: "block",
+          textAlign: "center",
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          fontSize: "0.78rem",
+          fontWeight: 800,
+          padding: "10px 12px",
+          marginBottom: 12,
+          borderRadius: 8,
+          background: "rgba(245,196,40,.95)",
+          border: "1px solid rgba(245,196,40,1)",
+          color: "#2a1b02",
+        }}
+      >
+        Posiciones 2ª fase
+      </Link>
+
       {equiposOrdenados
         .map((equipo) => {
           const p = resumen.find((r) => r.categoriaId === equipo.id);
