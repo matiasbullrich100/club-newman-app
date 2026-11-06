@@ -1,8 +1,8 @@
 // Primera vs Hindu -- FINAL de playoff, sabado 2026-11-07 17:10 en CASI (partido Fecha 28, fase "final").
 // Formacion de la placa del club: 15 titulares (capitan: Alejandro Urtubey) + las "Reservas" 16-23 como suplentes
 // (igual que en la semifinal). Se carga la hora (17:10) y la cancha (CASI) y se PUBLICA (pedido explicito).
-// Los nombres que ya tenian ficha de la semifinal se escriben igual para no partir al jugador en dos: "Gutierrez
-// Taboada, Gonzalo" (la placa dice "G. Taboada") y "Marolda, Santiago" (revisar contra la placa, ver DRY_RUN).
+// Los nombres que ya tenian ficha de la semifinal se escriben igual para no partir al jugador en dos: 
+// Taboada, Gonzalo" (la placa dice "G. Taboada") y "Marolda Santiago" (revisar contra la placa, ver DRY_RUN).
 // Idempotente; solo "programado".
 // Correr con: npx tsx src/scripts/migrate-primera-final-formacion.ts   (DRY_RUN=1 para solo mirar)
 
@@ -24,11 +24,11 @@ const TITULARES: { nombre: string; capitan?: boolean }[] = [
   { nombre: "Cardinal Paul" },
   { nombre: "Diaz de Vivar Rodrigo" },
   { nombre: "Marguery Lucas" },
-  { nombre: "Gutierrez Taboada Gonzalo" },
+  { nombre: "Gutierrez Taboada, Gonzalo" },
   { nombre: "Ulloa Jeronimo" },
   { nombre: "Lanfranco Benjamin" },
   { nombre: "Prince Simón" },
-  { nombre: "Marolda, Santiago" },
+  { nombre: "Marolda Santiago" },
   { nombre: "Daireaux, Juan Bautista" },
 ];
 
