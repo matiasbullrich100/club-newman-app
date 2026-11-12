@@ -28,7 +28,6 @@ export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }
         textOverflow: "ellipsis",
       }}
     >
-      {campeon && "🏆 "}
       {f ? f.club : "Por definir"}
     </span>
   );
@@ -40,10 +39,15 @@ export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }
         URBA · Torneo 2026 · Final
       </div>
       <div style={{ display: "grid", gap: 6, marginTop: 12 }}>
-        {filas.map((f) => (
+        {filas.map((f) => {
+          // Si el campeon de la final es Newman, el cartel CAMPEON va a la derecha, afuera del recuadro verde.
+          const campeonNewman = f.resultado ? f.finalistas[f.resultado.campeon]?.propio === true : false;
+          return (
+          <div key={f.categoriaId} style={{ display: "flex", alignItems: "stretch", gap: 6 }}>
           <div
-            key={f.categoriaId}
             style={{
+              flex: 1,
+              minWidth: 0,
               display: "grid",
               gridTemplateColumns: "74px 1fr",
               gap: 8,
@@ -79,7 +83,32 @@ export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }
               {chip(f.finalistas[1], f.resultado?.campeon === 1)}
             </div>
           </div>
-        ))}
+          {campeonNewman && (
+            <div
+              style={{
+                flex: "0 0 auto",
+                display: "grid",
+                alignContent: "center",
+                justifyItems: "center",
+                gap: 1,
+                padding: "0 7px",
+                borderRadius: 8,
+                background: "#f5a800",
+                color: "#2a1b02",
+                boxShadow: "0 0 10px rgba(245,168,0,.55)",
+                fontWeight: 900,
+                fontSize: "0.62rem",
+                letterSpacing: 0.6,
+                textTransform: "uppercase",
+              }}
+            >
+              <span aria-hidden style={{ fontSize: "1.05rem", lineHeight: 1 }}>🏆</span>
+              Campeón
+            </div>
+          )}
+          </div>
+          );
+        })}
       </div>
       <div style={{ textAlign: "center", marginTop: 10, fontSize: "0.68rem", opacity: 0.75 }}>
         Se completa solo con los resultados de las semifinales de URBA.

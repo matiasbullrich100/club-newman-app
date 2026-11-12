@@ -87,7 +87,7 @@ export default async function Home() {
       {/* Partido en curso (o recien terminado): marcador y reloj en vivo, con la formacion debajo. */}
       <div style={{ marginTop: 16 }}>
         <SemifinalesEnCurso semis={semisEnCurso} />
-        <ProgramaSemifinales semis={semis} />
+        <ProgramaSemifinales semis={semis} sinBotones />
       </div>
 
       <InstalarApp />

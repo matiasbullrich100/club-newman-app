@@ -31,7 +31,8 @@ function diaLargo(iso: string): string {
 // Programa de semifinales en orden cronologico: un bloque por DIA Y SEDE ("Viernes 23/10 · en Hindú", "Viernes
 // 23/10 · en CUBA", "Sábado 24/10 · en CUBA") y adentro cada partido por hora, con los mismos botones de siempre
 // (Tabla / Cruces / Fixt. Newm.) para ver como nos fue contra esos equipos. Lo muestran /superior y /playoff.
-export default function ProgramaSemifinales({ semis }: { semis: SemifinalProgramada[] }) {
+// sinBotones: filas mas bajas (sin Tabla / Cruces / Fixt. Newm.), para el inicio, donde importa que entren mas partidos por pantalla.
+export default function ProgramaSemifinales({ semis, sinBotones = false }: { semis: SemifinalProgramada[]; sinBotones?: boolean }) {
   if (semis.length === 0) return null;
 
   const grupos = new Map<string, SemifinalProgramada[]>();
@@ -63,9 +64,9 @@ export default function ProgramaSemifinales({ semis }: { semis: SemifinalProgram
                 categoriaNombre={s.categoriaNombre}
                 proxima={s.proxima}
                 sinSede
-                crucesHref={tieneFixtureDivision(s.categoriaId) ? `/fixture/${s.categoriaId}/cruces` : undefined}
-                posicionesHref={TORNEOS_URBA[s.categoriaId] !== undefined ? `/posiciones/${s.categoriaId}` : undefined}
-                fixtureHref={`/categoria/${s.categoriaId}/fixture`}
+                crucesHref={!sinBotones && tieneFixtureDivision(s.categoriaId) ? `/fixture/${s.categoriaId}/cruces` : undefined}
+                posicionesHref={!sinBotones && TORNEOS_URBA[s.categoriaId] !== undefined ? `/posiciones/${s.categoriaId}` : undefined}
+                fixtureHref={sinBotones ? undefined : `/categoria/${s.categoriaId}/fixture`}
               />
               {s.formacion && <PanelFormacion cancha={s.proxima.cancha} numeroCancha={s.proxima.numeroCancha} hora={s.proxima.hora} formacion={s.formacion} />}
               </div>
