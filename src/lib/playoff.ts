@@ -16,18 +16,21 @@ export interface PlayoffCategoria {
   sedeFinal?: string;
   /** Hora de la final ("HH:MM"); ausente = todavia sin informar. */
   horaFinal?: string;
+  /** Cancha puntual de la final dentro de la sede ("2" -> "CUBA 2"). */
+  canchaFinal?: string;
 }
 
 // Programa oficial de semifinales de URBA (Intermedia, Pre A-F y M22: viernes 23 y sabado 24/10/2026 en CUBA Villa de
 // Mayo, M22 en Hindu). Las dos semifinales de una categoria juegan a la misma hora salvo M22. Primera: fechas de la
 // prensa de URBA (vie 30 y sab 31/10, cancha de CASI), horario todavia sin informar.
-const cuba = (fecha: string, hora: string, horaFinal?: string): PlayoffCategoria => ({
+const cuba = (fecha: string, hora: string, horaFinal: string, canchaFinal: string): PlayoffCategoria => ({
   semis: [
     { fecha, hora, cruce: [1, 4] },
     { fecha, hora, cruce: [2, 3] },
   ],
   final: "2026-11-14",
-  ...(horaFinal ? { horaFinal } : {}),
+  horaFinal,
+  canchaFinal,
   sede: "CUBA (Villa de Mayo)",
 });
 
@@ -43,20 +46,24 @@ export const PLAYOFF: Record<string, PlayoffCategoria> = {
     horaFinal: "17:10",
     sedeFinal: "CASI",
   },
-  intermedia: cuba("2026-10-24", "18:00", "16:00"),
-  "pre-a": cuba("2026-10-24", "16:00", "14:00"),
-  "pre-b": cuba("2026-10-24", "14:00", "12:00"),
-  "pre-c": cuba("2026-10-24", "12:00", "10:00"),
-  "pre-d": cuba("2026-10-24", "10:00"),
-  "pre-e": cuba("2026-10-23", "21:00", "12:00"),
-  "pre-f": cuba("2026-10-23", "19:00", "10:00"),
-  // M-22: en Hindu; SIC vs Buenos Aires 21:00 y Newman vs Hindu 19:00. Final todavia sin fecha.
+  intermedia: cuba("2026-10-24", "18:00", "16:00", "1"),
+  "pre-a": cuba("2026-10-24", "16:00", "14:00", "2"),
+  "pre-b": cuba("2026-10-24", "14:00", "14:00", "3"),
+  "pre-c": cuba("2026-10-24", "12:00", "12:00", "3"),
+  "pre-d": cuba("2026-10-24", "10:00", "10:00", "2"),
+  "pre-e": cuba("2026-10-23", "21:00", "12:00", "1"),
+  "pre-f": cuba("2026-10-23", "19:00", "10:00", "3"),
+  // M-22: semifinales en Hindu (SIC vs Buenos Aires 21:00 y Newman vs Hindu 19:00); la final, en CUBA (afiche de las finales).
   "m-22": {
     semis: [
       { fecha: "2026-10-23", hora: "21:00", cruce: [1, 4] },
       { fecha: "2026-10-23", hora: "19:00", cruce: [2, 3] },
     ],
     sede: "Hindú",
+    final: "2026-11-14",
+    sedeFinal: "CUBA (Villa de Mayo)",
+    horaFinal: "12:00",
+    canchaFinal: "2",
   },
 };
 

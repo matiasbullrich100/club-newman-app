@@ -68,6 +68,7 @@ export interface FilaFinalistas {
   finalistas: [Finalista | null, Finalista | null]; // null = todavia por definir
   fechaFinal?: string; // ISO yyyy-mm-dd
   horaFinal?: string; // "HH:MM"
+  cancha?: string; // cancha puntual dentro de la sede ("2")
   sede?: string; // "CUBA"
   /** La final ya se jugo: goles de cada finalista (mismo orden que `finalistas`) y cual gano (0 o 1). */
   resultado?: { goles: [number, number]; campeon: 0 | 1 };
@@ -225,6 +226,7 @@ export async function finalistasPlayoff(): Promise<FilaFinalistas[]> {
       finalistas: finalistasDe(doc),
       fechaFinal: cfg?.final,
       horaFinal: cfg?.horaFinal,
+      cancha: cfg?.canchaFinal,
       ...(jugada ? { resultado: { goles: [f!.golesLocal, f!.golesVisitante] as [number, number], campeon: (f!.golesLocal > f!.golesVisitante ? 0 : 1) as 0 | 1 } } : {}),
       sede: (cfg?.sedeFinal ?? cfg?.sede)?.replace(/ \(.*\)$/, "").replace(/^Cancha de /, "") || undefined,
     };

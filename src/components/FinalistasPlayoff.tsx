@@ -64,7 +64,7 @@ export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }
                 <span style={{ fontSize: "0.64rem", letterSpacing: 0.3, opacity: 0.95 }}>{f.horaFinal} hs</span>
               )}
               {f.fechaFinal && f.sede && (
-                <span style={{ fontSize: "0.64rem", textTransform: "uppercase", letterSpacing: 0.3, opacity: 0.8 }}>{f.sede}</span>
+                <span style={{ fontSize: "0.64rem", textTransform: "uppercase", letterSpacing: 0.3, opacity: 0.8 }}>{f.cancha ? `${f.sede} ${f.cancha}` : f.sede}</span>
               )}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
