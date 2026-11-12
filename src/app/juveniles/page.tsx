@@ -80,7 +80,7 @@ export default async function JuvenilesPage() {
           color: "#2a1b02",
         }}
       >
-        Posiciones 2ª fase
+        Resultados finales
       </Link>
 
       {equiposOrdenados

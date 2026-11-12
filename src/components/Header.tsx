@@ -175,22 +175,6 @@ export default function Header({
         </div>
       </div>
 
-      {tituloHome && (
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            fontWeight: 700,
-            fontSize: "1.35rem",
-            letterSpacing: 1.5,
-            textTransform: "uppercase",
-            color: DORADO,
-            marginTop: 14,
-          }}
-        >
-          Club Newman
-        </div>
-      )}
     </div>
   );
 }

@@ -47,6 +47,28 @@ export default async function Home() {
 
       {/* Primera gano la final: el inicio abre festejando (ver campeonPrimera, dura unos dias). */}
       {campeon && <BicampeonHero campeon={campeon} />}
+      {/* Pastilla del mismo ancho que el cartel: como quedo cada categoria de Juveniles al cierre de la 2da fase. */}
+      {campeon && (
+        <Link
+          href="/posiciones-juveniles"
+          style={{
+            display: "block",
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+            fontSize: "0.85rem",
+            fontWeight: 800,
+            padding: "11px 12px",
+            marginBottom: 6,
+            borderRadius: 10,
+            background: "rgba(245,196,40,.95)",
+            border: "1px solid rgba(245,196,40,1)",
+            color: "#2a1b02",
+          }}
+        >
+          Juveniles · Resultados finales
+        </Link>
+      )}
 
       {/* Tres pastillas arriba (Plantel Superior / Juveniles / Playoff), y enseguida el programa de semifinales: el
           partido de HOY con formacion publicada muestra la formacion directo. */}

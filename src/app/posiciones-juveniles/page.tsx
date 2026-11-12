@@ -24,9 +24,9 @@ export default async function PosicionesJuvenilesPage() {
       <SessionBar session={session} />
       <Header rightLabel="Juveniles" logo="urba" rightLabelShift={14} />
 
-      <div style={{ marginTop: 14, textAlign: "center", fontWeight: 800, color: DORADO, fontSize: "1.25rem", lineHeight: 1.2 }}>Posiciones · 2ª fase</div>
+      <div style={{ marginTop: 14, textAlign: "center", fontWeight: 800, color: DORADO, fontSize: "1.25rem", lineHeight: 1.2 }}>Resultados finales</div>
       <div style={{ textAlign: "center", marginTop: 4, fontSize: "0.68rem", letterSpacing: 1, textTransform: "uppercase", color: DORADO_SUAVE }}>
-        URBA · Juveniles 2026
+        Juveniles · 2ª fase · URBA 2026
       </div>
 
       {filas.length === 0 ? (
