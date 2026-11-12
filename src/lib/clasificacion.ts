@@ -38,11 +38,12 @@ function cruceDirecto(a: string, b: string, partidos: PartidoDivision[]): CruceD
 /**
  * Desempate por los partidos entre dos equipos igualados en puntos: gana el que sumo mas puntos de
  * tabla en esos dos partidos y, si empatan, el de mayor diferencia de tantos. Solo vale cuando los
- * dos partidos ya se jugaron; si falta alguno o siguen igualados, no hay desempate (false).
+ * dos partidos ya se jugaron; si falta alguno o siguen igualados, no hay desempate (false). `minimoCruces`: cuantos
+ * partidos entre los dos hacen falta (2 en la doble rueda de Plantel Superior; 1 en Juveniles, de una sola rueda).
  */
-export function ganaDesempateDirecto(a: string, b: string, partidos: PartidoDivision[]): boolean {
+export function ganaDesempateDirecto(a: string, b: string, partidos: PartidoDivision[], minimoCruces = 2): boolean {
   const c = cruceDirecto(a, b, partidos);
-  if (c.jugados < 2) return false;
+  if (c.jugados < minimoCruces) return false;
   if (c.puntosA !== c.puntosB) return c.puntosA > c.puntosB;
   return c.difA > c.difB;
 }
@@ -68,13 +69,13 @@ export function ganaDesempateDirecto(a: string, b: string, partidos: PartidoDivi
 // reves). El reglamento desempata primero por los partidos entre los igualados (ver ganaDesempateDirecto), asi
 // que para el playoff se reordenan los pares igualados en puntos segun ese criterio. Devuelve filas NUEVAS ya
 // renumeradas (posicion = lugar). Sin partidos, deja la tabla como esta.
-export function reordenarPorDesempateDirecto(filas: FilaPosicion[], partidos?: PartidoDivision[]): FilaPosicion[] {
+export function reordenarPorDesempateDirecto(filas: FilaPosicion[], partidos?: PartidoDivision[], minimoCruces = 2): FilaPosicion[] {
   const orden = [...filas].sort((a, b) => a.posicion - b.posicion);
   if (partidos) {
     for (let pasada = 0; pasada < orden.length; pasada++) {
       let hubo = false;
       for (let i = 0; i < orden.length - 1; i++) {
-        if (orden[i].puntos === orden[i + 1].puntos && ganaDesempateDirecto(orden[i + 1].equipo, orden[i].equipo, partidos)) {
+        if (orden[i].puntos === orden[i + 1].puntos && ganaDesempateDirecto(orden[i + 1].equipo, orden[i].equipo, partidos, minimoCruces)) {
           [orden[i], orden[i + 1]] = [orden[i + 1], orden[i]];
           hubo = true;
         }
