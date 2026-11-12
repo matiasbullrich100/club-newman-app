@@ -6,6 +6,8 @@ import Buscador from "@/components/Buscador";
 import InstalarApp from "@/components/InstalarApp";
 import ProgramaSemifinales from "@/components/ProgramaSemifinales";
 import SemifinalesEnCurso from "@/components/SemifinalesEnCurso";
+import BicampeonHero from "@/components/BicampeonHero";
+import { campeonPrimera } from "@/lib/campeonPrimera";
 import { semifinalesEnCursoOTerminadas, semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
@@ -30,7 +32,7 @@ const botonChico: React.CSSProperties = { ...botonStyle, fontSize: "0.52rem", le
 export default async function Home() {
   const session = await getSession();
   // Semifinales de la semana (por dia y sede); el partido de HOY con formacion publicada muestra la formacion directo.
-  const [semis, semisEnCurso] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas()]);
+  const [semis, semisEnCurso, campeon] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas(), campeonPrimera()]);
   // El boton "Formaciones" (pantalla /formaciones para cargar/publicar) lo ven el Administrador
   // (sin alcance) y cualquier Manager de division.
   const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
@@ -42,6 +44,9 @@ export default async function Home() {
       <Buscador flotante />
       <Header tituloHome />
       <SessionBar session={session} />
+
+      {/* Primera gano la final: el inicio abre festejando (ver campeonPrimera, dura unos dias). */}
+      {campeon && <BicampeonHero campeon={campeon} />}
 
       {/* Tres pastillas arriba (Plantel Superior / Juveniles / Playoff), y enseguida el programa de semifinales: el
           partido de HOY con formacion publicada muestra la formacion directo. */}

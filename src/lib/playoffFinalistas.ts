@@ -67,7 +67,10 @@ export interface FilaFinalistas {
   categoria: string; // "Pre A"...
   finalistas: [Finalista | null, Finalista | null]; // null = todavia por definir
   fechaFinal?: string; // ISO yyyy-mm-dd
+  horaFinal?: string; // "HH:MM"
   sede?: string; // "CUBA"
+  /** La final ya se jugo: goles de cada finalista (mismo orden que `finalistas`) y cual gano (0 o 1). */
+  resultado?: { goles: [number, number]; campeon: 0 | 1 };
 }
 
 // "SIC B" -> "SIC", "Hindu" -> "Hindú", "Buenos Aires C&RC" -> "BACRC".
@@ -214,11 +217,15 @@ export async function finalistasPlayoff(): Promise<FilaFinalistas[]> {
   return categorias.map((cat) => {
     const doc = docs.get(cat.id);
     const cfg = PLAYOFF[cat.id];
+    const f = doc?.final;
+    const jugada = !!f?.jugado && f.golesLocal !== f.golesVisitante;
     return {
       categoriaId: cat.id,
       categoria: cat.nombre,
       finalistas: finalistasDe(doc),
       fechaFinal: cfg?.final,
+      horaFinal: cfg?.horaFinal,
+      ...(jugada ? { resultado: { goles: [f!.golesLocal, f!.golesVisitante] as [number, number], campeon: (f!.golesLocal > f!.golesVisitante ? 0 : 1) as 0 | 1 } } : {}),
       sede: (cfg?.sedeFinal ?? cfg?.sede)?.replace(/ \(.*\)$/, "").replace(/^Cancha de /, "") || undefined,
     };
   });

@@ -7,12 +7,13 @@ import type { Finalista, FilaFinalistas } from "@/lib/playoffFinalistas";
 // "Por definir" y se completa solo cuando URBA carga el resultado (ver src/lib/playoffFinalistas.ts). El equipo
 // de Newman va en amarillo, igual que en la tabla de clasificados.
 export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }) {
-  const chip = (f: Finalista | null) => (
+  const chip = (f: Finalista | null, campeon = false) => (
     <span
       style={{
         flex: 1,
         minWidth: 0,
         background: f ? (f.propio ? "#f5a800" : "rgba(0,0,0,.2)") : "transparent",
+        ...(campeon ? { boxShadow: "0 0 0 2px #fff3c4" } : {}),
         border: f ? "none" : "1px dashed rgba(255,255,255,.4)",
         color: f?.propio ? "#2a1b02" : "inherit",
         fontWeight: f?.propio ? 800 : 500,
@@ -27,6 +28,7 @@ export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }
         textOverflow: "ellipsis",
       }}
     >
+      {campeon && "🏆 "}
       {f ? f.club : "Por definir"}
     </span>
   );
@@ -58,14 +60,23 @@ export default function FinalistasPlayoff({ filas }: { filas: FilaFinalistas[] }
                   {fechaCorta(f.fechaFinal)}
                 </span>
               )}
+              {f.fechaFinal && f.horaFinal && (
+                <span style={{ fontSize: "0.64rem", letterSpacing: 0.3, opacity: 0.95 }}>{f.horaFinal} hs</span>
+              )}
               {f.fechaFinal && f.sede && (
                 <span style={{ fontSize: "0.64rem", textTransform: "uppercase", letterSpacing: 0.3, opacity: 0.8 }}>{f.sede}</span>
               )}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              {chip(f.finalistas[0])}
-              <span style={{ fontSize: "0.6rem", opacity: 0.75, textTransform: "uppercase" }}>vs</span>
-              {chip(f.finalistas[1])}
+              {chip(f.finalistas[0], f.resultado?.campeon === 0)}
+              {f.resultado ? (
+                <span style={{ fontSize: "0.72rem", fontWeight: 800, whiteSpace: "nowrap" }}>
+                  {f.resultado.goles[0]} - {f.resultado.goles[1]}
+                </span>
+              ) : (
+                <span style={{ fontSize: "0.6rem", opacity: 0.75, textTransform: "uppercase" }}>vs</span>
+              )}
+              {chip(f.finalistas[1], f.resultado?.campeon === 1)}
             </div>
           </div>
         ))}
