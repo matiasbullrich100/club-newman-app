@@ -47,7 +47,17 @@ export default async function Home() {
 
       {/* Primera gano la final: el inicio abre festejando (ver campeonPrimera, dura unos dias). */}
       {campeon && <BicampeonHero campeon={campeon} />}
-      {/* Pastilla del mismo ancho que el cartel: como quedo cada categoria de Juveniles al cierre de la 2da fase. */}
+      {/* Primero el programa de las Finales (o el partido en curso / recien terminado, con marcador y reloj en vivo y la
+          formacion debajo): el partido de HOY con formacion publicada muestra la formacion directo. */}
+      {(semisEnCurso.length > 0 || semis.length > 0) && (
+        <div style={{ marginTop: 16 }}>
+          <SemifinalesEnCurso semis={semisEnCurso} />
+          <ProgramaSemifinales semis={semis} sinBotones />
+        </div>
+      )}
+
+      {/* Debajo de las Finales: la pastilla del mismo ancho que el cartel (como quedo cada categoria de Juveniles al
+          cierre de la 2da fase) y las tres pastillas (Plantel Superior / Juveniles / Playoff). */}
       {campeon && (
         <Link
           href="/posiciones-juveniles"
@@ -70,8 +80,6 @@ export default async function Home() {
         </Link>
       )}
 
-      {/* Tres pastillas arriba (Plantel Superior / Juveniles / Playoff), y enseguida el programa de semifinales: el
-          partido de HOY con formacion publicada muestra la formacion directo. */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginTop: 12 }}>
         <Link href="/superior" style={botonChico}>
           Plantel Superior
@@ -82,12 +90,6 @@ export default async function Home() {
         <Link href="/playoff" style={{ ...botonChico, background: "rgba(245,196,40,.95)", borderColor: "rgba(245,196,40,1)", color: "#2a1b02" }}>
           Playoff
         </Link>
-      </div>
-
-      {/* Partido en curso (o recien terminado): marcador y reloj en vivo, con la formacion debajo. */}
-      <div style={{ marginTop: 16 }}>
-        <SemifinalesEnCurso semis={semisEnCurso} />
-        <ProgramaSemifinales semis={semis} sinBotones />
       </div>
 
       <InstalarApp />
