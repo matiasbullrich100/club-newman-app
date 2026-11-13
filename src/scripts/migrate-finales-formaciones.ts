@@ -128,7 +128,7 @@ const EQUIPOS: EquipoFormacion[] = [
       ["20", "Gibelli, Cruz"],
       ["21", "Tapia Valentín"],
       ["22", "Daireaux, Marcos"],
-      ["25", "Aramburu Bautista"],
+      // 25 Aramburu Bautista: la planilla lo trae tambien aca, pero el club pidio que sea suplente SOLO de Pre E
       // 27 Lopez Saubidet Martín, 28 Renati Mateo, 29 Heidkamp Felipe, 30 Skinner Gonzalo: celestes (reservas), no se cargan
     ],
   },
