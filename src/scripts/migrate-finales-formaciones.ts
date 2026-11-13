@@ -3,8 +3,8 @@
 // Pre F vs Los Tilos / Pre A vs Hindu"). Se cargan como BORRADOR (formacionPublicada: false): el club las publica.
 // Reglas de esta carga:
 //  - Los jugadores en CELESTE al pie de cada lista son las "reservas": no se cargan (pedido explicito, por ahora).
-//  - Suplentes con el dorsal de la planilla (hay saltos). Pre A va solo con titulares (regla fija: Primera, Inter y
-//    Pre A no llevan suplentes, aunque la planilla los traiga).
+//  - Suplentes con el dorsal de la planilla (hay saltos). Pre A: la regla fija es solo titulares (Primera, Inter y Pre A
+//    no llevan suplentes), pero para esta final el club pidio cargarlos.
 //  - "Muñoz Tomás x" -> sin la "x". "Sluzewski Monto, Santiago" -> "Sluzewski, Santiago" (el club lo corrigio: es
 //    solo Santiago Sluzewski; el nombre viejo de la planilla ya no existe en la base).
 //  - "Gassibayle Ramón" (planilla) -> "Gassiebayle Ramón" (como esta guardado, 32 partidos): una sola ficha.
@@ -39,7 +39,7 @@ interface EquipoFormacion {
 
 const EQUIPOS: EquipoFormacion[] = [
   {
-    categoriaId: "pre-a", // vs Hindu, 14:00 -- solo titulares
+    categoriaId: "pre-a", // vs Hindu, 14:00 -- suplentes agregados a pedido (normalmente Pre A va solo con titulares)
     hora: "14:00",
     titulares: [
       "Wright James",
@@ -58,7 +58,17 @@ const EQUIPOS: EquipoFormacion[] = [
       "Pereyra, Cruz",
       "Gutierrez Taboada Santiago",
     ],
-    suplentes: [],
+    suplentes: [
+      ["16", "Shaw, Marcos"],
+      ["17", "Granato, Belisario"],
+      ["18", "Walker Bautista"],
+      ["19", "Shaw Francisco"],
+      ["20", "Demarchi Valentín"],
+      ["21", "Bullrich, Simón"],
+      ["22", "Benedit, Juan"],
+      ["23", "Mc Grech, Juan"],
+      // 25 en adelante (De Elizalde, Iribarne, Ibarguren, Uranga Tomas, Dacunto, Vallis, Silva, Monpelat): celestes (reservas), no se cargan
+    ],
   },
   {
     categoriaId: "pre-e", // vs SIC, 12:00
@@ -136,6 +146,8 @@ function distancia(a: string, b: string): number {
 async function main() {
   config({ path: resolve(__dirname, "../../.env.local") });
   const dryRun = process.env.DRY_RUN === "1";
+  // SOLO=pre-a (o pre-a,pre-e): limita la corrida a esas categorias, para no tocar las demas.
+  const solo = process.env.SOLO?.split(",").map((x) => x.trim()).filter(Boolean);
   const { adminDb } = await import("../lib/firebase-admin");
 
   // Nombres ya guardados: id -> nombre exacto (jugadores/ primero, despues el plantel de estas 3 categorias).
@@ -165,12 +177,13 @@ async function main() {
   const parecidos: string[] = [];
 
   for (const eq of EQUIPOS) {
+    if (solo && !solo.includes(eq.categoriaId)) continue;
     if (eq.titulares.length !== 15) throw new Error(`${eq.categoriaId}: ${eq.titulares.length} titulares`);
     const pid = partidoId(eq.categoriaId, NUMERO_FECHA);
     const partidoRef = adminDb.collection("partidos").doc(pid);
     const snap = await partidoRef.get();
     if (!snap.exists) throw new Error(`${pid} no existe`);
-    const d = snap.data() as { estado?: string; fase?: string; rival?: string; fecha?: string; hora?: string; esLocal?: boolean; cancha?: string };
+    const d = snap.data() as { estado?: string; formacionPublicada?: boolean; fase?: string; rival?: string; fecha?: string; hora?: string; esLocal?: boolean; cancha?: string };
     if (d.fase !== "final") throw new Error(`${pid}: no es una final`);
     if (d.estado !== "programado") {
       console.warn(`SALTEADO ${pid}: estado "${d.estado}"`);
@@ -208,7 +221,7 @@ async function main() {
     if (dryRun) continue;
     for (const x of aBorrar) batch.delete(x.ref);
     for (const j of jugadores) batch.set(partidoRef.collection("plantel").doc(playerId(j.nombre)), j);
-    batch.update(partidoRef, { formacionPublicada: false, enCanchaIds: titularesIds, formacionActualizadaEn: new Date(), updatedAt: new Date() });
+    batch.update(partidoRef, { formacionPublicada: d.formacionPublicada === true, enCanchaIds: titularesIds, formacionActualizadaEn: new Date(), updatedAt: new Date() });
   }
 
   console.log(nuevos.length ? "\nJugadores NUEVOS (revisar nombre):\n  " + nuevos.join("\n  ") : "\nSin jugadores nuevos.");
