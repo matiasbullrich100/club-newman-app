@@ -81,6 +81,27 @@ export default async function Home() {
           Juveniles · Resultados finales
         </Link>
       )}
+      {festejo && (
+        <Link
+          href="/campeones"
+          style={{
+            display: "block",
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+            fontSize: "0.85rem",
+            fontWeight: 800,
+            padding: "11px 12px",
+            marginBottom: 6,
+            borderRadius: 10,
+            background: "rgba(245,196,40,.95)",
+            border: "1px solid rgba(245,196,40,1)",
+            color: "#2a1b02",
+          }}
+        >
+          Campeones 2026 · Todos los títulos
+        </Link>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5, marginTop: 12 }}>
         <Link href="/superior" style={botonChico}>
