@@ -46,6 +46,7 @@ export default async function CampeonesPage() {
   const session = await getSession();
   const campeones = await campeonesTemporada();
   const clubes = titulosPorClub(campeones);
+  const clubesSuperior = titulosPorClub(campeones, "superior");
   const superior = campeones.filter((c) => c.grupo === "superior");
   const porEdad = ORDEN_EDAD.map((id) => ({ id, categorias: campeones.filter((c) => c.edadId === id) })).filter((g) => g.categorias.length > 0);
   const sinDefinir = campeones.filter((c) => !c.campeon).length;
@@ -75,6 +76,23 @@ export default async function CampeonesPage() {
                   <span style={{ fontSize: "0.66rem", opacity: 0.8, whiteSpace: "nowrap" }}>
                     Plantel {c.superior} · Juveniles {c.juveniles}
                   </span>
+                  <span style={{ fontWeight: 900, fontSize: "1.05rem", minWidth: 46, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                    <span aria-hidden>🏆 </span>
+                    {c.total}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            {titulo("Campeonatos por club · Plantel Superior")}
+            <div style={{ display: "grid", gap: 5 }}>
+              {clubesSuperior.map((c, i) => (
+                <div key={c.club} style={{ ...fila, gridTemplateColumns: "22px 1fr auto auto", ...estilo(c.club === "Newman") }}>
+                  <span style={{ fontSize: "0.72rem", opacity: 0.7 }}>{i + 1}</span>
+                  <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>{c.club}</span>
+                  <span style={{ fontSize: "0.66rem", opacity: 0.8, textAlign: "right" }}>{c.categorias.join(" · ")}</span>
                   <span style={{ fontWeight: 900, fontSize: "1.05rem", minWidth: 46, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
                     <span aria-hidden>🏆 </span>
                     {c.total}

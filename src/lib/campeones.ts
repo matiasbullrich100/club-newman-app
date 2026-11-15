@@ -31,6 +31,7 @@ export interface TitulosClub {
   superior: number;
   juveniles: number;
   total: number;
+  categorias: string[]; // las que gano ("Primera", "Pre E"...), en el orden de la tabla
 }
 
 // Maximo que suma un equipo por partido en Juveniles: victoria 4 + bonus ofensivo 1.
@@ -107,14 +108,16 @@ export async function campeonesTemporada(): Promise<CampeonCategoria[]> {
   return [...superior, ...juveniles];
 }
 
-// Titulos por club, de mas a menos (a igualdad, primero el que mas gano en Plantel Superior y despues por nombre).
-export function titulosPorClub(campeones: CampeonCategoria[]): TitulosClub[] {
+// Titulos por club, de mas a menos (a igualdad, primero el que mas gano en Plantel Superior y despues por nombre). Con
+// `grupo` cuenta solo ese grupo (ej. "superior" para la tabla de Plantel Superior).
+export function titulosPorClub(campeones: CampeonCategoria[], grupo?: CampeonCategoria["grupo"]): TitulosClub[] {
   const porClub = new Map<string, TitulosClub>();
   for (const c of campeones) {
-    if (!c.campeon) continue;
-    const fila = porClub.get(c.campeon) ?? { club: c.campeon, superior: 0, juveniles: 0, total: 0 };
+    if (!c.campeon || (grupo && c.grupo !== grupo)) continue;
+    const fila = porClub.get(c.campeon) ?? { club: c.campeon, superior: 0, juveniles: 0, total: 0, categorias: [] };
     fila[c.grupo] += 1;
     fila.total += 1;
+    fila.categorias.push(c.categoria);
     porClub.set(c.campeon, fila);
   }
   return [...porClub.values()].sort((a, b) => b.total - a.total || b.superior - a.superior || a.club.localeCompare(b.club));
