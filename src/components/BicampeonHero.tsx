@@ -1,13 +1,14 @@
 import { fechaCorta } from "@/lib/playoff";
-import type { CampeonPrimera } from "@/lib/campeonPrimera";
+import type { CampeonPrimera, TituloPlantel } from "@/lib/campeonPrimera";
 import { BORDO, BORDO_OSC, CREMA, DORADO, DORADO_CLARO } from "@/lib/colors";
 
 const CONFETI = [DORADO, CREMA, DORADO_CLARO, "#b9425f"];
 
 // Cartel de festejo con el que abre el inicio cuando Primera gana la final: dos estrellas (los dos titulos), el
-// NEWMAN BICAMPEON con brillo dorado, el resultado de la final y papelitos cayendo. Todo es CSS (sin JS); con
-// "reducir movimiento" quedan solo el cartel y el texto, quietos.
-export default function BicampeonHero({ campeon }: { campeon: CampeonPrimera }) {
+// NEWMAN BICAMPEON con brillo dorado, el resultado de la final y papelitos cayendo. Debajo, los campeonatos y
+// subcampeonatos de las demas divisiones de Plantel Superior (`titulos`). Todo es CSS (sin JS); con "reducir
+// movimiento" quedan solo el cartel y el texto, quietos.
+export default function BicampeonHero({ campeon, titulos = [] }: { campeon: CampeonPrimera; titulos?: TituloPlantel[] }) {
   const { newman, rival, rivalNombre, fecha, sede } = campeon;
   return (
     <section
@@ -73,6 +74,29 @@ export default function BicampeonHero({ campeon }: { campeon: CampeonPrimera }) 
         {fechaCorta(fecha)}
         {sede ? ` · ${sede}` : ""} · <span style={{ color: DORADO, fontWeight: 800, opacity: 1 }}>¡Dale Bordó!</span>
       </div>
+
+      {/* Las otras divisiones: campeonatos primero, despues subcampeonatos (ya vienen ordenados). */}
+      {titulos.length > 0 && (
+        <div style={{ marginTop: 9, paddingTop: 7, borderTop: "1px solid rgba(245,168,0,.35)", display: "grid", gap: 4 }}>
+          {titulos.map((t) => (
+            <div key={t.categoria} style={{ display: "grid", gridTemplateColumns: "20px 44px 1fr auto", alignItems: "baseline", gap: 6, textAlign: "left" }}>
+              <span aria-hidden style={{ fontSize: "0.85rem", lineHeight: 1 }}>
+                {t.campeon ? "🏆" : "🥈"}
+              </span>
+              <span style={{ fontSize: "0.72rem", fontWeight: 900, letterSpacing: 0.5, textTransform: "uppercase", color: t.campeon ? DORADO_CLARO : CREMA }}>{t.categoria}</span>
+              <span style={{ fontSize: "0.62rem", fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", color: t.campeon ? DORADO : CREMA, opacity: t.campeon ? 1 : 0.85 }}>
+                {t.campeon ? "Campeón" : "Subcampeón"}
+              </span>
+              <span style={{ fontSize: "0.7rem", color: CREMA, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+                <b>
+                  {t.newman} - {t.rival}
+                </b>{" "}
+                {t.rivalNombre}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

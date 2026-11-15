@@ -7,7 +7,7 @@ import InstalarApp from "@/components/InstalarApp";
 import ProgramaSemifinales from "@/components/ProgramaSemifinales";
 import SemifinalesEnCurso from "@/components/SemifinalesEnCurso";
 import BicampeonHero from "@/components/BicampeonHero";
-import { campeonPrimera } from "@/lib/campeonPrimera";
+import { festejoBicampeon } from "@/lib/campeonPrimera";
 import { semifinalesEnCursoOTerminadas, semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
 import { DORADO_SUAVE } from "@/lib/colors";
@@ -32,7 +32,8 @@ const botonChico: React.CSSProperties = { ...botonStyle, fontSize: "0.52rem", le
 export default async function Home() {
   const session = await getSession();
   // Semifinales de la semana (por dia y sede); el partido de HOY con formacion publicada muestra la formacion directo.
-  const [semis, semisEnCurso, campeon] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas(), campeonPrimera()]);
+  const [semis, semisEnCurso, festejo] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas(), festejoBicampeon()]);
+  const campeon = festejo?.campeon ?? null;
   // El boton "Formaciones" (pantalla /formaciones para cargar/publicar) lo ven el Administrador
   // (sin alcance) y cualquier Manager de division.
   const puedeSuperior = session?.rol === "manager" && (!session.alcance || session.alcance === "superior");
@@ -45,8 +46,9 @@ export default async function Home() {
       <Header tituloHome />
       <SessionBar session={session} />
 
-      {/* Primera gano la final: el inicio abre festejando (ver campeonPrimera, dura unos dias). */}
-      {campeon && <BicampeonHero campeon={campeon} />}
+      {/* Primera gano la final: el inicio abre festejando (ver festejoBicampeon, dura unos dias), con los campeonatos y
+          subcampeonatos de las otras divisiones adentro. */}
+      {festejo && <BicampeonHero campeon={festejo.campeon} titulos={festejo.titulos} />}
       {/* Primero el programa de las Finales (o el partido en curso / recien terminado, con marcador y reloj en vivo y la
           formacion debajo): el partido de HOY con formacion publicada muestra la formacion directo. */}
       {(semisEnCurso.length > 0 || semis.length > 0) && (
