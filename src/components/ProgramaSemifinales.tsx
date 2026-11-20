@@ -46,9 +46,18 @@ export default function ProgramaSemifinales({ semis, sinBotones = false }: { sem
     // Dia, despues hora del primer partido; a igual hora el bloque con menos partidos va primero.
     .sort((a, b) => (a[0].proxima.fecha ?? "").localeCompare(b[0].proxima.fecha ?? "") || porHora(a[0], b[0]) || a.length - b.length);
 
+  // Si lo que se muestra es la final del Nacional de Clubes (no del campeonato de URBA), el cartel lo dice.
+  const titulo = semis.every((s) => s.proxima.fase === "final")
+    ? semis.length === 1 && semis[0].proxima.torneo
+      ? `Final ${semis[0].proxima.torneo}`
+      : semis.length > 1
+        ? "Finales"
+        : "Final"
+    : "Semifinales";
+
   return (
     <section style={{ margin: "0 0 14px" }}>
-      <h2 style={{ fontSize: "1.5rem", textAlign: "center", color: DORADO, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 8px" }}>{semis.every((s) => s.proxima.fase === "final") ? (semis.length > 1 ? "Finales" : "Final") : "Semifinales"}</h2>
+      <h2 style={{ fontSize: "1.5rem", textAlign: "center", color: DORADO, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 8px" }}>{titulo}</h2>
       {ordenados.map((g) => {
         const sede = g[0].proxima.cancha ?? "";
         return (

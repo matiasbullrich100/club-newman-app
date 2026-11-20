@@ -46,17 +46,17 @@ export default async function Home() {
       <Header tituloHome />
       <SessionBar session={session} />
 
-      {/* Primera gano la final: el inicio abre festejando (ver festejoBicampeon, dura unos dias), con los campeonatos y
-          subcampeonatos de las otras divisiones adentro. */}
-      {festejo && <BicampeonHero campeon={festejo.campeon} titulos={festejo.titulos} />}
       {/* Primero el programa de las Finales (o el partido en curso / recien terminado, con marcador y reloj en vivo y la
           formacion debajo): el partido de HOY con formacion publicada muestra la formacion directo. */}
       {(semisEnCurso.length > 0 || semis.length > 0) && (
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 16, marginBottom: 16 }}>
           <SemifinalesEnCurso semis={semisEnCurso} />
           <ProgramaSemifinales semis={semis} sinBotones />
         </div>
       )}
+      {/* Primera gano la final: el inicio festeja (ver festejoBicampeon, dura unos dias), con los campeonatos y
+          subcampeonatos de las otras divisiones adentro. Va debajo de la final del Nacional de Clubes. */}
+      {festejo && <BicampeonHero campeon={festejo.campeon} titulos={festejo.titulos} />}
 
       {/* Debajo de las Finales: la pastilla del mismo ancho que el cartel (como quedo cada categoria de Juveniles al
           cierre de la 2da fase) y las tres pastillas (Plantel Superior / Juveniles / Playoff). */}
