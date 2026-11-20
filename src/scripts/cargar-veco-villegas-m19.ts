@@ -1,7 +1,7 @@
 // Torneo Veco Villegas (M19), sabado 2026-11-21 en Tucuman: 10:00 vs Jockey Club Salta y 17:00 vs Universitario de Tucuman.
 // Newman va con una lista cerrada de 30 jugadores ("Jugadores_Newman_2026.xlsx"). Crea los dos partidos (categoria m19-a,
 // Fecha 12 y 13: fuera del fixture de URBA, no cuentan para sus tablas) y carga una formacion TENTATIVA (BORRADOR) para
-// cada uno, armada por puesto habitual y por el equipo (A/B/C/D) donde mas jugo cada uno; el Manager la cambia y publica.
+// cada uno, armada con el dorsal HISTORICO de cada uno (empezando por la A y despues el resto; si varios usaron el mismo dorsal, va el de la A) y, donde no hay historia, por puesto habitual; el Manager la cambia y publica.
 // Los 15 titulares de un partido no se repiten en el otro (los 30 juegan); los suplentes 16-23 de cada partido salen de
 // los titulares del otro. Nombres: el ya guardado en la base si el id coincide; si no, el de ALIAS / la planilla.
 // Idempotente; solo actua si el partido no existe o sigue "programado". Correr con: npx tsx src/scripts/cargar-veco-villegas-m19.ts
@@ -30,20 +30,23 @@ const ALIAS: Record<string, string> = {
   "Golletti, Sebastian José": "Golletti, Sebastian",
   "Lascombes, Facundo Juan": "Lascombes, Facundo",
   "Lynch, Bautista": "Lynch, Bautista Santiago",
+  "Anchorena, Zenón María De": "Anchorena, Zenon",
   "Von Grolman Solá, Juan Pablo": "Von Grolman, Juan Pablo",
 };
 
 // Titulares 1-15 y suplentes 16-23 (apellido, nombre de la lista).
 const PARTIDOS = [
   {
+    // Los de la A, con el dorsal que mas uso cada uno en la A (Altgelt, que en la A uso el 13, va ahi aunque en la B es el 12).
     numeroFecha: 12, hora: "10:00", rival: "Jockey Club Salta",
-    titulares: ["Bourdieu, Carlos Maria", "Lynch, Bautista", "Von Grolman Solá, Juan Pablo", "Galice Naon, Rodrigo", "Chute, Benjamin", "Goti, Enzo", "Cardoni, Beltran", "Lascombes, Facundo Juan", "Bosch, Lucas", "Lanusse, Silvestre", "Barisic, Iván", "Aberg Cobo, Juan José", "Lagos Marmol, Maximo", "Gonzalez Hughes, Marcos", "Ulloa, Ramón"],
-    suplentes: ["Parrondo, Simon", "Blaquier, Simon", "Diaz De Vivar, Joaquin", "Chiappe, Mateo", "Castro Lacroze, Benjamin", "Sola, Santiago", "Llerena, Froilan", "Belaustegui, Vicente"],
+    titulares: ["Bourdieu, Carlos Maria", "Lynch, Bautista", "Von Grolman Solá, Juan Pablo", "Galice Naon, Rodrigo", "Goti, Enzo", "Chute, Benjamin", "Cardoni, Beltran", "Lascombes, Facundo Juan", "Bosch, Lucas", "Lagos Marmol, Maximo", "Barisic, Iván", "Aberg Cobo, Juan José", "Altgelt, James", "Gonzalez Hughes, Marcos", "Lanusse, Silvestre"],
+    suplentes: ["Parrondo, Simon", "Blaquier, Simon", "Diaz De Vivar, Joaquin", "Anchorena, Zenón María De", "Bosch, Emilio", "Sola, Santiago", "Ulloa, Ramón", "Achaval Rodriguez, Felix José"],
   },
   {
+    // El resto (B, C, D) con su dorsal historico; los puestos sin historia (4 y 7) por puesto habitual.
     numeroFecha: 13, hora: "17:00", rival: "Universitario de Tucumán",
-    titulares: ["Blaquier, Simon", "Parrondo, Simon", "Diaz De Vivar, Joaquin", "Chiappe, Mateo", "Gonzalez Calderon, Isidro", "Bosch, Emilio", "Anchorena, Zenón María De", "Castro Lacroze, Benjamin", "Sola, Santiago", "Llerena, Froilan", "Achaval Rodriguez, Felix José", "Altgelt, James", "Uranga, Felipe", "Golletti, Sebastian José", "Belaustegui, Vicente"],
-    suplentes: ["Lynch, Bautista", "Bourdieu, Carlos Maria", "Von Grolman Solá, Juan Pablo", "Galice Naon, Rodrigo", "Lascombes, Facundo Juan", "Bosch, Lucas", "Lagos Marmol, Maximo", "Ulloa, Ramón"],
+    titulares: ["Blaquier, Simon", "Parrondo, Simon", "Diaz De Vivar, Joaquin", "Gonzalez Calderon, Isidro", "Anchorena, Zenón María De", "Castro Lacroze, Benjamin", "Chiappe, Mateo", "Bosch, Emilio", "Sola, Santiago", "Ulloa, Ramón", "Belaustegui, Vicente", "Llerena, Froilan", "Uranga, Felipe", "Achaval Rodriguez, Felix José", "Golletti, Sebastian José"],
+    suplentes: ["Lynch, Bautista", "Bourdieu, Carlos Maria", "Von Grolman Solá, Juan Pablo", "Galice Naon, Rodrigo", "Lascombes, Facundo Juan", "Bosch, Lucas", "Lagos Marmol, Maximo", "Lanusse, Silvestre"],
   },
 ];
 
