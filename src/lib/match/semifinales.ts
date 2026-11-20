@@ -41,7 +41,8 @@ export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgr
     const p = snap.data() as Partido;
     if (!p.fase || p.estado !== "programado" || !p.fecha || p.fecha < hoy || p.fecha > domingo) continue;
     let formacion: JugadorFormacion[] | undefined;
-    if (p.fecha === hoy && p.formacionPublicada !== false) {
+    // La final del Nacional de Clubes (torneo) muestra la formacion publicada desde que se publica, no solo el dia del partido.
+    if ((p.fecha === hoy || p.torneo) && p.formacionPublicada !== false) {
       const plantel = await snap.ref.collection("plantel").get();
       formacion = plantel.docs.map((d) => ({ jugadorId: d.id, ...(d.data() as Omit<JugadorFormacion, "jugadorId">) }));
       if (formacion.length === 0) formacion = undefined;
