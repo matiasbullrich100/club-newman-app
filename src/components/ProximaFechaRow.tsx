@@ -21,7 +21,7 @@ function textoHorarioCancha(proxima: ProximaFecha, sinSede = false): string | nu
   const libreEstaSemana = noJuegaEstaSemana(proxima);
   // Sin partido esta semana la fila dice solo "Fecha libre" (como una fecha libre del fixture): sin horario ni sede.
   if (libreEstaSemana) return null;
-  const partes = [proxima.fase === "semifinal" ? "Semifinal" : proxima.fase === "final" ? "Final" : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
+  const partes = [proxima.fase === "semifinal" ? "Semifinal" : proxima.fase === "final" ? (proxima.torneo ? `Final ${proxima.torneo}` : "Final") : null, proxima.amistoso ? `Amistoso${proxima.formato ? ` · ${proxima.formato}` : ""}` : null, proxima.hora ? `${proxima.fecha ? `${diaSemanaCorto(proxima.fecha)} ` : ""}${proxima.hora} hs` : null, sede, cancha].filter(Boolean);
   return partes.length > 0 ? partes.join(" · ") : null;
 }
 

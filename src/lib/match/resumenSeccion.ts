@@ -157,6 +157,8 @@ export interface ProximaFecha {
   formato?: string;
   // "semifinal" / "final": partido de playoff (se rotula asi).
   fase?: "semifinal" | "final";
+  // Torneo cuando no es el de URBA (ej. "Nacional de Clubes"): se aclara junto a la fase.
+  torneo?: string;
 }
 
 /**
@@ -192,6 +194,7 @@ export async function proximasFechasDe(categoriaId: string, cantidad: number): P
     amistoso: p.amistoso,
     formato: p.formato,
     fase: p.fase,
+    torneo: p.torneo,
   }));
 }
 

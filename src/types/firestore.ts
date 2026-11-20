@@ -68,6 +68,8 @@ export interface Partido {
   amistoso?: boolean;
   // Partido de playoff ("semifinal" = Fecha 27, "final" = Fecha 28): se rotula asi en vez de "Fecha #N" (ver cargar-semifinales-plantel-superior).
   fase?: "semifinal" | "final";
+  // Torneo del partido cuando NO es el campeonato de URBA (ej. "Nacional de Clubes"): se aclara junto a la fase ("Final Nacional de Clubes").
+  torneo?: string;
   // Aclaracion de formato del partido (ej. "3 tiempos de 40") -- se muestra junto a "Amistoso".
   formato?: string;
   // Solo aplica a un partido "programado" -- ausente o true = la formacion es publica (default,

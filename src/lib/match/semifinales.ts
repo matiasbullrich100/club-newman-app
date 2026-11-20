@@ -5,8 +5,9 @@ import { debeMostrarProximaFechaEnArgentina, diasDesdeEnArgentina, domingoDeEsta
 import type { Partido } from "@/types/firestore";
 import type { ProximaFecha } from "./resumenSeccion";
 
-// Fechas de playoff de Plantel Superior: 27 = semifinal, 28 = final.
-const FECHAS_PLAYOFF = [27, 28];
+// Fechas de playoff de Plantel Superior: 27 = semifinal, 28 = final. La 29 es la final del Nacional de Clubes (Primera,
+// fase "final" con torneo "Nacional de Clubes"): se muestra en el programa igual que una final del playoff.
+const FECHAS_PLAYOFF = [27, 28, 29];
 
 export interface JugadorFormacion {
   jugadorId: string;
@@ -63,6 +64,7 @@ export async function semifinalesProgramadasEstaSemana(): Promise<SemifinalProgr
         amistoso: p.amistoso,
         formato: p.formato,
         fase: p.fase,
+        torneo: p.torneo,
       },
     });
   }
