@@ -7,6 +7,8 @@ import InstalarApp from "@/components/InstalarApp";
 import ProgramaSemifinales from "@/components/ProgramaSemifinales";
 import SemifinalesEnCurso from "@/components/SemifinalesEnCurso";
 import BicampeonHero from "@/components/BicampeonHero";
+import TorneoM19 from "@/components/TorneoM19";
+import { partidosTorneoM19 } from "@/lib/match/torneoM19";
 import { festejoBicampeon } from "@/lib/campeonPrimera";
 import { semifinalesEnCursoOTerminadas, semifinalesProgramadasEstaSemana } from "@/lib/match/semifinales";
 import { pruebasVisiblesPara } from "@/lib/partidosPrueba";
@@ -32,7 +34,7 @@ const botonChico: React.CSSProperties = { ...botonStyle, fontSize: "0.52rem", le
 export default async function Home() {
   const session = await getSession();
   // Semifinales de la semana (por dia y sede); el partido de HOY con formacion publicada muestra la formacion directo.
-  const [semis, semisEnCurso, festejo] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas(), festejoBicampeon()]);
+  const [semis, semisEnCurso, festejo, torneoM19] = await Promise.all([semifinalesProgramadasEstaSemana(), semifinalesEnCursoOTerminadas(), festejoBicampeon(), partidosTorneoM19()]);
   const campeon = festejo?.campeon ?? null;
   // El boton "Formaciones" (pantalla /formaciones para cargar/publicar) lo ven el Administrador
   // (sin alcance) y cualquier Manager de division.
@@ -54,6 +56,8 @@ export default async function Home() {
           <ProgramaSemifinales semis={semis} sinBotones />
         </div>
       )}
+      {/* Torneo de M19 (Veco Villegas): debajo de la final del Nacional, con la formacion cuando el Manager la publica. */}
+      <TorneoM19 partidos={torneoM19} />
       {/* Primera gano la final: el inicio festeja (ver festejoBicampeon, dura unos dias), con los campeonatos y
           subcampeonatos de las otras divisiones adentro. Va debajo de la final del Nacional de Clubes. */}
       {festejo && <BicampeonHero campeon={festejo.campeon} titulos={festejo.titulos} />}

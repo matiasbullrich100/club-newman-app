@@ -101,7 +101,7 @@ export default async function PartidoPage({
   const cabecera = (
     <>
       <BackLink href={backHref} />
-      <Header rightLabel={partido.torneo === "Nacional de Clubes" ? "Nacional" : `Fecha ${partido.numeroFecha}`} logo={categoria?.grupo === "juveniles" ? "urba" : "top14"} />
+      <Header rightLabel={partido.torneo === "Nacional de Clubes" ? "Nacional" : partido.torneo ? partido.torneo.replace(/^Torneo /, "") : `Fecha ${partido.numeroFecha}`} logo={categoria?.grupo === "juveniles" ? "urba" : "top14"} />
       <SessionBar session={session} />
       <div style={{ fontWeight: 700, color: DORADO_SUAVE, letterSpacing: 1, marginTop: 8, marginBottom: "2%", textTransform: "uppercase" }}>
         {categoriaNombre}
