@@ -1583,6 +1583,21 @@ export async function reemplazarJugadorFormacion(
     if (viejoJugadorId === nuevoJugadorId) throw new Error("Elegí un jugador distinto");
 
     const viejo = viejoSnap.data() as JugadorPartido;
+
+    // Partido de un torneo (lista cerrada de jugadores, ej. Veco Villegas): si el elegido ya esta en la formacion, los dos
+    // INTERCAMBIAN dorsal y puesto -- nadie sale de la lista ni queda un hueco (en una formacion normal el que sale se
+    // va: lesion, enfermedad).
+    if (partido.torneo && nuevoSnap.exists) {
+      const nuevoPrev = nuevoSnap.data() as JugadorPartido;
+      tx.set(viejoRef, { ...viejo, dorsal: nuevoPrev.dorsal, titular: nuevoPrev.titular, enCancha: nuevoPrev.titular });
+      tx.set(nuevoRef, { ...nuevoPrev, dorsal: viejo.dorsal, titular: viejo.titular, enCancha: viejo.titular });
+      const enCanchaIds = partido.enCanchaIds.filter((id) => id !== viejoJugadorId && id !== nuevoJugadorId);
+      if (nuevoPrev.titular) enCanchaIds.push(viejoJugadorId);
+      if (viejo.titular) enCanchaIds.push(nuevoJugadorId);
+      tx.update(partidoRef, { enCanchaIds, formacionActualizadaEn: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+      return;
+    }
+
     // El elegido puede ya estar en esta formacion (ej. de suplente) -- en ese caso su doc se
     // sobreescribe con el puesto/dorsal del que sale, asi que su puesto anterior queda vacio
     // solo (mismo doc, una entrada por jugador). Si ya venia marcado agregadoEnVivo (lo metio el

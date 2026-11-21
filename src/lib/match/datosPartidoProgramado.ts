@@ -21,10 +21,18 @@ export async function datosPartidoProgramado(partidoId: string, partido: Partido
       : adminDb.collection("jugadores").where("grupo", "==", "juveniles").where("edadId", "==", grupo.edadId);
   const [plantelSnap, jugadoresSnap] = await Promise.all([partidoRef.collection("plantel").get(), jugadoresQuery.get()]);
 
-  const plantelCompleto = jugadoresSnap.docs.map((d) => ({
+  let plantelCompleto = jugadoresSnap.docs.map((d) => ({
     jugadorId: d.id,
     nombre: (d.data() as JugadorAgregado).nombre,
   }));
+  // Torneo con lista cerrada (ej. Veco Villegas de M19: 30 jugadores): el buscador del Manager solo ofrece a los que
+  // figuran en alguno de los partidos de ese torneo (la lista se cargo ahi). No aplica a la final del Nacional (fase "final").
+  if (partido.torneo && !partido.fase) {
+    const delTorneo = await adminDb.collection("partidos").where("torneo", "==", partido.torneo).get();
+    const planteles = await Promise.all(delTorneo.docs.map((d) => d.ref.collection("plantel").get()));
+    const lista = new Set(planteles.flatMap((s) => s.docs.map((d) => d.id)));
+    plantelCompleto = plantelCompleto.filter((j) => lista.has(j.jugadorId));
+  }
   const plantel = ordenarPorDorsal(
     plantelSnap.docs.map((d) => {
       const data = d.data() as JugadorPartido;

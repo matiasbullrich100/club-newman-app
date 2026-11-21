@@ -86,6 +86,7 @@ async function main() {
   console.log(nuevos.length ? `Jugadores NUEVOS (sin ficha previa): ${nuevos.join(" | ")}` : "Todos tienen ficha previa.");
 
   for (const p of PARTIDOS) {
+    if (process.env.SOLO && !partidoId(CATEGORIA, p.numeroFecha).endsWith(process.env.SOLO)) continue; // SOLO=f12 para rehacer uno solo
     const id = partidoId(CATEGORIA, p.numeroFecha);
     const ref = adminDb.collection("partidos").doc(id);
     const snap = await ref.get();
@@ -114,7 +115,7 @@ async function main() {
     const batch = adminDb.batch();
     for (const d of plantelSnap.docs) if (!ids.includes(d.id)) batch.delete(d.ref);
     jugadores.forEach((j, i) => batch.set(ref.collection("plantel").doc(ids[i]), j));
-    batch.update(ref, { formacionPublicada: false, enCanchaIds: titularesIds, formacionActualizadaEn: new Date(), updatedAt: new Date() });
+    batch.update(ref, { formacionPublicada: snap.exists ? (snap.data() as { formacionPublicada?: boolean }).formacionPublicada !== false : false, enCanchaIds: titularesIds, formacionActualizadaEn: new Date(), updatedAt: new Date() });
     await batch.commit();
   }
   console.log(dryRun ? "\n(DRY RUN) nada escrito." : "\nListo. Partidos creados y formaciones tentativas cargadas como BORRADOR.");
