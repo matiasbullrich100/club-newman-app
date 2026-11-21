@@ -35,12 +35,12 @@ const ALIAS: Record<string, string> = {
 };
 
 // Titulares 1-15 y suplentes 16-23 (apellido, nombre de la lista).
-const PARTIDOS = [
+const PARTIDOS: { numeroFecha: number; hora: string; rival: string; numeroCancha?: string; titulares: string[]; suplentes: string[] }[] = [
   {
-    // Los de la A, con el dorsal que mas uso cada uno en la A (Altgelt, que en la A uso el 13, va ahi aunque en la B es el 12).
-    numeroFecha: 12, hora: "10:00", rival: "Jockey Club Salta",
-    titulares: ["Bourdieu, Carlos Maria", "Lynch, Bautista", "Von Grolman Solá, Juan Pablo", "Galice Naon, Rodrigo", "Goti, Enzo", "Chute, Benjamin", "Cardoni, Beltran", "Lascombes, Facundo Juan", "Bosch, Lucas", "Lagos Marmol, Maximo", "Barisic, Iván", "Aberg Cobo, Juan José", "Altgelt, James", "Gonzalez Hughes, Marcos", "Lanusse, Silvestre"],
-    suplentes: ["Parrondo, Simon", "Blaquier, Simon", "Diaz De Vivar, Joaquin", "Anchorena, Zenón María De", "Bosch, Emilio", "Sola, Santiago", "Ulloa, Ramón", "Achaval Rodriguez, Felix José"],
+    // Formacion DEFINITIVA pasada por el club (placa "Jockey Club Salta - Cancha 1 (Sede) - P1", sab 21/11 10:00).
+    numeroFecha: 12, hora: "10:00", rival: "Jockey Club Salta", numeroCancha: "1",
+    titulares: ["Bourdieu, Carlos Maria", "Lynch, Bautista", "Von Grolman Solá, Juan Pablo", "Galice Naon, Rodrigo", "Goti, Enzo", "Chute, Benjamin", "Cardoni, Beltran", "Lascombes, Facundo Juan", "Bosch, Lucas", "Ulloa, Ramón", "Gonzalez Hughes, Marcos", "Aberg Cobo, Juan José", "Lagos Marmol, Maximo", "Barisic, Iván", "Lanusse, Silvestre"],
+    suplentes: ["Blaquier, Simon", "Parrondo, Simon", "Diaz De Vivar, Joaquin", "Anchorena, Zenón María De", "Bosch, Emilio", "Sola, Santiago", "Altgelt, James", "Golletti, Sebastian José"],
   },
   {
     // El resto (B, C, D) con su dorsal historico; los puestos sin historia (4 y 7) por puesto habitual.
@@ -58,9 +58,7 @@ async function main() {
 
   // Chequeos de la lista: 30 distintos y cada titular/suplente sale de ellos.
   if (new Set(POOL).size !== 30) throw new Error("la lista no tiene 30 jugadores distintos");
-  const titularesTodos = PARTIDOS.flatMap((p) => p.titulares);
-  if (new Set(titularesTodos).size !== 30 || !titularesTodos.every((n) => POOL.includes(n))) throw new Error("los titulares de los 2 partidos tienen que ser los 30 sin repetir");
-  for (const p of PARTIDOS) if (!p.suplentes.every((n) => POOL.includes(n)) || p.suplentes.some((n) => p.titulares.includes(n))) throw new Error("suplentes mal armados");
+  for (const p of PARTIDOS) if (!p.titulares.every((n) => POOL.includes(n)) || !p.suplentes.every((n) => POOL.includes(n)) || p.suplentes.some((n) => p.titulares.includes(n))) throw new Error("suplentes mal armados");
 
   // Nombres ya guardados: id -> nombre exacto (jugadores/ y el plantel de M19 A-E).
   const previos = new Map<string, string>();
@@ -115,7 +113,7 @@ async function main() {
     const batch = adminDb.batch();
     for (const d of plantelSnap.docs) if (!ids.includes(d.id)) batch.delete(d.ref);
     jugadores.forEach((j, i) => batch.set(ref.collection("plantel").doc(ids[i]), j));
-    batch.update(ref, { formacionPublicada: snap.exists ? (snap.data() as { formacionPublicada?: boolean }).formacionPublicada !== false : false, enCanchaIds: titularesIds, formacionActualizadaEn: new Date(), updatedAt: new Date() });
+    batch.update(ref, { formacionPublicada: snap.exists ? (snap.data() as { formacionPublicada?: boolean }).formacionPublicada !== false : false, ...(p.numeroCancha ? { numeroCancha: p.numeroCancha } : {}), enCanchaIds: titularesIds, formacionActualizadaEn: new Date(), updatedAt: new Date() });
     await batch.commit();
   }
   console.log(dryRun ? "\n(DRY RUN) nada escrito." : "\nListo. Partidos creados y formaciones tentativas cargadas como BORRADOR.");
