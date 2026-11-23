@@ -4,10 +4,10 @@ import { diasDesdeEnArgentina } from "@/lib/fecha";
 import type { Partido } from "@/types/firestore";
 import type { JugadorFormacion } from "./semifinales";
 
-// Torneo Veco Villegas (M19, sabado 21/11/2026 en Tucuman): dos partidos fuera del fixture de URBA, guardados como
-// m19-a Fecha 12 y 13 con `torneo` (ver src/scripts/cargar-veco-villegas-m19.ts). Se muestran en el inicio, debajo de la
+// Torneo Veco Villegas (M19, sabado 21/11/2026 en Tucuman): partidos fuera del fixture de URBA, guardados como
+// m19-a Fecha 12 a 15 con `torneo` (ver src/scripts/cargar-veco-villegas-m19.ts). Se muestran en el inicio, debajo de la
 // final del Nacional de Clubes, con la formacion abierta cuando el Manager la publica.
-const PARTIDOS_TORNEO_M19 = ["m19-a-f12", "m19-a-f13"];
+const PARTIDOS_TORNEO_M19 = ["m19-a-f12", "m19-a-f13", "m19-a-f14", "m19-a-f15"];
 // Cuantos dias (contando hoy) sigue visible en el inicio despues de jugado.
 const DIAS_VISIBLE_JUGADO = 2;
 
