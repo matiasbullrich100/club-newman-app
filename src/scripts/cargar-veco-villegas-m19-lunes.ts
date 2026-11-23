@@ -1,6 +1,6 @@
 // Torneo Veco Villegas (M19), lunes 2026-11-23, Copa de Plata, en Tucuman:
 //  - 16:30 Newman vs Universitario (Fecha 2), cancha 3 (Campo Norte / Anexo). Formacion de la placa del club, PUBLICADA.
-//  - 19:00 Los Tordos RC vs Newman (Fecha 3), cancha 1 (Sede). Se crea el partido; la formacion se carga cuando llegue.
+//  - 19:00 Los Tordos RC vs Newman (Fecha 3), cancha 1 (Sede). Se crea el partido; misma formacion que el de las 16:30 (pedido del club).
 // Son m19-a Fecha 14 y 15 (fuera del fixture de URBA, no cuentan para sus tablas), igual que los del sabado
 // (ver cargar-veco-villegas-m19.ts). Nombres: el ya guardado en la base si el id coincide.
 // Idempotente; solo actua si el partido no existe o sigue "programado". Correr con:
@@ -15,13 +15,17 @@ import type { JugadorPartido } from "../types/firestore";
 const CATEGORIA = "m19-a";
 const TORNEO = "Torneo Veco Villegas";
 
+// La misma formacion para los dos partidos del lunes (la placa del club trae la del 16:30; el club pidio repetirla a las 19:00).
+const TITULARES = ["Diaz De Vivar, Joaquin", "Parrondo, Simon", "Bourdieu, Carlos Maria", "Anchorena, Zenon", "Chiappe, Mateo", "Castro Lacroze, Benjamin", "Cardoni, Beltran", "Lascombes, Facundo", "Sola, Santiago", "Lagos Marmol, Maximo", "Barisic, Ivan", "Aberg Cobo, Juan Jose", "Altgelt, James", "Golletti, Sebastian", "Ulloa, Ramon"];
+const SUPLENTES = ["Von Grolman, Juan Pablo", "Lynch, Bautista Santiago", "Blaquier, Simon", "Goti, Enzo", "Galice Naon, Rodrigo", "Bosch, Lucas", "Gonzalez Hughes, Marcos", "Uranga, Felipe"];
+
 const PARTIDOS: { numeroFecha: number; hora: string; rival: string; esLocal: boolean; numeroCancha: string; titulares: string[]; suplentes: string[] }[] = [
   {
     numeroFecha: 14, hora: "16:30", rival: "Universitario", esLocal: true, numeroCancha: "3",
-    titulares: ["Diaz De Vivar, Joaquin", "Parrondo, Simon", "Bourdieu, Carlos Maria", "Anchorena, Zenon", "Chiappe, Mateo", "Castro Lacroze, Benjamin", "Cardoni, Beltran", "Lascombes, Facundo", "Sola, Santiago", "Lagos Marmol, Maximo", "Barisic, Ivan", "Aberg Cobo, Juan Jose", "Altgelt, James", "Golletti, Sebastian", "Ulloa, Ramon"],
-    suplentes: ["Von Grolman, Juan Pablo", "Lynch, Bautista Santiago", "Blaquier, Simon", "Goti, Enzo", "Galice Naon, Rodrigo", "Bosch, Lucas", "Gonzalez Hughes, Marcos", "Uranga, Felipe"],
+    titulares: TITULARES,
+    suplentes: SUPLENTES,
   },
-  { numeroFecha: 15, hora: "19:00", rival: "Los Tordos RC", esLocal: false, numeroCancha: "1", titulares: [], suplentes: [] },
+  { numeroFecha: 15, hora: "19:00", rival: "Los Tordos RC", esLocal: false, numeroCancha: "1", titulares: TITULARES, suplentes: SUPLENTES },
 ];
 
 async function main() {
