@@ -15,16 +15,18 @@ function diaLargo(iso: string): string {
 // publicada. Va en el inicio debajo de la final del Nacional de Clubes.
 export default function TorneoM19({ partidos }: { partidos: PartidoTorneoM19[] }) {
   if (partidos.length === 0) return null;
-  const { torneo, fecha, cancha } = partidos[0];
+  const { torneo } = partidos[0];
   return (
     <section style={{ margin: "0 0 14px" }}>
       <h2 style={{ fontSize: "1.5rem", textAlign: "center", color: DORADO, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 8px" }}>{torneo}</h2>
-      <div style={{ fontSize: "0.78rem", fontWeight: 700, color: DORADO_SUAVE, textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 5px" }}>
-        M19 · {diaLargo(fecha)}
-        {cancha && ` · en ${cancha}`}
-      </div>
-      {partidos.map((p) => (
+      {partidos.map((p, i) => (
         <div key={p.partidoId}>
+          {(i === 0 || partidos[i - 1].fecha !== p.fecha) && (
+            <div style={{ fontSize: "0.78rem", fontWeight: 700, color: DORADO_SUAVE, textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 5px" }}>
+              M19 · {diaLargo(p.fecha)}
+              {p.cancha && ` · en ${p.cancha}`}
+            </div>
+          )}
           {p.estado === "programado" ? (
             <ProximaFechaRow
               partidoId={p.partidoId}
